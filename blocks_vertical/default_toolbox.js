@@ -531,21 +531,21 @@ Blockly.Blocks.defaultToolbox = '<xml id="toolbox-categories" style="display: no
     '<block type="comments_hat" id="comments_hat">' +
       '<value name="COMMENT">' +
         '<shadow type="text">' +
-          '<field name="COMMENT">""</field>' +
+          '<field name="TEXT"></field>' +
         '</shadow>' +
       '</value>' +
     '</block>' +
     '<block type="comments_command" id="comments_command">' +
       '<value name="COMMENT">' +
         '<shadow type="text">' +
-          '<field name="COMMENT">""</field>' +
+          '<field name="TEXT"></field>' +
         '</shadow>' +
       '</value>' +
     '</block>' +
     '<block type="comments_loop" id="comments_loop">' +
       '<value name="COMMENT">' +
         '<shadow type="text">' +
-          '<field name="COMMENT">""</field>' +
+          '<field name="TEXT"></field>' +
         '</shadow>' +
       '</value>' +
     '</block>' +
@@ -557,14 +557,14 @@ Blockly.Blocks.defaultToolbox = '<xml id="toolbox-categories" style="display: no
       '</value>' +
       '<value name="COMMENT">' +
         '<shadow type="text">' +
-          '<field name="COMMENT">""</field>' +
+          '<field name="TEXT"></field>' +
         '</shadow>' +
       '</value>' +
     '</block>' +
     '<block type="comments_boolean" id="comments_boolean">' +
       '<value name="COMMENT">' +
         '<shadow type="text">' +
-          '<field name="COMMENT">""</field>' +
+          '<field name="TEXT"></field>' +
         '</shadow>' +
       '</value>' +
     '</block>' +
