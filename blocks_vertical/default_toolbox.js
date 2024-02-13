@@ -552,7 +552,7 @@ Blockly.Blocks.defaultToolbox = '<xml id="toolbox-categories" style="display: no
     '<block type="comments_reporter" id="comments_reporter">' +
       '<value name="VALUE">' +
         '<shadow type="text">' +
-          '<field name="VALUE">""</field>' +
+          '<field name="TEXT">""</field>' +
         '</shadow>' +
       '</value>' +
       '<value name="COMMENT">' +
