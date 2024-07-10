@@ -564,12 +564,21 @@ Blockly.Procedures.makeChangeTypeOption = function(block) {
         var procCode = block.getProcCode();
         var workspace = block.workspace;
         var actualReturnType = Blockly.Procedures.getProcedureReturnType(procCode, workspace);
-        // If the definition is boolean-shaped, then the reporter should be boolean-shaped,
+        // If the definition is object-shaped, then the reporter should be object-shaped,
+        // else if the definition is boolean-shaped, then the reporter should be boolean-shaped,
         // otherwise normal reporter shaped.
         newType = (
           actualReturnType === Blockly.PROCEDURES_CALL_TYPE_BOOLEAN ?
           actualReturnType :
-          Blockly.PROCEDURES_CALL_TYPE_REPORTER
+          (
+            actualReturnType === Blockly.PROCEDURES_CALL_TYPE_OBJECT ?
+            actualReturnType :
+            (
+              actualReturnType === Blockly.PROCEDURES_CALL_TYPE_ARRAY ?
+              actualReturnType :
+              Blockly.PROCEDURES_CALL_TYPE_REPORTER
+            )
+          )
         );
       } else {
         newType = Blockly.PROCEDURES_CALL_TYPE_STATEMENT;
@@ -716,6 +725,8 @@ Blockly.Procedures.getAllProcedureReturnTypes = function(workspace) {
  */
 Blockly.Procedures.getBlockReturnType = function(block) {
   var hasSeenBooleanReturn = false;
+  var hasSeenObjectReturn = false;
+  var hasSeenArrayReturn = false;
   /** @type {Blockly.Block[]} */
   var descendants = block.getDescendants();
   for (var i = 0; i < descendants.length; i++) {
@@ -726,6 +737,12 @@ Blockly.Procedures.getBlockReturnType = function(block) {
       if (i + 1 < descendants.length && descendants[i + 1].outputShape_ === Blockly.OUTPUT_SHAPE_HEXAGONAL) {
         // keep searching, because there may be other, non-boolean returns in this function definition.
         hasSeenBooleanReturn = true;
+      } else if (i + 1 < descendants.length && descendants[i + 1].outputShape_ === Blockly.OUTPUT_SHAPE_OBJECT) {
+        // keep searching, because there may be other, non-object returns in this function definition.
+        hasSeenObjectReturn = true;
+      } else if (i + 1 < descendants.length && descendants[i + 1].outputShape_ === Blockly.OUTPUT_SHAPE_SQUARE) {
+        // keep searching, because there may be other, non-array returns in this function definition.
+        hasSeenArrayReturn = true;
       } else {
         return Blockly.PROCEDURES_CALL_TYPE_REPORTER;
       }
@@ -733,6 +750,10 @@ Blockly.Procedures.getBlockReturnType = function(block) {
   }
   if (hasSeenBooleanReturn) {
     return Blockly.PROCEDURES_CALL_TYPE_BOOLEAN;
+  } else if (hasSeenObjectReturn) {
+    return Blockly.PROCEDURES_CALL_TYPE_OBJECT;
+  } else if (hasSeenArrayReturn) {
+    return Blockly.PROCEDURES_CALL_TYPE_ARRAY;
   } else {
     return Blockly.PROCEDURES_CALL_TYPE_STATEMENT;
   }

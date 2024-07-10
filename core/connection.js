@@ -710,6 +710,12 @@ Blockly.Connection.prototype.getOutputShape = function() {
   if (this.check_.indexOf('String') !== -1) {
     return Blockly.OUTPUT_SHAPE_SQUARE;
   }
+  if (this.check_.indexOf('Object') !== -1) {
+    return Blockly.OUTPUT_SHAPE_OBJECT;
+  }
+  if (this.check_.indexOf('Array') !== -1) {
+    return Blockly.OUTPUT_SHAPE_SQUARE;
+  }
   return Blockly.OUTPUT_SHAPE_ROUND;
 };
 

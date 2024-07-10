@@ -276,6 +276,26 @@ Blockly.BlockSvg.INPUT_SHAPE_HEXAGONAL =
 Blockly.BlockSvg.INPUT_SHAPE_HEXAGONAL_WIDTH = 12 * Blockly.BlockSvg.GRID_UNIT;
 
 /**
+ * SVG path for an empty Object input shape.
+ * @const
+ */
+Blockly.BlockSvg.INPUT_SHAPE_OBJECT =
+  'M ' + 4 * Blockly.BlockSvg.GRID_UNIT + ' 0 ' +
+  ' c ' + -3 * Blockly.BlockSvg.GRID_UNIT + ' 0 ' + -1.75 * Blockly.BlockSvg.GRID_UNIT + ' ' + 3.5 * Blockly.BlockSvg.GRID_UNIT + ' ' + -4 * Blockly.BlockSvg.GRID_UNIT + ' ' + 4 * Blockly.BlockSvg.GRID_UNIT +
+  ' c ' + 2.25 * Blockly.BlockSvg.GRID_UNIT + ' ' + 0.5 * Blockly.BlockSvg.GRID_UNIT + ' ' + Blockly.BlockSvg.GRID_UNIT + ' ' + 4 * Blockly.BlockSvg.GRID_UNIT + ' ' + 4 * Blockly.BlockSvg.GRID_UNIT + ' ' + 4 * Blockly.BlockSvg.GRID_UNIT +
+  ' h ' + 4 * Blockly.BlockSvg.GRID_UNIT +
+  ' c ' + 3 * Blockly.BlockSvg.GRID_UNIT + ' 0 ' + 1.75 * Blockly.BlockSvg.GRID_UNIT + ' ' + -3.5 * Blockly.BlockSvg.GRID_UNIT + ' ' + 4 * Blockly.BlockSvg.GRID_UNIT + ' ' + -4 * Blockly.BlockSvg.GRID_UNIT +
+  ' c ' + -2.25 * Blockly.BlockSvg.GRID_UNIT + ' ' + -0.5 * Blockly.BlockSvg.GRID_UNIT + ' ' + -Blockly.BlockSvg.GRID_UNIT + ' ' + -4 * Blockly.BlockSvg.GRID_UNIT + ' ' + -4 * Blockly.BlockSvg.GRID_UNIT + ' ' + -4 * Blockly.BlockSvg.GRID_UNIT +
+  ' h ' + -4 * Blockly.BlockSvg.GRID_UNIT +
+  ' z';
+
+/**
+ * Width of empty Object input shape.
+ * @const
+ */
+Blockly.BlockSvg.INPUT_SHAPE_OBJECT_WIDTH = 12 * Blockly.BlockSvg.GRID_UNIT;
+
+/**
  * SVG path for an empty square input shape.
  * @const
  */
@@ -294,7 +314,7 @@ Blockly.BlockSvg.INPUT_SHAPE_SQUARE =
  * Width of empty square input shape.
  * @const
  */
-Blockly.BlockSvg.INPUT_SHAPE_SQUARE_WIDTH = 10 * Blockly.BlockSvg.GRID_UNIT;
+Blockly.BlockSvg.INPUT_SHAPE_SQUARE_WIDTH = 12 * Blockly.BlockSvg.GRID_UNIT;
 
 /**
  * SVG path for an empty round input shape.
@@ -450,19 +470,29 @@ Blockly.BlockSvg.SHAPE_IN_SHAPE_PADDING = {
     0: 5 * Blockly.BlockSvg.GRID_UNIT, // Field in hexagon.
     1: 2 * Blockly.BlockSvg.GRID_UNIT, // Hexagon in hexagon.
     2: 5 * Blockly.BlockSvg.GRID_UNIT, // Round in hexagon.
-    3: 5 * Blockly.BlockSvg.GRID_UNIT // Square in hexagon.
+    3: 5 * Blockly.BlockSvg.GRID_UNIT, // Square in hexagon.
+    4: 3 * Blockly.BlockSvg.GRID_UNIT  // Object in hexagon.
   },
   2: { // Outer shape: round.
     0: 3 * Blockly.BlockSvg.GRID_UNIT, // Field in round.
     1: 3 * Blockly.BlockSvg.GRID_UNIT, // Hexagon in round.
     2: 1 * Blockly.BlockSvg.GRID_UNIT, // Round in round.
-    3: 2 * Blockly.BlockSvg.GRID_UNIT // Square in round.
+    3: 4 * Blockly.BlockSvg.GRID_UNIT, // Square in round.
+    4: 2 * Blockly.BlockSvg.GRID_UNIT  // Object in round.
   },
   3: { // Outer shape: square.
     0: 2 * Blockly.BlockSvg.GRID_UNIT, // Field in square.
     1: 2 * Blockly.BlockSvg.GRID_UNIT, // Hexagon in square.
     2: 2 * Blockly.BlockSvg.GRID_UNIT, // Round in square.
-    3: 2 * Blockly.BlockSvg.GRID_UNIT // Square in square.
+    3: 2 * Blockly.BlockSvg.GRID_UNIT, // Square in square.
+    4: 2 * Blockly.BlockSvg.GRID_UNIT  // Object in square.
+  },
+  4: { // Outer shape: object.
+    0: 5 * Blockly.BlockSvg.GRID_UNIT, // Field in object.
+    1: 4 * Blockly.BlockSvg.GRID_UNIT, // Hexagon in object.
+    2: 5 * Blockly.BlockSvg.GRID_UNIT, // Round in object.
+    3: 5 * Blockly.BlockSvg.GRID_UNIT, // Square in object.
+    4: 3 * Blockly.BlockSvg.GRID_UNIT  // Object in object.
   }
 };
 
@@ -937,6 +967,8 @@ Blockly.BlockSvg.prototype.computeInputWidth_ = function(input) {
         return Blockly.BlockSvg.INPUT_SHAPE_ROUND_WIDTH;
       case Blockly.OUTPUT_SHAPE_HEXAGONAL:
         return Blockly.BlockSvg.INPUT_SHAPE_HEXAGONAL_WIDTH;
+      case Blockly.OUTPUT_SHAPE_OBJECT:
+        return Blockly.BlockSvg.INPUT_SHAPE_OBJECT_WIDTH;
       default:
         return 0;
     }
@@ -1148,7 +1180,7 @@ Blockly.BlockSvg.prototype.renderDraw_ = function(iconWidth, inputRows) {
   if (this.outputConnection) {
     // Width of the curve/pointy-curve
     var shape = this.getOutputShape();
-    if (shape === Blockly.OUTPUT_SHAPE_HEXAGONAL || shape === Blockly.OUTPUT_SHAPE_ROUND) {
+    if (shape === Blockly.OUTPUT_SHAPE_HEXAGONAL || shape === Blockly.OUTPUT_SHAPE_ROUND || shape === Blockly.OUTPUT_SHAPE_OBJECT) {
       this.edgeShapeWidth_ = inputRows.bottomEdge / 2;
       this.edgeShape_ = shape;
       this.squareTopLeftCorner_ = true;
@@ -1191,6 +1223,10 @@ Blockly.BlockSvg.prototype.renderClassify_ = function() {
       shapes.push('boolean');
     } else if (this.edgeShape_ === Blockly.OUTPUT_SHAPE_ROUND) {
       shapes.push('round');
+    } else if (this.edgeShape_ === Blockly.OUTPUT_SHAPE_OBJECT) {
+      shapes.push('object');
+    } else if (this.edgeShape_ === Blockly.OUTPUT_SHAPE_SQUARE) {
+      shapes.push('square');
     }
   } else {
     // count the number of statement inputs
@@ -1473,6 +1509,11 @@ Blockly.BlockSvg.prototype.renderDrawLeft_ = function(steps) {
       // Draw a half-hexagon.
       steps.push('l ' + -this.edgeShapeWidth_ + ' ' + -this.edgeShapeWidth_ +
         ' l ' + this.edgeShapeWidth_ + ' ' + -this.edgeShapeWidth_);
+    } else if (this.edgeShape_ === Blockly.OUTPUT_SHAPE_OBJECT) {
+      steps.push(
+        ' c ' + -0.5625 * this.edgeShapeWidth_ + ' ' + -0.125 * this.edgeShapeWidth_ + ' ' + -0.25 * this.edgeShapeWidth_ + ' ' + -this.edgeShapeWidth_ + ' ' + -this.edgeShapeWidth_ + ' ' + -this.edgeShapeWidth_ +
+        ' c ' + 0.75 * this.edgeShapeWidth_ + ' 0 ' + 0.4375 * this.edgeShapeWidth_ + ' ' + -0.875 * this.edgeShapeWidth_ + ' ' + this.edgeShapeWidth_ + ' ' + -this.edgeShapeWidth_
+        );
     }
   }
   steps.push('z');
@@ -1495,6 +1536,11 @@ Blockly.BlockSvg.prototype.drawEdgeShapeRight_ = function(steps) {
       // Draw an half-hexagon.
       steps.push('l ' + this.edgeShapeWidth_ + ' ' + this.edgeShapeWidth_ +
           ' l ' + -this.edgeShapeWidth_ + ' ' + this.edgeShapeWidth_);
+    } else if (this.edgeShape_ === Blockly.OUTPUT_SHAPE_OBJECT) {
+      steps.push(
+        ' c ' + 0.5625 * this.edgeShapeWidth_ + ' ' + 0.125 * this.edgeShapeWidth_ + ' ' + 0.25 * this.edgeShapeWidth_ + ' ' + this.edgeShapeWidth_ + ' ' + this.edgeShapeWidth_ + ' ' + this.edgeShapeWidth_ +
+        ' c ' + -0.75 * this.edgeShapeWidth_ + ' 0 ' + -0.4375 * this.edgeShapeWidth_ + ' ' + 0.875 * this.edgeShapeWidth_ + ' ' + -this.edgeShapeWidth_ + ' ' + this.edgeShapeWidth_
+        );
     }
   }
 };
@@ -1663,6 +1709,11 @@ Blockly.BlockSvg.getInputShapeInfo_ = function(shape) {
       inputShapePath = Blockly.BlockSvg.INPUT_SHAPE_ROUND;
       inputShapeWidth = Blockly.BlockSvg.INPUT_SHAPE_ROUND_WIDTH;
       inputShapeArgType = 'round';
+      break;
+    case Blockly.OUTPUT_SHAPE_OBJECT:
+      inputShapePath = Blockly.BlockSvg.INPUT_SHAPE_OBJECT;
+      inputShapeWidth = Blockly.BlockSvg.INPUT_SHAPE_OBJECT_WIDTH;
+      inputShapeArgType = 'object';
       break;
     case Blockly.OUTPUT_SHAPE_SQUARE:
     default:  // If the input connection is not connected, draw a hole shape.

@@ -525,6 +525,123 @@ Blockly.Blocks.defaultToolbox = '<xml id="toolbox-categories" style="display: no
   '</category>' +
   '<category name="%{BKY_CATEGORY_VARIABLES}" id="data" colour="#FF8C1A" secondaryColour="#DB6E00" custom="VARIABLE">' +
   '</category>' +
+  '<category name="%{BKY_CATEGORY_JSON}" id="json" colour="#5755D4" secondaryColour="#4644AA">' +
+    '<block type="json_new_object" id="json_new_object">' +
+    '</block>' +
+    '<block type="json_to_object" id="json_to_object">' +
+      '<value name="STR">' +
+        '<shadow type="text">' +
+          '<field name="TEXT">{"key":"value"}</field>' +
+        '</shadow>' +
+      '</value>' +
+    '</block>' +
+    '<block type="json_to_string" id="json_to_string">' +
+    '</block>' +
+    '<block type="json_keys" id="json_keys">' +
+    '</block>' +
+    '<block type="json_values" id="json_values">' +
+    '</block>' +
+    '<block type="json_value_of_key" id="json_value_of_key">' +
+      '<value name="KEY">' +
+        '<shadow type="text">' +
+          '<field name="TEXT">key</field>' +
+        '</shadow>' +
+      '</value>' +
+    '</block>' +
+    '<block type="json_set_key" id="json_set_key">' +
+      '<value name="KEY">' +
+        '<shadow type="text">' +
+          '<field name="TEXT">key</field>' +
+        '</shadow>' +
+      '</value>' +
+      '<value name="VALUE">' +
+        '<shadow type="text">' +
+          '<field name="TEXT">bar</field>' +
+        '</shadow>' +
+      '</value>' +
+    '</block>' +
+    '<block type="json_delete_key" id="json_delete_key">' +
+      '<value name="KEY">' +
+        '<shadow type="text">' +
+          '<field name="TEXT">key</field>' +
+        '</shadow>' +
+      '</value>' +
+    '</block>' +
+    '<block type="json_join_object" id="json_join_object">' +
+    '</block>' +
+    '<block type="json_has_key" id="json_has_key">' +
+      '<value name="KEY">' +
+        '<shadow type="text">' +
+          '<field name="TEXT">key</field>' +
+        '</shadow>' +
+      '</value>' +
+    '</block>' +
+    '<block type="json_new_array" id="json_new_array">' +
+    '</block>' +
+    '<block type="json_to_array" id="json_to_array">' +
+      '<value name="STR">' +
+        '<shadow type="text">' +
+          '<field name="TEXT">["foo", "bar"]</field>' +
+        '</shadow>' +
+      '</value>' +
+    '</block>' +
+    '<block type="json_value_of_index" id="json_value_of_index">' +
+      '<value name="INDEX">' +
+        '<shadow type="math_number">' +
+          '<field name="NUM">0</field>' +
+        '</shadow>' +
+      '</value>' +
+    '</block>' +
+    '<block type="json_index_of_value" id="json_index_of_value">' +
+      '<value name="VALUE">' +
+        '<shadow type="text">' +
+          '<field name="TEXT">bar</field>' +
+        '</shadow>' +
+      '</value>' +
+    '</block>' +
+    '<block type="json_add_item" id="json_add_item">' +
+      '<value name="ITEM">' +
+        '<shadow type="text">' +
+          '<field name="TEXT">bar</field>' +
+        '</shadow>' +
+      '</value>' +
+    '</block>' +
+    '<block type="json_replace_index" id="json_replace_index">' +
+      '<value name="INDEX">' +
+        '<shadow type="math_number">' +
+          '<field name="NUM">1</field>' +
+        '</shadow>' +
+      '</value>' +
+      '<value name="ITEM">' +
+        '<shadow type="text">' +
+          '<field name="TEXT">baz</field>' +
+        '</shadow>' +
+      '</value>' +
+    '</block>' +
+    '<block type="json_delete_index" id="json_delete_index">' +
+      '<value name="INDEX">' +
+        '<shadow type="math_number">' +
+          '<field name="NUM">0</field>' +
+        '</shadow>' +
+      '</value>' +
+    '</block>' +
+    '<block type="json_delete_all_occurrences" id="json_delete_all_occurrences">' +
+      '<value name="ITEM">' +
+        '<shadow type="text">' +
+          '<field name="TEXT">bar</field>' +
+        '</shadow>' +
+      '</value>' +
+    '</block>' +
+    '<block type="json_join_array" id="json_join_array">' +
+    '</block>' +
+    '<block type="json_has_item" id="json_has_item">' +
+      '<value name="ITEM">' +
+        '<shadow type="text">' +
+          '<field name="TEXT">bar</field>' +
+        '</shadow>' +
+      '</value>' +
+    '</block>' +
+  '</category>' +
   '<category name="%{BKY_CATEGORY_MYBLOCKS}" id="more" colour="#FF6680" secondaryColour="#FF4D6A" custom="PROCEDURE">' +
   '</category>' +
   '<category name="%{BKY_CATEGORY_COMMENTS}" id="comments" colour="#E4DB8C" secondaryColour="#C6BE79">' +
@@ -562,6 +679,20 @@ Blockly.Blocks.defaultToolbox = '<xml id="toolbox-categories" style="display: no
       '</value>' +
     '</block>' +
     '<block type="comments_boolean" id="comments_boolean">' +
+      '<value name="COMMENT">' +
+        '<shadow type="text">' +
+          '<field name="TEXT"></field>' +
+        '</shadow>' +
+      '</value>' +
+    '</block>' +
+    '<block type="comments_object" id="comments_object">' +
+      '<value name="COMMENT">' +
+        '<shadow type="text">' +
+          '<field name="TEXT"></field>' +
+        '</shadow>' +
+      '</value>' +
+    '</block>' +
+    '<block type="comments_array" id="comments_array">' +
       '<value name="COMMENT">' +
         '<shadow type="text">' +
           '<field name="TEXT"></field>' +

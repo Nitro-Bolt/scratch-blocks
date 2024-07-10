@@ -143,3 +143,53 @@ Blockly.Blocks['comments_boolean'] = {
     });
   }
 };
+
+Blockly.Blocks['comments_object'] = {
+  /**
+   * Comment Object
+   * @this Blockly.Block
+   */
+  init: function() {
+    this.jsonInit({
+      "message0": Blockly.Msg.COMMENTS_ALTERNATE,
+      "args0": [
+        {
+          "type": "input_value",
+          "name": "VALUE",
+          "check": "Object"
+        },
+        {
+          "type": "input_value",
+          "name": "COMMENT"
+        }
+      ],
+      "category": Blockly.Categories.comments,
+      "extensions": ["colours_comments", "output_object"]
+    });
+  }
+};
+
+Blockly.Blocks['comments_array'] = {
+  /**
+   * Comment Array
+   * @this Blockly.Block
+   */
+  init: function() {
+    this.jsonInit({
+      "message0": Blockly.Msg.COMMENTS_ALTERNATE,
+      "args0": [
+        {
+          "type": "input_value",
+          "name": "VALUE",
+          "check": "Array"
+        },
+        {
+          "type": "input_value",
+          "name": "COMMENT"
+        }
+      ],
+      "category": Blockly.Categories.comments,
+      "extensions": ["colours_comments", "output_array"]
+    });
+  }
+};
