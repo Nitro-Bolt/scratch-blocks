@@ -204,14 +204,14 @@ Blockly.Blocks['json_delete_key'] = {
   }
 };
 
-Blockly.Blocks['json_join_object'] = {
+Blockly.Blocks['json_merge_object'] = {
   /**
    * Merges two Objects
    * @this Blockly.Block
    */
   init: function() {
     this.jsonInit({
-      "message0": Blockly.Msg.OPERATORS_JOIN,
+      "message0": Blockly.Msg.JSON_MERGE,
       "args0": [
         {
           "type": "input_value",
@@ -443,14 +443,14 @@ Blockly.Blocks['json_delete_all_occurrences'] = {
   }
 };
 
-Blockly.Blocks['json_join_array'] = {
+Blockly.Blocks['json_merge_array'] = {
   /**
    * Merges two Arrays
    * @this Blockly.Block
    */
   init: function() {
     this.jsonInit({
-      "message0": Blockly.Msg.OPERATORS_JOIN,
+      "message0": Blockly.Msg.JSON_MERGE,
       "args0": [
         {
           "type": "input_value",

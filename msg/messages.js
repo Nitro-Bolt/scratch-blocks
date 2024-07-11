@@ -95,6 +95,7 @@ Blockly.Msg.JSON_REPLACE_INDEX = 'replace index %1 in %2 with %3';
 Blockly.Msg.JSON_DELETE_INDEX = 'delete index %1 from %2';
 Blockly.Msg.JSON_DELETE_ALL_OCCURRENCES = 'delete all %1 from %2';
 Blockly.Msg.JSON_HAS_ITEM = '%1 has item %2?';
+Blockly.Msg.JSON_MERGE = 'merge %1 %2';
 Blockly.Msg.JSON_OBJECT = '{"key":"value"}';
 Blockly.Msg.JSON_ARRAY = '["foo","bar"]';
 Blockly.Msg.JSON_KEY = 'key';

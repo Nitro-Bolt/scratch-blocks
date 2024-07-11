@@ -567,7 +567,7 @@ Blockly.Blocks.defaultToolbox = '<xml id="toolbox-categories" style="display: no
         '</shadow>' +
       '</value>' +
     '</block>' +
-    '<block type="json_join_object" id="json_join_object">' +
+    '<block type="json_merge_object" id="json_merge_object">' +
     '</block>' +
     '<block type="json_has_key" id="json_has_key">' +
       '<value name="KEY">' +
@@ -632,7 +632,7 @@ Blockly.Blocks.defaultToolbox = '<xml id="toolbox-categories" style="display: no
         '</shadow>' +
       '</value>' +
     '</block>' +
-    '<block type="json_join_array" id="json_join_array">' +
+    '<block type="json_merge_array" id="json_merge_array">' +
     '</block>' +
     '<block type="json_has_item" id="json_has_item">' +
       '<value name="ITEM">' +
