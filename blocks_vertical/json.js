@@ -78,7 +78,7 @@ Blockly.Blocks['json_to_string'] = {
         },
       ],
       "category": Blockly.Categories.json,
-      "extensions": ["colours_json", "output_number"]
+      "extensions": ["colours_json", "output_string"]
     });
   }
 };
@@ -309,7 +309,7 @@ Blockly.Blocks['json_value_of_index'] = {
         }
       ],
       "category": Blockly.Categories.json,
-      "extensions": ["colours_json", "output_number"]
+      "extensions": ["colours_json", "output_string"]
     });
   }
 };
