@@ -79,7 +79,9 @@ Blockly.ScratchBlocks.ProcedureUtils.callerDomToMutation = function(xmlElement) 
   this.argumentIds_ = JSON.parse(xmlElement.getAttribute('argumentids'));
   this.warp_ = JSON.parse(xmlElement.getAttribute('warp'));
   if (xmlElement.getAttribute('colour')) {
-    this.colour_ = xmlElement.getAttribute('colour');
+    this.colours_ = Blockly.ScratchBlocks.ProcedureUtils.matchColours(
+      xmlElement.getAttribute('colour')
+    );
   }
   this.return_ = Blockly.ScratchBlocks.ProcedureUtils.parseReturnMutation(xmlElement);
   if (this.return_ !== Blockly.PROCEDURES_CALL_TYPE_STATEMENT) {
@@ -114,6 +116,51 @@ Blockly.ScratchBlocks.ProcedureUtils.definitionMutationToDom = function(
 };
 
 /**
+ * its in the name.
+ * @param {any} x
+ * @param {any} y
+ * @returns {any}
+ */
+function nullCoalsh(x, y) {
+  if (x === null || x === (void 0)) return y;
+  return x;
+}
+
+/**
+ * Generate colours 2 - 4.
+ * @param {string} colour1 The first colour.
+ * @param {!number} ld Lighten / Darken percent as a value from 0 - 1.
+ * @returns {string[]} Colours 2 - 4.
+ * @this Blockly.Block
+ */
+Blockly.ScratchBlocks.ProcedureUtils.matchColours = function(colour1, ld) {
+  ld = nullCoalsh(ld, 0.75); // 15 percent
+  colour1 = colour1.toLowerCase();
+  var categorys = Object.values(Blockly.Categories);
+  var maybeColours = Object.entries(Blockly.Colours).find(v => (
+    categorys.includes(v[0]) && (v[1].primary.toLowerCase() === colour1)
+  ));
+  if (maybeColours && maybeColours[1]) return [
+    maybeColours[1].primary,
+    maybeColours[1].secondary,
+    maybeColours[1].tertiary,
+    maybeColours[1].quaternary || maybeColours[1].tertiary
+  ];
+  var c = parseInt(colour1.slice(1, 7), 16);
+  var rgb = [(c >> 16), ((c >> 8) & 0x00ff), (c & 0x0000ff)];
+  rgb[0] = Math.floor(rgb[0] * ld) % 256;
+  rgb[1] = Math.floor(rgb[1] * ld) % 256;
+  rgb[2] = Math.floor(rgb[2] * ld) % 256;
+  var colour2 = '#' + (
+    rgb[0].toString(16).padStart(2, '0') +
+    rgb[1].toString(16).padStart(2, '0') +
+    rgb[2].toString(16).padStart(2, '0') +
+    colour1.slice(8)
+  );
+  return [colour1, colour2, colour2/*3*/, colour2/*4*/];
+};
+
+/**
  * Parse XML to restore the (non-editable) name and arguments of a
  * procedures_prototype block or a procedures_declaration block.
  * @param {!Element} xmlElement XML storage element.
@@ -122,8 +169,11 @@ Blockly.ScratchBlocks.ProcedureUtils.definitionMutationToDom = function(
 Blockly.ScratchBlocks.ProcedureUtils.definitionDomToMutation = function(xmlElement) {
   this.procCode_ = xmlElement.getAttribute('proccode');
   this.warp_ = JSON.parse(xmlElement.getAttribute('warp'));
+
   if (xmlElement.getAttribute('colour')) {
-    this.colour_ = xmlElement.getAttribute('colour');
+    this.colours_ = Blockly.ScratchBlocks.ProcedureUtils.matchColours(
+      xmlElement.getAttribute('colour')
+    );
   }
 
   var prevArgIds = this.argumentIds_;
@@ -169,7 +219,7 @@ Blockly.ScratchBlocks.ProcedureUtils.updateDisplay_ = function() {
   this.createAllInputs_(connectionMap);
   this.deleteShadows_(connectionMap);
 
-  this.setColour(this.colour_);
+  if (this.colours_) this.setColour(...this.colours_);
   if (!wasRendered && this.getReturn) {
     this.setInputsInline(true);
     if (this.getReturn() === Blockly.PROCEDURES_CALL_TYPE_STATEMENT) {
