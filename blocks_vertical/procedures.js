@@ -134,7 +134,7 @@ function nullCoalsh(x, y) {
  * @this Blockly.Block
  */
 Blockly.ScratchBlocks.ProcedureUtils.matchColours = function(colour1, ld) {
-  ld = nullCoalsh(ld, 0.75); // 15 percent
+  ld = nullCoalsh(ld, 0.75); // 25 percent
   colour1 = colour1.toLowerCase();
   var categorys = Object.values(Blockly.Categories);
   var maybeColours = Object.entries(Blockly.Colours).find(v => (
