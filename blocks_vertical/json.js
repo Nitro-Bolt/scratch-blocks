@@ -144,8 +144,10 @@ Blockly.Blocks['json_value_of_key'] = {
           "check": "Object"
         }
       ],
+      "output": null,
       "category": Blockly.Categories.json,
-      "extensions": ["colours_json", "output_number"]
+      "extensions": ["colours_json"],
+      "outputShape": Blockly.OUTPUT_SHAPE_ROUND
     });
   }
 };
@@ -308,8 +310,10 @@ Blockly.Blocks['json_value_of_index'] = {
           "check": "Array"
         }
       ],
+      "output": null,
       "category": Blockly.Categories.json,
-      "extensions": ["colours_json", "output_string"]
+      "extensions": ["colours_json"],
+      "outputShape": Blockly.OUTPUT_SHAPE_ROUND
     });
   }
 };

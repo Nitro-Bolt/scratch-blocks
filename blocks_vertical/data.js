@@ -46,9 +46,11 @@ Blockly.Blocks['data_variable'] = {
           "variableType": ""
         }
       ],
+      "output": null,
       "category": Blockly.Categories.data,
       "checkboxInFlyout": true,
-      "extensions": ["contextMenu_getVariableBlock", "colours_data", "output_string"]
+      "extensions": ["contextMenu_getVariableBlock", "colours_data"],
+      "outputShape": Blockly.OUTPUT_SHAPE_ROUND
     });
   }
 };
@@ -161,8 +163,10 @@ Blockly.Blocks['data_listcontents'] = {
           "variableType": Blockly.LIST_VARIABLE_TYPE
         }
       ],
+      "output": null,
       "category": Blockly.Categories.dataLists,
-      "extensions": ["contextMenu_getListBlock", "colours_data_lists", "output_string"],
+      "extensions": ["contextMenu_getListBlock", "colours_data_lists"],
+      "outputShape": Blockly.OUTPUT_SHAPE_ROUND,
       "checkboxInFlyout": true
     });
   }
