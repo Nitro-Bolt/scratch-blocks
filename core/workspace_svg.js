@@ -777,13 +777,6 @@ Blockly.WorkspaceSvg.prototype.processProcedureReturnsChanged_ = function() {
 };
 
 /**
- * Does not refresh toolbox.
- */
-Blockly.WorkspaceSvg.prototype.enableProcedureReturns = function() {
-  this.procedureReturnsEnabled = true;
-};
-
-/**
  * Resize and reposition all of the workspace chrome (toolbox,
  * trash, scrollbars etc.)
  * This should be called when something changes that

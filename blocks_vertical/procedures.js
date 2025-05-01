@@ -84,9 +84,6 @@ Blockly.ScratchBlocks.ProcedureUtils.callerDomToMutation = function(xmlElement) 
     );
   }
   this.return_ = Blockly.ScratchBlocks.ProcedureUtils.parseReturnMutation(xmlElement);
-  if (this.return_ !== Blockly.PROCEDURES_CALL_TYPE_STATEMENT) {
-    this.workspace.enableProcedureReturns();
-  }
   this.updateDisplay_();
 };
 
@@ -1242,6 +1239,5 @@ Blockly.Blocks['procedures_return'] = {
       ],
       "extensions": ["colours_more", "shape_end"]
     });
-    this.workspace.enableProcedureReturns();
   }
 };
