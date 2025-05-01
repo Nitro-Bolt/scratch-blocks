@@ -29,6 +29,7 @@ goog.require('Blockly.Blocks');
 goog.require('Blockly.Colours');
 goog.require('Blockly.constants');
 goog.require('Blockly.ScratchBlocks.VerticalExtensions');
+// goog.require('Blockly.ColourMutation');
 
 // Serialization and deserialization.
 
@@ -1091,7 +1092,9 @@ Blockly.Blocks['argument_reporter_boolean'] = {
       ],
       "extensions": ["colours_more", "output_boolean"]
     });
-  }
+  },
+  mutationToDom: function() { return Blockly.ColourMutation.mutationToDom.call(this, Blockly.Colours.more); },
+  domToMutation: Blockly.ColourMutation.domToMutation
 };
 
 Blockly.Blocks['argument_reporter_object'] = {
@@ -1106,7 +1109,9 @@ Blockly.Blocks['argument_reporter_object'] = {
       ],
       "extensions": ["colours_more", "output_object"]
     });
-  }
+  },
+  mutationToDom: function() { return Blockly.ColourMutation.mutationToDom.call(this, Blockly.Colours.more); },
+  domToMutation: Blockly.ColourMutation.domToMutation
 };
 
 Blockly.Blocks['argument_reporter_array'] = {
@@ -1121,7 +1126,9 @@ Blockly.Blocks['argument_reporter_array'] = {
       ],
       "extensions": ["colours_more", "output_array"]
     });
-  }
+  },
+  mutationToDom: function() { return Blockly.ColourMutation.mutationToDom.call(this, Blockly.Colours.more); },
+  domToMutation: Blockly.ColourMutation.domToMutation
 };
 
 Blockly.Blocks['argument_reporter_string_number'] = {
@@ -1136,7 +1143,9 @@ Blockly.Blocks['argument_reporter_string_number'] = {
       ],
       "extensions": ["colours_more", "output_number", "output_string"]
     });
-  }
+  },
+  mutationToDom: function() { return Blockly.ColourMutation.mutationToDom.call(this, Blockly.Colours.more); },
+  domToMutation: Blockly.ColourMutation.domToMutation
 };
 
 Blockly.Blocks['argument_editor_boolean'] = {
