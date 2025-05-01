@@ -27,6 +27,38 @@ goog.require('Blockly.Colours');
 goog.require('Blockly.constants');
 goog.require('Blockly.ScratchBlocks.VerticalExtensions');
 
+Blockly.Blocks['extension_extendable_test'] = {
+  /**
+   * @this Blockly.Block
+   */
+  init: function() {
+    this.jsonInit({
+      "message0": "extendable test %1 more text",
+      "args0": [
+        {
+          "type": "extendable",
+          "name": "EXTENDABLE",
+          "args": [
+            {
+              "type": "field_image",
+              "name": "IMAGE",
+              "src": Blockly.mainWorkspace.options.pathToMedia + "extensions/pen-block-icon.svg",
+              "width": 40,
+              "height": 40
+            },
+          ],
+          "separator": ["sep text"],
+          "minInputs": 0,
+          "maxInputs": 10,
+        },
+      ],
+      "category": Blockly.Categories.more,
+      "extensions": ["colours_more", "shape_statement"]
+    });
+  }
+};
+
+
 Blockly.Blocks['extension_pen_down'] = {
   /**
    * @this Blockly.Block

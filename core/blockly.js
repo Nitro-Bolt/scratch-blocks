@@ -42,6 +42,7 @@ goog.require('Blockly.FieldColourSlider');
 // Add it only if you need it.
 //goog.require('Blockly.FieldDate');
 goog.require('Blockly.FieldDropdown');
+goog.require('Blockly.FieldExtendable');
 goog.require('Blockly.FieldIconMenu');
 goog.require('Blockly.FieldImage');
 goog.require('Blockly.FieldNote');
