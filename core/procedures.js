@@ -223,6 +223,22 @@ Blockly.Procedures.flyoutCategory = function(workspace) {
 
   Blockly.Procedures.addCreateButton_(workspace, xmlList);
 
+  var returnBlock = goog.dom.createDom('block');
+  returnBlock.setAttribute('type', Blockly.PROCEDURES_RETURN_BLOCK_TYPE);
+  returnBlock.setAttribute('gap', 12);
+  var returnBlockValue = goog.dom.createDom('value');
+  returnBlockValue.setAttribute('name', 'VALUE');
+  var returnBlockShadow = goog.dom.createDom('shadow');
+  returnBlockShadow.setAttribute('type', 'text');
+  var returnBlockField = goog.dom.createDom('field');
+  returnBlockField.setAttribute('name', 'TEXT');
+  returnBlockShadow.appendChild(returnBlockField);
+  returnBlockValue.appendChild(returnBlockShadow);
+  returnBlock.appendChild(returnBlockValue);
+  xmlList.push(returnBlock);
+
+  xmlList.push(Blockly.Xml.textToDom('<xml><sep gap="24"/></xml>').firstChild);
+
   // Create call blocks for each procedure defined in the workspace
   var mutations = Blockly.Procedures.allProcedureMutations(workspace);
   mutations = Blockly.Procedures.sortProcedureMutations_(mutations);
@@ -241,32 +257,6 @@ Blockly.Procedures.flyoutCategory = function(workspace) {
     block.setAttribute('gap', 12);
     block.appendChild(mutation);
     xmlList.push(block);
-  }
-
-  var showReturn = (
-    Blockly.Procedures.DEFAULT_ENABLE_RETURNS ?
-    mutations.length > 0 :
-    workspace.procedureReturnsEnabled
-  );
-  if (showReturn) {
-    var returnBlock = goog.dom.createDom('block');
-    returnBlock.setAttribute('type', Blockly.PROCEDURES_RETURN_BLOCK_TYPE);
-    returnBlock.setAttribute('gap', 12);
-    var returnBlockValue = goog.dom.createDom('value');
-    returnBlockValue.setAttribute('name', 'VALUE');
-    var returnBlockShadow = goog.dom.createDom('shadow');
-    returnBlockShadow.setAttribute('type', 'text');
-    var returnBlockField = goog.dom.createDom('field');
-    returnBlockField.setAttribute('name', 'TEXT');
-    returnBlockShadow.appendChild(returnBlockField);
-    returnBlockValue.appendChild(returnBlockShadow);
-    returnBlock.appendChild(returnBlockValue);
-    xmlList.unshift(returnBlock);
-
-    var returnDocsButton = goog.dom.createDom('button');
-    returnDocsButton.setAttribute('callbackkey', 'OPEN_RETURN_DOCS');
-    returnDocsButton.setAttribute('text', Blockly.Msg.PROCEDURES_DOCS);
-    xmlList.unshift(returnDocsButton);
   }
 
   return xmlList;
@@ -678,12 +668,6 @@ Blockly.Procedures.USER_CAN_CHANGE_CALL_TYPE = true;
  * If false, a round procedure call reporter can be dropped into any input, including boolean ones.
  */
 Blockly.Procedures.ENFORCE_TYPES = false;
-
-/**
- * If true, the return block will always be available. If false, either create a block that requires
- * returns or call workspace.enableProcedureReturns() to enable return blocks.
- */
-Blockly.Procedures.DEFAULT_ENABLE_RETURNS = false;
 
 /**
  * @param {string} procCode The procedure code
