@@ -30,6 +30,7 @@
  **/
 goog.provide('Blockly');
 
+goog.require('Blockly.ColourMutation');
 goog.require('Blockly.BlockSvg.render');
 goog.require('Blockly.DropDownDiv');
 goog.require('Blockly.Events');
