@@ -1076,7 +1076,8 @@ Blockly.Blocks['procedures_declaration'] = {
   addObjectExternal: Blockly.ScratchBlocks.ProcedureUtils.addObjectExternal,
   addArrayExternal: Blockly.ScratchBlocks.ProcedureUtils.addArrayExternal,
   addStringNumberExternal: Blockly.ScratchBlocks.ProcedureUtils.addStringNumberExternal,
-  onChangeFn: Blockly.ScratchBlocks.ProcedureUtils.updateDeclarationProcCode_
+  onChangeFn: Blockly.ScratchBlocks.ProcedureUtils.updateDeclarationProcCode_,
+  // For colour fixing of the fields look at the GUI!!!.
 };
 
 Blockly.Blocks['argument_reporter_boolean'] = {
