@@ -271,6 +271,16 @@ Blockly.Field.prototype.initModel = function() {
 };
 
 /**
+ * Initialization code to run right after the field is added to an input.
+ * No-op by default.
+ * @param {!Blockly.Input} _input The input the field was added into.
+ * @param {!Blockly.Block} _block The block the field was added into.
+ */
+Blockly.Field.prototype.insertedInto = function(_input, _block) {
+};
+
+
+/**
  * Dispose of all DOM objects belonging to this editable field.
  */
 Blockly.Field.prototype.dispose = function() {

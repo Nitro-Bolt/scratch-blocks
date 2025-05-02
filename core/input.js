@@ -132,6 +132,8 @@ Blockly.Input.prototype.insertFieldAt = function(index, field, opt_name) {
     index = this.insertFieldAt(index, field.suffixField);
   }
 
+  field.insertedInto(this, this.sourceBlock_);
+
   if (this.sourceBlock_.rendered) {
     this.sourceBlock_.render();
     // Adding a field will cause the block to change shape.

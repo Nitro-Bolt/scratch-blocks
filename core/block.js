@@ -1242,30 +1242,33 @@ Blockly.Block.prototype.toString = function(opt_maxLength, opt_emptyToken) {
  * Shortcut for appending a value input row.
  * @param {string} name Language-neutral identifier which may used to find this
  *     input again.  Should be unique to this block.
+ * @param {number=} opt_position Position to insert this input into. Optional.
  * @return {!Blockly.Input} The input object created.
  */
-Blockly.Block.prototype.appendValueInput = function(name) {
-  return this.appendInput_(Blockly.INPUT_VALUE, name);
+Blockly.Block.prototype.appendValueInput = function(name, opt_position) {
+  return this.appendInput_(Blockly.INPUT_VALUE, name, opt_position);
 };
 
 /**
  * Shortcut for appending a statement input row.
  * @param {string} name Language-neutral identifier which may used to find this
  *     input again.  Should be unique to this block.
+ * @param {number=} opt_position Position to insert this input into. Optional.
  * @return {!Blockly.Input} The input object created.
  */
-Blockly.Block.prototype.appendStatementInput = function(name) {
-  return this.appendInput_(Blockly.NEXT_STATEMENT, name);
+Blockly.Block.prototype.appendStatementInput = function(name, opt_position) {
+  return this.appendInput_(Blockly.NEXT_STATEMENT, name, opt_position);
 };
 
 /**
  * Shortcut for appending a dummy input row.
  * @param {string=} opt_name Language-neutral identifier which may used to find
  *     this input again.  Should be unique to this block.
+ * @param {number=} opt_position Position to insert this input into. Optional.
  * @return {!Blockly.Input} The input object created.
  */
-Blockly.Block.prototype.appendDummyInput = function(opt_name) {
-  return this.appendInput_(Blockly.DUMMY_INPUT, opt_name || '');
+Blockly.Block.prototype.appendDummyInput = function(opt_name, opt_position) {
+  return this.appendInput_(Blockly.DUMMY_INPUT, opt_name || '', opt_position);
 };
 
 /**
@@ -1455,26 +1458,43 @@ Blockly.Block.prototype.interpolate_ = function(message, args, lastDummyAlign) {
     throw new Error('Block "' + this.type + '": ' +
         'Message does not reference all ' + args.length + ' arg(s).');
   }
+  this.appendArgsList(elements, lastDummyAlign);
+};
+
+/**
+ * Add an array of block inputs in jsonInit format, optionally in specific position.
+ * @param {Array} elements The array of elements to add
+ * @param {string=} lastDummyAlign If a dummy input is added at the end,
+ *     how should it be aligned?
+ * @param {number=} opt_position The position to place the elements in.
+ * @param {boolean=} opt_returnInputs If true, returns added inputs in an array.
+ * @returns {Array<Blockly.Input>} All inputs aded, if opt_returnInputs is true.
+ */
+Blockly.Block.prototype.appendArgsList = function(elements, lastDummyAlign, opt_position, opt_returnInputs) {
   // Add last dummy input if needed.
+  var dummyInput;
   if (elements.length && (typeof elements[elements.length - 1] == 'string' ||
       goog.string.startsWith(
           elements[elements.length - 1]['type'], 'field_'))) {
-    var dummyInput = {type: 'input_dummy'};
+    dummyInput = {type: 'input_dummy'};
     if (lastDummyAlign) {
       dummyInput['align'] = lastDummyAlign;
     }
-    elements.push(dummyInput);
   }
+
   // Lookup of alignment constants.
   var alignmentLookup = {
     'LEFT': Blockly.ALIGN_LEFT,
     'RIGHT': Blockly.ALIGN_RIGHT,
     'CENTRE': Blockly.ALIGN_CENTRE
   };
+  var returnedInputs = [];
   // Populate block with inputs and fields.
   var fieldStack = [];
-  for (var i = 0; i < elements.length; i++) {
+  var numElements = elements.length + (dummyInput ? 1 : 0);
+  for (var i = 0; i < numElements; i++) {
     var element = elements[i];
+    if (i == elements.length) element = dummyInput;
     if (typeof element == 'string') {
       fieldStack.push([element, undefined]);
     } else {
@@ -1487,13 +1507,32 @@ Blockly.Block.prototype.interpolate_ = function(message, args, lastDummyAlign) {
         } else {
           switch (element['type']) {
             case 'input_value':
-              input = this.appendValueInput(element['name']);
+              input = this.appendValueInput(element['name'], opt_position);
               break;
             case 'input_statement':
-              input = this.appendStatementInput(element['name']);
+              input = this.appendStatementInput(element['name'], opt_position);
               break;
             case 'input_dummy':
+              input = this.appendDummyInput(element['name'], opt_position);
+              break;
+            case 'extendable':
+              // Extendable inputs should always get their own inputs
+              if (element['type'] == 'extendable') {
+                if (fieldStack.length > 0) {
+                  var anotherInput = this.appendDummyInput(undefined, opt_position);
+                  for (var j = 0; j < fieldStack.length; j++) {
+                    anotherInput.appendField(fieldStack[j][0], fieldStack[j][1]);
+                  }
+                  fieldStack.length = 0;
+                }
+              }
+              if (!element['name']) {
+                throw new Error('Block "' + this.type + '": ' +
+                    'Extendable inputs must have a name.');
+              }
+
               input = this.appendDummyInput(element['name']);
+              field = Blockly.Field.fromJson(element);
               break;
             default:
               field = Blockly.Field.fromJson(element);
@@ -1515,7 +1554,9 @@ Blockly.Block.prototype.interpolate_ = function(message, args, lastDummyAlign) {
       } while (altRepeat);
       if (field) {
         fieldStack.push([field, element['name']]);
-      } else if (input) {
+      }
+      if (input) {
+        if (opt_returnInputs) returnedInputs.push(input);
         if (element['check']) {
           input.setCheck(element['check']);
         }
@@ -1529,6 +1570,7 @@ Blockly.Block.prototype.interpolate_ = function(message, args, lastDummyAlign) {
       }
     }
   }
+  return returnedInputs;
 };
 
 /**
@@ -1537,17 +1579,22 @@ Blockly.Block.prototype.interpolate_ = function(message, args, lastDummyAlign) {
  *     Blockly.DUMMY_INPUT.
  * @param {string} name Language-neutral identifier which may used to find this
  *     input again.  Should be unique to this block.
+ * @param {number=} opt_position Position to insert this input into. Optional.
  * @return {!Blockly.Input} The input object created.
  * @protected
  */
-Blockly.Block.prototype.appendInput_ = function(type, name) {
+Blockly.Block.prototype.appendInput_ = function(type, name, opt_position) {
   var connection = null;
   if (type == Blockly.INPUT_VALUE || type == Blockly.NEXT_STATEMENT) {
     connection = this.makeConnection_(type);
   }
   var input = new Blockly.Input(type, name, this, connection);
   // Append input to list.
-  this.inputList.push(input);
+  if (opt_position === undefined || opt_position < 0) {
+    this.inputList.push(input);
+  } else {
+    this.inputList.splice(opt_position, 0, input);
+  }
   return input;
 };
 
