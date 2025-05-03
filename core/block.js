@@ -1490,9 +1490,12 @@ Blockly.Block.prototype.interpolate_ = function(message, args, lastDummyAlign) {
  *     how should it be aligned?
  * @param {number=} opt_position The position to place the elements in.
  * @param {boolean=} opt_returnInputs If true, returns added inputs in an array.
- * @returns {Array<Blockly.Input>} All inputs aded, if opt_returnInputs is true.
+ * @param {string=} opt_namePrefix String to prefix all input and field names with.
+ * @returns {Array<Blockly.Input>} All inputs added, if opt_returnInputs is true.
  */
-Blockly.Block.prototype.appendArgsList = function(elements, lastDummyAlign, opt_position, opt_returnInputs) {
+Blockly.Block.prototype.appendArgsList = function(
+    elements, lastDummyAlign, opt_position, opt_returnInputs, opt_namePrefix
+) {
   if (!elements.length) return [];
   
   // Add last dummy input if needed.
@@ -1504,6 +1507,10 @@ Blockly.Block.prototype.appendArgsList = function(elements, lastDummyAlign, opt_
     if (lastDummyAlign) {
       dummyInput['align'] = lastDummyAlign;
     }
+  }
+
+  if (!opt_namePrefix) {
+    opt_namePrefix = "";
   }
 
   // Lookup of alignment constants.
@@ -1529,33 +1536,37 @@ Blockly.Block.prototype.appendArgsList = function(elements, lastDummyAlign, opt_
         if (typeof element == 'string') {
           field = new Blockly.FieldLabel(element);
         } else {
+          var name = element['name'] ? (opt_namePrefix + element['name']) : element['name']
           switch (element['type']) {
             case 'input_value':
-              input = this.appendValueInput(element['name'], opt_position);
+              input = this.appendValueInput(name, opt_position);
+              if (opt_position !== undefined) opt_position++;
               break;
             case 'input_statement':
-              input = this.appendStatementInput(element['name'], opt_position);
+              input = this.appendStatementInput(name, opt_position);
+              if (opt_position !== undefined) opt_position++;
               break;
             case 'input_dummy':
-              input = this.appendDummyInput(element['name'], opt_position);
+              input = this.appendDummyInput(name, opt_position);
+              if (opt_position !== undefined) opt_position++;
               break;
             case 'extendable':
               // Extendable inputs should always get their own inputs
-              if (element['type'] == 'extendable') {
-                if (fieldStack.length > 0) {
-                  var anotherInput = this.appendDummyInput(undefined, opt_position);
-                  for (var j = 0; j < fieldStack.length; j++) {
-                    anotherInput.appendField(fieldStack[j][0], fieldStack[j][1]);
-                  }
-                  fieldStack.length = 0;
-                }
-              }
               if (!element['name']) {
                 throw new Error('Block "' + this.type + '": ' +
                     'Extendable inputs must have a name.');
               }
-
-              input = this.appendDummyInput(element['name']);
+              if (fieldStack.length > 0) {
+                var anotherInput = this.appendDummyInput(undefined, opt_position);
+                if (opt_position !== undefined) opt_position++;
+                for (var j = 0; j < fieldStack.length; j++) {
+                  anotherInput.appendField(fieldStack[j][0], fieldStack[j][1]);
+                }
+                if (opt_returnInputs) returnedInputs.push(anotherInput);
+                fieldStack.length = 0;
+              }
+              input = this.appendDummyInput(name, opt_position);
+              if (opt_position !== undefined) opt_position++;
               field = Blockly.Field.fromJson(element);
               break;
             default:
@@ -1577,7 +1588,7 @@ Blockly.Block.prototype.appendArgsList = function(elements, lastDummyAlign, opt_
         }
       } while (altRepeat);
       if (field) {
-        fieldStack.push([field, element['name']]);
+        fieldStack.push([field, name]);
       }
       if (input) {
         if (opt_returnInputs) returnedInputs.push(input);

@@ -36,6 +36,7 @@ goog.require('Blockly.Blocks');
 Blockly.Blocks.defaultToolbox = '<xml id="toolbox-categories" style="display: none">' +
   '<category name="%{BKY_CATEGORY_MOTION}" id="motion" colour="#4C97FF" secondaryColour="#3373CC">' +
     '<block type="extension_extendable_test" id="extension_extendable_test"></block>' +
+    '<block type="extension_nested_extendable_test" id="extension_nested_extendable_test"></block>' +
     '<block type="motion_movesteps" id="motion_movesteps">' +
       '<value name="STEPS">' +
         '<shadow type="math_number">' +
