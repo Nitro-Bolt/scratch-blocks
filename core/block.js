@@ -1493,6 +1493,8 @@ Blockly.Block.prototype.interpolate_ = function(message, args, lastDummyAlign) {
  * @returns {Array<Blockly.Input>} All inputs aded, if opt_returnInputs is true.
  */
 Blockly.Block.prototype.appendArgsList = function(elements, lastDummyAlign, opt_position, opt_returnInputs) {
+  if (!elements.length) return [];
+  
   // Add last dummy input if needed.
   var dummyInput;
   if (elements.length && (typeof elements[elements.length - 1] == 'string' ||
@@ -1685,25 +1687,43 @@ Blockly.Block.prototype.moveNumberedInputBefore = function(
 Blockly.Block.prototype.removeInput = function(name, opt_quiet) {
   for (var i = 0, input; input = this.inputList[i]; i++) {
     if (input.name == name) {
-      if (input.connection && input.connection.isConnected()) {
-        input.connection.setShadowDom(null);
-        var block = input.connection.targetBlock();
-        if (block.isShadow()) {
-          // Destroy any attached shadow block.
-          block.dispose();
-        } else {
-          // Disconnect any attached normal block.
-          block.unplug();
-        }
-      }
-      input.dispose();
-      this.inputList.splice(i, 1);
+      this.removeNumberedInput(i, opt_quiet);
       return;
     }
   }
   if (!opt_quiet) {
     goog.asserts.fail('Input "%s" not found.', name);
   }
+};
+
+/**
+ * Remove an input from this block by its index.
+ * @param {number} inputIndex The index of the input.
+ * @param {boolean=} opt_quiet True to prevent error if input is not present.
+ * @throws {goog.asserts.AssertionError} if the input is not present and
+ *     opt_quiet is not true.
+ */
+Blockly.Block.prototype.removeNumberedInput = function(inputIndex, opt_quiet) {
+  var input = this.inputList[inputIndex];
+  if (!input) {
+    if (!opt_quiet) {
+      goog.asserts.fail('Input "%s" not found.', inputIndex);
+    }
+    return;
+  }
+  if (input.connection && input.connection.isConnected()) {
+    input.connection.setShadowDom(null);
+    var block = input.connection.targetBlock();
+    if (block.isShadow()) {
+      // Destroy any attached shadow block.
+      block.dispose();
+    } else {
+      // Disconnect any attached normal block.
+      block.unplug();
+    }
+  }
+  input.dispose();
+  this.inputList.splice(inputIndex, 1);
 };
 
 /**
