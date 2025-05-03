@@ -215,7 +215,8 @@ Blockly.FieldExtendable.prototype.setValue = function(newValue, opt_force, opt_n
     console.log('Extendable field ' + this.name + ' now has ' + this.inputs + ' input(s)');
     if (!opt_noRender) {
       this.render_();
-      if (this.sourceBlock_) {
+      if (this.sourceBlock_ && this.sourceBlock_.rendered) {
+        this.sourceBlock_.initSvg();
         this.sourceBlock_.render(false);
       }
     }
