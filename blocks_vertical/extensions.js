@@ -41,10 +41,13 @@ Blockly.Blocks['extension_extendable_test'] = {
           "args": [
             {
               "type": "field_image",
-              "name": "IMAGE",
               "src": Blockly.mainWorkspace.options.pathToMedia + "extensions/pen-block-icon.svg",
               "width": 40,
               "height": 40
+            },
+            {
+              "type": "input_value",
+              "name": "INPUT",
             },
           ],
           "separator": ["sep text"],
