@@ -213,10 +213,15 @@ Blockly.ScratchBlocks.ProcedureUtils.updateDisplay_ = function() {
   var connectionMap = this.disconnectOldBlocks_();
   this.removeAllInputs_();
 
+  // We don't wanna do this on any other block's.
+  if (this.type == 'procedures_prototype' || this.type == 'procedures_call' || this.type === 'procedures_declaration') {
+    if (this.colours_) this.setColour(...this.colours_);
+    this.colours_ = null; // We don't wanna have a cache of this as it break's colour changing.
+  }
+
   this.createAllInputs_(connectionMap);
   this.deleteShadows_(connectionMap);
 
-  if (this.colours_) this.setColour(...this.colours_);
   if (!wasRendered && this.getReturn) {
     this.setInputsInline(true);
     if (this.getReturn() === Blockly.PROCEDURES_CALL_TYPE_STATEMENT) {
@@ -528,9 +533,8 @@ Blockly.ScratchBlocks.ProcedureUtils.populateArgumentOnCaller_ = function(type,
     // Reattach the old block and shadow DOM.
     connectionMap[input.name] = null;
     oldBlock.outputConnection.connect(input.connection);
-    if ((type != 'b' || type != 'o' || type != 'a') && this.generateShadows_) {
+    if ((type == 's' || type == 'n') && this.generateShadows_) {
       var shadowDom = oldShadow || this.buildShadowDom_(type);
-      console.log("setting shadow dom: " + shadowDom);
       input.connection.setShadowDom(shadowDom);
     }
   } else if (this.generateShadows_) {
@@ -1077,8 +1081,20 @@ Blockly.Blocks['procedures_declaration'] = {
   addArrayExternal: Blockly.ScratchBlocks.ProcedureUtils.addArrayExternal,
   addStringNumberExternal: Blockly.ScratchBlocks.ProcedureUtils.addStringNumberExternal,
   onChangeFn: Blockly.ScratchBlocks.ProcedureUtils.updateDeclarationProcCode_,
-  // For colour fixing of the fields look at the GUI!!!.
+  // For colour fixing of the fields when on the GUI side look at the GUI!!!.
 };
+
+// marker
+/** @this Blockly.Block */
+function argumentReporterMutationToDom() {
+ if (!this.rendered || this.isShadow_) return document.createElement('mutation'); // Don't save the colour if we are a shadow.
+ return Blockly.ColourMutation.mutationToDom.call(this, Blockly.Colours.more);
+}
+/** @this Blockly.Block */
+function argumentReporterDomToMutation(node) {
+  if (this.isShadow_) return null; // Don't apply the colour if we are a shadow.
+  return Blockly.ColourMutation.domToMutation.call(this, node);
+}
 
 Blockly.Blocks['argument_reporter_boolean'] = {
   init: function() {
@@ -1093,8 +1109,8 @@ Blockly.Blocks['argument_reporter_boolean'] = {
       "extensions": ["colours_more", "output_boolean"]
     });
   },
-  mutationToDom: function() { return Blockly.ColourMutation.mutationToDom.call(this, Blockly.Colours.more); },
-  domToMutation: Blockly.ColourMutation.domToMutation
+  mutationToDom: argumentReporterMutationToDom,
+  domToMutation: argumentReporterDomToMutation
 };
 
 Blockly.Blocks['argument_reporter_object'] = {
@@ -1110,8 +1126,8 @@ Blockly.Blocks['argument_reporter_object'] = {
       "extensions": ["colours_more", "output_object"]
     });
   },
-  mutationToDom: function() { return Blockly.ColourMutation.mutationToDom.call(this, Blockly.Colours.more); },
-  domToMutation: Blockly.ColourMutation.domToMutation
+  mutationToDom: argumentReporterMutationToDom,
+  domToMutation: argumentReporterDomToMutation
 };
 
 Blockly.Blocks['argument_reporter_array'] = {
@@ -1127,8 +1143,8 @@ Blockly.Blocks['argument_reporter_array'] = {
       "extensions": ["colours_more", "output_array"]
     });
   },
-  mutationToDom: function() { return Blockly.ColourMutation.mutationToDom.call(this, Blockly.Colours.more); },
-  domToMutation: Blockly.ColourMutation.domToMutation
+  mutationToDom: argumentReporterMutationToDom,
+  domToMutation: argumentReporterDomToMutation
 };
 
 Blockly.Blocks['argument_reporter_string_number'] = {
@@ -1144,8 +1160,8 @@ Blockly.Blocks['argument_reporter_string_number'] = {
       "extensions": ["colours_more", "output_number", "output_string"]
     });
   },
-  mutationToDom: function() { return Blockly.ColourMutation.mutationToDom.call(this, Blockly.Colours.more); },
-  domToMutation: Blockly.ColourMutation.domToMutation
+  mutationToDom: argumentReporterMutationToDom,
+  domToMutation: argumentReporterDomToMutation
 };
 
 Blockly.Blocks['argument_editor_boolean'] = {
