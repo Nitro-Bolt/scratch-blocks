@@ -64,6 +64,17 @@ Blockly.Input = function(type, name, block, connection) {
    * @package
    */
   this.outlinePath = null;
+
+  /**
+   * If this input belongs to an extendable field, the name of said field.
+   * @type {string}
+   */
+  this.extendableName = null;
+  /**
+   * If this input belongs to an extendable field, the input's index in said field.
+   * @type {number}
+   */
+  this.extendableIndex = null;
 };
 
 /**
@@ -114,6 +125,7 @@ Blockly.Input.prototype.insertFieldAt = function(index, field, opt_name) {
   if (goog.isString(field)) {
     field = new Blockly.FieldLabel(/** @type {string} */ (field));
   }
+  field.setSourceInput(this);
   field.setSourceBlock(this.sourceBlock_);
   if (this.sourceBlock_.rendered) {
     field.init();

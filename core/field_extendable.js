@@ -11,7 +11,7 @@ goog.require('Blockly.Field');
 
 /**
  * Class for an extendable field.
- * @param {!Array} args Array of arguments to use for each extendable input, in the jsonInit format.
+ * @param {!Array} elements Array of arguments to use for each extendable input, in the jsonInit format.
  * @param {!number} defaultInputs Default number of inputs
  * @param {!number} minInputs Minimum inputs
  * @param {!number} maxInputs Maximum inputs
@@ -19,17 +19,18 @@ goog.require('Blockly.Field');
  * @extends {Blockly.Field}
  * @constructor
  */
-Blockly.FieldExtendable = function(args, defaultInputs, minInputs, maxInputs, separator) {
+Blockly.FieldExtendable = function(elements, defaultInputs, minInputs, maxInputs, separator) {
   Blockly.FieldExtendable.superClass_.constructor.call(this, '', undefined);
 
   this.size_ = new goog.math.Size(Blockly.FieldExtendable.ARROW_HEIGHT, Blockly.FieldExtendable.ARROW_WIDTH * 2);
 
+  this.elements = elements;
   this.minInputs = minInputs;
   this.maxInputs = maxInputs;
   this.separator = separator;
 
-  this.inputs = NaN;
-  this.setValue(defaultInputs);
+  this.inputs = undefined;
+  this.setValue(defaultInputs, false, true);
   this.addArgType('extendable');
 };
 goog.inherits(Blockly.FieldExtendable, Blockly.Field);
@@ -60,6 +61,7 @@ Blockly.FieldExtendable.fromJson = function(options) {
  * Mouse cursor style when over the hotspot that initiates editability.
  */
 Blockly.FieldExtendable.prototype.CURSOR = 'default';
+Blockly.FieldExtendable.prototype.EDITABLE = false;
 
 Blockly.FieldExtendable.ARROW_WIDTH = 16;
 Blockly.FieldExtendable.ARROW_HEIGHT = 32;
@@ -120,25 +122,102 @@ Blockly.FieldExtendable.prototype.getValue = function() {
 };
 
 /**
- * Set the amount of inputs. Clamped to min/max values-
- * @param {number | string} newValue Number of inputs.
+ * Get the prefix used for inputs.
+ * @return {string} The prefix.
  */
-Blockly.FieldExtendable.prototype.setValue = function(newValue) {
+Blockly.FieldExtendable.prototype.getPrefix = function() {
+  return String(this.name || "") + "_";
+};
+
+/**
+ * Get the prefix used for input separators.
+ * @return {string} The prefix.
+ */
+Blockly.FieldExtendable.prototype.getSepPrefix = function() {
+  return this.getPrefix() + "SEP";
+};
+
+/**
+ * Get the absolute name of an extendable input from its index.
+ * @param {number} id The index of the input.
+ * @param {boolean} opt_sep If true, this is a separator.
+ * @param {Blockly.Input=} opt_forInput The input object this name is for.
+ * @return {string} The final name of the input.
+ */
+Blockly.FieldExtendable.prototype.getInputName = function(id, opt_sep, opt_forInput) {
+  var suffix = "";
+  if (opt_forInput && opt_forInput.name) {
+    suffix += "_" + opt_forInput.name;
+  }
+  if (opt_sep) {
+    return this.getSepPrefix() + String(id) + suffix;
+  }
+  return this.getPrefix() + String(id) + suffix;
+};
+
+/**
+ * Set the amount of inputs.
+ * @param {number | string} newValue Number of inputs.
+ * @param {boolean=} opt_force If true, ignores the set min/max values.
+ * @param {boolean=} opt_noRender If true, skips rerendering.
+ */
+Blockly.FieldExtendable.prototype.setValue = function(newValue, opt_force, opt_noRender) {
   var newInputs = +newValue;
-  if (newInputs < this.minInputs) newInputs = this.minInputs;
-  else if (newInputs > this.maxInputs) newInputs = this.maxInputs;
+  if (!opt_force) {
+    if (newInputs < this.minInputs) newInputs = this.minInputs;
+    else if (newInputs > this.maxInputs) newInputs = this.maxInputs;
+  }
   
   if (this.inputs !== newInputs) {
     if (this.sourceBlock_ && Blockly.Events.isEnabled()) {
       Blockly.Events.fire(new Blockly.Events.BlockChange(
           this.sourceBlock_, 'field', this.name, this.inputs, newInputs));
     }
+
+    if (this.sourceBlock_) {
+      // If we decreased the number of inputs, remove some
+      if (newInputs < this.inputs) {
+        for (var i = this.sourceBlock_.inputList.length - 1; i >= 0; i--) {
+          var input = this.sourceBlock_.inputList[i];
+          if (input.extendableName == this.name && input.extendableIndex >= newInputs) {
+            this.sourceBlock_.removeNumberedInput(i);
+          }
+        }
+      }
+      // If we increased the number of inputs, add some
+      var thisIndex = this.sourceBlock_.inputList.indexOf(this.sourceInput_);
+      for (var i = this.inputs; i < newInputs; i++) {
+        // Add separator for inputs after the first
+        if (i > 0) {
+          var addedSeps = this.sourceBlock_.appendArgsList(this.separator, undefined, thisIndex, true);
+          for (var j = 0; j < addedSeps.length; j++) {
+            var sep = addedSeps[j];
+            sep.extendableName = this.name;
+            sep.extendableIndex = this.inputs + j;
+            sep.name = this.getInputName(sep.extendableIndex, true, sep);
+          }
+          thisIndex += addedSeps.length;
+        }
+
+        var addedInputs = this.sourceBlock_.appendArgsList(this.elements, undefined, thisIndex, true);
+        for (var j = 0; j < addedInputs.length; j++) {
+          var input = addedInputs[j];
+          input.extendableName = this.name;
+          input.extendableIndex = this.inputs + j;
+          input.name = this.getInputName(input.extendableIndex, false, input);
+        }
+        thisIndex += addedInputs.length;
+      }
+    }
+
     this.inputs = newInputs;
     // TODO: this is a debug thing until inputs are implemented
     console.log('Extendable field ' + this.name + ' now has ' + this.inputs + ' input(s)');
-    this.render_();
-    if (this.sourceBlock_) {
-      this.sourceBlock_.render(false);
+    if (!opt_noRender) {
+      this.render_();
+      if (this.sourceBlock_) {
+        this.sourceBlock_.render(false);
+      }
     }
   }
 };
@@ -181,6 +260,10 @@ Blockly.FieldExtendable.prototype.dispose_ = function() {
     if (thisField.mouseDownWrapperRight_) {
       Blockly.unbindEvent_(thisField.mouseDownWrapperRight_);
     }
+    // Dispose of any inputs added by this field
+    Blockly.Events.disable();
+    thisField.setValue(0, true, true);
+    Blockly.Events.enable();
   };
 };
 

@@ -153,6 +153,13 @@ Blockly.Field.prototype.text_ = '';
 Blockly.Field.prototype.sourceBlock_ = null;
 
 /**
+ * Input this field is attached to.  Starts as null, then in set in init.
+ * @type {Blockly.Input}
+ * @private
+ */
+Blockly.Field.prototype.sourceInput_ = null;
+
+/**
  * Is the field visible, or hidden due to the block being collapsed?
  * @type {boolean}
  * @private
@@ -215,6 +222,15 @@ Blockly.Field.prototype.SERIALIZABLE = true;
 Blockly.Field.prototype.setSourceBlock = function(block) {
   goog.asserts.assert(!this.sourceBlock_, 'Field already bound to a block.');
   this.sourceBlock_ = block;
+};
+
+/**
+ * Attach this field to an input.
+ * @param {!Blockly.Input} input The input containing this field.
+ */
+Blockly.Field.prototype.setSourceInput = function(input) {
+  goog.asserts.assert(!this.sourceInput_, 'Field already bound to an input.');
+  this.sourceInput_ = input;
 };
 
 /**
