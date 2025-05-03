@@ -141,18 +141,13 @@ Blockly.FieldExtendable.prototype.getSepPrefix = function() {
  * Get the absolute name of an extendable input from its index.
  * @param {number} id The index of the input.
  * @param {boolean} opt_sep If true, this is a separator.
- * @param {Blockly.Input=} opt_forInput The input object this name is for.
  * @return {string} The final name of the input.
  */
-Blockly.FieldExtendable.prototype.getInputName = function(id, opt_sep, opt_forInput) {
-  var suffix = "";
-  if (opt_forInput && opt_forInput.name) {
-    suffix += "_" + opt_forInput.name;
-  }
+Blockly.FieldExtendable.prototype.getInputName = function(id, opt_sep) {
   if (opt_sep) {
-    return this.getSepPrefix() + String(id) + suffix;
+    return this.getSepPrefix() + String(id);
   }
-  return this.getPrefix() + String(id) + suffix;
+  return this.getPrefix() + String(id);
 };
 
 /**
@@ -179,7 +174,7 @@ Blockly.FieldExtendable.prototype.setValue = function(newValue, opt_force, opt_n
       if (newInputs < this.inputs) {
         for (var i = this.sourceBlock_.inputList.length - 1; i >= 0; i--) {
           var input = this.sourceBlock_.inputList[i];
-          if (input.extendableName == this.name && input.extendableIndex >= newInputs) {
+          if (input && input.extendableName == this.name && input.extendableIndex >= newInputs) {
             this.sourceBlock_.removeNumberedInput(i);
           }
         }
@@ -189,22 +184,24 @@ Blockly.FieldExtendable.prototype.setValue = function(newValue, opt_force, opt_n
       for (var i = this.inputs; i < newInputs; i++) {
         // Add separator for inputs after the first
         if (i > 0) {
-          var addedSeps = this.sourceBlock_.appendArgsList(this.separator, undefined, thisIndex, true);
+          var addedSeps = this.sourceBlock_.appendArgsList(
+              this.separator, undefined, thisIndex, true, this.getInputName(this.inputs + i, true) + "_"
+          );
           for (var j = 0; j < addedSeps.length; j++) {
             var sep = addedSeps[j];
             sep.extendableName = this.name;
-            sep.extendableIndex = this.inputs + j;
-            sep.name = this.getInputName(sep.extendableIndex, true, sep);
+            sep.extendableIndex = this.inputs + i;
           }
           thisIndex += addedSeps.length;
         }
 
-        var addedInputs = this.sourceBlock_.appendArgsList(this.elements, undefined, thisIndex, true);
+        var addedInputs = this.sourceBlock_.appendArgsList(
+            this.elements, undefined, thisIndex, true, this.getInputName(this.inputs + i, false) + "_"
+        );
         for (var j = 0; j < addedInputs.length; j++) {
           var input = addedInputs[j];
           input.extendableName = this.name;
-          input.extendableIndex = this.inputs + j;
-          input.name = this.getInputName(input.extendableIndex, false, input);
+          input.extendableIndex = this.inputs + i;
         }
         thisIndex += addedInputs.length;
       }
@@ -246,26 +243,16 @@ Blockly.FieldExtendable.prototype.updateWidth = function() {
   }
 };
 
-/**
- * Clean up this FieldExtendable, as well as the inherited Field.
- * @return {!Function} Closure to call on destruction of the WidgetDiv.
- * @private
- */
-Blockly.FieldExtendable.prototype.dispose_ = function() {
-  var thisField = this;
-  return function() {
-    Blockly.FieldExtendable.superClass_.dispose_.call(thisField)();
-    if (thisField.mouseDownWrapperLeft_) {
-      Blockly.unbindEvent_(thisField.mouseDownWrapperLeft_);
-    }
-    if (thisField.mouseDownWrapperRight_) {
-      Blockly.unbindEvent_(thisField.mouseDownWrapperRight_);
-    }
-    // Dispose of any inputs added by this field
-    Blockly.Events.disable();
-    thisField.setValue(0, true, true);
-    Blockly.Events.enable();
-  };
+Blockly.FieldExtendable.prototype.dispose = function() {
+  // Dispose of any inputs added by this field
+  this.setValue(0, true, true);
+  if (this.mouseDownWrapperLeft_) {
+    Blockly.unbindEvent_(this.mouseDownWrapperLeft_);
+  }
+  if (this.mouseDownWrapperRight_) {
+    Blockly.unbindEvent_(this.mouseDownWrapperRight_);
+  }
+  Blockly.FieldExtendable.superClass_.dispose.call(this);
 };
 
 Blockly.Field.register('extendable', Blockly.FieldExtendable);

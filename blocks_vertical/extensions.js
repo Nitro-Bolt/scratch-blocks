@@ -61,6 +61,43 @@ Blockly.Blocks['extension_extendable_test'] = {
   }
 };
 
+Blockly.Blocks['extension_nested_extendable_test'] = {
+  /**
+   * @this Blockly.Block
+   */
+  init: function() {
+    this.jsonInit({
+      "message0": "nested extendable test %1 asd",
+      "args0": [
+        {
+          "type": "extendable",
+          "name": "EXTENDABLE",
+          "args": [
+            {
+              "type": "extendable",
+              "name": "EXTENDABLE",
+              "args": [
+                {
+                  "type": "input_value",
+                  "name": "INPUT",
+                },
+              ],
+              "separator": [""],
+              "minInputs": 0,
+              "maxInputs": 100,
+            },
+          ],
+          "separator": ["|"],
+          "minInputs": 0,
+          "maxInputs": 100,
+        },
+      ],
+      "category": Blockly.Categories.more,
+      "extensions": ["colours_more", "shape_statement"]
+    });
+  }
+};
+
 
 Blockly.Blocks['extension_pen_down'] = {
   /**
