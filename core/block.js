@@ -1501,6 +1501,19 @@ Blockly.Block.prototype.appendArgsList = function(
   // Populate block with inputs and fields.
   var fieldStack = [];
   var numElements = elements.length + (dummyInput ? 1 : 0);
+
+  var emptyFieldStack = (function() {
+    if (fieldStack.length > 0) {
+      var anotherInput = this.appendDummyInput(undefined, opt_position);
+      if (opt_position !== undefined) opt_position++;
+      for (var j = 0; j < fieldStack.length; j++) {
+        anotherInput.appendField(fieldStack[j][0], fieldStack[j][1]);
+      }
+      if (opt_returnInputs) returnedInputs.push(anotherInput);
+      fieldStack.length = 0;
+    }
+  }).bind(this);
+
   for (var i = 0; i < numElements; i++) {
     var element = elements[i];
     if (i == elements.length) element = dummyInput;
@@ -1521,6 +1534,7 @@ Blockly.Block.prototype.appendArgsList = function(
               if (opt_position !== undefined) opt_position++;
               break;
             case 'input_statement':
+              if (opt_position !== undefined) emptyFieldStack();
               input = this.appendStatementInput(name, opt_position);
               if (opt_position !== undefined) opt_position++;
               break;
@@ -1534,15 +1548,7 @@ Blockly.Block.prototype.appendArgsList = function(
                 throw new Error('Block "' + this.type + '": ' +
                     'Extendable inputs must have a name.');
               }
-              if (fieldStack.length > 0) {
-                var anotherInput = this.appendDummyInput(undefined, opt_position);
-                if (opt_position !== undefined) opt_position++;
-                for (var j = 0; j < fieldStack.length; j++) {
-                  anotherInput.appendField(fieldStack[j][0], fieldStack[j][1]);
-                }
-                if (opt_returnInputs) returnedInputs.push(anotherInput);
-                fieldStack.length = 0;
-              }
+              emptyFieldStack();
               input = this.appendDummyInput(name, opt_position);
               if (opt_position !== undefined) opt_position++;
               field = Blockly.Field.fromJson(element);

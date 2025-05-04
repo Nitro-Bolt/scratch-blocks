@@ -21,8 +21,6 @@ goog.require('Blockly.Field');
  * @constructor
  */
 Blockly.FieldExtendable = function(elements, defaultInputs, minInputs, maxInputs, separator, collapser) {
-  Blockly.FieldExtendable.superClass_.constructor.call(this, '', undefined);
-
   this.size_ = new goog.math.Size(Blockly.FieldExtendable.ARROW_HEIGHT, Blockly.FieldExtendable.ARROW_WIDTH * 2);
 
   this.elements = elements;
@@ -31,14 +29,28 @@ Blockly.FieldExtendable = function(elements, defaultInputs, minInputs, maxInputs
   this.separator = separator;
   this.collapser = collapser;
 
+  /** @type {boolean} */
+  this.disabled = false;
   this.inputs = undefined;
   this.defaultInputs = defaultInputs;
+
   this.addArgType('extendable');
+  
+  this.maxDisplayLength = Blockly.BlockSvg.MAX_DISPLAY_LENGTH;
 };
 goog.inherits(Blockly.FieldExtendable, Blockly.Field);
 
 Blockly.FieldExtendable.prototype.insertedInto = function(_input, _block) {
   this.setValue(this.defaultInputs, false);
+
+  function findStatements(n) {
+    return typeof n === "object" && n.type === "input_statement";
+  }
+  if (this.sourceBlock_.isInFlyout) {
+    this.disabled = !!(
+      this.elements.find(findStatements) || this.separator.find(findStatements) || this.collapser.find(findStatements)
+    );
+  }
 };
 
 /**
@@ -113,8 +125,8 @@ Blockly.FieldExtendable.prototype.init = function() {
   this.arrowRight.setAttributeNS('http://www.w3.org/1999/xlink', 'xlink:href',
       Blockly.mainWorkspace.options.pathToMedia + Blockly.FieldExtendable.ARROW_RIGHT_PATH
   );
-  this.arrowLeft.style.cursor = 'pointer';
-  this.arrowRight.style.cursor = 'pointer';
+  if (!this.disabled) this.arrowLeft.style.cursor = 'pointer';
+  if (!this.disabled) this.arrowRight.style.cursor = 'pointer';
 
   this.mouseDownWrapperLeft_ = Blockly.bindEventWithChecks_(
       this.arrowLeft, 'mousedown', this, this.onClick.bind(this, -1)
@@ -191,11 +203,7 @@ Blockly.FieldExtendable.prototype.setValue = function(newValue, opt_force, opt_n
   }
   
   if (this.inputs !== newInputs) {
-    if (this.sourceBlock_ && Blockly.Events.isEnabled()) {
-      Blockly.Events.fire(new Blockly.Events.BlockChange(
-          this.sourceBlock_, 'field', this.name, this.inputs, newInputs));
-    }
-
+    if (this.inputs === undefined) this.inputs = 0;
     if (this.sourceBlock_) {
       // If we decreased the number of inputs, remove some
       if (newInputs < this.inputs) {
@@ -235,11 +243,14 @@ Blockly.FieldExtendable.prototype.setValue = function(newValue, opt_force, opt_n
           }
         }
       }
+
+      if (this.sourceBlock_ && Blockly.Events.isEnabled()) {
+        Blockly.Events.fire(new Blockly.Events.BlockChange(
+            this.sourceBlock_, 'field', this.name, this.inputs, newInputs));
+      }
     }
 
     this.inputs = newInputs;
-    // TODO: this is a debug thing until inputs are implemented
-    console.log('Extendable field ' + this.name + ' now has ' + this.inputs + ' input(s)');
     if (!opt_noRender) {
       this.render_();
       if (this.sourceBlock_ && this.sourceBlock_.rendered) {
@@ -255,6 +266,7 @@ Blockly.FieldExtendable.prototype.setValue = function(newValue, opt_force, opt_n
  * @param {MouseEvent=} ev An optional mouse event.
  */
 Blockly.FieldExtendable.prototype.onClick = function(inputs, ev) {
+  if (this.disabled) return;
   this.setValue(this.inputs + (inputs * (ev && ev.shiftKey ? 3 : 1)));
 };
 

@@ -161,6 +161,41 @@ Blockly.Blocks['extension_recursive_extendable_test'] = {
   }
 };
 
+Blockly.Blocks['extension_extendable_if_test'] = {
+  /**
+   * @this Blockly.Block
+   */
+  init: function() {
+    this.jsonInit({
+      "message0": "%1",
+      "args0": [
+        {
+          "type": "extendable",
+          "name": "SUBSTACKS",
+          "args": [
+            "if",
+            {
+              "type": "input_value",
+              "name": "CONDITION",
+              "check": "Boolean"
+            },
+            "then",
+            {
+              "type": "input_statement",
+              "name": "SUBSTACK",
+            },
+          ],
+          "separator": "else",
+          "minInputs": 1,
+        }
+      ],
+      "category": Blockly.Categories.more,
+      "extensions": ["colours_more", "shape_statement"]
+    });
+  }
+};
+
+
 
 Blockly.Blocks['extension_pen_down'] = {
   /**
