@@ -86,7 +86,7 @@ Blockly.FieldExtendable.prototype.REVERSE_SERIALIZE = true;
 /**
  * Field name separator.
  */
-Blockly.FieldExtendable.prototype.SEP = ".";
+Blockly.FieldExtendable.prototype.SEP = "_";
 
 Blockly.FieldExtendable.ARROW_WIDTH = 16;
 Blockly.FieldExtendable.ARROW_HEIGHT = 32;
