@@ -165,7 +165,11 @@ Blockly.Xml.allFieldsToDom_ = function(block, element) {
     for (var j = 0, field; field = input.fieldRow[j]; j++) {
       var fieldDom = Blockly.Xml.fieldToDom_(field);
       if (fieldDom) {
-        element.appendChild(fieldDom);
+        if (field.REVERSE_SERIALIZE) {
+          element.insertBefore(fieldDom, element.children[0] || null);
+        } else {
+          element.appendChild(fieldDom);
+        }
       }
     }
   }
