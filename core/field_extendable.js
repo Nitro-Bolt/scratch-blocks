@@ -31,7 +31,7 @@ Blockly.FieldExtendable = function(elements, defaultInputs, minInputs, maxInputs
   this.separator = separator;
   this.collapser = collapser;
 
-  this.inputs = undefined;
+  this.inputs = 0;
   this.defaultInputs = defaultInputs;
   this.addArgType('extendable');
 };
