@@ -21,6 +21,7 @@ goog.require('Blockly.Field');
  * @constructor
  */
 Blockly.FieldExtendable = function(elements, defaultInputs, minInputs, maxInputs, separator, collapser) {
+  Blockly.FieldExtendable.superClass_.constructor.call(this, '', undefined);
   this.size_ = new goog.math.Size(Blockly.FieldExtendable.ARROW_HEIGHT, Blockly.FieldExtendable.ARROW_WIDTH * 2);
 
   this.elements = elements;
@@ -31,12 +32,10 @@ Blockly.FieldExtendable = function(elements, defaultInputs, minInputs, maxInputs
 
   /** @type {boolean} */
   this.disabled = false;
-  this.inputs = undefined;
+  this.inputs = 0;
   this.defaultInputs = defaultInputs;
 
   this.addArgType('extendable');
-  
-  this.maxDisplayLength = Blockly.BlockSvg.MAX_DISPLAY_LENGTH;
 };
 goog.inherits(Blockly.FieldExtendable, Blockly.Field);
 
