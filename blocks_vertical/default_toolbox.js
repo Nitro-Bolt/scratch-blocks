@@ -35,9 +35,6 @@ goog.require('Blockly.Blocks');
 
 Blockly.Blocks.defaultToolbox = '<xml id="toolbox-categories" style="display: none">' +
   '<category name="%{BKY_CATEGORY_MOTION}" id="motion" colour="#4C97FF" secondaryColour="#3373CC">' +
-    '<block type="extension_extendable_test" id="extension_extendable_test"></block>' +
-    '<block type="extension_nested_extendable_test" id="extension_nested_extendable_test"></block>' +
-    '<block type="extension_nested_extendable_inputs_test" id="extension_nested_extendable_inputs_test"></block>' +
     '<block type="motion_movesteps" id="motion_movesteps">' +
       '<value name="STEPS">' +
         '<shadow type="math_number">' +
@@ -756,7 +753,13 @@ Blockly.Blocks.defaultToolbox = '<xml id="toolbox-categories" style="display: no
     '    </shadow>' +
     '  </value>' +
     '</block>' +
-    '<sep gap="36"></sep>' +
+  '</category>' +
+  '<category name="Extensions" id="extensions" colour="#FF6680" secondaryColour="#FF4D6A" ' +
+    'iconURI="../media/extensions/wedo2-block-icon.svg" showStatusButton="true">' +
+    '<block type="extension_extendable_test" id="extension_extendable_test"></block>' +
+    '<block type="extension_nested_extendable_test" id="extension_nested_extendable_test"></block>' +
+    '<block type="extension_nested_extendable_inputs_test" id="extension_nested_extendable_inputs_test"></block>' +
+    '<block type="extension_recursive_extendable_test" id="extension_recursive_extendable_test"></block>' +
     '<block type="extension_pen_down" id="extension_pen_down"></block>' +
     '<block type="extension_music_drum" id="extension_music_drum">' +
       '<value name="NUMBER">' +

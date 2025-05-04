@@ -71,6 +71,11 @@ Blockly.FieldExtendable.fromJson = function(options) {
  */
 Blockly.FieldExtendable.prototype.CURSOR = 'default';
 Blockly.FieldExtendable.prototype.EDITABLE = false;
+Blockly.FieldExtendable.prototype.REVERSE_SERIALIZE = true;
+/**
+ * Field name separator.
+ */
+Blockly.FieldExtendable.prototype.SEP = ".";
 
 Blockly.FieldExtendable.ARROW_WIDTH = 16;
 Blockly.FieldExtendable.ARROW_HEIGHT = 32;
@@ -135,7 +140,7 @@ Blockly.FieldExtendable.prototype.getValue = function() {
  * @return {string} The prefix.
  */
 Blockly.FieldExtendable.prototype.getPrefix = function() {
-  return String(this.name || "") + "_";
+  return String(this.name || "") + this.SEP;
 };
 
 /**
@@ -162,7 +167,7 @@ Blockly.FieldExtendable.prototype.getInputName = function(id, opt_midfix) {
 Blockly.FieldExtendable.prototype.appendArgsList = function(elements, midfix, inputIndex, extendableIndex) {
   if (!elements.length) return inputIndex;
   var addedInputs = this.sourceBlock_.appendArgsList(
-      elements, undefined, inputIndex, true, this.getInputName(extendableIndex, midfix) + "_"
+      elements, undefined, inputIndex, true, this.getInputName(extendableIndex, midfix) + this.SEP
   );
   for (var j = 0; j < addedInputs.length; j++) {
     var input = addedInputs[j];

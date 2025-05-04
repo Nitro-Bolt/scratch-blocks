@@ -216,6 +216,13 @@ Blockly.Field.prototype.EDITABLE = true;
 Blockly.Field.prototype.SERIALIZABLE = true;
 
 /**
+ * If true, this field will be serialized in reverse (in case fields before this one depend on this field's value).
+ * @type {boolean}
+ * @public
+ */
+Blockly.Field.prototype.REVERSE_SERIALIZE = false;
+
+/**
  * Attach this field to a block.
  * @param {!Blockly.Block} block The block containing this field.
  */
