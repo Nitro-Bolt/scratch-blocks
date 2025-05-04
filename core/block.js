@@ -1514,7 +1514,7 @@ Blockly.Block.prototype.appendArgsList = function(
         if (typeof element == 'string') {
           field = new Blockly.FieldLabel(element);
         } else {
-          var name = element['name'] ? (opt_namePrefix + element['name']) : element['name']
+          var name = element['name'] ? (opt_namePrefix + element['name']) : element['name'];
           switch (element['type']) {
             case 'input_value':
               input = this.appendValueInput(name, opt_position);
@@ -1711,8 +1711,8 @@ Blockly.Block.prototype.removeNumberedInput = function(inputIndex, opt_quiet) {
       block.unplug();
     }
   }
-  input.dispose();
   this.inputList.splice(inputIndex, 1);
+  input.dispose();
 };
 
 /**
