@@ -38,7 +38,7 @@ Blockly.FieldExtendable = function(elements, defaultInputs, minInputs, maxInputs
 goog.inherits(Blockly.FieldExtendable, Blockly.Field);
 
 Blockly.FieldExtendable.prototype.insertedInto = function(_input, _block) {
-  this.setValue(this.defaultInputs, false, true);
+  this.setValue(this.defaultInputs, false);
 };
 
 /**
