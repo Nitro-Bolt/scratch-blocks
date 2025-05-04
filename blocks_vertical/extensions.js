@@ -67,7 +67,47 @@ Blockly.Blocks['extension_nested_extendable_test'] = {
    */
   init: function() {
     this.jsonInit({
-      "message0": "nested extendable test %1 asd",
+      "message0": "nested extendable test: %1 asd",
+      "args0": [
+        {
+          "type": "extendable",
+          "name": "EXTENDABLE",
+          "args": [
+            {
+              "type": "extendable",
+              "name": "EXTENDABLE",
+              "args": [
+                {
+                  "type": "field_image",
+                  "src": Blockly.mainWorkspace.options.pathToMedia + "extensions/pen-block-icon.svg",
+                  "width": 40,
+                  "height": 40
+                },
+              ],
+              "separator": [""],
+              "minInputs": 0,
+              "maxInputs": 100,
+            },
+          ],
+          "separator": ["|"],
+          "collapser": "EMPTY",
+          "minInputs": 0,
+          "maxInputs": 100,
+        },
+      ],
+      "category": Blockly.Categories.more,
+      "extensions": ["colours_more", "shape_statement"]
+    });
+  }
+};
+
+Blockly.Blocks['extension_nested_extendable_inputs_test'] = {
+  /**
+   * @this Blockly.Block
+   */
+  init: function() {
+    this.jsonInit({
+      "message0": "nested extendable with inputs %1 asd",
       "args0": [
         {
           "type": "extendable",

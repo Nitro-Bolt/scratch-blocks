@@ -163,8 +163,8 @@ Blockly.Input.prototype.insertFieldAt = function(index, field, opt_name) {
 Blockly.Input.prototype.removeField = function(name) {
   for (var i = 0, field; field = this.fieldRow[i]; i++) {
     if (field.name === name) {
-      field.dispose();
       this.fieldRow.splice(i, 1);
+      field.dispose();
       if (this.sourceBlock_.rendered) {
         this.sourceBlock_.render();
         // Removing a field will cause the block to change shape.

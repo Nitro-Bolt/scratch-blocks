@@ -16,10 +16,11 @@ goog.require('Blockly.Field');
  * @param {!number} minInputs Minimum inputs
  * @param {!number} maxInputs Maximum inputs
  * @param {!Array} separator Array of arguments to use as a separator
+ * @param {!Array} collapser Array of arguments to use with 0 inputs
  * @extends {Blockly.Field}
  * @constructor
  */
-Blockly.FieldExtendable = function(elements, defaultInputs, minInputs, maxInputs, separator) {
+Blockly.FieldExtendable = function(elements, defaultInputs, minInputs, maxInputs, separator, collapser) {
   Blockly.FieldExtendable.superClass_.constructor.call(this, '', undefined);
 
   this.size_ = new goog.math.Size(Blockly.FieldExtendable.ARROW_HEIGHT, Blockly.FieldExtendable.ARROW_WIDTH * 2);
@@ -28,12 +29,17 @@ Blockly.FieldExtendable = function(elements, defaultInputs, minInputs, maxInputs
   this.minInputs = minInputs;
   this.maxInputs = maxInputs;
   this.separator = separator;
+  this.collapser = collapser;
 
   this.inputs = undefined;
-  this.setValue(defaultInputs, false, true);
+  this.defaultInputs = defaultInputs;
   this.addArgType('extendable');
 };
 goog.inherits(Blockly.FieldExtendable, Blockly.Field);
+
+Blockly.FieldExtendable.prototype.insertedInto = function(_input, _block) {
+  this.setValue(this.defaultInputs, false, true);
+};
 
 /**
  * Construct a FieldExtendable from a JSON arg object.
@@ -54,7 +60,10 @@ Blockly.FieldExtendable.fromJson = function(options) {
   var separator = options.separator;
   if (separator === undefined) separator = [];
   if (!Array.isArray(separator)) separator = [separator];
-  return new Blockly.FieldExtendable(args, defaultInputs, minInputs, maxInputs, separator);
+  var collapser = options.collapser;
+  if (collapser === undefined) collapser = [];
+  if (!Array.isArray(collapser)) collapser = [collapser];
+  return new Blockly.FieldExtendable(args, defaultInputs, minInputs, maxInputs, separator, collapser);
 };
 
 /**
@@ -103,10 +112,10 @@ Blockly.FieldExtendable.prototype.init = function() {
   this.arrowRight.style.cursor = 'pointer';
 
   this.mouseDownWrapperLeft_ = Blockly.bindEventWithChecks_(
-      this.arrowLeft, 'mousedown', this, this.addInputs.bind(this, -1)
+      this.arrowLeft, 'mousedown', this, this.onClick.bind(this, -1)
   );
   this.mouseDownWrapperRight_ = Blockly.bindEventWithChecks_(
-      this.arrowRight, 'mousedown', this, this.addInputs.bind(this, 1)
+      this.arrowRight, 'mousedown', this, this.onClick.bind(this, 1)
   );
 
   this.sourceBlock_.getSvgRoot().appendChild(this.fieldGroup_);
@@ -130,24 +139,37 @@ Blockly.FieldExtendable.prototype.getPrefix = function() {
 };
 
 /**
- * Get the prefix used for input separators.
- * @return {string} The prefix.
+ * Get the absolute name of an extendable input from its index.
+ * @param {number | string} id The index of the input.
+ * @param {string=} opt_midfix An optional string to add after the prefix.
+ * @return {string} The final name of the input.
  */
-Blockly.FieldExtendable.prototype.getSepPrefix = function() {
-  return this.getPrefix() + "SEP";
+Blockly.FieldExtendable.prototype.getInputName = function(id, opt_midfix) {
+  if (opt_midfix) {
+    return this.getPrefix() + opt_midfix + String(id);
+  }
+  return this.getPrefix() + String(id);
 };
 
 /**
  * Get the absolute name of an extendable input from its index.
- * @param {number} id The index of the input.
- * @param {boolean} opt_sep If true, this is a separator.
- * @return {string} The final name of the input.
+ * @param {Array} elements Elements to add.
+ * @param {string} midfix A string to add after the prefix.
+ * @param {number} inputIndex The index to start appending inputs to in the block.
+ * @param {number | string} extendableIndex The extendable input index.
+ * @return {number} The shifted input index after the inputs were added.
  */
-Blockly.FieldExtendable.prototype.getInputName = function(id, opt_sep) {
-  if (opt_sep) {
-    return this.getSepPrefix() + String(id);
+Blockly.FieldExtendable.prototype.appendArgsList = function(elements, midfix, inputIndex, extendableIndex) {
+  if (!elements.length) return inputIndex;
+  var addedInputs = this.sourceBlock_.appendArgsList(
+      elements, undefined, inputIndex, true, this.getInputName(extendableIndex, midfix) + "_"
+  );
+  for (var j = 0; j < addedInputs.length; j++) {
+    var input = addedInputs[j];
+    input.extendableName = this.name;
+    input.extendableIndex = extendableIndex;
   }
-  return this.getPrefix() + String(id);
+  return inputIndex + addedInputs.length;
 };
 
 /**
@@ -172,8 +194,9 @@ Blockly.FieldExtendable.prototype.setValue = function(newValue, opt_force, opt_n
     if (this.sourceBlock_) {
       // If we decreased the number of inputs, remove some
       if (newInputs < this.inputs) {
-        for (var i = this.sourceBlock_.inputList.length - 1; i >= 0; i--) {
-          var input = this.sourceBlock_.inputList[i];
+        var inputList = Array.from(this.sourceBlock_.inputList);
+        for (var i = inputList.length - 1; i >= 0; i--) {
+          var input = inputList[i];
           if (input && input.extendableName == this.name && input.extendableIndex >= newInputs) {
             this.sourceBlock_.removeNumberedInput(i);
           }
@@ -183,27 +206,29 @@ Blockly.FieldExtendable.prototype.setValue = function(newValue, opt_force, opt_n
       var thisIndex = this.sourceBlock_.inputList.indexOf(this.sourceInput_);
       for (var i = this.inputs; i < newInputs; i++) {
         // Add separator for inputs after the first
-        if (i > 0) {
-          var addedSeps = this.sourceBlock_.appendArgsList(
-              this.separator, undefined, thisIndex, true, this.getInputName(this.inputs + i, true) + "_"
+        if (i > 0 && this.separator.length) {
+          thisIndex = this.appendArgsList(
+              this.separator, "SEP", thisIndex, i
           );
-          for (var j = 0; j < addedSeps.length; j++) {
-            var sep = addedSeps[j];
-            sep.extendableName = this.name;
-            sep.extendableIndex = this.inputs + i;
-          }
-          thisIndex += addedSeps.length;
         }
-
-        var addedInputs = this.sourceBlock_.appendArgsList(
-            this.elements, undefined, thisIndex, true, this.getInputName(this.inputs + i, false) + "_"
+        thisIndex = this.appendArgsList(
+            this.elements, "", thisIndex, i
         );
-        for (var j = 0; j < addedInputs.length; j++) {
-          var input = addedInputs[j];
-          input.extendableName = this.name;
-          input.extendableIndex = this.inputs + i;
+      }
+
+      if (newInputs === 0 && this.inputs !== 0) {
+        // Add collapser if needed
+        thisIndex = this.appendArgsList(
+            this.collapser, "", thisIndex, "COLLAPSER"
+        );
+      } else if (newInputs !== 0 && this.inputs === 0) {
+        // Or remove it
+        for (var i = this.sourceBlock_.inputList.length - 1; i >= 0; i--) {
+          var input = this.sourceBlock_.inputList[i];
+          if (input && input.extendableName == this.name && input.extendableIndex == "COLLAPSER") {
+            this.sourceBlock_.removeNumberedInput(i);
+          }
         }
-        thisIndex += addedInputs.length;
       }
     }
 
@@ -218,6 +243,14 @@ Blockly.FieldExtendable.prototype.setValue = function(newValue, opt_force, opt_n
       }
     }
   }
+};
+
+/**
+ * @param {number} inputs Number of inputs to add.
+ * @param {MouseEvent=} ev An optional mouse event.
+ */
+Blockly.FieldExtendable.prototype.onClick = function(inputs, ev) {
+  this.setValue(this.inputs + (inputs * (ev && ev.shiftKey ? 3 : 1)));
 };
 
 /**
@@ -245,7 +278,14 @@ Blockly.FieldExtendable.prototype.updateWidth = function() {
 
 Blockly.FieldExtendable.prototype.dispose = function() {
   // Dispose of any inputs added by this field
-  this.setValue(0, true, true);
+  if (this.sourceBlock_) {
+    for (var i = this.sourceBlock_.inputList.length - 1; i >= 0; i--) {
+      var input = this.sourceBlock_.inputList[i];
+      if (input && input.sourceBlock_ && input.extendableName == this.name) {
+        this.sourceBlock_.removeNumberedInput(i);
+      }
+    }
+  }
   if (this.mouseDownWrapperLeft_) {
     Blockly.unbindEvent_(this.mouseDownWrapperLeft_);
   }
