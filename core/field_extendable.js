@@ -42,14 +42,7 @@ goog.inherits(Blockly.FieldExtendable, Blockly.Field);
 Blockly.FieldExtendable.prototype.insertedInto = function(_input, _block) {
   this.setValue(this.defaultInputs, false);
 
-  function findStatements(n) {
-    return typeof n === "object" && n.type === "input_statement";
-  }
-  if (this.sourceBlock_.isInFlyout) {
-    this.disabled = !!(
-      this.elements.find(findStatements) || this.separator.find(findStatements) || this.collapser.find(findStatements)
-    );
-  }
+  this.disabled = this.sourceBlock_.isInFlyout;
 };
 
 /**
