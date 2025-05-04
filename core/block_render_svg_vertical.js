@@ -740,7 +740,7 @@ Blockly.BlockSvg.prototype.renderFields_ = function(fieldList, cursorX,
     // to avoid overlapping with the notch. Label and image fields are
     // excluded.
     if (this.previousConnection && !(field instanceof Blockly.FieldLabel) &&
-        !(field instanceof Blockly.FieldImage)) {
+        !(field instanceof Blockly.FieldImage) && !(field instanceof Blockly.FieldExtendable)) {
       cursorX = this.RTL ?
         Math.min(cursorX, -Blockly.BlockSvg.INPUT_AND_FIELD_MIN_X) :
         Math.max(cursorX, Blockly.BlockSvg.INPUT_AND_FIELD_MIN_X);
@@ -785,8 +785,8 @@ Blockly.BlockSvg.prototype.renderFields_ = function(fieldList, cursorX,
       }
     }
     if (this.RTL &&
-        field instanceof Blockly.FieldImage &&
-        field.getFlipRTL()) {
+        (field instanceof Blockly.FieldImage &&
+        field.getFlipRTL() || field instanceof Blockly.FieldExtendable)) {
       scale = 'scale(-1 1)';
       translateX += field.renderWidth;
     }
