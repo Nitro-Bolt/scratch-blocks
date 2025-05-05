@@ -13,6 +13,7 @@ goog.require('Blockly.constants');
 
 Blockly.Blocks['checkbox'] = {
   /**
+   * Block for checkbox input
    * @this Blockly.Block
    */
   init: function() {
