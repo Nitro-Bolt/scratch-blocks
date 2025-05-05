@@ -255,7 +255,7 @@ Blockly.FieldExtendable.prototype.setValue = function(newValue, opt_force, opt_n
       this.render_();
       if (this.sourceBlock_ && this.sourceBlock_.rendered) {
         this.sourceBlock_.initSvg();
-        this.sourceBlock_.render(false);
+        this.sourceBlock_.render();
       }
     }
   }
