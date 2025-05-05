@@ -27,6 +27,26 @@ goog.require('Blockly.Colours');
 goog.require('Blockly.constants');
 goog.require('Blockly.ScratchBlocks.VerticalExtensions');
 
+Blockly.Blocks['extension_checkbox_test'] = {
+  /**
+   * @this Blockly.Block
+   */
+  init: function() {
+    this.jsonInit({
+      "message0": "checkbox test %1",
+      "args0": [
+        {
+          "type": "input_value",
+          "name": "CHECKBOX",
+          "output": "Boolean"
+        }
+      ],
+      "category": Blockly.Categories.more,
+      "extensions": ["colours_more", "shape_statement"]
+    });
+  }
+};
+
 Blockly.Blocks['extension_pen_down'] = {
   /**
    * @this Blockly.Block
