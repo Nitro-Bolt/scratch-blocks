@@ -166,12 +166,18 @@ Blockly.FieldExtendable.prototype.getInputName = function(id, opt_midfix) {
  * @param {string} midfix A string to add after the prefix.
  * @param {number} inputIndex The index to start appending inputs to in the block.
  * @param {number | string} extendableIndex The extendable input index.
+ * @param {boolean=} populate If true, default input_values shadows will automatically be populated.
  * @return {number} The shifted input index after the inputs were added.
  */
-Blockly.FieldExtendable.prototype.appendArgsList = function(elements, midfix, inputIndex, extendableIndex) {
+Blockly.FieldExtendable.prototype.appendArgsList = function(elements, midfix, inputIndex, extendableIndex, populate) {
   if (!elements.length) return inputIndex;
   var addedInputs = this.sourceBlock_.appendArgsList(
-      elements, undefined, inputIndex, true, this.getInputName(extendableIndex, midfix) + this.SEP
+      elements, {
+        position: inputIndex,
+        returnInputs: true,
+        namePrefix: this.getInputName(extendableIndex, midfix) + this.SEP,
+        populate: populate
+      }
   );
   for (var j = 0; j < addedInputs.length; j++) {
     var input = addedInputs[j];
@@ -195,6 +201,7 @@ Blockly.FieldExtendable.prototype.setValue = function(newValue, opt_force, opt_n
   }
   
   if (this.inputs !== newInputs) {
+    var shouldPopulate = this.sourceBlock_ && (this.sourceBlock_.rendered || this.sourceBlock_.isInFlyout);
     if (this.inputs === undefined) this.inputs = 0;
     if (this.sourceBlock_) {
       // If we decreased the number of inputs, remove some
@@ -213,18 +220,18 @@ Blockly.FieldExtendable.prototype.setValue = function(newValue, opt_force, opt_n
         // Add separator for inputs after the first
         if (i > 0 && this.separator.length) {
           thisIndex = this.appendArgsList(
-              this.separator, "SEP", thisIndex, i
+              this.separator, "SEP", thisIndex, i, shouldPopulate
           );
         }
         thisIndex = this.appendArgsList(
-            this.elements, "", thisIndex, i
+            this.elements, "", thisIndex, i, shouldPopulate
         );
       }
 
       if (newInputs === 0 && this.inputs !== 0) {
         // Add collapser if needed
         thisIndex = this.appendArgsList(
-            this.collapser, "", thisIndex, "COLLAPSER"
+            this.collapser, "", thisIndex, "COLLAPSER", shouldPopulate
         );
       } else if (newInputs !== 0 && this.inputs === 0) {
         // Or remove it
