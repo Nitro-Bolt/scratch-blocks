@@ -137,4 +137,9 @@ Blockly.FieldCheckbox.prototype.showEditor_ = function() {
   }
 };
 
+Blockly.FieldCheckbox.prototype.updateWidth = function() {
+  Blockly.FieldCheckbox.superClass_.updateWidth.call(this)
+  this.size_.width = 8 * Blockly.BlockSvg.GRID_UNIT
+}
+
 Blockly.Field.register('field_checkbox', Blockly.FieldCheckbox);
