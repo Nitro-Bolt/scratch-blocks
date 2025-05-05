@@ -1480,23 +1480,32 @@ Blockly.Block.prototype.interpolate_ = function(message, args, lastDummyAlign) {
     throw new Error('Block "' + this.type + '": ' +
         'Message does not reference all ' + args.length + ' arg(s).');
   }
-  this.appendArgsList(elements, lastDummyAlign);
+  this.appendArgsList(elements, {lastDummyAlign: lastDummyAlign, populate: this.isInFlyout});
 };
 
 /**
  * Add an array of block inputs in jsonInit format, optionally in specific position.
  * @param {Array} elements The array of elements to add
- * @param {string=} lastDummyAlign If a dummy input is added at the end,
+ * @param {object} options Additional options.
+ * @param {string=} options.lastDummyAlign If a dummy input is added at the end,
  *     how should it be aligned?
- * @param {number=} opt_position The position to place the elements in.
- * @param {boolean=} opt_returnInputs If true, returns added inputs in an array.
- * @param {string=} opt_namePrefix String to prefix all input and field names with.
+ * @param {number=} options.position The position to place the elements in.
+ * @param {boolean=} options.returnInputs If true, returns added inputs in an array.
+ * @param {string=} options.namePrefix String to prefix all input and field names with.
+ * @param {boolean=} options.populate If true, input_value shadows will automatically be populated.
  * @returns {Array<Blockly.Input>} All inputs added, if opt_returnInputs is true.
  */
 Blockly.Block.prototype.appendArgsList = function(
-    elements, lastDummyAlign, opt_position, opt_returnInputs, opt_namePrefix
+    elements, options
 ) {
   if (!elements.length) return [];
+
+  if (!options) options = {};
+  var lastDummyAlign = options.lastDummyAlign;
+  var opt_position = options.position;
+  var opt_returnInputs = options.returnInputs;
+  var opt_namePrefix = options.namePrefix;
+  var opt_populate = options.populate;
   
   // Add last dummy input if needed.
   var dummyInput;
@@ -1554,6 +1563,27 @@ Blockly.Block.prototype.appendArgsList = function(
             case 'input_value':
               input = this.appendValueInput(name, opt_position);
               if (opt_position !== undefined) opt_position++;
+              if (opt_populate && element.shadowOpcode) {
+                var blockType = element.shadowOpcode;
+                Blockly.Events.disable();
+                try {
+                  var newBlock = this.workspace.newBlock(blockType);
+                  if (element.shadowFieldName) {
+                    newBlock.setFieldValue(element.shadowFieldValue, element.shadowFieldName);
+                  }
+                  newBlock.setShadow(true);
+                  if (!this.isInsertionMarker()) {
+                    newBlock.initSvg();
+                    newBlock.render(false);
+                  }
+                } finally {
+                  Blockly.Events.enable();
+                }
+                if (Blockly.Events.isEnabled()) {
+                  Blockly.Events.fire(new Blockly.Events.BlockCreate(newBlock));
+                }
+                newBlock.outputConnection.connect(input.connection);
+              }
               break;
             case 'input_statement':
               if (opt_position !== undefined) emptyFieldStack();

@@ -48,6 +48,9 @@ Blockly.Blocks['extension_extendable_test'] = {
             {
               "type": "input_value",
               "name": "INPUT",
+              "shadowOpcode": "text",
+              "shadowFieldName": "TEXT",
+              "shadowFieldValue": "apple"
             },
           ],
           "separator": ["sep text"],
