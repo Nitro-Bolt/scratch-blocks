@@ -451,13 +451,13 @@ Blockly.ScratchBlocks.ProcedureUtils.attachShadow_ = function(input,
       switch (argumentType) {
         case 'n':
           newBlock.setFieldValue('1', 'NUM');
-          break
+          break;
         case 's':
           newBlock.setFieldValue('', 'TEXT');
-          break
+          break;
         case 'b':
           newBlock.setFieldValue('FALSE', 'CHECKBOX')
-          break
+          break;
       }
       newBlock.setShadow(true);
       if (!this.isInsertionMarker()) {
