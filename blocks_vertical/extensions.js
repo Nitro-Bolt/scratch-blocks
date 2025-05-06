@@ -198,6 +198,43 @@ Blockly.Blocks['extension_extendable_if_test'] = {
   }
 };
 
+Blockly.Blocks['extension_extendable_reporter_test'] = {
+  /**
+   * @this Blockly.Block
+   */
+  init: function() {
+    this.jsonInit({
+      "message0": "hot dog %1",
+      "args0": [
+        {
+          "type": "extendable",
+          "name": "EXTENDABLE",
+          "args": [
+            {
+              "type": "field_image",
+              "src": Blockly.mainWorkspace.options.pathToMedia + "extensions/pen-block-icon.svg",
+              "width": 40,
+              "height": 40
+            },
+            {
+              "type": "input_value",
+              "name": "INPUT",
+              "shadowOpcode": "text",
+              "shadowFieldName": "TEXT",
+              "shadowFieldValue": "apple"
+            },
+          ],
+          "separator": ["sep text"],
+          "minInputs": 0,
+          "maxInputs": 10,
+        },
+      ],
+      "category": Blockly.Categories.more,
+      "extensions": ["colours_more", "output_string"]
+    });
+  }
+};
+
 
 
 Blockly.Blocks['extension_pen_down'] = {
