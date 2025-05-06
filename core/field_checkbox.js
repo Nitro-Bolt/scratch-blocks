@@ -26,6 +26,7 @@
 
 goog.provide('Blockly.FieldCheckbox');
 
+goog.require('Blockly.Colours');
 goog.require('Blockly.Field');
 
 
@@ -64,6 +65,11 @@ Blockly.FieldCheckbox.fromJson = function(options) {
 Blockly.FieldCheckbox.CHECKMARK = 'M -4.5 1.5 A 1 1 90 0 1 -2.5 -0.5 L -1.5 0.5 L 2.5 -3.5 A 1 1 0 0 1 4.5 -1.5 L -0.5 3.5 Q -1.5 4.5 -2.5 3.5 Z';
 
 /**
+ * Icon for the cross mark.
+ */
+Blockly.FieldCheckbox.CROSS = 'M -2.5 -4.5 A 1 1 0 0 0 -4.5 -2.5 L -2 0 L -4.5 2.5 A 1 1 0 0 0 -2.5 4.5 L 0 2 L 2.5 4.5 A 1 1 0 0 0 4.5 2.5 L 2 0 L 4.5 -2.5 A 1 1 0 0 0 2.5 -4.5 L 0 -2 Z'
+
+/**
  * Mouse cursor style when over the hotspot that initiates editability.
  */
 Blockly.FieldCheckbox.prototype.CURSOR = 'pointer';
@@ -81,12 +87,12 @@ Blockly.FieldCheckbox.prototype.init = function() {
   // Instead it uses a custom checkmark element that is either visible or not.
   this.checkElement_ = Blockly.utils.createSvgElement('path',
     {
-      'class': 'blocklyText blocklyCheckbox',
+      'class': 'blocklyText',
       'transform': `translate(${this.textElement_.getAttribute('x')},${this.textElement_.getAttribute('y')-2}) scale(1.5)`
     },
     this.fieldGroup_
   );
-  this.checkElement_.setAttribute('d', this.state_ ? Blockly.FieldCheckbox.CHECKMARK : 'M 0 0 Z');
+  this.rerender(this.state_);
 };
 
 /**
@@ -96,6 +102,25 @@ Blockly.FieldCheckbox.prototype.init = function() {
 Blockly.FieldCheckbox.prototype.getValue = function() {
   return String(this.state_).toUpperCase();
 };
+
+/**
+ * @param {boolean} state
+ */
+Blockly.FieldCheckbox.prototype.rerender = function(state) {
+  if (this.checkElement_) {
+    this.checkElement_.setAttribute('d', state ? Blockly.FieldCheckbox.CHECKMARK : Blockly.FieldCheckbox.CROSS);
+    this.checkElement_.setAttribute('opacity', state ? 1 : 0.5);
+  }
+  if (this.sourceBlock_) {
+    if (state) {
+      this.sourceBlock_.setColour(Blockly.Colours.operators.primary, Blockly.Colours.operators.primary, this.sourceBlock_.getColourTertiary(),
+          this.sourceBlock_.getColourQuaternary());
+    } else {
+      this.sourceBlock_.setColour(this.sourceBlock_.getColourTertiary(), this.sourceBlock_.getColourTertiary(), this.sourceBlock_.getColourTertiary(),
+          this.sourceBlock_.getColourQuaternary());
+    }
+  }
+}
 
 /**
  * Set the checkbox to be checked if newBool is 'TRUE' or true,
@@ -111,9 +136,7 @@ Blockly.FieldCheckbox.prototype.setValue = function(newBool) {
           this.sourceBlock_, 'field', this.name, this.state_, newState));
     }
     this.state_ = newState;
-    if (this.checkElement_) {
-      this.checkElement_.setAttribute('d', newState ? Blockly.FieldCheckbox.CHECKMARK : 'M 0 0 Z');
-    }
+    this.rerender(newState);
   }
 };
 
