@@ -58,9 +58,10 @@ Blockly.FieldCheckbox.fromJson = function(options) {
   return new Blockly.FieldCheckbox(options['checked'] ? 'TRUE' : 'FALSE');
 };
 
-Blockly.FieldCheckbox.SYMBOL_FALSE = 'M -2.5 -4.5 A 1 1 0 0 0 -4.5 -2.5 L -2 0 L -4.5 2.5 A 1 1 0 0 0 -2.5 4.5 L 0 2 L 2.5 4.5 A 1 1 0 0 0 4.5 2.5 L 2 0 L 4.5 -2.5 A 1 1 0 0 0 2.5 -4.5 L 0 -2 Z'
-
-Blockly.FieldCheckbox.SYMBOL_TRUE = 'M -4.5 1.5 A 1 1 90 0 1 -2.5 -0.5 L -1.5 0.5 L 2.5 -3.5 A 1 1 0 0 1 4.5 -1.5 L -0.5 3.5 Q -1.5 4.5 -2.5 3.5 Z'
+/**
+ * Icon for the checkmark.
+ */
+Blockly.FieldCheckbox.CHECKMARK = 'M -4.5 1.5 A 1 1 90 0 1 -2.5 -0.5 L -1.5 0.5 L 2.5 -3.5 A 1 1 0 0 1 4.5 -1.5 L -0.5 3.5 Q -1.5 4.5 -2.5 3.5 Z';
 
 /**
  * Mouse cursor style when over the hotspot that initiates editability.
@@ -85,7 +86,7 @@ Blockly.FieldCheckbox.prototype.init = function() {
     },
     this.fieldGroup_
   );
-  this.checkElement_.setAttribute('d', this.state_ ? Blockly.FieldCheckbox.SYMBOL_TRUE : Blockly.FieldCheckbox.SYMBOL_FALSE);
+  this.checkElement_.setAttribute('d', this.state_ ? Blockly.FieldCheckbox.CHECKMARK : 'M 0 0 Z');
 };
 
 /**
@@ -111,7 +112,7 @@ Blockly.FieldCheckbox.prototype.setValue = function(newBool) {
     }
     this.state_ = newState;
     if (this.checkElement_) {
-      this.checkElement_.setAttribute('d', newState ? Blockly.FieldCheckbox.SYMBOL_TRUE : Blockly.FieldCheckbox.SYMBOL_FALSE);
+      this.checkElement_.setAttribute('d', newState ? Blockly.FieldCheckbox.CHECKMARK : 'M 0 0 Z');
     }
   }
 };
