@@ -63,10 +63,14 @@ Blockly.FieldCheckbox.fromJson = function(options) {
  */
 Blockly.FieldCheckbox.CHECK_CHAR = '\u2713';
 
+Blockly.FieldCheckbox.SYMBOL_FALSE = 'M -2.5 -4.5 A 1 1 0 0 0 -4.5 -2.5 L -2 0 L -4.5 2.5 A 1 1 0 0 0 -2.5 4.5 L 0 2 L 2.5 4.5 A 1 1 0 0 0 4.5 2.5 L 2 0 L 4.5 -2.5 A 1 1 0 0 0 2.5 -4.5 L 0 -2 Z'
+
+Blockly.FieldCheckbox.SYMBOL_TRUE = 'M -4.5 1.5 A 1 1 90 0 1 -2.5 -0.5 L -1.5 0.5 L 2.5 -3.5 A 1 1 0 0 1 4.5 -1.5 L -0.5 3.5 Q -1.5 4.5 -2.5 3.5 Z'
+
 /**
  * Mouse cursor style when over the hotspot that initiates editability.
  */
-Blockly.FieldCheckbox.prototype.CURSOR = 'default';
+Blockly.FieldCheckbox.prototype.CURSOR = 'pointer';
 
 /**
  * Install this checkbox on a block.
@@ -79,19 +83,14 @@ Blockly.FieldCheckbox.prototype.init = function() {
   Blockly.FieldCheckbox.superClass_.init.call(this);
   // The checkbox doesn't use the inherited text element.
   // Instead it uses a custom checkmark element that is either visible or not.
-  this.checkElement_ = Blockly.utils.createSvgElement('text',
+  this.checkElement_ = Blockly.utils.createSvgElement('path',
     {
       'class': 'blocklyText blocklyCheckbox',
-      'dominant-baseline': 'middle',
-      'text-anchor': 'middle',
-      'x': this.textElement_.getAttribute('x'),
-      'y': this.textElement_.getAttribute('y')
+      'transform': `translate(${this.textElement_.getAttribute('x')},${this.textElement_.getAttribute('y')-2}) scale(2)`
     },
     this.fieldGroup_
   );
-  var textNode = document.createTextNode(Blockly.FieldCheckbox.CHECK_CHAR);
-  this.checkElement_.appendChild(textNode);
-  this.checkElement_.style.display = this.state_ ? 'block' : 'none';
+  this.checkElement_.setAttribute('d', this.state_ ? Blockly.FieldCheckbox.SYMBOL_TRUE : Blockly.FieldCheckbox.SYMBOL_FALSE);
 };
 
 /**
@@ -117,7 +116,7 @@ Blockly.FieldCheckbox.prototype.setValue = function(newBool) {
     }
     this.state_ = newState;
     if (this.checkElement_) {
-      this.checkElement_.style.display = newState ? 'block' : 'none';
+      this.checkElement_.setAttribute('d', newState ? Blockly.FieldCheckbox.SYMBOL_TRUE : Blockly.FieldCheckbox.SYMBOL_FALSE);
     }
   }
 };
