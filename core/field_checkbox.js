@@ -86,7 +86,7 @@ Blockly.FieldCheckbox.prototype.init = function() {
   this.checkElement_ = Blockly.utils.createSvgElement('path',
     {
       'class': 'blocklyText blocklyCheckbox',
-      'transform': `translate(${this.textElement_.getAttribute('x')},${this.textElement_.getAttribute('y')-2}) scale(2)`
+      'transform': `translate(${this.textElement_.getAttribute('x')},${this.textElement_.getAttribute('y')-2}) scale(1.5)`
     },
     this.fieldGroup_
   );
