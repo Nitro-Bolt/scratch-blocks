@@ -456,7 +456,7 @@ Blockly.ScratchBlocks.ProcedureUtils.attachShadow_ = function(input,
           newBlock.setFieldValue('', 'TEXT');
           break;
         case 'b':
-          newBlock.setFieldValue('FALSE', 'CHECKBOX')
+          newBlock.setFieldValue('FALSE', 'CHECKBOX');
           break;
       }
       newBlock.setShadow(true);
