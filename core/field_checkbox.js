@@ -93,7 +93,7 @@ Blockly.FieldCheckbox.prototype.init = function() {
     },
     this.fieldGroup_
   );
-  this.rerender(this.state_);
+  this.render_();
 };
 
 /**
@@ -104,24 +104,44 @@ Blockly.FieldCheckbox.prototype.getValue = function() {
   return String(this.state_).toUpperCase();
 };
 
-/**
- * @param {boolean} state
- */
-Blockly.FieldCheckbox.prototype.rerender = function(state) {
+Blockly.FieldCheckbox.prototype.updateState = function() {
   if (this.checkElement_) {
-    this.checkElement_.setAttribute('d', state ? Blockly.FieldCheckbox.CHECKMARK : Blockly.FieldCheckbox.CROSS);
-    this.checkElement_.setAttribute('opacity', state ? 1 : 0.5);
+    this.checkElement_.setAttribute('d', this.state_ ? Blockly.FieldCheckbox.CHECKMARK : Blockly.FieldCheckbox.CROSS);
+    this.checkElement_.setAttribute('opacity', this.state_ ? 1 : 0.5);
   }
-  if (this.sourceBlock_) {
-    if (state) {
+  if (this.sourceBlock_ && !this.sourceBlock_.isInsertionMarker()) {
+    if (this.state_) {
       this.sourceBlock_.setColour(Blockly.Colours.operators.primary, Blockly.Colours.operators.primary, this.sourceBlock_.getColourTertiary(),
           this.sourceBlock_.getColourQuaternary());
     } else {
-      this.sourceBlock_.setColour(this.sourceBlock_.getColourTertiary(), this.sourceBlock_.getColourTertiary(), this.sourceBlock_.getColourTertiary(),
-          this.sourceBlock_.getColourQuaternary());
+      this.sourceBlock_.setColour(
+        this.sourceBlock_.getColourTertiary(), this.sourceBlock_.getColourTertiary(),
+        this.sourceBlock_.getColourTertiary(), this.sourceBlock_.getColourQuaternary()
+      );
     }
   }
-}
+};
+
+/**
+ * Attach this field to a block.
+ * @param {!Blockly.Block} block The block containing this field.
+ */
+Blockly.FieldCheckbox.prototype.setSourceBlock = function(block) {
+  Blockly.FieldCheckbox.superClass_.setSourceBlock.call(this, block);
+  // HACK: for shadow blocks. wait until the block is inserted into its parent
+  if (window.queueMicrotask) {
+    window.queueMicrotask(this.updateState.bind(this));
+  } else {
+    // eslint-disable-next-line no-undef
+    Promise.resolve().then(this.updateState.bind(this));
+  }
+};
+
+
+Blockly.FieldCheckbox.prototype.render_ = function() {
+  this.updateState();
+  Blockly.FieldCheckbox.superClass_.render_.call(this);
+};
 
 /**
  * Set the checkbox to be checked if newBool is 'TRUE' or true,
@@ -137,7 +157,7 @@ Blockly.FieldCheckbox.prototype.setValue = function(newBool) {
           this.sourceBlock_, 'field', this.name, this.state_, newState));
     }
     this.state_ = newState;
-    this.rerender(newState);
+    this.render_();
   }
 };
 
@@ -157,8 +177,9 @@ Blockly.FieldCheckbox.prototype.showEditor_ = function() {
 };
 
 Blockly.FieldCheckbox.prototype.updateWidth = function() {
-  Blockly.FieldCheckbox.superClass_.updateWidth.call(this)
-  this.size_.width = 8 * Blockly.BlockSvg.GRID_UNIT
-}
+  Blockly.FieldCheckbox.superClass_.updateWidth.call(this);
+  this.size_.width = 8 * Blockly.BlockSvg.GRID_UNIT;
+  this.updateState();
+};
 
 Blockly.Field.register('field_checkbox', Blockly.FieldCheckbox);
