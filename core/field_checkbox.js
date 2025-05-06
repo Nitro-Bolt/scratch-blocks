@@ -58,11 +58,6 @@ Blockly.FieldCheckbox.fromJson = function(options) {
   return new Blockly.FieldCheckbox(options['checked'] ? 'TRUE' : 'FALSE');
 };
 
-/**
- * Character for the checkmark.
- */
-Blockly.FieldCheckbox.CHECK_CHAR = '\u2713';
-
 Blockly.FieldCheckbox.SYMBOL_FALSE = 'M -2.5 -4.5 A 1 1 0 0 0 -4.5 -2.5 L -2 0 L -4.5 2.5 A 1 1 0 0 0 -2.5 4.5 L 0 2 L 2.5 4.5 A 1 1 0 0 0 4.5 2.5 L 2 0 L 4.5 -2.5 A 1 1 0 0 0 2.5 -4.5 L 0 -2 Z'
 
 Blockly.FieldCheckbox.SYMBOL_TRUE = 'M -4.5 1.5 A 1 1 90 0 1 -2.5 -0.5 L -1.5 0.5 L 2.5 -3.5 A 1 1 0 0 1 4.5 -1.5 L -0.5 3.5 Q -1.5 4.5 -2.5 3.5 Z'
