@@ -761,6 +761,7 @@ Blockly.Blocks.defaultToolbox = '<xml id="toolbox-categories" style="display: no
     '<block type="extension_nested_extendable_inputs_test" id="extension_nested_extendable_inputs_test"></block>' +
     '<block type="extension_recursive_extendable_test" id="extension_recursive_extendable_test"></block>' +
     '<block type="extension_extendable_if_test" id="extension_extendable_if_test"></block>' +
+    '<block type="extension_extendable_reporter_test" id="extension_extendable_reporter_test"></block>' +
     '<sep gap="36"></sep>' +
     '<block type="extension_pen_down" id="extension_pen_down"></block>' +
     '<block type="extension_music_drum" id="extension_music_drum">' +
