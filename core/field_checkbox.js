@@ -27,6 +27,7 @@
 goog.provide('Blockly.FieldCheckbox');
 
 goog.require('Blockly.Colours');
+
 goog.require('Blockly.Field');
 
 
