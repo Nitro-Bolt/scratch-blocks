@@ -744,7 +744,7 @@ Blockly.Blocks.defaultToolbox = '<xml id="toolbox-categories" style="display: no
         '<shadow type="checkbox"></shadow>' +
       '</value>' +
     '</block>' +
-    '<sep gap="36"/>' +
+    '<sep gap="36"></sep>' +
     '<block type="extension_pen_down" id="extension_pen_down"></block>' +
     '<block type="extension_music_drum" id="extension_music_drum">' +
       '<value name="NUMBER">' +
