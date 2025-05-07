@@ -33,7 +33,7 @@ goog.require('Blockly.Field');
 
 /**
  * Class for a checkbox field.
- * @param {string} state The initial state of the field ('TRUE' or 'FALSE').
+ * @param {string} state The initial state of the field ('true' or 'false').
  * @param {Function=} opt_validator A function that is executed when a new
  *     option is selected.  Its sole argument is the new checkbox state.  If
  *     it returns a value, this becomes the new checkbox state, unless the
@@ -57,7 +57,7 @@ goog.inherits(Blockly.FieldCheckbox, Blockly.Field);
  * @nocollapse
  */
 Blockly.FieldCheckbox.fromJson = function(options) {
-  return new Blockly.FieldCheckbox(options['checked'] ? 'TRUE' : 'FALSE');
+  return new Blockly.FieldCheckbox(options['checked'] ? 'true' : 'false');
 };
 
 /**
@@ -97,11 +97,11 @@ Blockly.FieldCheckbox.prototype.init = function() {
 };
 
 /**
- * Return 'TRUE' if the checkbox is checked, 'FALSE' otherwise.
+ * Return 'true' if the checkbox is checked, 'false' otherwise.
  * @return {string} Current state.
  */
 Blockly.FieldCheckbox.prototype.getValue = function() {
-  return String(this.state_).toUpperCase();
+  return this.state_ ? 'true' : 'false';
 };
 
 Blockly.FieldCheckbox.prototype.updateState = function() {
@@ -144,17 +144,17 @@ Blockly.FieldCheckbox.prototype.render_ = function() {
 };
 
 /**
- * Set the checkbox to be checked if newBool is 'TRUE' or true,
+ * Set the checkbox to be checked if newBool is 'true' or true,
  * unchecks otherwise.
  * @param {string|boolean} newBool New state.
  */
 Blockly.FieldCheckbox.prototype.setValue = function(newBool) {
   var newState = (typeof newBool == 'string') ?
-      (newBool.toUpperCase() == 'TRUE') : !!newBool;
+      (newBool.toLowerCase() == 'true') : !!newBool;
   if (this.state_ !== newState) {
     if (this.sourceBlock_ && Blockly.Events.isEnabled()) {
       Blockly.Events.fire(new Blockly.Events.BlockChange(
-          this.sourceBlock_, 'field', this.name, this.state_, newState));
+          this.sourceBlock_, 'field', this.name, this.state_ ? 'true' : 'false', newState ? 'true' : 'false'));
     }
     this.state_ = newState;
     this.render_();
@@ -172,7 +172,7 @@ Blockly.FieldCheckbox.prototype.showEditor_ = function() {
     newState = this.callValidator(newState);
   }
   if (newState !== null) {
-    this.setValue(String(newState).toUpperCase());
+    this.setValue(newState ? 'true' : 'false');
   }
 };
 
