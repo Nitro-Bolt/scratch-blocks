@@ -250,10 +250,10 @@
       editorActions.style.visibility = 'hidden';
     }
 
-    document.getElementById('changeColour').addEventListener('change', ev => {
-      mutationRoot.setColour(ev.target.value)
-      mutationRoot.updateDisplay_()
-    }) 
+    document.getElementById('changeColour').addEventListener('change', element => {
+      mutationRoot.setColour(element.target.value);
+      mutationRoot.updateDisplay_();
+    });
 </script>
 
 </body>
