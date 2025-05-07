@@ -296,10 +296,26 @@ Blockly.Blocks.defaultToolbox = '<xml id="toolbox-categories" style="display: no
       '</value>' +
     '</block>' +
     '<block type="control_forever" id="control_forever"></block>' +
-    '<block type="control_if" id="control_if"></block>' +
-    '<block type="control_if_else" id="control_if_else"></block>' +
-    '<block type="control_wait_until" id="control_wait_until"></block>' +
-    '<block type="control_repeat_until" id="control_repeat_until"></block>' +
+    '<block type="control_if" id="control_if">' +
+      '<value name="CONDITION">' +
+        '<shadow type="checkbox"></shadow>' +
+      '</value>' +
+    '</block>' +
+    '<block type="control_if_else" id="control_if_else">' +
+      '<value name="CONDITION">' +
+        '<shadow type="checkbox"></shadow>' +
+      '</value>' +
+    '</block>' +
+    '<block type="control_wait_until" id="control_wait_until">' +
+      '<value name="CONDITION">' +
+        '<shadow type="checkbox"></shadow>' +
+      '</value>' +
+    '</block>' +
+    '<block type="control_repeat_until" id="control_repeat_until">' +
+      '<value name="CONDITION">' +
+        '<shadow type="checkbox"></shadow>' +
+      '</value>' +
+    '</block>' +
     '<block type="control_stop" id="control_stop"></block>' +
     '<block type="control_start_as_clone" id="control_start_as_clone"></block>' +
     '<block type="control_create_clone_of" id="control_create_clone_of">' +
@@ -450,9 +466,27 @@ Blockly.Blocks.defaultToolbox = '<xml id="toolbox-categories" style="display: no
         '</shadow>' +
       '</value>' +
     '</block>' +
-    '<block type="operator_and" id="operator_and"></block>' +
-    '<block type="operator_or" id="operator_or"></block>' +
-    '<block type="operator_not" id="operator_not"></block>' +
+    '<block type="operator_and" id="operator_and">' +
+      '<value name="OPERAND1">' +
+        '<shadow type="checkbox"></shadow>' +
+      '</value>' +
+      '<value name="OPERAND2">' +
+        '<shadow type="checkbox"></shadow>' +
+      '</value>' +
+    '</block>' +
+    '<block type="operator_or" id="operator_or">' +
+      '<value name="OPERAND1">' +
+        '<shadow type="checkbox"></shadow>' +
+      '</value>' +
+      '<value name="OPERAND2">' +
+        '<shadow type="checkbox"></shadow>' +
+      '</value>' +
+    '</block>' +
+    '<block type="operator_not" id="operator_not">' +
+      '<value name="OPERAND">' +
+        '<shadow type="checkbox"></shadow>' +
+      '</value>' +
+    '</block>' +
     '<block type="operator_join" id="operator_join">' +
       '<value name="STRING1">' +
         '<shadow type="text">' +
@@ -679,6 +713,9 @@ Blockly.Blocks.defaultToolbox = '<xml id="toolbox-categories" style="display: no
       '</value>' +
     '</block>' +
     '<block type="comments_boolean" id="comments_boolean">' +
+      '<value name="VALUE">' +
+        '<shadow type="checkbox"></shadow>' +
+      '</value>' +
       '<value name="COMMENT">' +
         '<shadow type="text">' +
           '<field name="TEXT"></field>' +
@@ -702,6 +739,12 @@ Blockly.Blocks.defaultToolbox = '<xml id="toolbox-categories" style="display: no
   '</category>' +
   '<category name="Extensions" id="extensions" colour="#FF6680" secondaryColour="#FF4D6A" ' +
     'iconURI="../media/extensions/wedo2-block-icon.svg" showStatusButton="true">' +
+    '<block type="extension_checkbox_test">' +
+      '<value name="CHECKBOX">' +
+        '<shadow type="checkbox"></shadow>' +
+      '</value>' +
+    '</block>' +
+    '<sep gap="36"></sep>' +
     '<block type="extension_pen_down" id="extension_pen_down"></block>' +
     '<block type="extension_music_drum" id="extension_music_drum">' +
       '<value name="NUMBER">' +
