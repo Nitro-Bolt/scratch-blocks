@@ -1458,6 +1458,7 @@ Blockly.BlockSvg.prototype.renderInputShape_ = function(input, x, y) {
         input.booleanCheckbox = {
           dead: false,
           _boundClick: null,
+          _skipBind: !!input._skipBooleanCheckboxBind,
           node: Blockly.utils.createSvgElement('path', {
             'style': 'display: none;',
             'class': 'blocklyText',
@@ -1474,10 +1475,12 @@ Blockly.BlockSvg.prototype.renderInputShape_ = function(input, x, y) {
             this._boundClick[1][0][0].style.removeProperty('cursor');
             this.node.setAttribute('style', 'display: none;');
             Blockly.FieldCheckbox.connectBoolean(this.input);
-            this.remove();
-            delete this.input.booleanCheckbox;
           },
           bindClick: function(inputShape) {
+            if (this._skipBind) {
+              this._skipBind = false;
+              return;
+            }
             if (this.dead || this._boundClick) return;
             this._boundClick = [
               Blockly.bindEvent_(this.node, 'click', this, this.click),
@@ -1494,6 +1497,7 @@ Blockly.BlockSvg.prototype.renderInputShape_ = function(input, x, y) {
           input
         };
         inputShape.after(input.booleanCheckbox.node);
+        delete input._skipBooleanCheckboxBind;
       }
       // Magic
       inputShape.onmouseout = function() {

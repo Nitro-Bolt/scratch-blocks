@@ -113,21 +113,16 @@ Blockly.FieldCheckbox.prototype.init = function() {
  * @private
  */
 Blockly.FieldCheckbox.prototype.showEditor_ = function() {
-  /**
-   * Handle's the actual showEditor_ action.
-   * @this {Blockly.Block}
-   */
-  var reload = (function() {
-    // Disable binding the click event (prevent's instant regeneration)
-    this.getParent().getInputWithBlock(this)._skipBooleanCheckboxBind = true;
-    // Remove the block
-    this.dispose(false, false);
-  }).bind(this.sourceBlock_);
-  if (window.queueMicrotask) {
-    queueMicrotask(reload);
-  } else {
-    Promise.resolve().then(reload);
-  }
+  var source = this.sourceBlock_;
+  this.dispose(); // Dispose of the field.
+  var input = source.getParent().getInputWithBlock(source);
+  // Disable binding the click event.
+  input._skipBooleanCheckboxBind = true;
+  // Remove the shadow dom from the connection. (to prevent regeneration)
+  input.connection.setShadowDom();
+  // Dispose of our shadow parent.
+  source.unplug(false);
+  source.dispose(false, false);
 };
 
 Blockly.FieldCheckbox.prototype.updateWidth = function() {
