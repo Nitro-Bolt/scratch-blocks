@@ -1454,11 +1454,11 @@ Blockly.BlockSvg.prototype.renderInputShape_ = function(input, x, y) {
     inputShape.setAttribute('data-argument-type', inputShapeInfo.argType);
     inputShape.setAttribute('style', 'visibility: visible');
     if (inputShapeInfo.argType == 'boolean') {
-      // Allow a custom cursor for the field to use as a "quick callback".
       if (input._temporaryCursor) {
         inputShape.style.cursor = input._temporaryCursor;
         delete input._temporaryCursor;
       }
+      // Allow a custom cursor for the field to use as a "quick callback".
       // Make sure we don't already have a checkbox handler.
       if (!input.booleanCheckbox) {
         input.booleanCheckbox = {
@@ -1484,8 +1484,8 @@ Blockly.BlockSvg.prototype.renderInputShape_ = function(input, x, y) {
           bindClick: function(inputShape) {
             if (this.dead || this._boundClick) return;
             this._boundClick = [
-              Blockly.bindEvent_(this.node, 'click', this, this.click),
-              Blockly.bindEvent_(inputShape, 'click', this, this.click)
+              Blockly.bindEvent_(this.node, 'mouseup', this, this.click),
+              Blockly.bindEvent_(inputShape, 'mouseup', this, this.click)
             ];
           },
           unbindClick: function() {
@@ -1517,7 +1517,7 @@ Blockly.BlockSvg.prototype.renderInputShape_ = function(input, x, y) {
         input.booleanCheckbox.node.setAttribute('style', 'pointer-events: none;');
         input.booleanCheckbox.bindClick(inputShape);
       };
-      Blockly.bindEvent_(inputShape, 'click', input, function() {
+      Blockly.bindEvent_(inputShape, 'mouseup', input, function() {
         if (!this.booleanCheckbox || this.booleanCheckbox.dead) return;
         // If the click was bound we can just assume the user is on a computer and move on.
         if (this.booleanCheckbox._boundClick) return;
