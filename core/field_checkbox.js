@@ -116,8 +116,8 @@ Blockly.FieldCheckbox.prototype.showEditor_ = function() {
   var source = this.sourceBlock_;
   this.dispose(); // Dispose of the field.
   var input = source.getParent().getInputWithBlock(source);
-  // Disable binding the click event.
-  input._skipBooleanCheckboxBind = true;
+  // Tell the input to add the cursor tag.
+  input._temporaryCursor = this.CURSOR;
   // Remove the shadow dom from the connection. (to prevent regeneration)
   input.connection.setShadowDom();
   // Dispose of our shadow parent.
