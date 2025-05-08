@@ -1464,6 +1464,7 @@ Blockly.BlockSvg.prototype.renderInputShape_ = function(input, x, y) {
         input.booleanCheckbox = {
           dead: false,
           _boundClick: null,
+          _wasMovable: false,
           node: Blockly.utils.createSvgElement('path', {
             'style': 'display: none;',
             'class': 'blocklyText',
@@ -1478,7 +1479,10 @@ Blockly.BlockSvg.prototype.renderInputShape_ = function(input, x, y) {
           },
           click: function(ev) {
             if (this.dead || !this._boundClick) return;
-            ev.preventDefault();
+            var workspace = this.input.sourceBlock_.workspace;
+            // Disable visual report's.
+            ev.stopImmediatePropagation();
+            this.input.sourceBlock_
             this.node.setAttribute('style', 'display: none;');
             Blockly.FieldCheckbox.connectBoolean(this.input);
             this.unbindClick();
@@ -1486,7 +1490,13 @@ Blockly.BlockSvg.prototype.renderInputShape_ = function(input, x, y) {
           bindClick: function(inputShape) {
             if (this.dead || this._boundClick) return;
             this._boundClick = [
-              Blockly.bindEvent_(inputShape, 'mousedown', this, () => this._canClick = true),
+              // We do our own mouse click type actions, mainly to fix chromium browsers.
+              Blockly.bindEvent_(inputShape, 'mousedown', this, (ev) => {
+                if (this._canClick) return;
+                var workspace = this.input.sourceBlock_.workspace;
+                ev.stopImmediatePropagation();
+                this._canClick = true;
+              }),
               Blockly.bindEvent_(inputShape, 'mouseup', this, (ev) => this._canClick && this.click(ev))
             ];
           },
@@ -1520,6 +1530,7 @@ Blockly.BlockSvg.prototype.renderInputShape_ = function(input, x, y) {
         input.booleanCheckbox.node.setAttribute('style', 'pointer-events: none;');
         input.booleanCheckbox.bindClick(inputShape);
       };
+      // Mobile support.
       Blockly.bindEvent_(inputShape, 'mousedown', input, function(ev) {
         if (!this.booleanCheckbox || this.booleanCheckbox.dead) return;
         // If the click was bound we can just assume the user is on a computer and move on.
