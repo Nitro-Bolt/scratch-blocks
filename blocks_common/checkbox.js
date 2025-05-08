@@ -32,5 +32,6 @@ Blockly.Blocks['checkbox'] = {
       "colourTertiary": Blockly.Colours.textField,
       "colourQuaternary": Blockly.Colours.textField
     });
+    this.setOpacity(0);
   }
 };

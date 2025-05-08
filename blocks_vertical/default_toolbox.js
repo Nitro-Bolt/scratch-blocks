@@ -297,9 +297,6 @@ Blockly.Blocks.defaultToolbox = '<xml id="toolbox-categories" style="display: no
     '</block>' +
     '<block type="control_forever" id="control_forever"></block>' +
     '<block type="control_if" id="control_if">' +
-      '<value name="CONDITION">' +
-        '<shadow type="checkbox"></shadow>' +
-      '</value>' +
     '</block>' +
     '<block type="control_if_else" id="control_if_else">' +
       '<value name="CONDITION">' +
