@@ -719,12 +719,16 @@ Blockly.Blocks.defaultToolbox = '<xml id="toolbox-categories" style="display: no
     '</block>' +
     '<block type="extension_checkbox_test_legacy">' + // enabled legacy
       '<value name="CHECKBOX">' +
-        '<shadow type="checkbox">TRUE</shadow>' +
+        '<shadow type="checkbox">' +
+          '<field name="CHECKBOX">TRUE</field>' +
+        '</shadow>' +
       '</value>' +
     '</block>' +
     '<block type="extension_checkbox_test_legacy">' + // disabled legacy
       '<value name="CHECKBOX">' +
-        '<shadow type="checkbox">FALSE</shadow>' + // this should instantly turn off
+        '<shadow type="checkbox">' +
+          '<field name="CHECKBOX">FALSE</field>' + // this should instantly turn off
+        '</shadow>' +
       '</value>' +
     '</block>' +
     '<sep gap="36"></sep>' +

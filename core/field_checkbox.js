@@ -89,9 +89,9 @@ Blockly.FieldCheckbox.connectBoolean = function(input) {
  */
 Blockly.FieldCheckbox.fromJson = function(options) {
   if (options.checked !== (void 0)) {
-    console.warn('The "checked" option has no effect and is depricated.');
+    console.warn('The "checked" option is depricated.');
   }
-  return new Blockly.FieldCheckbox();
+  return new Blockly.FieldCheckbox(options.checked);
 };
 
 /**
@@ -132,7 +132,6 @@ Blockly.FieldCheckbox.prototype.init = function() {
   // remove ourselves from our parent block, we already know if it's true we should
   // stay in our parent block.
   if (this._alternateSupport) {
-    alert(1);
     if (window.queueMicrotask) {
       queueMicrotask(this.showEditor_.bind(this));
     } else {
@@ -142,13 +141,18 @@ Blockly.FieldCheckbox.prototype.init = function() {
 };
 
 /**
- * Check if we should even exist before setting the parent block.
+ * Make sure if we are set to a form of false to kill ourselves.
+ * @param {any} value The new value.
  */
-Blockly.FieldCheckbox.prototype.setParentBlock = function(block) {
-  if (this._alternateSupport) {
-    this.showEditor_();
+Blockly.FieldCheckbox.prototype.setValue = function(value) {
+  if (value === false || String(value).toLowerCase() == 'false') {
+    this._alternateSupport = true; // Just incase we are not initialized set this to true.
+    if (this.fieldGroup_) this.showEditor_(); // If we have initialized then perform the removal action.
+    return;
+  } else if (value === true || String(value).toLowerCase() == 'true') {
+    value = ' '; // The right TRUE value for this field.
   }
-  return Blockly.FieldCheckbox.superClass_.prototype.setParentBlock(block);
+  return Blockly.FieldCheckbox.superClass_.setValue.call(this, value);
 };
 
 /**
@@ -158,7 +162,8 @@ Blockly.FieldCheckbox.prototype.setParentBlock = function(block) {
 Blockly.FieldCheckbox.prototype.showEditor_ = function() {
   var source = this.sourceBlock_;
   this.dispose(); // Dispose of the field.
-  var input = source && source.getParent().getInputWithBlock(source);
+  var input = source && source.getParent() && source.getParent().getInputWithBlock(source);
+  // Make sure we have a parent and are in an input, otherwise something.. weird is going on.
   if (!source || !input) {
     console.warn('Orphaned checkbox field was clicked.');
     return;
