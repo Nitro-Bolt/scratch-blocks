@@ -1464,7 +1464,6 @@ Blockly.BlockSvg.prototype.renderInputShape_ = function(input, x, y) {
         input.booleanCheckbox = {
           dead: false,
           _boundClick: null,
-          _wasMovable: false,
           node: Blockly.utils.createSvgElement('path', {
             'style': 'display: none;',
             'class': 'blocklyText',
