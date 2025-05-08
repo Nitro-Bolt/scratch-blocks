@@ -297,24 +297,12 @@ Blockly.Blocks.defaultToolbox = '<xml id="toolbox-categories" style="display: no
     '</block>' +
     '<block type="control_forever" id="control_forever"></block>' +
     '<block type="control_if" id="control_if">' +
-      '<value name="CONDITION">' +
-        '<shadow type="checkbox"></shadow>' +
-      '</value>' +
     '</block>' +
     '<block type="control_if_else" id="control_if_else">' +
-      '<value name="CONDITION">' +
-        '<shadow type="checkbox"></shadow>' +
-      '</value>' +
     '</block>' +
     '<block type="control_wait_until" id="control_wait_until">' +
-      '<value name="CONDITION">' +
-        '<shadow type="checkbox"></shadow>' +
-      '</value>' +
     '</block>' +
     '<block type="control_repeat_until" id="control_repeat_until">' +
-      '<value name="CONDITION">' +
-        '<shadow type="checkbox"></shadow>' +
-      '</value>' +
     '</block>' +
     '<block type="control_stop" id="control_stop"></block>' +
     '<block type="control_start_as_clone" id="control_start_as_clone"></block>' +
@@ -467,25 +455,10 @@ Blockly.Blocks.defaultToolbox = '<xml id="toolbox-categories" style="display: no
       '</value>' +
     '</block>' +
     '<block type="operator_and" id="operator_and">' +
-      '<value name="OPERAND1">' +
-        '<shadow type="checkbox"></shadow>' +
-      '</value>' +
-      '<value name="OPERAND2">' +
-        '<shadow type="checkbox"></shadow>' +
-      '</value>' +
     '</block>' +
     '<block type="operator_or" id="operator_or">' +
-      '<value name="OPERAND1">' +
-        '<shadow type="checkbox"></shadow>' +
-      '</value>' +
-      '<value name="OPERAND2">' +
-        '<shadow type="checkbox"></shadow>' +
-      '</value>' +
     '</block>' +
     '<block type="operator_not" id="operator_not">' +
-      '<value name="OPERAND">' +
-        '<shadow type="checkbox"></shadow>' +
-      '</value>' +
     '</block>' +
     '<block type="operator_join" id="operator_join">' +
       '<value name="STRING1">' +
@@ -713,9 +686,6 @@ Blockly.Blocks.defaultToolbox = '<xml id="toolbox-categories" style="display: no
       '</value>' +
     '</block>' +
     '<block type="comments_boolean" id="comments_boolean">' +
-      '<value name="VALUE">' +
-        '<shadow type="checkbox"></shadow>' +
-      '</value>' +
       '<value name="COMMENT">' +
         '<shadow type="text">' +
           '<field name="TEXT"></field>' +
@@ -739,9 +709,26 @@ Blockly.Blocks.defaultToolbox = '<xml id="toolbox-categories" style="display: no
   '</category>' +
   '<category name="Extensions" id="extensions" colour="#FF6680" secondaryColour="#FF4D6A" ' +
     'iconURI="../media/extensions/wedo2-block-icon.svg" showStatusButton="true">' +
-    '<block type="extension_checkbox_test">' +
+    /* checkbox testing */
+    '<block type="extension_checkbox_test">' + // enabled
       '<value name="CHECKBOX">' +
         '<shadow type="checkbox"></shadow>' +
+      '</value>' +
+    '</block>' +
+    '<block type="extension_checkbox_test">' + // disabled
+    '</block>' +
+    '<block type="extension_checkbox_test_legacy">' + // enabled legacy
+      '<value name="CHECKBOX">' +
+        '<shadow type="checkbox">' +
+          '<field name="CHECKBOX">TRUE</field>' +
+        '</shadow>' +
+      '</value>' +
+    '</block>' +
+    '<block type="extension_checkbox_test_legacy">' + // disabled legacy
+      '<value name="CHECKBOX">' +
+        '<shadow type="checkbox">' +
+          '<field name="CHECKBOX">FALSE</field>' + // this should instantly turn off
+        '</shadow>' +
       '</value>' +
     '</block>' +
     '<sep gap="36"></sep>' +

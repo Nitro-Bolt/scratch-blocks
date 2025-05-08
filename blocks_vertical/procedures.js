@@ -110,17 +110,6 @@ Blockly.ScratchBlocks.ProcedureUtils.definitionMutationToDom = function(
   container.setAttribute('warp', JSON.stringify(this.warp_));
   container.setAttribute('colour', this.colour_);
   return container;
-};
-
-/**
- * its in the name.
- * @param {any} x
- * @param {any} y
- * @returns {any}
- */
-function nullCoalsh(x, y) {
-  if (x === null || x === (void 0)) return y;
-  return x;
 }
 
 /**
@@ -131,7 +120,7 @@ function nullCoalsh(x, y) {
  * @this Blockly.Block
  */
 Blockly.ScratchBlocks.ProcedureUtils.matchColours = function(colour1, ld) {
-  ld = nullCoalsh(ld, 0.75); // 25 percent
+  ld = (ld == null) ? 0.75 : ld; // 25 percent
   colour1 = colour1.toLowerCase();
   var categorys = Object.values(Blockly.Categories);
   var maybeColours = Object.entries(Blockly.Colours).find(v => (
@@ -444,15 +433,15 @@ Blockly.ScratchBlocks.ProcedureUtils.buildShadowDom_ = function(type) {
 /**
  * Create a new shadow block and attach it to the given input.
  * @param {!Blockly.Input} input The value input to attach a block to.
- * @param {string} argumentType One of 'b' (boolean), 'o' (object), 'a' (array),
+ * @param {string} argumentType One of 'o' (object), 'a' (array),
  *     's' (string) or 'n' (number).
  * @private
  * @this Blockly.Block
  */
 Blockly.ScratchBlocks.ProcedureUtils.attachShadow_ = function(input,
     argumentType) {
-  if (['n', 's', 'b'].includes(argumentType)) {
-    var blockType = {'n': 'math_number', 's': 'text', 'b': 'checkbox'}[argumentType];
+  if (['n', 's'].includes(argumentType)) {
+    var blockType = {'n': 'math_number', 's': 'text'}[argumentType];
     Blockly.Events.disable();
     try {
       var newBlock = this.workspace.newBlock(blockType);
@@ -462,9 +451,6 @@ Blockly.ScratchBlocks.ProcedureUtils.attachShadow_ = function(input,
           break;
         case 's':
           newBlock.setFieldValue('', 'TEXT');
-          break;
-        case 'b':
-          newBlock.setFieldValue('false', 'CHECKBOX');
           break;
       }
       newBlock.setShadow(true);

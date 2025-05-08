@@ -36,13 +36,75 @@ Blockly.Blocks['extension_checkbox_test'] = {
       "message0": "checkbox test %1",
       "args0": [
         {
-          "type": "input_value",
           "name": "CHECKBOX",
-          "output": "Boolean"
+          "type": "input_value",
+          "check": "Boolean"
         }
       ],
       "category": Blockly.Categories.more,
       "extensions": ["colours_more", "shape_statement"]
+    });
+  }
+};
+
+Blockly.Blocks['extension_checkbox_test_legacy'] = {
+  /**
+   * @this Blockly.Block
+   */
+  init: function() {
+    this.jsonInit({
+      "message0": "checkbox test %1 (legacy)",
+      "args0": [
+        {
+          "name": "CHECKBOX",
+          "type": "input_value",
+          "check": "Boolean"
+        }
+      ],
+      "category": Blockly.Categories.more,
+      "extensions": ["colours_more", "shape_statement"]
+    });
+  }
+};
+
+Blockly.Blocks['extension_checkbox_test_legacy_json'] = {
+  /**
+   * @this Blockly.Block
+   */
+  init: function() {
+    this.jsonInit({
+      "message0": "(legacy jsonInit) %1 FALSE",
+      "args0": [
+        {
+          "name": "CHECKBOX",
+          "type": "field_checkbox",
+          "checked": "FALSE",
+          "check": "Boolean"
+        }
+      ],
+      "category": Blockly.Categories.more,
+      "extensions": ["colours_more", "output_boolean"]
+    });
+  }
+};
+
+Blockly.Blocks['extension_checkbox_test_legacy_json2'] = {
+  /**
+   * @this Blockly.Block
+   */
+  init: function() {
+    this.jsonInit({
+      "message0": "(legacy jsonInit) %1 TRUE",
+      "args0": [
+        {
+          "name": "CHECKBOX",
+          "type": "field_checkbox",
+          "checked": "TRUE",
+          "check": "Boolean"
+        }
+      ],
+      "category": Blockly.Categories.more,
+      "extensions": ["colours_more", "output_boolean"]
     });
   }
 };

@@ -24,40 +24,74 @@
  */
 'use strict';
 
+// super cool staircase -cubester & miyo
 goog.provide('Blockly.FieldCheckbox');
 
-goog.require('Blockly.Colours');
+goog.require('Blockly.Events');
 
 goog.require('Blockly.Field');
+
+goog.require('Blockly.Xml');
 
 
 /**
  * Class for a checkbox field.
- * @param {string} state The initial state of the field ('true' or 'false').
- * @param {Function=} opt_validator A function that is executed when a new
- *     option is selected.  Its sole argument is the new checkbox state.  If
- *     it returns a value, this becomes the new checkbox state, unless the
- *     value is null, in which case the change is aborted.
+ *   Internally repurposed as a display.
  * @extends {Blockly.Field}
  * @constructor
  */
-Blockly.FieldCheckbox = function(state, opt_validator) {
-  Blockly.FieldCheckbox.superClass_.constructor.call(this, '', opt_validator);
-  // Set the initial state.
-  this.setValue(state);
+Blockly.FieldCheckbox = function(optArg) {
+  Blockly.FieldCheckbox.superClass_.constructor.call(this, ' ');
+  if (optArg) {
+    // Support other mod's that use this field.
+    optArg = String(optArg).toLowerCase();
+    if (optArg == 'true') {/* no-op */}
+    else if (optArg == 'false') {
+      this._alternateSupport = true;
+    }
+  }
   this.addArgType('checkbox');
 };
 goog.inherits(Blockly.FieldCheckbox, Blockly.Field);
 
 /**
+ * Marker boolean set by the constructor for if we are detecting other,
+ * mod's that may use this field. This is done so that we don't break
+ * anyone's projects by making a fields usage completely different
+ * like we do.
+ * @type {boolean}
+ * @private
+ */
+Blockly.FieldCheckbox.prototype._alternateSupport = false;
+
+/**
+ * Connect's a checkbox shadow to the specified input.
+ * @param {Blockly.Input} input The boolean input to connect too.
+ * This is used by block_svg_render_vertical to add swap the checkbox state on boolean values.
+ */
+Blockly.FieldCheckbox.connectBoolean = function(input) {
+  Blockly.Events.setGroup(true);
+  var block = Blockly.Xml.domToBlock(
+    Blockly.Xml.textToDom(`<xml><block type="checkbox"><field name="CHECKBOX"> </field></block></xml>`).querySelector('block'),
+    input.sourceBlock_.workspace,
+  );
+  block.setShadow(true);
+  block.render();
+  block.outputConnection.connect(input.connection);
+  Blockly.Events.setGroup(false);
+};
+
+/**
  * Construct a FieldCheckbox from a JSON arg object.
- * @param {!Object} options A JSON object with options (checked).
  * @returns {!Blockly.FieldCheckbox} The new field instance.
  * @package
  * @nocollapse
  */
 Blockly.FieldCheckbox.fromJson = function(options) {
-  return new Blockly.FieldCheckbox(options['checked'] ? 'true' : 'false');
+  if (options.checked !== (void 0)) {
+    console.warn('The "checked" option is deprecated.');
+  }
+  return new Blockly.FieldCheckbox(options.checked);
 };
 
 /**
@@ -86,79 +120,39 @@ Blockly.FieldCheckbox.prototype.init = function() {
   Blockly.FieldCheckbox.superClass_.init.call(this);
   // The checkbox doesn't use the inherited text element.
   // Instead it uses a custom checkmark element that is either visible or not.
-  this.checkElement_ = Blockly.utils.createSvgElement('path',
-    {
-      'class': 'blocklyText',
-      'transform': `translate(${this.textElement_.getAttribute('x')},${this.textElement_.getAttribute('y')-2}) scale(1.5)`
-    },
-    this.fieldGroup_
-  );
-  this.render_();
-};
-
-/**
- * Return 'true' if the checkbox is checked, 'false' otherwise.
- * @return {string} Current state.
- */
-Blockly.FieldCheckbox.prototype.getValue = function() {
-  return this.state_ ? 'true' : 'false';
-};
-
-Blockly.FieldCheckbox.prototype.updateState = function() {
-  if (this.checkElement_) {
-    this.checkElement_.setAttribute('d', this.state_ ? Blockly.FieldCheckbox.CHECKMARK : Blockly.FieldCheckbox.CROSS);
-    this.checkElement_.setAttribute('opacity', this.state_ ? 1 : 0.5);
-  }
-  if (this.sourceBlock_ && !this.sourceBlock_.isInsertionMarker()) {
-    if (this.state_) {
-      this.sourceBlock_.setColour(Blockly.Colours.operators.primary, Blockly.Colours.operators.primary, this.sourceBlock_.getColourTertiary(),
-          this.sourceBlock_.getColourQuaternary());
+  this.render_(); // Rerender
+  this.checkElement_ = Blockly.utils.createSvgElement('path', {
+    'class': 'blocklyText',
+    'transform': `translate(${this.textElement_.getAttribute('x')},${this.textElement_.getAttribute('y') - 2}) scale(1.5)`,
+    'd': Blockly.FieldCheckbox.CHECKMARK
+  }, this.fieldGroup_);
+  this.textElement_.after(this.checkElement_);
+  // We have to wait for all the other stuff to finish before doing the following.
+  // If we detect another mod / old use of the field then we should instantly
+  // remove ourselves from our parent block, we already know if it's true we should
+  // stay in our parent block.
+  if (this._alternateSupport) {
+    if (window.queueMicrotask) {
+      queueMicrotask(this.showEditor_.bind(this));
     } else {
-      this.sourceBlock_.setColour(
-        this.sourceBlock_.getColourTertiary(), this.sourceBlock_.getColourTertiary(),
-        this.sourceBlock_.getColourTertiary(), this.sourceBlock_.getColourQuaternary()
-      );
+      Promise.resolve().then(this.showEditor_.bind(this));
     }
   }
 };
 
 /**
- * Attach this field to a block.
- * @param {!Blockly.Block} block The block containing this field.
+ * Make sure if we are set to a form of false to kill ourselves.
+ * @param {any} value The new value.
  */
-Blockly.FieldCheckbox.prototype.setSourceBlock = function(block) {
-  Blockly.FieldCheckbox.superClass_.setSourceBlock.call(this, block);
-  // HACK: for shadow blocks. wait until the block is inserted into its parent
-  if (window.queueMicrotask) {
-    window.queueMicrotask(this.updateState.bind(this));
-  } else {
-    // eslint-disable-next-line no-undef
-    Promise.resolve().then(this.updateState.bind(this));
+Blockly.FieldCheckbox.prototype.setValue = function(value) {
+  if (value === false || String(value).toLowerCase() == 'false') {
+    this._alternateSupport = true; // Just incase we are not initialized set this to true.
+    if (this.fieldGroup_) this.showEditor_(); // If we have initialized then perform the removal action.
+    return;
+  } else if (value === true || String(value).toLowerCase() == 'true') {
+    value = ' '; // The right TRUE value for this field.
   }
-};
-
-
-Blockly.FieldCheckbox.prototype.render_ = function() {
-  this.updateState();
-  Blockly.FieldCheckbox.superClass_.render_.call(this);
-};
-
-/**
- * Set the checkbox to be checked if newBool is 'true' or true,
- * unchecks otherwise.
- * @param {string|boolean} newBool New state.
- */
-Blockly.FieldCheckbox.prototype.setValue = function(newBool) {
-  var newState = (typeof newBool == 'string') ?
-      (newBool.toLowerCase() == 'true') : !!newBool;
-  if (this.state_ !== newState) {
-    if (this.sourceBlock_ && Blockly.Events.isEnabled()) {
-      Blockly.Events.fire(new Blockly.Events.BlockChange(
-          this.sourceBlock_, 'field', this.name, this.state_ ? 'true' : 'false', newState ? 'true' : 'false'));
-    }
-    this.state_ = newState;
-    this.render_();
-  }
+  return Blockly.FieldCheckbox.superClass_.setValue.call(this, value);
 };
 
 /**
@@ -166,20 +160,26 @@ Blockly.FieldCheckbox.prototype.setValue = function(newBool) {
  * @private
  */
 Blockly.FieldCheckbox.prototype.showEditor_ = function() {
-  var newState = !this.state_;
-  if (this.sourceBlock_) {
-    // Call any validation function, and allow it to override.
-    newState = this.callValidator(newState);
+  var source = this.sourceBlock_;
+  this.dispose(); // Dispose of the field.
+  var input = source && source.getParent() && source.getParent().getInputWithBlock(source);
+  // Make sure we have a parent and are in an input, otherwise something.. weird is going on.
+  if (!source || !input) {
+    console.warn('Orphaned checkbox field was clicked.');
+    return;
   }
-  if (newState !== null) {
-    this.setValue(newState ? 'true' : 'false');
-  }
+  // Tell the input to add the cursor tag.
+  input._temporaryCursor = this.CURSOR;
+  // Remove the shadow dom from the connection. (to prevent regeneration)
+  input.connection.setShadowDom();
+  // Dispose of our shadow parent.
+  source.unplug(false);
+  source.dispose(false, false);
 };
 
 Blockly.FieldCheckbox.prototype.updateWidth = function() {
   Blockly.FieldCheckbox.superClass_.updateWidth.call(this);
   this.size_.width = 8 * Blockly.BlockSvg.GRID_UNIT;
-  this.updateState();
 };
 
 Blockly.Field.register('field_checkbox', Blockly.FieldCheckbox);

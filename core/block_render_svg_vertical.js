@@ -1434,6 +1434,10 @@ Blockly.BlockSvg.prototype.renderInputShape_ = function(input, x, y) {
   // Input shapes are only visibly rendered on non-connected slots.
   if (input.connection.targetConnection) {
     inputShape.setAttribute('style', 'visibility: hidden');
+    if (inputShape.booleanCheckbox) {
+      inputShape.booleanCheckbox.remove();
+      delete inputShape.booleanCheckbox;
+    }
   } else {
     var inputShapeX = 0, inputShapeY = 0;
     var inputShapeInfo =
@@ -1449,6 +1453,79 @@ Blockly.BlockSvg.prototype.renderInputShape_ = function(input, x, y) {
         'translate(' + inputShapeX + ',' + inputShapeY + ')');
     inputShape.setAttribute('data-argument-type', inputShapeInfo.argType);
     inputShape.setAttribute('style', 'visibility: visible');
+    if (inputShapeInfo.argType == 'boolean') {
+      if (input._temporaryCursor) {
+        inputShape.style.cursor = input._temporaryCursor;
+        delete input._temporaryCursor;
+      }
+      // Allow a custom cursor for the field to use as a "quick callback".
+      // Make sure we don't already have a checkbox handler.
+      if (!input.booleanCheckbox) {
+        input.booleanCheckbox = {
+          dead: false,
+          _boundClick: null,
+          node: Blockly.utils.createSvgElement('path', {
+            'style': 'display: none;',
+            'class': 'blocklyText',
+            'opacity': '0.5',
+            'd': Blockly.FieldCheckbox.CROSS
+          }),
+          remove() {
+            this.dead = true;
+            this.unbindClick();
+            this.node.remove();
+          },
+          click: function() {
+            if (this.dead || !this._boundClick) return;
+            this.node.setAttribute('style', 'display: none;');
+            Blockly.FieldCheckbox.connectBoolean(this.input);
+            this.unbindClick();
+          },
+          bindClick: function(inputShape) {
+            if (this.dead || this._boundClick) return;
+            this._boundClick = [
+              Blockly.bindEvent_(this.node, 'mouseup', this, this.click),
+              Blockly.bindEvent_(inputShape, 'mouseup', this, this.click)
+            ];
+          },
+          unbindClick: function() {
+            if (!goog.isArray(this._boundClick)) return;
+            Blockly.unbindEvent_(this._boundClick[0]);
+            Blockly.unbindEvent_(this._boundClick[1]);
+            this._boundClick = null;
+          },
+          input
+        };
+        inputShape.after(input.booleanCheckbox.node);
+      }
+      // Setup hover event's to make the cross show and allow clicking.
+      inputShape.onmouseout = function() {
+        if (!input.booleanCheckbox || input.booleanCheckbox.dead) return;
+        input.booleanCheckbox.node.setAttribute('style', 'display: none;');
+        input.booleanCheckbox.unbindClick();
+      };
+      inputShape.onmouseover = function() {
+        if (!input.booleanCheckbox || input.booleanCheckbox.dead) return;
+        input.booleanCheckbox.node.setAttribute(
+          'transform', 'translate(' + (
+            inputShapeX + 24
+          ) + ',' + (
+            inputShapeY + 16
+          ) + ') scale(1.5)'
+        );
+        inputShape.style.cursor = Blockly.FieldCheckbox.prototype.CURSOR;
+        input.booleanCheckbox.node.setAttribute('style', 'pointer-events: none;');
+        input.booleanCheckbox.bindClick(inputShape);
+      };
+      Blockly.bindEvent_(inputShape, 'mouseup', input, function() {
+        if (!this.booleanCheckbox || this.booleanCheckbox.dead) return;
+        // If the click was bound we can just assume the user is on a computer and move on.
+        if (this.booleanCheckbox._boundClick) return;
+        // they are probably on mobile.
+        this.booleanCheckbox._boundClick = true; // Just lie.
+        this.booleanCheckbox.click();
+      });
+    }
   }
 };
 
@@ -1767,7 +1844,8 @@ Blockly.BlockSvg.prototype.renderMoveConnections_ = function() {
   }
 
   for (var i = 0; i < this.inputList.length; i++) {
-    var conn = this.inputList[i].connection;
+    var inp = this.inputList[i];
+    var conn = inp.connection;
     if (conn) {
       conn.moveToOffset(blockTL);
       if (conn.isConnected()) {

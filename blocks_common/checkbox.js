@@ -27,10 +27,9 @@ Blockly.Blocks['checkbox'] = {
       ],
       "output": "Boolean",
       "outputShape": Blockly.OUTPUT_SHAPE_HEXAGONAL,
-      "colour": Blockly.Colours.textField,
-      "colourSecondary": Blockly.Colours.textField,
-      "colourTertiary": Blockly.Colours.textField,
-      "colourQuaternary": Blockly.Colours.textField
+      "extensions": ["colours_operators"],
     });
+    // Slightly transparent to make it look nicer. (like a blend)
+    this.setOpacity(0.8);
   }
 };
