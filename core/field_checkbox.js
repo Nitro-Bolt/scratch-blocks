@@ -89,7 +89,7 @@ Blockly.FieldCheckbox.connectBoolean = function(input) {
  */
 Blockly.FieldCheckbox.fromJson = function(options) {
   if (options.checked !== (void 0)) {
-    console.warn('The "checked" option is depricated.');
+    console.warn('The "checked" option is deprecated.');
   }
   return new Blockly.FieldCheckbox(options.checked);
 };
