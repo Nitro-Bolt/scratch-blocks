@@ -1463,6 +1463,8 @@ Blockly.BlockSvg.prototype.renderInputShape_ = function(input, x, y) {
       if (!input.booleanCheckbox) {
         input.booleanCheckbox = {
           dead: false,
+          _canClick: false,
+          _didMove: false,
           _boundClick: null,
           node: Blockly.utils.createSvgElement('path', {
             'style': 'display: none;',
@@ -1478,10 +1480,9 @@ Blockly.BlockSvg.prototype.renderInputShape_ = function(input, x, y) {
           },
           click: function(ev) {
             if (this.dead || !this._boundClick) return;
-            var workspace = this.input.sourceBlock_.workspace;
-            // Disable visual report's.
+            // Disable visual report's on the GUI end.
             ev.stopImmediatePropagation();
-            this.input.sourceBlock_
+            // Connect the checkbox.
             this.node.setAttribute('style', 'display: none;');
             Blockly.FieldCheckbox.connectBoolean(this.input);
             this.unbindClick();
@@ -1492,11 +1493,27 @@ Blockly.BlockSvg.prototype.renderInputShape_ = function(input, x, y) {
               // We do our own mouse click type actions, mainly to fix chromium browsers.
               Blockly.bindEvent_(inputShape, 'mousedown', this, (ev) => {
                 if (this._canClick) return;
-                var workspace = this.input.sourceBlock_.workspace;
-                ev.stopImmediatePropagation();
-                this._canClick = true;
+                this._didMove = false;
+                // If the user move's there mouse while it's down then they are probably trying to drag.
+                var move = Blockly.bindEvent_(inputShape, 'mousemove', this, (ev) => {
+                  // Since this is the case just disable clicking and say the user tried to move.
+                  this._didMove = true;
+                  Blockly.unbindEvent_(this._canClick);
+                  this._canClick = false;
+                });
+                this._canClick = move;
               }),
-              Blockly.bindEvent_(inputShape, 'mouseup', this, (ev) => this._canClick && this.click(ev))
+              Blockly.bindEvent_(inputShape, 'mouseup', this, (ev) => {
+                if (!this._canClick) return;
+                // If the user didnt move their mouse then unbind the move event.
+                if (!this._didMove) Blockly.unbindEvent_(this._canClick);
+                // Since the mouse was not moved we can assume the user does not want to drag the block
+                // so we can cancel the current drag gesture (if it exists) and perform our activation actions.
+                var workspace = this.input.sourceBlock_.workspace;
+                if (!workspace.currentGesture_) workspace = Blockly.getMainWorkspace();
+                workspace.currentGesture_.cancel(); // Stop dragging.
+                this.click(ev); // Perform the rest of the clickng actions.
+              })
             ];
           },
           unbindClick: function() {
