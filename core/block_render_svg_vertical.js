@@ -1472,11 +1472,13 @@ Blockly.BlockSvg.prototype.renderInputShape_ = function(input, x, y) {
           }),
           remove() {
             this.dead = true;
+            this._canClick = false; // Just incase.
             this.unbindClick();
             this.node.remove();
           },
-          click: function() {
+          click: function(ev) {
             if (this.dead || !this._boundClick) return;
+            ev.preventDefault();
             this.node.setAttribute('style', 'display: none;');
             Blockly.FieldCheckbox.connectBoolean(this.input);
             this.unbindClick();
@@ -1484,12 +1486,13 @@ Blockly.BlockSvg.prototype.renderInputShape_ = function(input, x, y) {
           bindClick: function(inputShape) {
             if (this.dead || this._boundClick) return;
             this._boundClick = [
-              Blockly.bindEvent_(this.node, 'mousedown', this, this.click),
-              Blockly.bindEvent_(inputShape, 'mousedown', this, this.click)
+              Blockly.bindEvent_(inputShape, 'mousedown', this, () => this._canClick = true),
+              Blockly.bindEvent_(inputShape, 'mouseup', this, (ev) => this._canClick && this.click(ev))
             ];
           },
           unbindClick: function() {
             if (!goog.isArray(this._boundClick)) return;
+            this._canClick = false;
             Blockly.unbindEvent_(this._boundClick[0]);
             Blockly.unbindEvent_(this._boundClick[1]);
             this._boundClick = null;
@@ -1517,10 +1520,11 @@ Blockly.BlockSvg.prototype.renderInputShape_ = function(input, x, y) {
         input.booleanCheckbox.node.setAttribute('style', 'pointer-events: none;');
         input.booleanCheckbox.bindClick(inputShape);
       };
-      Blockly.bindEvent_(inputShape, 'mousedown', input, function() {
+      Blockly.bindEvent_(inputShape, 'mousedown', input, function(ev) {
         if (!this.booleanCheckbox || this.booleanCheckbox.dead) return;
         // If the click was bound we can just assume the user is on a computer and move on.
         if (this.booleanCheckbox._boundClick) return;
+        ev.stopPropagation();
         // they are probably on mobile.
         this.booleanCheckbox._boundClick = true; // Just lie.
         this.booleanCheckbox.click();
