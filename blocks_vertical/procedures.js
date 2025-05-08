@@ -436,15 +436,15 @@ Blockly.ScratchBlocks.ProcedureUtils.buildShadowDom_ = function(type) {
 /**
  * Create a new shadow block and attach it to the given input.
  * @param {!Blockly.Input} input The value input to attach a block to.
- * @param {string} argumentType One of 'b' (boolean), 'o' (object), 'a' (array),
+ * @param {string} argumentType One of 'o' (object), 'a' (array),
  *     's' (string) or 'n' (number).
  * @private
  * @this Blockly.Block
  */
 Blockly.ScratchBlocks.ProcedureUtils.attachShadow_ = function(input,
     argumentType) {
-  if (['n', 's', 'b'].includes(argumentType)) {
-    var blockType = {'n': 'math_number', 's': 'text', 'b': 'checkbox'}[argumentType];
+  if (['n', 's'].includes(argumentType)) {
+    var blockType = {'n': 'math_number', 's': 'text'}[argumentType];
     Blockly.Events.disable();
     try {
       var newBlock = this.workspace.newBlock(blockType);
@@ -454,9 +454,6 @@ Blockly.ScratchBlocks.ProcedureUtils.attachShadow_ = function(input,
           break;
         case 's':
           newBlock.setFieldValue('', 'TEXT');
-          break;
-        case 'b':
-          newBlock.setFieldValue('false', 'CHECKBOX');
           break;
       }
       newBlock.setShadow(true);
