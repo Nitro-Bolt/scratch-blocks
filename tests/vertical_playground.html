@@ -313,6 +313,44 @@
         Blockly.Xml.clearWorkspaceAndLoadFromXml(xml, workspace);
         workspace.getFlyout().setRecyclingEnabled(true);
       }
+
+      function tryCoreReload() {
+        var input = document.querySelector('input#coreValue');
+        if (input.value.trim() == '') {
+          input.value = '';
+          alert('Please supply a valid file :c');
+          return;
+        }
+        if (input.value.endsWith('.js')) {
+          console.warn('If you are trying to load a file that ends with an extra .js then just put the `.js` extension count +1.');
+          console.warn('but then again, if you are doing that it is bad practice... so fix it :)');
+          input.value = input.value.slice(0, -3);
+        }
+        var file = 'core/' + input.value + '.js';
+        console.log('Attempting to reload: ' + file);
+        var script = Array.from(document.scripts).find(script => script.src.endsWith(file));
+        if (!script) {
+          alert('Unable to find core file, are you sure it was loaded?');
+          return;
+        }
+        var next = document.createElement('script');
+        next.onabort = () => {
+          alert('Script reload was aborted.');
+          next.remove();
+        };
+        next.onerror = (e) => {
+          alert('Script reload failed as the script had an error, please check your console.');
+          next.remove();
+          throw e;
+        };
+        next.onload = () => {
+          console.log('Reloaded core file.');
+          script.remove();
+        };
+        next.type = 'text/javascript';
+        next.src = script.src;
+        document.body.appendChild(next);
+      }
     </script>
 
     <style>
@@ -582,6 +620,12 @@
       Report:
       <input id="reportValue" type="text" value="123" />
       <input type="button" value="Report last clicked block" onclick="reportDemo()" />
+    </p>
+
+    <p>
+      Core file:
+      <input id="coreValue" type="text" value="field_checkbox" />
+      <input type="button" value="attempt reload" onclick="tryCoreReload()" />
     </p>
   </body>
 </html>
