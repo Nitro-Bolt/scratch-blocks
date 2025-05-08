@@ -24,15 +24,15 @@
  */
 'use strict';
 
+// super cool staircase -cubester & miyo
 goog.provide('Blockly.FieldCheckbox');
 
-goog.require('Blockly.Colours');
+goog.require('Blockly.Events');
 
 goog.require('Blockly.Field');
 
 goog.require('Blockly.Xml');
 
-goog.require('Blockly.Events');
 
 /**
  * Class for a checkbox field.
@@ -40,11 +40,29 @@ goog.require('Blockly.Events');
  * @extends {Blockly.Field}
  * @constructor
  */
-Blockly.FieldCheckbox = function() {
+Blockly.FieldCheckbox = function(optArg) {
   Blockly.FieldCheckbox.superClass_.constructor.call(this, ' ');
+  if (optArg) {
+    // Support other mod's that use this field.
+    optArg = String(optArg).toLowerCase();
+    if (optArg == 'true') {/* no-op */}
+    else if (optArg == 'false') {
+      this._alternateSupport = true;
+    }
+  }
   this.addArgType('checkbox');
 };
 goog.inherits(Blockly.FieldCheckbox, Blockly.Field);
+
+/**
+ * Marker boolean set by the constructor for if we are detecting other,
+ * mod's that may use this field. This is done so that we don't break
+ * anyone's projects by making a fields usage completely different
+ * like we do.
+ * @type {boolean}
+ * @private
+ */
+Blockly.FieldCheckbox.prototype._alternateSupport = false;
 
 /**
  * Connect's a checkbox shadow to the specified input.
@@ -69,7 +87,10 @@ Blockly.FieldCheckbox.connectBoolean = function(input) {
  * @package
  * @nocollapse
  */
-Blockly.FieldCheckbox.fromJson = function() {
+Blockly.FieldCheckbox.fromJson = function(options) {
+  if (options.checked !== (void 0)) {
+    console.warn('The "checked" option has no effect and is depricated.');
+  }
   return new Blockly.FieldCheckbox();
 };
 
@@ -106,6 +127,28 @@ Blockly.FieldCheckbox.prototype.init = function() {
     'd': Blockly.FieldCheckbox.CHECKMARK
   }, this.fieldGroup_);
   this.textElement_.after(this.checkElement_);
+  // We have to wait for all the other stuff to finish before doing the following.
+  // If we detect another mod / old use of the field then we should instantly
+  // remove ourselves from our parent block, we already know if it's true we should
+  // stay in our parent block.
+  if (this._alternateSupport) {
+    alert(1);
+    if (window.queueMicrotask) {
+      queueMicrotask(this.showEditor_.bind(this));
+    } else {
+      Promise.resolve().then(this.showEditor_.bind(this));
+    }
+  }
+};
+
+/**
+ * Check if we should even exist before setting the parent block.
+ */
+Blockly.FieldCheckbox.prototype.setParentBlock = function(block) {
+  if (this._alternateSupport) {
+    this.showEditor_();
+  }
+  return Blockly.FieldCheckbox.superClass_.prototype.setParentBlock(block);
 };
 
 /**
@@ -115,7 +158,11 @@ Blockly.FieldCheckbox.prototype.init = function() {
 Blockly.FieldCheckbox.prototype.showEditor_ = function() {
   var source = this.sourceBlock_;
   this.dispose(); // Dispose of the field.
-  var input = source.getParent().getInputWithBlock(source);
+  var input = source && source.getParent().getInputWithBlock(source);
+  if (!source || !input) {
+    console.warn('Orphaned checkbox field was clicked.');
+    return;
+  }
   // Tell the input to add the cursor tag.
   input._temporaryCursor = this.CURSOR;
   // Remove the shadow dom from the connection. (to prevent regeneration)

@@ -47,6 +47,26 @@ Blockly.Blocks['extension_checkbox_test'] = {
   }
 };
 
+Blockly.Blocks['extension_checkbox_test_legacy'] = {
+  /**
+   * @this Blockly.Block
+   */
+  init: function() {
+    this.jsonInit({
+      "message0": "checkbox test %1 (legacy)",
+      "args0": [
+        {
+          "name": "CHECKBOX",
+          "type": "input_value",
+          "check": "Boolean"
+        }
+      ],
+      "category": Blockly.Categories.more,
+      "extensions": ["colours_more", "shape_statement"]
+    });
+  }
+};
+
 Blockly.Blocks['extension_pen_down'] = {
   /**
    * @this Blockly.Block
