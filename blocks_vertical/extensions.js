@@ -36,9 +36,9 @@ Blockly.Blocks['extension_checkbox_test'] = {
       "message0": "checkbox test %1",
       "args0": [
         {
-          "type": "input_value",
           "name": "CHECKBOX",
-          "output": "Boolean"
+          "type": "input_value",
+          "check": "Boolean"
         }
       ],
       "category": Blockly.Categories.more,
