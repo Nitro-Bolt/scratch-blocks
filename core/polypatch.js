@@ -23,6 +23,8 @@
  */
 'use strict';
 
+/* eslint-disable no-undef */
+
 goog.provide('Polypatch');
 goog.require('goog.color');
 goog.require('goog.array');
