@@ -24,11 +24,12 @@
 'use strict';
 
 goog.provide('Polypatch');
-goog.require('goog.global');
+goog.require('goog.color');
+goog.require('goog.array');
 goog.require('goog.asserts');
-goog.provides('goog.isSafeFunction');
-goog.provides('goog.asserts.assertAtLeastLength');
-goog.provides('goog.queueMicrotask');
+goog.provide('goog.isSafeFunction');
+goog.provide('goog.asserts.assertAtLeastLength');
+goog.provide('goog.queueMicrotask');
 
 /**
  * Checks if a value is a safe callable function.
@@ -37,6 +38,9 @@ goog.provides('goog.queueMicrotask');
 goog.isSafeFunction = function(value) {
   return (goog.typeOf(value) == 'function') && goog.isDef(value.call);
 };
+
+// Allow transparent hex code's
+goog.color.validHexColorRe_ = /^#((?:[0-9a-f]{3}){1,2}$)|(?:[0-9a-f]{8}$)/;
 
 // Attempt to find native implementation's and replace goog's implementations of them.
 if (goog.isSafeFunction(Array.isArray.call)) goog.isArray = Array.isArray;
@@ -54,7 +58,7 @@ if (goog.isSafeFunction(Array.from)) goog.array.toArray = Array.from;
    or the array length is not the same as length.
  */
 goog.asserts.assertAtLeastLength = function(value, length, opt_message, var_args) {
-  if (goog.asserts.ENABLE_ASSERTS && ) {
+  if (goog.asserts.ENABLE_ASSERTS && !goog.isArray(value)) {
     if (!goog.isArrayLike(value)) {
       goog.asserts.doAssertFailure_(
         'Expected array-like but got %s: %s.', [goog.typeOf(value), value],
@@ -68,7 +72,7 @@ goog.asserts.assertAtLeastLength = function(value, length, opt_message, var_args
       );
     }
   }
-  if (value.length < length) return /** @type {!Array<?>} */ (value);
+  if (value.length >= length) return /** @type {!Array<?>} */ (value);
   goog.asserts.doAssertFailure_(
     'Expected array-like to be minimum length of %s but got: %s.', [length, value.length],
     opt_message, Array.prototype.slice.call(arguments, 2)
