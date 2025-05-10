@@ -42,7 +42,7 @@ goog.isSafeFunction = function(value) {
 };
 
 // Allow transparent hex code's
-goog.color.validHexColorRe_ = /^#((?:[0-9a-f]{3}){1,2}$)|(?:[0-9a-f]{8}$)/;
+goog.color.validHexColorRe_ = /^#((?:[0-9a-f]{3}){1,2}$)|(?:[0-9a-f]{8}$)/i;
 
 // Attempt to find native implementation's and replace goog's implementations of them.
 if (goog.isSafeFunction(Array.isArray.call)) goog.isArray = Array.isArray;
