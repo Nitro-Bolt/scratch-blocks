@@ -24,7 +24,7 @@
  */
 'use strict';
 
-// super cool staircase -cubester & miyo
+// "super cool staircase" - Cubester & Miyo
 goog.provide('Blockly.FieldCheckbox');
 
 goog.require('Blockly.Events');
