@@ -234,6 +234,7 @@
     "SENSING_CURRENT_HOUR": "hour",
     "SENSING_CURRENT_MINUTE": "minute",
     "SENSING_CURRENT_SECOND": "second",
+    "SENSING_CURRENT_REFRESHTIME": "screen refresh time",
     "SENSING_DAYSSINCE2000": "days since 2000",
     "SENSING_USERNAME": "username",
     "SENSING_USERID": "user id",
