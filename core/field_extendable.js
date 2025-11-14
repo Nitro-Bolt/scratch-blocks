@@ -77,7 +77,7 @@ Blockly.FieldExtendable.fromJson = function(options) {
  * Mouse cursor style when over the hotspot that initiates editability.
  */
 Blockly.FieldExtendable.prototype.CURSOR = 'default';
-Blockly.FieldExtendable.prototype.EDITABLE = false;
+Blockly.FieldExtendable.prototype.EDITABLE = true;
 Blockly.FieldExtendable.prototype.REVERSE_SERIALIZE = true;
 /**
  * Field name separator.
@@ -123,11 +123,17 @@ Blockly.FieldExtendable.prototype.init = function() {
   if (!this.disabled) this.arrowLeft.style.cursor = 'pointer';
   if (!this.disabled) this.arrowRight.style.cursor = 'pointer';
 
+  this.mouseDownWrapperLeftDown_ = Blockly.bindEventWithChecks_(
+      this.arrowLeft, 'mousedown', this, this.onMouseDown_
+  );
+  this.mouseDownWrapperRightDown_ = Blockly.bindEventWithChecks_(
+      this.arrowRight, 'mousedown', this, this.onMouseDown_
+  );
   this.mouseDownWrapperLeft_ = Blockly.bindEventWithChecks_(
-      this.arrowLeft, 'mousedown', this, this.onClick.bind(this, -1)
+      this.arrowLeft, 'click', this, this.onClick.bind(this, -1)
   );
   this.mouseDownWrapperRight_ = Blockly.bindEventWithChecks_(
-      this.arrowRight, 'mousedown', this, this.onClick.bind(this, 1)
+      this.arrowRight, 'click', this, this.onClick.bind(this, 1)
   );
 
   this.sourceBlock_.getSvgRoot().appendChild(this.fieldGroup_);
@@ -280,8 +286,16 @@ Blockly.FieldExtendable.prototype.setValue = function(newValue, opt_force, opt_n
  * @param {MouseEvent=} ev An optional mouse event.
  */
 Blockly.FieldExtendable.prototype.onClick = function(inputs, ev) {
-  if (this.disabled) return;
+  if (this.disabled || !this.isCurrentlyEditable()) return;
   this.setValue(this.inputs + (inputs * (ev && ev.shiftKey ? 3 : 1)));
+};
+
+/**
+ * This field is editable, but only through the extra buttons it adds.
+ * @private
+ */
+Blockly.FieldExtendable.prototype.showEditor_ = function() {
+  // nop.
 };
 
 /**
@@ -322,6 +336,12 @@ Blockly.FieldExtendable.prototype.dispose = function() {
   }
   if (this.mouseDownWrapperRight_) {
     Blockly.unbindEvent_(this.mouseDownWrapperRight_);
+  }
+  if (this.mouseDownWrapperLeftDown_) {
+    Blockly.unbindEvent_(this.mouseDownWrapperLeftDown_);
+  }
+  if (this.mouseDownWrapperRightDown_) {
+    Blockly.unbindEvent_(this.mouseDownWrapperRightDown_);
   }
   Blockly.FieldExtendable.superClass_.dispose.call(this);
 };
