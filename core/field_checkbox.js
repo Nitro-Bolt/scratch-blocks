@@ -72,10 +72,9 @@ Blockly.FieldCheckbox.prototype._alternateSupport = false;
 Blockly.FieldCheckbox.connectBoolean = function(input) {
   Blockly.Events.setGroup(true);
   var block = Blockly.Xml.domToBlock(
-    Blockly.Xml.textToDom(`<xml><block type="checkbox"><field name="CHECKBOX"> </field></block></xml>`).querySelector('block'),
+    Blockly.Xml.textToDom('<xml><shadow type="checkbox"><field name="CHECKBOX"> </field></shadow></xml>').querySelector('shadow'),
     input.sourceBlock_.workspace,
   );
-  block.setShadow(true);
   block.render();
   block.outputConnection.connect(input.connection);
   Blockly.Events.setGroup(false);
