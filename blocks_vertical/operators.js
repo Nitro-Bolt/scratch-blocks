@@ -723,3 +723,60 @@ Blockly.Blocks['operator_divide_extendable'] = {
     });
   }
 };
+
+Blockly.Blocks['operator_and_extendable'] = {
+  /**
+   * Block for extendable "and" boolean comparator.
+   * @this Blockly.Block
+   */
+  init: function() {
+    this.jsonInit({
+      "message0": Blockly.Msg.OPERATORS_AND_EXTENDABLE,
+      "args0": [
+        {
+          "type": "extendable",
+          "name": "OPERANDS",
+          "args": [
+            {
+              "type": "input_value",
+              "name": "OPERAND",
+              "check": "Boolean"
+            },
+          ],
+          "separator": Blockly.Msg.OPERATORS_AND_EXTENDABLE_SEPARATOR,
+          "minInputs": 2
+        },
+      ],
+      "category": Blockly.Categories.operators,
+      "extensions": ["colours_operators", "output_boolean"]
+    });
+  }
+};
+Blockly.Blocks['operator_or_extendable'] = {
+  /**
+   * Block for extendable "or" boolean comparator.
+   * @this Blockly.Block
+   */
+  init: function() {
+    this.jsonInit({
+      "message0": Blockly.Msg.OPERATORS_OR_EXTENDABLE,
+      "args0": [
+        {
+          "type": "extendable",
+          "name": "OPERANDS",
+          "args": [
+            {
+              "type": "input_value",
+              "name": "OPERAND",
+              "check": "Boolean"
+            },
+          ],
+          "separator": Blockly.Msg.OPERATORS_OR_EXTENDABLE_SEPARATOR,
+          "minInputs": 2
+        },
+      ],
+      "category": Blockly.Categories.operators,
+      "extensions": ["colours_operators", "output_boolean"]
+    });
+  }
+};
