@@ -318,5 +318,9 @@ Blockly.Input.prototype.isClickable = function() {
 };
 
 Blockly.Input.prototype.onClick = function() {
-  Blockly.FieldCheckbox.connectBoolean(this);
+  var check = this.connection.check_ || [];
+
+  if (check.indexOf('Boolean') !== -1) {
+    Blockly.FieldCheckbox.connectBoolean(this);
+  }
 };
