@@ -606,3 +606,120 @@ Blockly.Blocks['operator_join_extendable'] = {
     });
   }
 };
+
+Blockly.Blocks['operator_add_extendable'] = {
+  /**
+   * @this Blockly.Block
+   */
+  init: function() {
+    this.jsonInit({
+      "message0": "%1",
+      "args0": [
+        {
+          "type": "extendable",
+          "name": "NUMS",
+          "args": [
+            {
+              "type": "input_value",
+              "name": "NUM",
+              "shadowOpcode": "math_number",
+              "shadowFieldName": "NUM",
+              "shadowFieldValue": ""
+            },
+          ],
+          "separator": "+",
+          "minInputs": 2
+        },
+      ],
+      "category": Blockly.Categories.operators,
+      "extensions": ["colours_operators", "output_number"]
+    });
+  }
+};
+Blockly.Blocks['operator_subtract_extendable'] = {
+  /**
+   * @this Blockly.Block
+   */
+  init: function() {
+    this.jsonInit({
+      "message0": "%1",
+      "args0": [
+        {
+          "type": "extendable",
+          "name": "NUMS",
+          "args": [
+            {
+              "type": "input_value",
+              "name": "NUM",
+              "shadowOpcode": "math_number",
+              "shadowFieldName": "NUM",
+              "shadowFieldValue": ""
+            },
+          ],
+          "separator": "-",
+          "minInputs": 2
+        },
+      ],
+      "category": Blockly.Categories.operators,
+      "extensions": ["colours_operators", "output_number"]
+    });
+  }
+};
+Blockly.Blocks['operator_multiply_extendable'] = {
+  /**
+   * @this Blockly.Block
+   */
+  init: function() {
+    this.jsonInit({
+      "message0": "%1",
+      "args0": [
+        {
+          "type": "extendable",
+          "name": "NUMS",
+          "args": [
+            {
+              "type": "input_value",
+              "name": "NUM",
+              "shadowOpcode": "math_number",
+              "shadowFieldName": "NUM",
+              "shadowFieldValue": ""
+            },
+          ],
+          "separator": "*",
+          "minInputs": 2
+        },
+      ],
+      "category": Blockly.Categories.operators,
+      "extensions": ["colours_operators", "output_number"]
+    });
+  }
+};
+Blockly.Blocks['operator_divide_extendable'] = {
+  /**
+   * @this Blockly.Block
+   */
+  init: function() {
+    this.jsonInit({
+      "message0": "%1",
+      "args0": [
+        {
+          "type": "extendable",
+          "name": "NUMS",
+          "args": [
+            {
+              "type": "input_value",
+              "name": "NUM",
+              "shadowOpcode": "math_number",
+              "shadowFieldName": "NUM",
+              "shadowFieldValue": ""
+            },
+          ],
+          "separator": "/",
+          "minInputs": 2
+        },
+      ],
+      "category": Blockly.Categories.operators,
+      "extensions": ["colours_operators", "output_number"]
+    });
+  }
+};
