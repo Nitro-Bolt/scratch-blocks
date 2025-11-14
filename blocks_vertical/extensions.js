@@ -64,6 +64,47 @@ Blockly.Blocks['extension_extendable_test'] = {
   }
 };
 
+Blockly.Blocks['extension_extendable_broken_test'] = {
+  /**
+   * @this Blockly.Block
+   */
+  init: function() {
+    this.jsonInit({
+      "message0": "extendable broken test %1",
+      "args0": [
+        {
+          "type": "extendable",
+          "name": "CASES",
+          "args": [
+            "case",
+            {
+              "type": "extendable",
+              "name": "CASE_VALUES",
+              "args": [
+                {
+                  "type": "input_value",
+                  "name": "CONDITION",
+                  "shadowOpcode": "text",
+                  "shadowFieldName": "TEXT",
+                  "shadowFieldValue": "apple"
+                },
+              ],
+              "minInputs": 1,
+              "defaultInputs": 1
+            },
+            {
+              "type": "input_statement",
+              "name": "SUBSTACK",
+            },
+          ],
+        },
+      ],
+      "category": Blockly.Categories.more,
+      "extensions": ["colours_more", "shape_statement"]
+    });
+  }
+};
+
 Blockly.Blocks['extension_nested_extendable_test'] = {
   /**
    * @this Blockly.Block
@@ -198,6 +239,77 @@ Blockly.Blocks['extension_extendable_if_test'] = {
   }
 };
 
+Blockly.Blocks['extension_extendable_switch_test'] = {
+  /**
+   * @this Blockly.Block
+   */
+  init: function() {
+    this.jsonInit({
+      "message0": "switch %1 %2 %3",
+      "args0": [
+        {
+          "type": "input_value",
+          "name": "VALUE"
+        },
+        {
+          "type": "extendable",
+          "name": "CASES",
+          "args": [
+            "case",
+            {
+              "type": "extendable",
+              "name": "CASE_VALUES",
+              "args": [
+                {
+                  "type": "input_value",
+                  "name": "CONDITION",
+                  "shadowOpcode": "text",
+                  "shadowFieldName": "TEXT",
+                  "shadowFieldValue": "apple"
+                },
+              ],
+              "minInputs": 1,
+              "defaultInputs": 1
+            },
+            {
+              "type": "input_statement",
+              "name": "SUBSTACK",
+            },
+            {
+              "type": "extendable",
+              "name": "CONTINUE_TO",
+              "args": [
+                "continue to"
+              ],
+              "minInputs": 0,
+              "maxInputs": 1,
+              "defaultInputs": 0
+            },
+          ],
+          "minInputs": 0,
+          "defaultInputs": 1
+        },
+        {
+          "type": "extendable",
+          "name": "DEFAULT_CASE",
+          "args": [
+            "default",
+            {
+              "type": "input_statement",
+              "name": "SUBSTACK",
+            },
+          ],
+          "minInputs": 0,
+          "maxInputs": 1,
+          "defaultInputs": 1
+        }
+      ],
+      "category": Blockly.Categories.more,
+      "extensions": ["colours_more", "shape_statement"]
+    });
+  }
+};
+
 Blockly.Blocks['extension_extendable_reporter_test'] = {
   /**
    * @this Blockly.Block
@@ -235,6 +347,87 @@ Blockly.Blocks['extension_extendable_reporter_test'] = {
   }
 };
 
+Blockly.Blocks['extension_checkbox_test'] = {
+  /**
+   * @this Blockly.Block
+   */
+  init: function() {
+    this.jsonInit({
+      "message0": "checkbox test %1",
+      "args0": [
+        {
+          "name": "CHECKBOX",
+          "type": "input_value",
+          "check": "Boolean"
+        }
+      ],
+      "category": Blockly.Categories.more,
+      "extensions": ["colours_more", "shape_statement"]
+    });
+  }
+};
+
+Blockly.Blocks['extension_checkbox_test_legacy'] = {
+  /**
+   * @this Blockly.Block
+   */
+  init: function() {
+    this.jsonInit({
+      "message0": "checkbox test %1 (legacy)",
+      "args0": [
+        {
+          "name": "CHECKBOX",
+          "type": "input_value",
+          "check": "Boolean"
+        }
+      ],
+      "category": Blockly.Categories.more,
+      "extensions": ["colours_more", "shape_statement"]
+    });
+  }
+};
+
+Blockly.Blocks['extension_checkbox_test_legacy_json'] = {
+  /**
+   * @this Blockly.Block
+   */
+  init: function() {
+    this.jsonInit({
+      "message0": "(legacy jsonInit) %1 FALSE",
+      "args0": [
+        {
+          "name": "CHECKBOX",
+          "type": "field_checkbox",
+          "checked": "FALSE",
+          "check": "Boolean"
+        }
+      ],
+      "category": Blockly.Categories.more,
+      "extensions": ["colours_more", "output_boolean"]
+    });
+  }
+};
+
+Blockly.Blocks['extension_checkbox_test_legacy_json2'] = {
+  /**
+   * @this Blockly.Block
+   */
+  init: function() {
+    this.jsonInit({
+      "message0": "(legacy jsonInit) %1 TRUE",
+      "args0": [
+        {
+          "name": "CHECKBOX",
+          "type": "field_checkbox",
+          "checked": "TRUE",
+          "check": "Boolean"
+        }
+      ],
+      "category": Blockly.Categories.more,
+      "extensions": ["colours_more", "output_boolean"]
+    });
+  }
+};
 
 
 Blockly.Blocks['extension_pen_down'] = {

@@ -44,14 +44,14 @@ Blockly.Blocks.defaultToolbox = '<xml id="toolbox-categories" style="display: no
     '</block>' +
     '<block type="motion_turnright" id="motion_turnright">' +
       '<value name="DEGREES">' +
-        '<shadow type="math_number">' +
+        '<shadow type="math_angle">' +
           '<field name="NUM">15</field>' +
         '</shadow>' +
       '</value>' +
     '</block>' +
     '<block type="motion_turnleft" id="motion_turnleft">' +
       '<value name="DEGREES">' +
-        '<shadow type="math_number">' +
+        '<shadow type="math_angle">' +
           '<field name="NUM">15</field>' +
         '</shadow>' +
       '</value>' +
@@ -702,12 +702,36 @@ Blockly.Blocks.defaultToolbox = '<xml id="toolbox-categories" style="display: no
   '</category>' +
   '<category name="Extensions" id="extensions" colour="#FF6680" secondaryColour="#FF4D6A" ' +
     'iconURI="../media/extensions/wedo2-block-icon.svg" showStatusButton="true">' +
+    /* extendable testing */
     '<block type="extension_extendable_test" id="extension_extendable_test"></block>' +
     '<block type="extension_nested_extendable_test" id="extension_nested_extendable_test"></block>' +
     '<block type="extension_nested_extendable_inputs_test" id="extension_nested_extendable_inputs_test"></block>' +
     '<block type="extension_recursive_extendable_test" id="extension_recursive_extendable_test"></block>' +
     '<block type="extension_extendable_if_test" id="extension_extendable_if_test"></block>' +
     '<block type="extension_extendable_reporter_test" id="extension_extendable_reporter_test"></block>' +
+    '<sep gap="36"></sep>' +
+    /* checkbox testing */
+    '<block type="extension_checkbox_test">' + // enabled
+      '<value name="CHECKBOX">' +
+        '<shadow type="checkbox"></shadow>' +
+      '</value>' +
+    '</block>' +
+    '<block type="extension_checkbox_test">' + // disabled
+    '</block>' +
+    '<block type="extension_checkbox_test_legacy">' + // enabled legacy
+      '<value name="CHECKBOX">' +
+        '<shadow type="checkbox">' +
+          '<field name="CHECKBOX">TRUE</field>' +
+        '</shadow>' +
+      '</value>' +
+    '</block>' +
+    '<block type="extension_checkbox_test_legacy">' + // disabled legacy
+      '<value name="CHECKBOX">' +
+        '<shadow type="checkbox">' +
+          '<field name="CHECKBOX">FALSE</field>' + // this should instantly turn off
+        '</shadow>' +
+      '</value>' +
+    '</block>' +
     '<sep gap="36"></sep>' +
     '<block type="extension_pen_down" id="extension_pen_down"></block>' +
     '<block type="extension_music_drum" id="extension_music_drum">' +

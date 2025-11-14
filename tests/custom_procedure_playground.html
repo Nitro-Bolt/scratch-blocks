@@ -10,13 +10,13 @@
     <script src="../blocks_common/math.js"></script>
     <script src="../blocks_common/text.js"></script>
     <script src="../blocks_common/colour.js"></script>
+    <script src="../blocks_common/checkbox.js"></script>
     <script src="../blocks_vertical/control.js"></script>
     <script src="../blocks_vertical/event.js"></script>
     <script src="../blocks_vertical/motion.js"></script>
     <script src="../blocks_vertical/looks.js"></script>
     <script src="../blocks_vertical/procedures.js"></script>
     <script src="../blocks_vertical/operators.js"></script>
-    <script src="../blocks_vertical/pen.js"></script>
     <script src="../blocks_vertical/sound.js"></script>
     <script src="../blocks_vertical/sensing.js"></script>
     <script src="../blocks_vertical/data.js"></script>
@@ -53,6 +53,7 @@
         <button id="okButton" onclick="applyMutation()">ok</button>
         <button id="rndButton" onclick="removeRandomInput()">remove random input</button>
         <button id="addRndButton" onclick="addRandomInput()">add random input</button>
+        <input id="changeColour" type="color" value="#FF6680" />
       </td>
     </tr>
   </table>
@@ -249,6 +250,11 @@
       definitionWorkspace.refreshToolboxSelection_()
       editorActions.style.visibility = 'hidden';
     }
+
+    document.getElementById('changeColour').addEventListener('change', ev => {
+      mutationRoot.setColour(ev.target.value);
+      mutationRoot.updateDisplay_();
+    });
 </script>
 
 </body>

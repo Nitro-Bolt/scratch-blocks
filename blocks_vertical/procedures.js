@@ -110,17 +110,6 @@ Blockly.ScratchBlocks.ProcedureUtils.definitionMutationToDom = function(
   container.setAttribute('warp', JSON.stringify(this.warp_));
   container.setAttribute('colour', this.colour_);
   return container;
-};
-
-/**
- * its in the name.
- * @param {any} x
- * @param {any} y
- * @returns {any}
- */
-function nullCoalsh(x, y) {
-  if (x === null || x === (void 0)) return y;
-  return x;
 }
 
 /**
@@ -131,7 +120,7 @@ function nullCoalsh(x, y) {
  * @this Blockly.Block
  */
 Blockly.ScratchBlocks.ProcedureUtils.matchColours = function(colour1, ld) {
-  ld = nullCoalsh(ld, 0.75); // 25 percent
+  ld = (ld == null) ? 0.75 : ld; // 25 percent
   colour1 = colour1.toLowerCase();
   var categorys = Object.values(Blockly.Categories);
   var maybeColours = Object.entries(Blockly.Colours).find(v => (
@@ -417,14 +406,22 @@ Blockly.ScratchBlocks.ProcedureUtils.addLabelEditor_ = function(text) {
  */
 Blockly.ScratchBlocks.ProcedureUtils.buildShadowDom_ = function(type) {
   var shadowDom = goog.dom.createDom('shadow');
-  if (type == 'n') {
-    var shadowType = 'math_number';
-    var fieldName = 'NUM';
-    var fieldValue = '1';
-  } else {
-    var shadowType = 'text';
-    var fieldName = 'TEXT';
-    var fieldValue = '';
+  switch (type) {
+    case 'n':
+      var shadowType = 'math_number';
+      var fieldName = 'NUM';
+      var fieldValue = '1';
+      break;
+    case 's':
+      var shadowType = 'text';
+      var fieldName = 'TEXT';
+      var fieldValue = '';
+      break;
+    case 'b':
+      var shadowType = 'checkbox';
+      var fieldName = 'CHECKBOX';
+      var fieldValue = 'FALSE';
+      break;
   }
   shadowDom.setAttribute('type', shadowType);
   var fieldDom = goog.dom.createDom('field', null, fieldValue);
@@ -436,22 +433,25 @@ Blockly.ScratchBlocks.ProcedureUtils.buildShadowDom_ = function(type) {
 /**
  * Create a new shadow block and attach it to the given input.
  * @param {!Blockly.Input} input The value input to attach a block to.
- * @param {string} argumentType One of 'b' (boolean), 'o' (object), 'a' (array),
+ * @param {string} argumentType One of 'o' (object), 'a' (array),
  *     's' (string) or 'n' (number).
  * @private
  * @this Blockly.Block
  */
 Blockly.ScratchBlocks.ProcedureUtils.attachShadow_ = function(input,
     argumentType) {
-  if (argumentType == 'n' || argumentType == 's') {
-    var blockType = argumentType == 'n' ? 'math_number' : 'text';
+  if (['n', 's'].includes(argumentType)) {
+    var blockType = {'n': 'math_number', 's': 'text'}[argumentType];
     Blockly.Events.disable();
     try {
       var newBlock = this.workspace.newBlock(blockType);
-      if (argumentType == 'n') {
-        newBlock.setFieldValue('1', 'NUM');
-      } else {
-        newBlock.setFieldValue('', 'TEXT');
+      switch (argumentType) {
+        case 'n':
+          newBlock.setFieldValue('1', 'NUM');
+          break;
+        case 's':
+          newBlock.setFieldValue('', 'TEXT');
+          break;
       }
       newBlock.setShadow(true);
       if (!this.isInsertionMarker()) {
@@ -533,7 +533,7 @@ Blockly.ScratchBlocks.ProcedureUtils.populateArgumentOnCaller_ = function(type,
     // Reattach the old block and shadow DOM.
     connectionMap[input.name] = null;
     oldBlock.outputConnection.connect(input.connection);
-    if ((type == 's' || type == 'n') && this.generateShadows_) {
+    if ((['s', 'n', 'b'].includes(type)) && this.generateShadows_) {
       var shadowDom = oldShadow || this.buildShadowDom_(type);
       input.connection.setShadowDom(shadowDom);
     }
