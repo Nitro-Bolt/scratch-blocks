@@ -76,7 +76,6 @@ Blockly.Blocks['extension_extendable_broken_test'] = {
           "type": "extendable",
           "name": "CASES",
           "args": [
-            "case",
             {
               "type": "extendable",
               "name": "CASE_VALUES",
@@ -86,7 +85,7 @@ Blockly.Blocks['extension_extendable_broken_test'] = {
                   "name": "CONDITION",
                   "shadowOpcode": "text",
                   "shadowFieldName": "TEXT",
-                  "shadowFieldValue": "apple"
+                  "shadowFieldValue": "should be before statement"
                 },
               ],
               "minInputs": 1,
