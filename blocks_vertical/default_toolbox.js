@@ -725,6 +725,22 @@ Blockly.Blocks.defaultToolbox = '<xml id="toolbox-categories" style="display: no
   '</category>' +
   '<category name="Extensions" id="extensions" colour="#FF6680" secondaryColour="#FF4D6A" ' +
     'iconURI="../media/extensions/wedo2-block-icon.svg" showStatusButton="true">' +
+    /* extendable testing */
+    '<block type="extension_extendable_test" id="extension_extendable_test"></block>' +
+    '<block type="extension_extendable_broken_test" id="extension_extendable_broken_test"></block>' +
+    '<block type="extension_nested_extendable_test" id="extension_nested_extendable_test"></block>' +
+    '<block type="extension_nested_extendable_inputs_test" id="extension_nested_extendable_inputs_test"></block>' +
+    '<block type="extension_recursive_extendable_test" id="extension_recursive_extendable_test"></block>' +
+    '<block type="extension_extendable_if_test" id="extension_extendable_if_test"></block>' +
+    '<block type="extension_extendable_switch_test" id="extension_extendable_switch_test">' +
+      '<value name="VALUE">' +
+        '<shadow type="text">' +
+          '<field name="TEXT">apple</field>' +
+        '</shadow>' +
+      '</value>' +
+    '</block>' +
+    '<block type="extension_extendable_reporter_test" id="extension_extendable_reporter_test"></block>' +
+    '<sep gap="36"></sep>' +
     /* checkbox testing */
     '<block type="extension_checkbox_test">' + // enabled
       '<value name="CHECKBOX">' +

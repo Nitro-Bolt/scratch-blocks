@@ -29,10 +29,13 @@ Blockly.FieldExtendable = function(elements, defaultInputs, minInputs, maxInputs
   this.separator = separator;
   this.collapser = collapser;
 
+  this.lastInputRow = undefined;
+
   /** @type {boolean} */
   this.disabled = false;
   this.inputs = undefined;
   this.defaultInputs = defaultInputs;
+  this.firstTimeAddingInputs = true;
 
   this.addArgType('extendable');
   
@@ -171,6 +174,7 @@ Blockly.FieldExtendable.prototype.getInputName = function(id, opt_midfix) {
  * @return {number} The shifted input index after the inputs were added.
  */
 Blockly.FieldExtendable.prototype.appendArgsList = function(elements, midfix, inputIndex, extendableIndex, populate) {
+  this.lastInputRow = inputIndex;
   if (!elements.length) return inputIndex;
   var addedInputs = this.sourceBlock_.appendArgsList(
       elements, {
@@ -185,6 +189,7 @@ Blockly.FieldExtendable.prototype.appendArgsList = function(elements, midfix, in
     input.extendableName = this.name;
     input.extendableIndex = extendableIndex;
   }
+  this.lastInputRow = inputIndex + addedInputs.length;
   return inputIndex + addedInputs.length;
 };
 
@@ -207,11 +212,12 @@ Blockly.FieldExtendable.prototype.setValue = function(newValue, opt_force, opt_n
     if (this.sourceBlock_) {
       // If we decreased the number of inputs, remove some
       if (newInputs < this.inputs) {
-        var inputList = Array.from(this.sourceBlock_.inputList);
+        var inputList = this.sourceBlock_.inputList;
+        var sb = this.sourceBlock_;
         for (var i = inputList.length - 1; i >= 0; i--) {
           var input = inputList[i];
           if (input && input.extendableName == this.name && input.extendableIndex >= newInputs) {
-            this.sourceBlock_.removeNumberedInput(i);
+            sb.removeNumberedInput(i);
           }
         }
       }
@@ -228,7 +234,7 @@ Blockly.FieldExtendable.prototype.setValue = function(newValue, opt_force, opt_n
             this.elements, "", thisIndex, i, shouldPopulate
         );
       }
-
+      
       if (newInputs === 0 && this.inputs !== 0) {
         // Add collapser if needed
         thisIndex = this.appendArgsList(
@@ -258,7 +264,16 @@ Blockly.FieldExtendable.prototype.setValue = function(newValue, opt_force, opt_n
         this.sourceBlock_.render();
       }
     }
+  } else if (this.sourceBlock_) {
+    if (newInputs === 0 && this.firstTimeAddingInputs) {
+      // Add collapser on first block creation
+      var thisIndex = this.sourceBlock_.inputList.indexOf(this.sourceInput_);
+      thisIndex = this.appendArgsList(
+          this.collapser, "", thisIndex, "COLLAPSER", shouldPopulate
+      );
+    }
   }
+  this.firstTimeAddingInputs = false;
 };
 
 /**

@@ -64,6 +64,46 @@ Blockly.Blocks['extension_extendable_test'] = {
   }
 };
 
+Blockly.Blocks['extension_extendable_broken_test'] = {
+  /**
+   * @this Blockly.Block
+   */
+  init: function() {
+    this.jsonInit({
+      "message0": "extendable broken test %1",
+      "args0": [
+        {
+          "type": "extendable",
+          "name": "CASES",
+          "args": [
+            {
+              "type": "extendable",
+              "name": "CASE_VALUES",
+              "args": [
+                {
+                  "type": "input_value",
+                  "name": "CONDITION",
+                  "shadowOpcode": "text",
+                  "shadowFieldName": "TEXT",
+                  "shadowFieldValue": "should be before statement"
+                },
+              ],
+              "minInputs": 1,
+              "defaultInputs": 1
+            },
+            {
+              "type": "input_statement",
+              "name": "SUBSTACK",
+            },
+          ],
+        },
+      ],
+      "category": Blockly.Categories.more,
+      "extensions": ["colours_more", "shape_statement"]
+    });
+  }
+};
+
 Blockly.Blocks['extension_nested_extendable_test'] = {
   /**
    * @this Blockly.Block

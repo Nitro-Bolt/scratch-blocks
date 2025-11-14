@@ -1589,6 +1589,7 @@ Blockly.Block.prototype.appendArgsList = function(
               if (opt_position !== undefined) emptyFieldStack();
               input = this.appendStatementInput(name, opt_position);
               if (opt_position !== undefined) opt_position++;
+              if (opt_position !== undefined) emptyFieldStack();
               break;
             case 'input_dummy':
               input = this.appendDummyInput(name, opt_position);
