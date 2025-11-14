@@ -48,6 +48,7 @@
         <button id="boolean" onclick="addBoolean()">Add boolean input</button>
         <button id="object" onclick="addObject()">Add object input</button>
         <button id="array" onclick="addArray()">Add array input</button>
+        <button id="statement" onclick="addStatement()">Add statement input</button>
         <button id="label" onclick="addLabel()">Add label</button>
         <button id="cancelButton" onclick="cancel()">cancel</button>
         <button id="okButton" onclick="applyMutation()">ok</button>
@@ -209,6 +210,10 @@
 
     function addArray() {
       mutationRoot.addArrayExternal();
+    }
+
+    function addStatement() {
+      mutationRoot.addStatementExternal();
     }
 
     function addTextNumber() {

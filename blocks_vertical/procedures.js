@@ -298,8 +298,8 @@ Blockly.ScratchBlocks.ProcedureUtils.removeAllInputs_ = function() {
  * @this Blockly.Block
  */
 Blockly.ScratchBlocks.ProcedureUtils.createAllInputs_ = function(connectionMap) {
-  // Split the proc into components, by %n, %b, %o, %a, and %s (ignoring escaped).
-  var procComponents = this.procCode_.split(/(?=[^\\]%[nboas])/);
+  // Split the proc into components, by %n, %b, %o, %a, %c, and %s (ignoring escaped).
+  var procComponents = this.procCode_.split(/(?=[^\\]%[nboasc])/);
   procComponents = procComponents.map(function(c) {
     return c.trim(); // Strip whitespace.
   });
@@ -310,7 +310,7 @@ Blockly.ScratchBlocks.ProcedureUtils.createAllInputs_ = function(connectionMap) 
     var labelText;
     if (component.substring(0, 1) == '%') {
       var argumentType = component.substring(1, 2);
-      if (!(argumentType == 'n' || argumentType == 'b' || argumentType == 'o' || argumentType == 'a' || argumentType == 's')) {
+      if (!['n', 'b', 'o', 'a', 's', 'c'].includes(argumentType)) {
         throw new Error(
             'Found an custom procedure with an invalid type: ' + argumentType);
       }
@@ -318,13 +318,18 @@ Blockly.ScratchBlocks.ProcedureUtils.createAllInputs_ = function(connectionMap) 
 
       var id = this.argumentIds_[argumentCount];
 
-      var input = this.appendValueInput(id);
-      if (argumentType == 'b') {
-        input.setCheck('Boolean');
-      } else if (argumentType == 'o') {
-        input.setCheck('Object');
-      } else if (argumentType == 'a') {
-        input.setCheck('Array');
+      var input
+      if (argumentType === 'c') {
+        input = this.appendStatementInput(id);
+      } else {
+        input = this.appendValueInput(id);
+        if (argumentType == 'b') {
+          input.setCheck('Boolean');
+        } else if (argumentType == 'o') {
+          input.setCheck('Object');
+        } else if (argumentType == 'a') {
+          input.setCheck('Array');
+        }
       }
       this.populateArgument_(argumentType, argumentCount, connectionMap, id,
           input);
@@ -621,7 +626,8 @@ Blockly.ScratchBlocks.ProcedureUtils.populateArgumentOnDeclaration_ = function(
   }
 
   // Attach the block.
-  input.connection.connect(argumentEditor.outputConnection);
+  if (type == "c") input.connection.connect(argumentEditor.previousConnection)
+  else input.connection.connect(argumentEditor.outputConnection);
 };
 
 /**
@@ -676,6 +682,8 @@ Blockly.ScratchBlocks.ProcedureUtils.createArgumentEditor_ = function(
       var newBlock = this.workspace.newBlock('argument_editor_object');
     } else if (argumentType == 'a') {
       var newBlock = this.workspace.newBlock('argument_editor_array');
+    } else if (argumentType == 'c') {
+      var newBlock = this.workspace.newBlock('argument_editor_statement')
     }
     newBlock.setFieldValue(displayName, 'TEXT');
     newBlock.setShadow(true);
@@ -721,6 +729,11 @@ Blockly.ScratchBlocks.ProcedureUtils.updateDeclarationProcCode_ = function() {
       } else {
         this.procCode_ += '%s';
       }
+    } else if (input.type == Blockly.NEXT_STATEMENT) {
+      var target = input.connection.targetBlock();
+      this.displayNames_.push(target.getFieldValue('TEXT'));
+      this.argumentIds_.push(input.name);
+      this.procCode += '%c';
     } else {
       throw new Error(
           'Unexpected input type on a procedure mutator root: ' + input.type);
@@ -797,6 +810,21 @@ Blockly.ScratchBlocks.ProcedureUtils.addArrayExternal = function() {
   this.displayNames_.push('array');
   this.argumentIds_.push(Blockly.utils.genUid());
   this.argumentDefaults_.push(new Array());
+  this.updateDisplay_();
+  this.focusLastEditor_();
+};
+
+/**
+ * Externally-visible function to add a statement argument to the procedure
+ * declaration.
+ * @public
+ */
+Blockly.ScratchBlocks.ProcedureUtils.addStatementExternal = function() {
+  Blockly.WidgetDiv.hide(true);
+  this.procCode_ = this.procCode_ + ' %c';
+  this.displayNames_.push('statement');
+  this.argumentIds_.push(Blockly.utils.genUid());
+  this.argumentDefaults_.push('');
   this.updateDisplay_();
   this.focusLastEditor_();
 };
@@ -1079,6 +1107,7 @@ Blockly.Blocks['procedures_declaration'] = {
   addBooleanExternal: Blockly.ScratchBlocks.ProcedureUtils.addBooleanExternal,
   addObjectExternal: Blockly.ScratchBlocks.ProcedureUtils.addObjectExternal,
   addArrayExternal: Blockly.ScratchBlocks.ProcedureUtils.addArrayExternal,
+  addStatementExternal: Blockly.ScratchBlocks.ProcedureUtils.addStatementExternal,
   addStringNumberExternal: Blockly.ScratchBlocks.ProcedureUtils.addStringNumberExternal,
   onChangeFn: Blockly.ScratchBlocks.ProcedureUtils.updateDeclarationProcCode_,
   // For colour fixing of the fields when on the GUI side look at the GUI!!!.
@@ -1221,6 +1250,23 @@ Blockly.Blocks['argument_editor_array'] = {
       "colourTertiary": Blockly.Colours.textField,
       "colourQuaternary": Blockly.Colours.textField,
       "extensions": ["output_array"]
+    });
+  },
+  // Exist on declaration and arguments editors, with different implementations.
+  removeFieldCallback: Blockly.ScratchBlocks.ProcedureUtils.removeArgumentCallback_
+};
+
+Blockly.Blocks['argument_editor_statement'] = {
+  init: function() {
+    this.jsonInit({ "message0": "%1",
+      "args0": [
+        {
+          "type": "field_input_removable",
+          "name": "TEXT",
+          "text": "foo"
+        }
+      ],
+      "extensions": ["shape_statement", "colours_more"]
     });
   },
   // Exist on declaration and arguments editors, with different implementations.
