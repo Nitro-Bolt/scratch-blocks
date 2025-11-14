@@ -476,6 +476,14 @@ Blockly.Css.CONTENT = [
     'fill: $colour_textFieldText;',
   '}',
 
+  '.blocklyBooleanCheckbox {',
+    'display: none;',
+    'pointer-events: none;',
+  '}',
+  '.blocklyInputOutline:hover + .blocklyBooleanCheckbox {',
+    'display: block;',
+  '}',
+
   '.blocklyTextTruncated {',
     'font-size: 11pt;',
   '}',

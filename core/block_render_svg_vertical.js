@@ -1434,9 +1434,8 @@ Blockly.BlockSvg.prototype.renderInputShape_ = function(input, x, y) {
   // Input shapes are only visibly rendered on non-connected slots.
   if (input.connection.targetConnection) {
     inputShape.setAttribute('style', 'visibility: hidden');
-    if (inputShape.booleanCheckbox) {
-      inputShape.booleanCheckbox.remove();
-      delete inputShape.booleanCheckbox;
+    if (input.booleanCheckbox) {
+      input.booleanCheckbox.setAttribute('style', 'visibility: hidden');
     }
   } else {
     var inputShapeX = 0, inputShapeY = 0;
@@ -1454,108 +1453,24 @@ Blockly.BlockSvg.prototype.renderInputShape_ = function(input, x, y) {
     inputShape.setAttribute('data-argument-type', inputShapeInfo.argType);
     inputShape.setAttribute('style', 'visibility: visible');
     if (inputShapeInfo.argType == 'boolean') {
-      if (input._temporaryCursor) {
-        inputShape.style.cursor = input._temporaryCursor;
-        delete input._temporaryCursor;
-      }
       // Allow a custom cursor for the field to use as a "quick callback".
-      // Make sure we don't already have a checkbox handler.
       if (!input.booleanCheckbox) {
-        input.booleanCheckbox = {
-          dead: false,
-          _canClick: false,
-          _didMove: false,
-          _boundClick: null,
-          node: Blockly.utils.createSvgElement('path', {
-            'style': 'display: none;',
-            'class': 'blocklyText',
-            'opacity': '0.5',
-            'd': Blockly.FieldCheckbox.CROSS
-          }),
-          remove() {
-            this.dead = true;
-            this._canClick = false; // Just incase.
-            this.unbindClick();
-            this.node.remove();
-          },
-          click: function(ev) {
-            if (this.dead || !this._boundClick) return;
-            // Disable visual report's on the GUI end.
-            ev.stopImmediatePropagation();
-            // Connect the checkbox.
-            this.node.setAttribute('style', 'display: none;');
-            Blockly.FieldCheckbox.connectBoolean(this.input);
-            this.unbindClick();
-          },
-          bindClick: function(inputShape) {
-            if (this.dead || this._boundClick) return;
-            this._boundClick = [
-              // We do our own mouse click type actions, mainly to fix chromium browsers.
-              Blockly.bindEvent_(inputShape, 'mousedown', this, (ev) => {
-                if (this._canClick) return;
-                this._didMove = false;
-                // If the user move's there mouse while it's down then they are probably trying to drag.
-                var move = Blockly.bindEvent_(inputShape, 'mousemove', this, (ev) => {
-                  // Since this is the case just disable clicking and say the user tried to move.
-                  this._didMove = true;
-                  Blockly.unbindEvent_(this._canClick);
-                  this._canClick = false;
-                });
-                this._canClick = move;
-              }),
-              Blockly.bindEvent_(inputShape, 'mouseup', this, (ev) => {
-                if (!this._canClick) return;
-                // If the user didnt move their mouse then unbind the move event.
-                if (!this._didMove) Blockly.unbindEvent_(this._canClick);
-                // Since the mouse was not moved we can assume the user does not want to drag the block
-                // so we can cancel the current drag gesture (if it exists) and perform our activation actions.
-                var workspace = this.input.sourceBlock_.workspace;
-                if (!workspace.currentGesture_) workspace = Blockly.getMainWorkspace();
-                workspace.currentGesture_.cancel(); // Stop dragging.
-                this.click(ev); // Perform the rest of the clickng actions.
-              })
-            ];
-          },
-          unbindClick: function() {
-            if (!goog.isArray(this._boundClick)) return;
-            this._canClick = false;
-            Blockly.unbindEvent_(this._boundClick[0]);
-            Blockly.unbindEvent_(this._boundClick[1]);
-            this._boundClick = null;
-          },
-          input
-        };
-        inputShape.after(input.booleanCheckbox.node);
+        input.booleanCheckbox = Blockly.utils.createSvgElement('path', {
+          'class': 'blocklyText blocklyBooleanCheckbox',
+          'opacity': '0.5',
+          'd': Blockly.FieldCheckbox.CROSS
+        });
+        inputShape.after(input.booleanCheckbox);
       }
-      // Setup hover event's to make the cross show and allow clicking.
-      inputShape.onmouseout = function() {
-        if (!input.booleanCheckbox || input.booleanCheckbox.dead) return;
-        input.booleanCheckbox.node.setAttribute('style', 'display: none;');
-        input.booleanCheckbox.unbindClick();
-      };
-      inputShape.onmouseover = function() {
-        if (!input.booleanCheckbox || input.booleanCheckbox.dead) return;
-        input.booleanCheckbox.node.setAttribute(
+      input.booleanCheckbox.setAttribute(
           'transform', 'translate(' + (
             inputShapeX + 24
           ) + ',' + (
             inputShapeY + 16
           ) + ') scale(1.5)'
-        );
-        inputShape.style.cursor = Blockly.FieldCheckbox.prototype.CURSOR;
-        input.booleanCheckbox.node.setAttribute('style', 'pointer-events: none;');
-        input.booleanCheckbox.bindClick(inputShape);
-      };
-      // Mobile support.
-      Blockly.bindEvent_(inputShape, 'mousedown', input, function(ev) {
-        if (!this.booleanCheckbox || this.booleanCheckbox.dead) return;
-        // If the click was bound we can just assume the user is on a computer and move on.
-        if (this.booleanCheckbox._boundClick) return;
-        ev.stopPropagation();
-        // they are probably on mobile.
-        this.booleanCheckbox._boundClick = true; // Just lie.
-        this.booleanCheckbox.click();
-      });
+      );
+      input.booleanCheckbox.setAttribute('style', 'visibility: visible');
+      inputShape.style.cursor = Blockly.FieldCheckbox.prototype.CURSOR;
     }
   }
 };

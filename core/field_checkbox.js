@@ -167,8 +167,6 @@ Blockly.FieldCheckbox.prototype.showEditor_ = function() {
     console.warn('Orphaned checkbox field was clicked.');
     return;
   }
-  // Tell the input to add the cursor tag.
-  input._temporaryCursor = this.CURSOR;
   // Remove the shadow dom from the connection. (to prevent regeneration)
   input.connection.setShadowDom();
   // Dispose of our shadow parent.
