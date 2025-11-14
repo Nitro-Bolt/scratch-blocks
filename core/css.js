@@ -792,9 +792,7 @@ Blockly.Css.CONTENT = [
   '}',
 
   '.blocklyAngleCircle {',
-    'stroke: ' + Blockly.Colours.motion.tertiary + ';',
     'stroke-width: 1;',
-    'fill: ' + Blockly.Colours.motion.secondary + ';',
   '}',
 
   '.blocklyAngleCenterPoint {',
