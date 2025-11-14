@@ -575,3 +575,34 @@ Blockly.Blocks['operator_typeof'] = {
     });
   }
 };
+
+
+// extendable blocks
+Blockly.Blocks['operator_join_extendable'] = {
+  /**
+   * @this Blockly.Block
+   */
+  init: function() {
+    this.jsonInit({
+      "message0": Blockly.Msg.OPERATORS_JOIN_EXTENDABLE,
+      "args0": [
+        {
+          "type": "extendable",
+          "name": "STRINGS",
+          "args": [
+            {
+              "type": "input_value",
+              "name": "STRING",
+              "shadowOpcode": "text",
+              "shadowFieldName": "TEXT",
+              "shadowFieldValue": Blockly.Msg.OPERATORS_JOIN_EXTENDABLE_APPLE
+            },
+          ],
+          "minInputs": 1,
+        },
+      ],
+      "category": Blockly.Categories.operators,
+      "extensions": ["colours_operators", "output_string"]
+    });
+  }
+};

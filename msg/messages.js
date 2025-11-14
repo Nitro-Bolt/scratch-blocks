@@ -274,6 +274,8 @@ Blockly.Msg.OPERATORS_CAST_BOOLEAN = 'boolean';
 Blockly.Msg.OPERATORS_CAST_ARRAY = 'array';
 Blockly.Msg.OPERATORS_CAST_OBJECT = 'object';
 Blockly.Msg.OPERATORS_TYPEOF = 'type of %1';
+Blockly.Msg.OPERATORS_JOIN_EXTENDABLE = "join %1";
+Blockly.Msg.OPERATORS_JOIN_EXTENDABLE_APPLE = "apple";
 
 // Procedures blocks
 Blockly.Msg.PROCEDURES_DEFINITION = 'define %1';
