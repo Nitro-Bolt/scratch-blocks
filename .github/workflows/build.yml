@@ -64,6 +64,10 @@ jobs:
           name: github-pages
           path: './'
 
+      - name: Clear artifact
+        run: |
+          rm -f artifact.tar
+
       - name: Commit
         uses: EndBug/add-and-commit@v9.1.1
         with:
