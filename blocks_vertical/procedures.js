@@ -493,6 +493,8 @@ Blockly.ScratchBlocks.ProcedureUtils.createArgumentReporter_ = function(
     var blockType = 'argument_reporter_object';
   } else if (argumentType == 'a') {
     var blockType = 'argument_reporter_array';
+  } else if (argumentType == 'c') {
+    var blockType = 'argument_reporter_statement'
   }
   Blockly.Events.disable();
   try {
@@ -537,7 +539,8 @@ Blockly.ScratchBlocks.ProcedureUtils.populateArgumentOnCaller_ = function(type,
   if (connectionMap && oldBlock) {
     // Reattach the old block and shadow DOM.
     connectionMap[input.name] = null;
-    oldBlock.outputConnection.connect(input.connection);
+    if (type == 'c') oldBlock.previousConnection.connect(input.connection);
+    else oldBlock.outputConnection.connect(input.connection);
     if ((['s', 'n', 'b'].includes(type)) && this.generateShadows_) {
       var shadowDom = oldShadow || this.buildShadowDom_(type);
       input.connection.setShadowDom(shadowDom);
@@ -584,7 +587,8 @@ Blockly.ScratchBlocks.ProcedureUtils.populateArgumentOnPrototype_ = function(
   }
 
   // Attach the block.
-  input.connection.connect(argumentReporter.outputConnection);
+  if (type == 'c') input.connection.connect(argumentReporter.previousConnection);
+  else input.connection.connect(argumentReporter.outputConnection);
 };
 
 /**
@@ -626,7 +630,7 @@ Blockly.ScratchBlocks.ProcedureUtils.populateArgumentOnDeclaration_ = function(
   }
 
   // Attach the block.
-  if (type == "c") input.connection.connect(argumentEditor.previousConnection)
+  if (type == 'c') input.connection.connect(argumentEditor.previousConnection)
   else input.connection.connect(argumentEditor.outputConnection);
 };
 
@@ -653,6 +657,9 @@ Blockly.ScratchBlocks.ProcedureUtils.checkOldTypeMatches_ = function(oldBlock,
     return true;
   }
   if (type == 'a' && oldBlock.type == 'argument_reporter_array') {
+    return true;
+  }
+  if (type == 'c' && oldBlock.type == 'argument_reporter_statement') {
     return true;
   }
   return false;
@@ -942,7 +949,8 @@ Blockly.ScratchBlocks.ProcedureUtils.updateArgumentReporterNames_ = function(pre
     if ((block.type === 'argument_reporter_string_number' ||
         block.type === 'argument_reporter_boolean' ||
         block.type === 'argument_reporter_object' ||
-        block.type === 'argument_reporter_array'
+        block.type === 'argument_reporter_array' ||
+        block.type === 'argument_reporter_statement'
       ) &&
         !block.isShadow()) { // Exclude arg reporters in the prototype block, which are shadows.
       argReporters.push(block);
@@ -1193,6 +1201,23 @@ Blockly.Blocks['argument_reporter_string_number'] = {
   domToMutation: argumentReporterDomToMutation
 };
 
+Blockly.Blocks['argument_reporter_statement'] = {
+  init: function() {
+    this.jsonInit({ "message0": " %1",
+      "args0": [
+        {
+          "type": "field_label_serializable",
+          "name": "VALUE",
+          "text": ""
+        }
+      ],
+      "extensions": ["colours_more", "shape_statement"]
+    });
+  },
+  mutationToDom: argumentReporterMutationToDom,
+  domToMutation: argumentReporterDomToMutation
+};
+
 Blockly.Blocks['argument_editor_boolean'] = {
   init: function() {
     this.jsonInit({ "message0": " %1",
@@ -1258,7 +1283,7 @@ Blockly.Blocks['argument_editor_array'] = {
 
 Blockly.Blocks['argument_editor_statement'] = {
   init: function() {
-    this.jsonInit({ "message0": "%1",
+    this.jsonInit({ "message0": " %1",
       "args0": [
         {
           "type": "field_input_removable",
