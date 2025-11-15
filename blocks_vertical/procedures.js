@@ -733,7 +733,7 @@ Blockly.ScratchBlocks.ProcedureUtils.updateDeclarationProcCode_ = function() {
       var target = input.connection.targetBlock();
       this.displayNames_.push(target.getFieldValue('TEXT'));
       this.argumentIds_.push(input.name);
-      this.procCode += '%c';
+      this.procCode_ += '%c';
     } else {
       throw new Error(
           'Unexpected input type on a procedure mutator root: ' + input.type);
