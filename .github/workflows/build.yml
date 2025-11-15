@@ -64,8 +64,9 @@ jobs:
           name: github-pages
           path: './'
 
-      - name: Clear artifact
+      - name: Extract artifact
         run: |
+          tar -xf artifact.tar -C .
           rm -f artifact.tar
 
       - name: Commit
