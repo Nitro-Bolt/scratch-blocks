@@ -1037,7 +1037,7 @@ Blockly.Block.prototype.setFieldValue = function(newValue, name) {
 Blockly.Block.prototype.setPreviousStatement = function(newBoolean, opt_check) {
   if (newBoolean) {
     if (opt_check === undefined) {
-      opt_check = null;
+      opt_check = "normal";
     }
     if (!this.previousConnection) {
       goog.asserts.assert(!this.outputConnection,
@@ -1065,7 +1065,7 @@ Blockly.Block.prototype.setPreviousStatement = function(newBoolean, opt_check) {
 Blockly.Block.prototype.setNextStatement = function(newBoolean, opt_check) {
   if (newBoolean) {
     if (opt_check === undefined) {
-      opt_check = null;
+      opt_check = "normal";
     }
     if (!this.nextConnection) {
       this.nextConnection = this.makeConnection_(Blockly.NEXT_STATEMENT);
@@ -1255,7 +1255,9 @@ Blockly.Block.prototype.appendValueInput = function(name) {
  * @return {!Blockly.Input} The input object created.
  */
 Blockly.Block.prototype.appendStatementInput = function(name) {
-  return this.appendInput_(Blockly.NEXT_STATEMENT, name);
+  let output = this.appendInput_(Blockly.NEXT_STATEMENT, name);
+  output.setCheck("normal")
+  return output
 };
 
 /**

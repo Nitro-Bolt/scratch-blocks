@@ -214,8 +214,8 @@ Blockly.ScratchBlocks.ProcedureUtils.updateDisplay_ = function() {
   if (!wasRendered && this.getReturn) {
     this.setInputsInline(true);
     if (this.getReturn() === Blockly.PROCEDURES_CALL_TYPE_STATEMENT) {
-      this.setPreviousStatement(true, null);
-      this.setNextStatement(true, null);
+      this.setPreviousStatement(true, "normal");
+      this.setNextStatement(true, "normal");
     } else {
       if (this.getReturn() === Blockly.PROCEDURES_CALL_TYPE_BOOLEAN) {
         this.setOutput(true, null);
@@ -320,7 +320,7 @@ Blockly.ScratchBlocks.ProcedureUtils.createAllInputs_ = function(connectionMap) 
 
       var input
       if (argumentType === 'c') {
-        input = this.appendStatementInput(id);
+        input = this.appendStatementInput(id).setCheck(this.type == 'procedures_prototype' ? "argumentReporterCommand" : "normal");
       } else {
         input = this.appendValueInput(id);
         if (argumentType == 'b') {
@@ -504,6 +504,10 @@ Blockly.ScratchBlocks.ProcedureUtils.createArgumentReporter_ = function(
     if (!this.isInsertionMarker()) {
       newBlock.initSvg();
       newBlock.render(false);
+    }
+    if (argumentType === 'c') {
+      newBlock.setPreviousStatement(true, 'argumentReporterCommand')
+      newBlock.setNextStatement(true, 'argumentReporterCommand')
     }
   } finally {
     Blockly.Events.enable();

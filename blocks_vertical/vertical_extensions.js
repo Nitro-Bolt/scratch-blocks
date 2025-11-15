@@ -76,8 +76,8 @@ Blockly.ScratchBlocks.VerticalExtensions.COLOUR_TEXTFIELD = function() {
  */
 Blockly.ScratchBlocks.VerticalExtensions.SHAPE_STATEMENT = function() {
   this.setInputsInline(true);
-  this.setPreviousStatement(true, null);
-  this.setNextStatement(true, null);
+  this.setPreviousStatement(true, "normal");
+  this.setNextStatement(true, "normal");
 };
 
 /**
@@ -89,7 +89,7 @@ Blockly.ScratchBlocks.VerticalExtensions.SHAPE_STATEMENT = function() {
  */
 Blockly.ScratchBlocks.VerticalExtensions.SHAPE_HAT = function() {
   this.setInputsInline(true);
-  this.setNextStatement(true, null);
+  this.setNextStatement(true, "normal");
 };
 
 /**
@@ -101,7 +101,7 @@ Blockly.ScratchBlocks.VerticalExtensions.SHAPE_HAT = function() {
  */
 Blockly.ScratchBlocks.VerticalExtensions.SHAPE_END = function() {
   this.setInputsInline(true);
-  this.setPreviousStatement(true, null);
+  this.setPreviousStatement(true, "normal");
 };
 
 /**
