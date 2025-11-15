@@ -216,6 +216,9 @@ Blockly.ScratchBlocks.ProcedureUtils.updateDisplay_ = function() {
     if (this.getReturn() === Blockly.PROCEDURES_CALL_TYPE_STATEMENT) {
       this.setPreviousStatement(true, "normal");
       this.setNextStatement(true, "normal");
+    } else if (/*this.inputList.find(v => v.type == Blockly.NEXT_STATEMENT)*/false) {
+      this.setOutput(true, null);
+      this.setOutputShape(Blockly.OUTPUT_SHAPE_SQUARE)
     } else {
       if (this.getReturn() === Blockly.PROCEDURES_CALL_TYPE_BOOLEAN) {
         this.setOutput(true, null);
