@@ -40,10 +40,33 @@ jobs:
       - name: Install Dependencies and Build
         run: npm ci
 
-      - name: Commit and Push Build
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: './'
+      - name: Deploy to GitHub Pages
+        uses: actions/deploy-pages@v4
+
+      - name: Checkout to develop-builds
+        uses: actions/checkout@v3
+        with:
+          ref: develop-builds
+
+      - name: Clear out things
         run: |
-          git config --local user.name "GitHub Action"
-          git config --local user.email "action@github.com"
-          git add .
-          git commit -m "Update Builds"
-          git push origin develop-builds
+          rm -rf ./*
+
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: github-pages
+          path: './'
+
+      - name: Commit
+        uses: EndBug/add-and-commit@v9.1.1
+        with:
+          message: ${{ github.event.head_commit.message }}
+          committer_name: GitHub Actions
+          committer_email: actions@github.com
