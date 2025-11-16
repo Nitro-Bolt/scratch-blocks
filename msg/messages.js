@@ -57,6 +57,10 @@ Blockly.Msg.CONTROL_CLEARCOUNTER = 'clear counter';
 Blockly.Msg.CONTROL_ALLATONCE = 'all at once';
 Blockly.Msg.CONTROL_FOREACHINRANGE = 'for each %1 in range %2 to %3';
 Blockly.Msg.CONTROL_FOREACHINRANGE_ITEM = 'i';
+Blockly.Msg.CONTROL_EXTENDABLE_IF = 'if';
+Blockly.Msg.CONTROL_EXTENDABLE_THEN = 'then';
+Blockly.Msg.CONTROL_EXTENDABLE_ELSE_SEPARATOR = 'else';
+Blockly.Msg.CONTROL_EXTENDABLE_ELSE_END = 'else';
 
 // Data blocks
 Blockly.Msg.DATA_SETVARIABLETO = 'set %1 to %2';

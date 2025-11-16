@@ -187,7 +187,8 @@ Blockly.FieldExtendable.prototype.appendArgsList = function(elements, midfix, in
         position: inputIndex,
         returnInputs: true,
         namePrefix: this.getInputName(extendableIndex, midfix) + this.SEP,
-        populate: populate
+        populate: populate,
+        isExtendable: true
       }
   );
   for (var j = 0; j < addedInputs.length; j++) {
