@@ -654,10 +654,14 @@ Blockly.Block.prototype.isShadow = function() {
 
 /**
  * Set whether this block is a shadow block or not.
- * @param {boolean} shadow True if a shadow.
+ * @param {boolean} newBoolean True if a shadow.
  */
-Blockly.Block.prototype.setShadow = function(shadow) {
-  this.isShadow_ = shadow;
+Blockly.Block.prototype.setShadow = function(newBoolean) {
+  if (this.isShadow_ != newBoolean) {
+    Blockly.Events.fire(new Blockly.Events.BlockChange(
+        this, 'shadow', null, this.isShadow_, newBoolean));
+    this.isShadow_ = newBoolean;
+  }
 };
 
 /**
