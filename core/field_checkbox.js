@@ -172,6 +172,8 @@ Blockly.FieldCheckbox.prototype.showEditor_ = function() {
   }
   // Remove the shadow dom from the connection. (to prevent regeneration)
   input.connection.setShadowDom();
+  // Un-shadow the block so the VM will properly delete it.
+  source.setShadow(false);
   // Dispose of our shadow parent.
   source.unplug(false);
   source.dispose(false, false);
