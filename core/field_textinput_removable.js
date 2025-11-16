@@ -53,6 +53,12 @@ Blockly.FieldTextInputRemovable = function(text, opt_validator, opt_restrictor) 
 };
 goog.inherits(Blockly.FieldTextInputRemovable, Blockly.FieldTextInput);
 
+Blockly.FieldTextInputRemovable.prototype.init = function() {
+  Blockly.FieldTextInputRemovable.superClass_.init.call(this);
+
+  this.textElement_.classList.add('removableTextInput');
+}
+
 /**
  * Show the inline free-text editor on top of the text with the remove button.
  * @private

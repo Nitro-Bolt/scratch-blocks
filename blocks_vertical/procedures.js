@@ -1235,11 +1235,7 @@ Blockly.Blocks['argument_editor_boolean'] = {
           "text": "foo"
         }
       ],
-      "colour": Blockly.Colours.textField,
-      "colourSecondary": Blockly.Colours.textField,
-      "colourTertiary": Blockly.Colours.textField,
-      "colourQuaternary": Blockly.Colours.textField,
-      "extensions": ["output_boolean"]
+      "extensions": ["colours_more", "output_boolean"]
     });
   },
   // Exist on declaration and arguments editors, with different implementations.
@@ -1256,11 +1252,7 @@ Blockly.Blocks['argument_editor_object'] = {
           "text": "foo"
         }
       ],
-      "colour": Blockly.Colours.textField,
-      "colourSecondary": Blockly.Colours.textField,
-      "colourTertiary": Blockly.Colours.textField,
-      "colourQuaternary": Blockly.Colours.textField,
-      "extensions": ["output_object"]
+      "extensions": ["colours_more", "output_object"]
     });
   },
   // Exist on declaration and arguments editors, with different implementations.
@@ -1277,11 +1269,7 @@ Blockly.Blocks['argument_editor_array'] = {
           "text": "foo"
         }
       ],
-      "colour": Blockly.Colours.textField,
-      "colourSecondary": Blockly.Colours.textField,
-      "colourTertiary": Blockly.Colours.textField,
-      "colourQuaternary": Blockly.Colours.textField,
-      "extensions": ["output_array"]
+      "extensions": ["colours_more", "output_array"]
     });
   },
   // Exist on declaration and arguments editors, with different implementations.
@@ -1298,7 +1286,7 @@ Blockly.Blocks['argument_editor_statement'] = {
           "text": "foo"
         }
       ],
-      "extensions": ["shape_statement", "colours_more"]
+      "extensions": ["colours_more", "shape_statement"]
     });
   },
   // Exist on declaration and arguments editors, with different implementations.
@@ -1315,11 +1303,7 @@ Blockly.Blocks['argument_editor_string_number'] = {
           "text": "foo"
         }
       ],
-      "colour": Blockly.Colours.textField,
-      "colourSecondary": Blockly.Colours.textField,
-      "colourTertiary": Blockly.Colours.textField,
-      "colourQuaternary": Blockly.Colours.textField,
-      "extensions": ["output_number", "output_string"]
+      "extensions": ["colours_more", "output_number", "output_string"]
     });
   },
   // Exist on declaration and arguments editors, with different implementations.
