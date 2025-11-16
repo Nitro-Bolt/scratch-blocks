@@ -670,7 +670,7 @@ Blockly.Blocks['control_if_else_extendable'] = {
       "args2": [
         {
           "type": "input_statement",
-          "name": "ELSE",
+          "name": "SUBSTACKELSE",
         },
       ],
       "category": Blockly.Categories.control,
