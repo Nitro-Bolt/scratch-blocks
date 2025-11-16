@@ -1484,6 +1484,7 @@ Blockly.Block.prototype.appendArgsList = function(
   var opt_returnInputs = options.returnInputs;
   var opt_namePrefix = options.namePrefix;
   var opt_populate = options.populate;
+  var opt_isExtendable = options.isExtendable;
   
   // Add last dummy input if needed.
   var dummyInput;
@@ -1565,6 +1566,7 @@ Blockly.Block.prototype.appendArgsList = function(
               break;
             case 'input_statement':
               if (opt_position !== undefined) emptyFieldStack();
+              if (opt_isExtendable) name = "SUBSTACK" + name;
               input = this.appendStatementInput(name, opt_position);
               if (opt_position !== undefined) opt_position++;
               if (opt_position !== undefined) emptyFieldStack();
@@ -1578,6 +1580,10 @@ Blockly.Block.prototype.appendArgsList = function(
               if (!element['name']) {
                 throw new Error('Block "' + this.type + '": ' +
                     'Extendable inputs must have a name.');
+              }
+              if (element['name'].startsWith("SUBSTACK")) {
+                throw new Error('Block "' + this.type + '": ' +
+                    'Extendable input names must not start with "SUBSTACK".');
               }
               emptyFieldStack();
               input = this.appendDummyInput(name, opt_position);
