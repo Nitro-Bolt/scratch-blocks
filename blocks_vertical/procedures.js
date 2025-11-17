@@ -895,18 +895,19 @@ Blockly.ScratchBlocks.ProcedureUtils.removeFieldCallback = function(field) {
     return;
   }
   var inputNameToRemove = null;
+  const cannotRemove = (i) => i == 0 && this.inputList[1].type == Blockly.NEXT_STATEMENT
   for (var n = 0; n < this.inputList.length; n++) {
     var input = this.inputList[n];
     if (input.connection) {
       var target = input.connection.targetBlock();
       if (target.getField(field.name) == field) {
+        if (cannotRemove(n)) return
         inputNameToRemove = input.name;
       }
     } else {
-      for (var j = 0; j < input.fieldRow.length; j++) {
-        if (input.fieldRow[j] == field) {
-          inputNameToRemove = input.name;
-        }
+      if (input.fieldRow[0] == field) {
+        if (cannotRemove(n)) return
+        inputNameToRemove = input.name;
       }
     }
   }
