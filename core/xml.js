@@ -406,10 +406,13 @@ Blockly.Xml.textToDom = function(text) {
  * @return {Array.<string>} An array containing new block ids.
  */
 Blockly.Xml.clearWorkspaceAndLoadFromXml = function(xml, workspace) {
+  var wasEventsEnabled = Blockly.Events.isEnabled();
+  Blockly.Events.disable();
   workspace.setResizesEnabled(false);
   workspace.setToolboxRefreshEnabled(false);
   workspace.clear();
   var blockIds = Blockly.Xml.domToWorkspace(xml, workspace);
+  if (wasEventsEnabled) Blockly.Events.enable();
   workspace.setResizesEnabled(true);
   workspace.setToolboxRefreshEnabled(true);
   return blockIds;
