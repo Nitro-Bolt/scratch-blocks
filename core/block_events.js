@@ -416,6 +416,12 @@ Blockly.Events.Move.prototype.toJson = function() {
   if (this.newInputName) {
     json['newInputName'] = this.newInputName;
   }
+  if (this.oldParentId) {
+    json['oldParentId'] = this.oldParentId;
+  }
+  if (this.oldInputName) {
+    json['oldInputName'] = this.oldInputName;
+  }
   if (this.newCoordinate) {
     json['newCoordinate'] = Math.round(this.newCoordinate.x) + ',' +
         Math.round(this.newCoordinate.y);
@@ -431,6 +437,12 @@ Blockly.Events.Move.prototype.fromJson = function(json) {
   Blockly.Events.Move.superClass_.fromJson.call(this, json);
   this.newParentId = json['newParentId'];
   this.newInputName = json['newInputName'];
+  if (json['oldParentId']) {
+    this.oldParentId = json['oldParentId'];
+  }
+  if (json['oldInputName']) {
+    this.oldInputName = json['oldInputName'];
+  }
   if (json['newCoordinate']) {
     var xy = json['newCoordinate'].split(',');
     this.newCoordinate =
