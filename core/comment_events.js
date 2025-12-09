@@ -167,7 +167,7 @@ Blockly.Events.CommentChange.prototype.toJson = function() {
  */
 Blockly.Events.CommentChange.prototype.fromJson = function(json) {
   Blockly.Events.CommentChange.superClass_.fromJson.call(this, json);
-  this.newContents_ = json['newValue'];
+  this.newContents_ = json['newContents'];
 };
 
 /**
@@ -267,6 +267,11 @@ Blockly.Events.CommentCreate.prototype.type = Blockly.Events.COMMENT_CREATE;
 Blockly.Events.CommentCreate.prototype.toJson = function() {
   var json = Blockly.Events.CommentCreate.superClass_.toJson.call(this);
   json['xml'] = Blockly.Xml.domToText(this.xml);
+  json['text'] = this.text;
+  json['minimized'] = this.minimized;
+  if (this.xy) json['xy'] = Math.round(this.xy.x) + ',' + Math.round(this.xy.y);
+  json['width'] = this.width;
+  json['height'] = this.height;
   return json;
 };
 
@@ -277,6 +282,19 @@ Blockly.Events.CommentCreate.prototype.toJson = function() {
 Blockly.Events.CommentCreate.prototype.fromJson = function(json) {
   Blockly.Events.CommentCreate.superClass_.fromJson.call(this, json);
   this.xml = Blockly.Xml.textToDom('<xml>' + json['xml'] + '</xml>').firstChild;
+  this.text = json['text'];
+  this.minimized = json['minimized'];
+  if (json['xy']) {
+    var xyStr = json['xy'].split(',');
+    var x = parseFloat(xyStr[0]);
+    var y = parseFloat(xyStr[1]);
+    this.xy = new goog.math.Coordinate(isNaN(x) ? 0 : x, isNaN(y) ? 0 : y);
+  } else {
+    this.xy = new goog.math.Coordinate(0,0);
+    console.warn('Comment is missing "xy" attribute');
+  }
+  this.width = json['width'];
+  this.height = json['height'];
 };
 
 /**
