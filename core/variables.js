@@ -329,7 +329,7 @@ Blockly.Variables.createVariable = function(workspace, opt_callback, opt_type) {
           var flyout = workspace.isFlyout ? workspace : workspace.getFlyout();
           var variableBlockId = variable.getId();
           if (flyout.setCheckboxState) {
-            flyout.setCheckboxState(variableBlockId, true);
+            flyout.setCheckboxState(variableBlockId, false);
           }
 
           if (opt_callback) {
