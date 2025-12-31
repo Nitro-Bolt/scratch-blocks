@@ -757,6 +757,32 @@ Blockly.Gesture.prototype.doInputClick_ = function() {
  * @private
  */
 Blockly.Gesture.prototype.doBlockClick_ = function() {
+  if (this.mostRecentEvent_.button === 1 || this.mostRecentEvent_.shiftKey) {
+    // Wheel button...
+    // Intercept clicks to allow jump to...?
+    var block = this.startBlock_;
+    for (; block; block = block.getSurroundParent()) {
+      if (!block.type === "procedures_call") return;
+
+      var findProcCode = block.getProcCode();
+      var topBlocks = this.startWorkspace_.getTopBlocks();
+      console.log(topBlocks);
+      for(var i = 0; i < topBlocks.length; i++) {
+        var root = topBlocks[i];
+        console.log(root);
+        if (root.type !== "procedures_definition") return;
+
+        var label = root.getChildren()[0];
+        var procCode = label.getProcCode();
+        if (procCode && procCode === findProcCode) {
+          // Found... navigate to it!
+          this.startWorkspace_.centerOnBlock(root.id);
+          return;
+        }
+      }
+    }
+  }
+
   // Block click in an autoclosing flyout.
   if (this.flyout_ && this.flyout_.autoClose) {
     if (!this.targetBlock_.disabled) {
