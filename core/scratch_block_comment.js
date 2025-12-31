@@ -178,10 +178,6 @@ Blockly.ScratchBlockComment.prototype.drawIcon_ = function(_group) {
  * @package
  */
 Blockly.ScratchBlockComment.prototype.renderIcon = function(cursorX, topMargin) {
-  if (this.collapseHidden && this.block_.isCollapsed()) {
-    this.iconGroup_.setAttribute('display', 'none');
-    return cursorX;
-  }
   this.iconGroup_.setAttribute('display', 'block');
 
   var width = this.SIZE;
