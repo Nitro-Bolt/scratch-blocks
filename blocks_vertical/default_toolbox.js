@@ -541,6 +541,8 @@ Blockly.Blocks.defaultToolbox = '<xml id="toolbox-categories" style="display: no
     '</block>' +
     '<block type="json_values" id="json_values">' +
     '</block>' +
+    '<block type="json_entries" id="json_entries">' +
+    '</block>' +
     '<block type="json_value_of_key" id="json_value_of_key">' +
       '<value name="KEY">' +
         '<shadow type="text">' +
