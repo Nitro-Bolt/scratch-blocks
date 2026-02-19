@@ -259,11 +259,14 @@ Blockly.ContextMenu.blockCollapseOption = function(block) {
     descendantCount -= nextBlock.getDescendants(false, true).length;
   }
 
+  // Disable collapsing for procedures definition.
+  const enabled = block.type !== Blockly.PROCEDURES_DEFINITION_BLOCK_TYPE;
+
   if (block.isCollapsed()) {
     var expandOption = {
       text: descendantCount == 1 ? Blockly.Msg.EXPAND_BLOCK :
           Blockly.Msg.EXPAND_X_BLOCKS.replace('%1', String(descendantCount)),
-      enabled: true,
+      enabled,
       callback: function() {
         block.setCollapsed(false);
         // uncollapse any blocks in branches
@@ -277,7 +280,7 @@ Blockly.ContextMenu.blockCollapseOption = function(block) {
     var collapseOption = {
       text: descendantCount == 1 ? Blockly.Msg.COLLAPSE_BLOCK :
           Blockly.Msg.COLLAPSE_X_BLOCKS.replace('%1', String(descendantCount)),
-      enabled: true,
+      enabled,
       callback: function() {
         block.setCollapsed(true);
       }
