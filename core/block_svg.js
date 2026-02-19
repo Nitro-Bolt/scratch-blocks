@@ -576,7 +576,7 @@ Blockly.BlockSvg.prototype.setCollapsed = function(collapsed) {
   if (this.collapsed_ == collapsed) {
     return;
   }
-  var renderList = [];
+  var renderList = [this];
   // Show/hide the inputs.
   for (var i = 0, input; input = this.inputList[i]; i++) {
     renderList.push.apply(renderList, input.setVisible(!collapsed));
@@ -586,7 +586,7 @@ Blockly.BlockSvg.prototype.setCollapsed = function(collapsed) {
   if (collapsed) {
     var icons = this.getIcons();
     for (var i = 0; i < icons.length; i++) {
-      icons[i].setVisible(false);
+      //icons[i].setVisible(false);
     }
     var text = this.toString(Blockly.COLLAPSE_CHARS);
     this.appendDummyInput(COLLAPSED_INPUT_NAME).appendField(text).init();
@@ -597,10 +597,6 @@ Blockly.BlockSvg.prototype.setCollapsed = function(collapsed) {
   }
   Blockly.BlockSvg.superClass_.setCollapsed.call(this, collapsed);
 
-  if (!renderList.length) {
-    // No child blocks, just render this block.
-    renderList[0] = this;
-  }
   if (this.rendered) {
     for (var i = 0, block; block = renderList[i]; i++) {
       block.render();
@@ -714,6 +710,9 @@ Blockly.BlockSvg.prototype.showContextMenu_ = function(e) {
         Blockly.ContextMenu.blockDuplicateOption(block, e));
     if (this.isEditable() && this.workspace.options.comments) {
       menuOptions.push(Blockly.ContextMenu.blockCommentOption(block));
+    }
+    if (this.workspace.options.collapse) {
+      menuOptions.push(Blockly.ContextMenu.blockCollapseOption(block));
     }
     menuOptions.push(Blockly.ContextMenu.blockDeleteOption(block));
   } else if (this.parentBlock_ && this.isShadow_) {

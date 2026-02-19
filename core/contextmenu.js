@@ -251,6 +251,41 @@ Blockly.ContextMenu.blockDeleteOption = function(block) {
   return deleteOption;
 };
 
+Blockly.ContextMenu.blockCollapseOption = function(block) {
+  var descendantCount = block.getDescendants(false, true).length;
+  var nextBlock = block.getNextBlock();
+  if (nextBlock) {
+    // Blocks in the current stack would survive this block's deletion.
+    descendantCount -= nextBlock.getDescendants(false, true).length;
+  }
+
+  if (block.isCollapsed()) {
+    var expandOption = {
+      text: descendantCount == 1 ? Blockly.Msg.EXPAND_BLOCK :
+          Blockly.Msg.EXPAND_X_BLOCKS.replace('%1', String(descendantCount)),
+      enabled: true,
+      callback: function() {
+        block.setCollapsed(false);
+        // uncollapse any blocks in branches
+        var blocks = block.getDescendants(false, true);
+        var badBlocks = nextBlock ? nextBlock.getDescendants(false, true) : [];
+        blocks.filter(v => !badBlocks.includes(v)).forEach(v => v.setCollapsed(false));
+      }
+    };
+    return expandOption;
+  } else {
+    var collapseOption = {
+      text: descendantCount == 1 ? Blockly.Msg.COLLAPSE_BLOCK :
+          Blockly.Msg.COLLAPSE_X_BLOCKS.replace('%1', String(descendantCount)),
+      enabled: true,
+      callback: function() {
+        block.setCollapsed(true);
+      }
+    };
+    return collapseOption;
+  }
+}
+
 /**
  * Make a context menu option for showing help for the current block.
  * @param {!Blockly.BlockSvg} block The block where the right-click originated.
