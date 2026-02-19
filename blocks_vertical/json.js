@@ -125,6 +125,27 @@ Blockly.Blocks['json_values'] = {
   }
 };
 
+Blockly.Blocks['json_entries'] = {
+  /**
+   * Fetches the entries of the object
+   * @this Blockly.Block
+   */
+  init: function() {
+    this.jsonInit({
+      "message0": Blockly.Msg.JSON_ENTRIES,
+      "args0": [
+        {
+          "type": "input_value",
+          "name": "OBJ",
+          "check": "Object"
+        },
+      ],
+      "category": Blockly.Categories.json,
+      "extensions": ["colours_json", "output_array"]
+    });
+  }
+};
+
 Blockly.Blocks['json_value_of_key'] = {
   /**
    * Fetches the value of the target key

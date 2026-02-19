@@ -82,6 +82,7 @@ Blockly.Msg.JSON_TO_OBJECT = '%1 to object';
 Blockly.Msg.JSON_TO_STRING = '%1 to string';
 Blockly.Msg.JSON_KEYS = 'keys of %1';
 Blockly.Msg.JSON_VALUES = 'values of %1';
+Blockly.Msg.JSON_ENTRIES = 'entries of %1';
 Blockly.Msg.JSON_VALUE_OF_KEY = 'value of %1 in %2';
 Blockly.Msg.JSON_SET_KEY = 'set %1 in %2 to %3';
 Blockly.Msg.JSON_DELETE_KEY = 'delete %1 in %2';
