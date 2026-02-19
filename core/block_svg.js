@@ -576,6 +576,10 @@ Blockly.BlockSvg.prototype.setCollapsed = function(collapsed) {
   if (this.collapsed_ == collapsed) {
     return;
   }
+  // Disable collapsing for procedures definition.
+  if (this.type === 'procedures_definition') {
+    return;
+  }
   var renderList = [this];
   // Show/hide the inputs.
   for (var i = 0, input; input = this.inputList[i]; i++) {
