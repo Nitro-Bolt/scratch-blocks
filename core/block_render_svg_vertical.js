@@ -1099,7 +1099,7 @@ Blockly.BlockSvg.prototype.computeOutputPadding_ = function(inputRows) {
   var otherShape;
   // In checking the left/start side, a field takes precedence over any input.
   // That's because a field will be rendered before any value input.
-  if (firstField) {
+  if (firstField || !firstInput.connection) {
     otherShape = 0; // Field comes first in the row.
   } else {
     // Value input comes first in the row.
@@ -1127,7 +1127,7 @@ Blockly.BlockSvg.prototype.computeOutputPadding_ = function(inputRows) {
   // In checking the right/end side, any value input takes precedence over any field.
   // That's because fields are rendered before inputs...the last item
   // in the row will be an input, if one exists.
-  if (lastInput.connection) {
+  if (lastInput.connection && lastInput.connection) {
     // Value input last in the row.
     var inputConnection = lastInput.connection;
     if (!inputConnection.targetConnection) {
@@ -1194,6 +1194,9 @@ Blockly.BlockSvg.prototype.renderDraw_ = function(iconWidth, inputRows) {
   var cursorY = this.renderDrawRight_(steps, inputRows, iconWidth);
   this.renderDrawBottom_(steps, cursorY);
   this.renderDrawLeft_(steps);
+  
+  // fix collapsed inputs
+  if (this.isCollapsed()) this.svgGroup_.querySelectorAll('.blocklyInputOutline').forEach(v => v.setAttribute('style', 'visibility: hidden'));
 
   var pathString = steps.join(' ');
   this.svgPath_.setAttribute('d', pathString);
