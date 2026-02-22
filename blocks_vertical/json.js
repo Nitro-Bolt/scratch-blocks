@@ -170,9 +170,8 @@ Blockly.Blocks['json_get_properties'] = {
           "check": "Object"
         }
       ],
-      "output": "Array",
       "category": Blockly.Categories.json,
-      "extensions": ["colours_json"]
+      "extensions": ["colours_json", "output_array"]
     });
   }
 };
