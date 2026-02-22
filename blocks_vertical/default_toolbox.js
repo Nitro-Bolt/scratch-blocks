@@ -543,6 +543,8 @@ Blockly.Blocks.defaultToolbox = '<xml id="toolbox-categories" style="display: no
     '</block>' +
     '<block type="json_entries" id="json_entries">' +
     '</block>' +
+    '<block type="json_get_properties" id="json_get_properties">' +
+    '</block>' +
     '<block type="json_value_of_key" id="json_value_of_key">' +
       '<value name="KEY">' +
         '<shadow type="text">' +
@@ -601,6 +603,8 @@ Blockly.Blocks.defaultToolbox = '<xml id="toolbox-categories" style="display: no
         '</shadow>' +
       '</value>' +
     '</block>' +
+    '<block type="json_array_length" id="json_array_length">' +
+    '</block>' +
     '<block type="json_add_item" id="json_add_item">' +
       '<value name="ITEM">' +
         '<shadow type="text">' +
@@ -633,6 +637,8 @@ Blockly.Blocks.defaultToolbox = '<xml id="toolbox-categories" style="display: no
           '<field name="TEXT">bar</field>' +
         '</shadow>' +
       '</value>' +
+    '</block>' +
+    '<block type="json_slice_array" id="json_slice_array">' +
     '</block>' +
     '<block type="json_merge_array" id="json_merge_array">' +
     '</block>' +
