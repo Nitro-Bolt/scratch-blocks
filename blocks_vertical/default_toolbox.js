@@ -253,6 +253,13 @@ Blockly.Blocks.defaultToolbox = '<xml id="toolbox-categories" style="display: no
     '</block>' +
     '<block type="sound_volume" id="sound_volume"></block>' +
   '</category>' +
+  '<category name="%{BKY_CATEGORY_ASSETS}" id="assets" colour="#FCB103" secondaryColour="#DB9A37">' +
+    '<block type="assets_test" id="assets_test">' +
+      '<value name="ASSET_MENU">' +
+        '<shadow type="assets_menu"></shadow>' +
+      '</value>' +
+    '</block>' +
+  '</category>' +
   '<category name="%{BKY_CATEGORY_EVENTS}" id="events" colour="#FFD500" secondaryColour="#CC9900">' +
     '<block type="event_whenflagclicked" id="event_whenflagclicked"></block>' +
     '<block type="event_whenkeypressed" id="event_whenkeypressed">' +

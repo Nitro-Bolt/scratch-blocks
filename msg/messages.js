@@ -316,6 +316,9 @@ Blockly.Msg.SOUND_SETVOLUMETO = 'set volume to %1%';
 Blockly.Msg.SOUND_VOLUME = 'volume';
 Blockly.Msg.SOUND_RECORD = 'record...';
 
+// Asset blocks
+Blockly.Msg.ASSETS_TEST = 'test %1';
+
 // Comment Blocks
 Blockly.Msg.COMMENTS_DEFAULT = '// %1';
 Blockly.Msg.COMMENTS_ALTERNATE = '%1 // %2';
@@ -324,6 +327,7 @@ Blockly.Msg.COMMENTS_ALTERNATE = '%1 // %2';
 Blockly.Msg.CATEGORY_MOTION = 'Motion';
 Blockly.Msg.CATEGORY_LOOKS = 'Looks';
 Blockly.Msg.CATEGORY_SOUND = 'Sound';
+Blockly.Msg.CATEGORY_ASSETS = 'Assets';
 Blockly.Msg.CATEGORY_EVENTS = 'Events';
 Blockly.Msg.CATEGORY_CONTROL = 'Control';
 Blockly.Msg.CATEGORY_SENSING = 'Sensing';
