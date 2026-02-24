@@ -30,6 +30,7 @@
  **/
 goog.provide('Blockly');
 
+goog.require('Polypatch');
 goog.require('Blockly.ColourMutation');
 goog.require('Blockly.BlockSvg.render');
 goog.require('Blockly.DropDownDiv');

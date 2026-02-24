@@ -125,6 +125,57 @@ Blockly.Blocks['json_values'] = {
   }
 };
 
+Blockly.Blocks['json_entries'] = {
+  /**
+   * Fetches the entries of the object
+   * @this Blockly.Block
+   */
+  init: function() {
+    this.jsonInit({
+      "message0": Blockly.Msg.JSON_ENTRIES,
+      "args0": [
+        {
+          "type": "input_value",
+          "name": "OBJ",
+          "check": "Object"
+        },
+      ],
+      "category": Blockly.Categories.json,
+      "extensions": ["colours_json", "output_array"]
+    });
+  }
+};
+
+Blockly.Blocks['json_get_properties'] = {
+  /**
+   * Fetches keys, values, or entries of an object based on selection.
+   * @this Blockly.Block
+   */
+  init: function() {
+    this.jsonInit({
+      "message0": Blockly.Msg.JSON_GET_PROPERTIES,
+      "args0": [
+        {
+          "type": "field_dropdown",
+          "name": "PROPERTY",
+          "options": [
+            ["keys", "keys"],
+            ["values", "values"],
+            ["entries", "entries"]
+          ]
+        },
+        {
+          "type": "input_value",
+          "name": "OBJ",
+          "check": "Object"
+        }
+      ],
+      "category": Blockly.Categories.json,
+      "extensions": ["colours_json", "output_array"]
+    });
+  }
+};
+
 Blockly.Blocks['json_value_of_key'] = {
   /**
    * Fetches the value of the target key
@@ -494,6 +545,65 @@ Blockly.Blocks['json_has_item'] = {
       ],
       "category": Blockly.Categories.json,
       "extensions": ["colours_json", "output_boolean"]
+    });
+  }
+};
+
+Blockly.Blocks['json_array_length'] = {
+  init: function() {
+    this.jsonInit({
+      "message0": Blockly.Msg.JSON_ARRAY_LENGTH,
+      "args0": [
+        {
+          "type": "input_value",
+          "name": "ARR",
+          "check": "Array"
+        }
+      ],
+      "category": Blockly.Categories.json,
+      "extensions": ["colours_json", "output_number"]
+    });
+  }
+};
+
+Blockly.Blocks['json_slice_array'] = {
+  init: function() {
+    this.jsonInit({
+      "message0": Blockly.Msg.JSON_SLICE_ARRAY,
+      "args0": [
+        {
+          "type": "input_value",
+          "name": "START"
+        },
+        {
+          "type": "input_value",
+          "name": "END"
+        },
+        {
+          "type": "input_value",
+          "name": "ARR",
+          "check": "Array"
+        }
+      ],
+      "category": Blockly.Categories.json,
+      "extensions": ["colours_json", "output_array"]
+    });
+  }
+};
+
+Blockly.Blocks['json_reverse_array'] = {
+  init: function() {
+    this.jsonInit({
+      "message0": Blockly.Msg.JSON_REVERSE_ARRAY,
+      "args0": [
+        {
+          "type": "input_value",
+          "name": "ARR",
+          "check": "Array"
+        }
+      ],
+      "category": Blockly.Categories.json,
+      "extensions": ["colours_json", "output_array"]
     });
   }
 };

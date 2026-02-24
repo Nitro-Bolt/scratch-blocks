@@ -472,6 +472,18 @@ Blockly.Css.CONTENT = [
     'font-weight: 500;',
   '}',
 
+  '.blocklyCheckbox {',
+    'fill: $colour_textFieldText;',
+  '}',
+
+  '.blocklyBooleanCheckbox {',
+    'display: none;',
+    'pointer-events: none;',
+  '}',
+  '.blocklyInputOutline:hover + .blocklyBooleanCheckbox {',
+    'display: block;',
+  '}',
+
   '.blocklyTextTruncated {',
     'font-size: 11pt;',
   '}',
@@ -788,9 +800,7 @@ Blockly.Css.CONTENT = [
   '}',
 
   '.blocklyAngleCircle {',
-    'stroke: ' + Blockly.Colours.motion.tertiary + ';',
     'stroke-width: 1;',
-    'fill: ' + Blockly.Colours.motion.secondary + ';',
   '}',
 
   '.blocklyAngleCenterPoint {',

@@ -1099,7 +1099,7 @@ Blockly.BlockSvg.prototype.computeOutputPadding_ = function(inputRows) {
   var otherShape;
   // In checking the left/start side, a field takes precedence over any input.
   // That's because a field will be rendered before any value input.
-  if (firstField) {
+  if (firstField || !firstInput.connection) {
     otherShape = 0; // Field comes first in the row.
   } else {
     // Value input comes first in the row.
@@ -1127,7 +1127,7 @@ Blockly.BlockSvg.prototype.computeOutputPadding_ = function(inputRows) {
   // In checking the right/end side, any value input takes precedence over any field.
   // That's because fields are rendered before inputs...the last item
   // in the row will be an input, if one exists.
-  if (lastInput.connection) {
+  if (lastInput.connection && lastInput.connection) {
     // Value input last in the row.
     var inputConnection = lastInput.connection;
     if (!inputConnection.targetConnection) {
@@ -1194,6 +1194,9 @@ Blockly.BlockSvg.prototype.renderDraw_ = function(iconWidth, inputRows) {
   var cursorY = this.renderDrawRight_(steps, inputRows, iconWidth);
   this.renderDrawBottom_(steps, cursorY);
   this.renderDrawLeft_(steps);
+  
+  // fix collapsed inputs
+  if (this.isCollapsed()) this.svgGroup_.querySelectorAll('.blocklyInputOutline').forEach(v => v.setAttribute('style', 'visibility: hidden'));
 
   var pathString = steps.join(' ');
   this.svgPath_.setAttribute('d', pathString);
@@ -1434,6 +1437,9 @@ Blockly.BlockSvg.prototype.renderInputShape_ = function(input, x, y) {
   // Input shapes are only visibly rendered on non-connected slots.
   if (input.connection.targetConnection) {
     inputShape.setAttribute('style', 'visibility: hidden');
+    if (input.booleanCheckbox) {
+      input.booleanCheckbox.setAttribute('style', 'visibility: hidden');
+    }
   } else {
     var inputShapeX = 0, inputShapeY = 0;
     var inputShapeInfo =
@@ -1449,6 +1455,26 @@ Blockly.BlockSvg.prototype.renderInputShape_ = function(input, x, y) {
         'translate(' + inputShapeX + ',' + inputShapeY + ')');
     inputShape.setAttribute('data-argument-type', inputShapeInfo.argType);
     inputShape.setAttribute('style', 'visibility: visible');
+    if (inputShapeInfo.argType == 'boolean') {
+      // Allow a custom cursor for the field to use as a "quick callback".
+      if (!input.booleanCheckbox) {
+        input.booleanCheckbox = Blockly.utils.createSvgElement('path', {
+          'class': 'blocklyText blocklyBooleanCheckbox',
+          'opacity': '0.5',
+          'd': Blockly.FieldCheckbox.CROSS
+        });
+        inputShape.after(input.booleanCheckbox);
+      }
+      input.booleanCheckbox.setAttribute(
+          'transform', 'translate(' + (
+            inputShapeX + 24
+          ) + ',' + (
+            inputShapeY + 16
+          ) + ') scale(1.5)'
+      );
+      input.booleanCheckbox.setAttribute('style', 'visibility: visible');
+      inputShape.style.cursor = Blockly.FieldCheckbox.prototype.CURSOR;
+    }
   }
 };
 
@@ -1767,7 +1793,8 @@ Blockly.BlockSvg.prototype.renderMoveConnections_ = function() {
   }
 
   for (var i = 0; i < this.inputList.length; i++) {
-    var conn = this.inputList[i].connection;
+    var inp = this.inputList[i];
+    var conn = inp.connection;
     if (conn) {
       conn.moveToOffset(blockTL);
       if (conn.isConnected()) {

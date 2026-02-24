@@ -44,14 +44,14 @@ Blockly.Blocks.defaultToolbox = '<xml id="toolbox-categories" style="display: no
     '</block>' +
     '<block type="motion_turnright" id="motion_turnright">' +
       '<value name="DEGREES">' +
-        '<shadow type="math_number">' +
+        '<shadow type="math_angle">' +
           '<field name="NUM">15</field>' +
         '</shadow>' +
       '</value>' +
     '</block>' +
     '<block type="motion_turnleft" id="motion_turnleft">' +
       '<value name="DEGREES">' +
-        '<shadow type="math_number">' +
+        '<shadow type="math_angle">' +
           '<field name="NUM">15</field>' +
         '</shadow>' +
       '</value>' +
@@ -352,6 +352,8 @@ Blockly.Blocks.defaultToolbox = '<xml id="toolbox-categories" style="display: no
     '</block>' +
     '<block type="sensing_current" id="sensing_current"></block>' +
     '<block type="sensing_dayssince2000" id="sensing_dayssince2000"></block>' +
+    '<block type="sensing_online" id="sensing_online"></block>' +
+    '<block type="sensing_username" id="sensing_username"></block>' +
   '</category>' +
   '<category name="%{BKY_CATEGORY_OPERATORS}" id="operators" colour="#40BF4A" secondaryColour="#389438">' +
     '<block type="operator_add" id="operator_add">' +
@@ -541,6 +543,10 @@ Blockly.Blocks.defaultToolbox = '<xml id="toolbox-categories" style="display: no
     '</block>' +
     '<block type="json_values" id="json_values">' +
     '</block>' +
+    '<block type="json_entries" id="json_entries">' +
+    '</block>' +
+    '<block type="json_get_properties" id="json_get_properties">' +
+    '</block>' +
     '<block type="json_value_of_key" id="json_value_of_key">' +
       '<value name="KEY">' +
         '<shadow type="text">' +
@@ -599,6 +605,8 @@ Blockly.Blocks.defaultToolbox = '<xml id="toolbox-categories" style="display: no
         '</shadow>' +
       '</value>' +
     '</block>' +
+    '<block type="json_array_length" id="json_array_length">' +
+    '</block>' +
     '<block type="json_add_item" id="json_add_item">' +
       '<value name="ITEM">' +
         '<shadow type="text">' +
@@ -631,6 +639,8 @@ Blockly.Blocks.defaultToolbox = '<xml id="toolbox-categories" style="display: no
           '<field name="TEXT">bar</field>' +
         '</shadow>' +
       '</value>' +
+    '</block>' +
+    '<block type="json_slice_array" id="json_slice_array">' +
     '</block>' +
     '<block type="json_merge_array" id="json_merge_array">' +
     '</block>' +
@@ -702,6 +712,29 @@ Blockly.Blocks.defaultToolbox = '<xml id="toolbox-categories" style="display: no
   '</category>' +
   '<category name="Extensions" id="extensions" colour="#FF6680" secondaryColour="#FF4D6A" ' +
     'iconURI="../media/extensions/wedo2-block-icon.svg" showStatusButton="true">' +
+    /* checkbox testing */
+    '<block type="extension_checkbox_test">' + // enabled
+      '<value name="CHECKBOX">' +
+        '<shadow type="checkbox"></shadow>' +
+      '</value>' +
+    '</block>' +
+    '<block type="extension_checkbox_test">' + // disabled
+    '</block>' +
+    '<block type="extension_checkbox_test_legacy">' + // enabled legacy
+      '<value name="CHECKBOX">' +
+        '<shadow type="checkbox">' +
+          '<field name="CHECKBOX">TRUE</field>' +
+        '</shadow>' +
+      '</value>' +
+    '</block>' +
+    '<block type="extension_checkbox_test_legacy">' + // disabled legacy
+      '<value name="CHECKBOX">' +
+        '<shadow type="checkbox">' +
+          '<field name="CHECKBOX">FALSE</field>' + // this should instantly turn off
+        '</shadow>' +
+      '</value>' +
+    '</block>' +
+    '<sep gap="36"></sep>' +
     '<block type="extension_pen_down" id="extension_pen_down"></block>' +
     '<block type="extension_music_drum" id="extension_music_drum">' +
       '<value name="NUMBER">' +

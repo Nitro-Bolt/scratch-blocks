@@ -654,10 +654,14 @@ Blockly.Block.prototype.isShadow = function() {
 
 /**
  * Set whether this block is a shadow block or not.
- * @param {boolean} shadow True if a shadow.
+ * @param {boolean} newBoolean True if a shadow.
  */
-Blockly.Block.prototype.setShadow = function(shadow) {
-  this.isShadow_ = shadow;
+Blockly.Block.prototype.setShadow = function(newBoolean) {
+  if (this.isShadow_ != newBoolean) {
+    Blockly.Events.fire(new Blockly.Events.BlockChange(
+        this, 'shadow', null, this.isShadow_, newBoolean));
+    this.isShadow_ = newBoolean;
+  }
 };
 
 /**
@@ -1221,14 +1225,14 @@ Blockly.Block.prototype.toString = function(opt_maxLength, opt_emptyToken) {
       if (input.connection) {
         var child = input.connection.targetBlock();
         if (child) {
-          text.push(child.toString(undefined, opt_emptyToken));
+          text.push(child.toString(undefined, emptyFieldPlaceholder));
         } else {
-          text.push(emptyFieldPlaceholder);
+          text.push('...');
         }
       }
     }
   }
-  text = goog.string.trim(text.join(' ')) || '???';
+  text = goog.string.trim(text.join(' ')) || emptyFieldPlaceholder;
   if (opt_maxLength) {
     // TODO: Improve truncation so that text from this block is given priority.
     // E.g. "1+2+3+4+5+6+7+8+9=0" should be "...6+7+8+9=0", not "1+2+3+4+5...".
