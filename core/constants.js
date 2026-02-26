@@ -271,6 +271,7 @@ Blockly.Categories = {
   "pen": "pen",
   "data": "data",
   "dataLists": "data-lists",
+  "dataTables": "data-tables",
   "json": "json",
   "event": "events",
   "control": "control",
@@ -348,6 +349,14 @@ Blockly.NEW_BROADCAST_MESSAGE_ID = 'NEW_BROADCAST_MESSAGE_ID';
  * @const {string}
  */
 Blockly.BROADCAST_MESSAGE_VARIABLE_TYPE = 'broadcast_msg';
+
+/**
+ * String representing the variable type of table blocks.
+ * This string, for use in differentiating between types of variables,
+ * indicates that the current variable is a table.
+ * @const {string}
+ */
+Blockly.TABLE_VARIABLE_TYPE = 'table';
 
 /**
  * String representing the variable type of list blocks.
