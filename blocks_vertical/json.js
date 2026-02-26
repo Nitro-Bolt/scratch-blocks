@@ -42,47 +42,6 @@ Blockly.Blocks['json_new_object'] = {
   }
 };
 
-Blockly.Blocks['json_to_object'] = {
-  /**
-   * Converts a string to an Object
-   * @this Blockly.Block
-   */
-  init: function() {
-    this.jsonInit({
-      "message0": Blockly.Msg.JSON_TO_OBJECT,
-      "args0": [
-        {
-          "type": "input_value",
-          "name": "STR"
-        },
-      ],
-      "category": Blockly.Categories.json,
-      "extensions": ["colours_json", "output_object"]
-    });
-  }
-};
-
-Blockly.Blocks['json_to_string'] = {
-  /**
-   * Converts an Object to a string
-   * @this Blockly.Block
-   */
-  init: function() {
-    this.jsonInit({
-      "message0": Blockly.Msg.JSON_TO_STRING,
-      "args0": [
-        {
-          "type": "input_value",
-          "name": "OBJ",
-          "check": "Object"
-        },
-      ],
-      "category": Blockly.Categories.json,
-      "extensions": ["colours_json", "output_string"]
-    });
-  }
-};
-
 Blockly.Blocks['json_get_properties'] = {
   /**
    * Fetches keys, values, or entries of an object based on selection.
@@ -253,26 +212,6 @@ Blockly.Blocks['json_new_array'] = {
   init: function() {
     this.jsonInit({
       "message0": Blockly.Msg.JSON_NEW_ARRAY,
-      "category": Blockly.Categories.json,
-      "extensions": ["colours_json", "output_array"]
-    });
-  }
-};
-
-Blockly.Blocks['json_to_array'] = {
-  /**
-   * Converts a string to an Array
-   * @this Blockly.Block
-   */
-  init: function() {
-    this.jsonInit({
-      "message0": Blockly.Msg.JSON_TO_ARRAY,
-      "args0": [
-        {
-          "type": "input_value",
-          "name": "STR"
-        },
-      ],
       "category": Blockly.Categories.json,
       "extensions": ["colours_json", "output_array"]
     });
