@@ -313,9 +313,12 @@ Blockly.FieldVariable.dropdownCreate = function() {
     options.unshift(
         [Blockly.Msg.NEW_BROADCAST_MESSAGE, Blockly.NEW_BROADCAST_MESSAGE_ID]);
   } else {
-    // Scalar variables and lists have the same backing action, but the option
+    // Scalar variables, lists, and tables have the same backing action, but the option
     // text is different.
-    if (this.defaultType_ == Blockly.LIST_VARIABLE_TYPE) {
+    if (this.defaultType_ == Blockly.TABLE_VARIABLE_TYPE) {
+      var renameText = Blockly.Msg.RENAME_TABLE;
+      var deleteText = Blockly.Msg.DELETE_TABLE;
+    } else if (this.defaultType_ == Blockly.LIST_VARIABLE_TYPE) {
       var renameText = Blockly.Msg.RENAME_LIST;
       var deleteText = Blockly.Msg.DELETE_LIST;
     } else {
