@@ -78,8 +78,6 @@ Blockly.Msg.DATA_INDEX_RANDOM = 'random';
 
 // JSON blocks
 Blockly.Msg.JSON_NEW_OBJECT = 'new object';
-Blockly.Msg.JSON_TO_OBJECT = '%1 to object';
-Blockly.Msg.JSON_TO_STRING = '%1 to string';
 Blockly.Msg.JSON_GET_PROPERTIES = '%1 of %2';
 Blockly.Msg.JSON_GET_PROPERTIES_KEYS = "keys";
 Blockly.Msg.JSON_GET_PROPERTIES_VALUES = "values";
@@ -89,7 +87,6 @@ Blockly.Msg.JSON_SET_KEY = 'set %1 in %2 to %3';
 Blockly.Msg.JSON_DELETE_KEY = 'delete %1 in %2';
 Blockly.Msg.JSON_HAS_KEY = '%1 has key %2?';
 Blockly.Msg.JSON_NEW_ARRAY = 'new array';
-Blockly.Msg.JSON_TO_ARRAY = '%1 to array';
 Blockly.Msg.JSON_VALUE_OF_INDEX = 'item %1 of %2';
 Blockly.Msg.JSON_INDEX_OF_VALUE = 'index of %1 in %2';
 Blockly.Msg.JSON_ADD_ITEM = 'add %1 to %2';
@@ -247,6 +244,12 @@ Blockly.Msg.OPERATORS_MATHOP_LN = 'ln';
 Blockly.Msg.OPERATORS_MATHOP_LOG = 'log';
 Blockly.Msg.OPERATORS_MATHOP_EEXP = 'e ^';
 Blockly.Msg.OPERATORS_MATHOP_10EXP = '10 ^';
+Blockly.Msg.OPERATORS_CAST = '%1 as %2';
+Blockly.Msg.OPERATORS_CAST_STRING = 'string';
+Blockly.Msg.OPERATORS_CAST_NUMBER = 'number';
+Blockly.Msg.OPERATORS_CAST_BOOLEAN = 'boolean';
+Blockly.Msg.OPERATORS_CAST_ARRAY = 'array';
+Blockly.Msg.OPERATORS_CAST_OBJECT = 'object';
 
 // Procedures blocks
 Blockly.Msg.PROCEDURES_DEFINITION = 'define %1';
