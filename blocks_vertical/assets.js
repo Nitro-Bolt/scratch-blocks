@@ -56,15 +56,54 @@ Blockly.Blocks['assets_menu'] = {
   }
 };
 
-Blockly.Blocks['assets_test'] = {
+Blockly.Blocks['assets_file_as_type'] = {
   /**
-   * Test block to report the data of an asset
+   * Block to report the data of an asset
    * @this Blockly.Block
    */
   init: function() {
     this.jsonInit({
-      "message0": Blockly.Msg.ASSETS_TEST,
+      "message0": Blockly.Msg.ASSETS_FILE_AS_TYPE,
       "args0": [
+        {
+          "type": "input_value",
+          "name": "ASSET_MENU"
+        },
+        {
+          "type": "field_dropdown",
+          "name": "TYPE",
+          "options": [
+            ['text', 'text'],
+            ['data: URI', 'data: uri']
+          ]
+        }
+      ],
+      "category": Blockly.Categories.assets,
+      "extensions": ["colours_assets", "output_string"]
+    });
+  }
+};
+
+Blockly.Blocks['assets_metadata'] = {
+  /**
+   * Block to report the metadata of an asset
+   * @this Blockly.Block
+   */
+  init: function() {
+    this.jsonInit({
+      "message0": Blockly.Msg.ASSETS_METADATA,
+      "args0": [
+        {
+          "type": "field_dropdown",
+          "name": "TYPE",
+          "options": [
+            ['name', 'name'],
+            ['extension', 'extension'],
+            ['content type', 'content type'],
+            ['last modified', 'last modified'],
+            ['md5', 'md5']
+          ]
+        },
         {
           "type": "input_value",
           "name": "ASSET_MENU"
@@ -72,6 +111,71 @@ Blockly.Blocks['assets_test'] = {
       ],
       "category": Blockly.Categories.assets,
       "extensions": ["colours_assets", "output_string"]
+    });
+  }
+};
+
+Blockly.Blocks['assets_set'] = {
+  /**
+   * Block to set a piece of metadata in an asset
+   * @this Blockly.Block
+   */
+  init: function() {
+    this.jsonInit({
+      "message0": Blockly.Msg.ASSETS_SET,
+      "args0": [
+        {
+          "type": "field_dropdown",
+          "name": "TYPE",
+          "options": [
+            ['name', 'name'],
+            ['extension', 'extension'],
+            ['content type', 'content type']
+          ]
+        },
+        {
+          "type": "input_value",
+          "name": "ASSET_MENU"
+        },
+        {
+          "type": "input_value",
+          "name": "VALUE"
+        }
+      ],
+      "category": Blockly.Categories.assets,
+      "extensions": ["colours_assets", "shape_statement"]
+    });
+  }
+};
+
+Blockly.Blocks['assets_write'] = {
+  /**
+   * Block to set the content of an asset
+   * @this Blockly.Block
+   */
+  init: function() {
+    this.jsonInit({
+      "message0": Blockly.Msg.ASSETS_WRITE,
+      "args0": [
+        {
+          "type": "input_value",
+          "name": "VALUE"
+        },
+        {
+          "type": "input_value",
+          "name": "ASSET_MENU"
+        },
+        {
+          "type": "field_dropdown",
+          "name": "TYPE",
+          options: [
+            ['text', 'text'],
+            ['data: URI', 'data: uri']
+          ]
+        }
+      ],
+      "category": Blockly.Categories.assets,
+      "extensions": ["colours_assets", "shape_statement"]
     });
   }
 };
