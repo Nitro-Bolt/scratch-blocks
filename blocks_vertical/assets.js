@@ -162,16 +162,16 @@ Blockly.Blocks['assets_write'] = {
           "name": "VALUE"
         },
         {
-          "type": "input_value",
-          "name": "ASSET_MENU"
-        },
-        {
           "type": "field_dropdown",
           "name": "TYPE",
           options: [
             ['text', 'text'],
             ['data: URI', 'data: uri']
           ]
+        },
+        {
+          "type": "input_value",
+          "name": "ASSET_MENU"
         }
       ],
       "category": Blockly.Categories.assets,
