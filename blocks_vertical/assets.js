@@ -164,7 +164,7 @@ Blockly.Blocks['assets_write'] = {
         {
           "type": "field_dropdown",
           "name": "TYPE",
-          options: [
+          "options": [
             ['text', 'text'],
             ['data: URI', 'data: uri']
           ]
