@@ -109,6 +109,33 @@ Blockly.Blocks['extension_checkbox_test_legacy_json2'] = {
   }
 };
 
+Blockly.Blocks['extension_input'] = {
+  init: function () {
+    this.jsonInit({
+      "message0": 'input %1',
+      "args0": [
+        {
+          "type": "input_value",
+          "name": "VALUE"
+        }
+      ],
+      "category": Blockly.Categories.more,
+      "extensions": ["colours_more", "shape_statement"]
+    });
+  }
+};
+
+Blockly.Blocks['extension_blockduplicateondrag'] = {
+  init: function () {
+    this.jsonInit({
+      "message0": 'duplicate on drag',
+      "duplicateOnDrag": true,
+      "category": Blockly.Categories.more,
+      "extensions": ["colours_more", "output_string"]
+    });
+  }
+};
+
 Blockly.Blocks['extension_pen_down'] = {
   /**
    * @this Blockly.Block

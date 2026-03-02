@@ -298,6 +298,7 @@ Blockly.Connection.prototype.canConnectWithReason_ = function(target) {
   if (!target) {
     return Blockly.Connection.REASON_TARGET_NULL;
   }
+
   if (this.isSuperior()) {
     var blockA = this.sourceBlock_;
     var blockB = target.getSourceBlock();
@@ -307,6 +308,7 @@ Blockly.Connection.prototype.canConnectWithReason_ = function(target) {
     var blockA = target.getSourceBlock();
     var superiorConn = target;
   }
+
   if (blockA && blockA == blockB) {
     return Blockly.Connection.REASON_SELF_CONNECTION;
   } else if (target.type != Blockly.OPPOSITE_TYPE[this.type]) {
@@ -326,6 +328,13 @@ Blockly.Connection.prototype.canConnectWithReason_ = function(target) {
     // on a defnoreturn block, unless the connecting block is a specific type.
     // And hack to fix #1534: Fail attempts to connect anything but a
     // defnoreturn block to a prototype block.
+    return Blockly.Connection.REASON_CUSTOM_PROCEDURE;
+  } else if ((this.targetConnection?.sourceBlock_ &&
+            (Blockly.scratchBlocksUtils.isShadowArgumentReporter(this.targetConnection.sourceBlock_) ||
+             this.targetConnection.sourceBlock_.canDuplicateOnDrag?.())) ||
+           (target.targetConnection?.sourceBlock_ &&
+            (Blockly.scratchBlocksUtils.isShadowArgumentReporter(target.targetConnection.sourceBlock_) ||
+             target.targetConnection.sourceBlock_.canDuplicateOnDrag?.()))) {
     return Blockly.Connection.REASON_CUSTOM_PROCEDURE;
   }
   return Blockly.Connection.CAN_CONNECT;

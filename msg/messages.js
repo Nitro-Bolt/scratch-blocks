@@ -115,8 +115,9 @@ Blockly.Msg.JSON_MERGE = 'merge %1 %2';
 Blockly.Msg.JSON_ARRAY_LENGTH = 'length of %1';
 Blockly.Msg.JSON_SLICE_ARRAY = 'items %1 to %2 in %3';
 Blockly.Msg.JSON_REVERSE_ARRAY = 'reverse %1';
-Blockly.Msg.JSON_OBJECT = '{"key":"value"}';
-Blockly.Msg.JSON_ARRAY = '["foo","bar"]';
+Blockly.Msg.JSON_MAP = 'map %1 using %2 %3 -> %4';
+Blockly.Msg.JSON_MAP_VALUE = 'value';
+Blockly.Msg.JSON_MAP_INDEX = 'index'
 Blockly.Msg.JSON_KEY = 'key';
 Blockly.Msg.JSON_BAR = 'bar';
 Blockly.Msg.JSON_BAZ = 'baz';
@@ -267,6 +268,7 @@ Blockly.Msg.OPERATORS_CAST_NUMBER = 'number';
 Blockly.Msg.OPERATORS_CAST_BOOLEAN = 'boolean';
 Blockly.Msg.OPERATORS_CAST_ARRAY = 'array';
 Blockly.Msg.OPERATORS_CAST_OBJECT = 'object';
+Blockly.Msg.OPERATORS_TYPEOF = 'type of %1';
 
 // Procedures blocks
 Blockly.Msg.PROCEDURES_DEFINITION = 'define %1';
