@@ -329,12 +329,14 @@ Blockly.Connection.prototype.canConnectWithReason_ = function(target) {
     // And hack to fix #1534: Fail attempts to connect anything but a
     // defnoreturn block to a prototype block.
     return Blockly.Connection.REASON_CUSTOM_PROCEDURE;
-  } else if ((this.targetConnection?.sourceBlock_ &&
-            (Blockly.scratchBlocksUtils.isShadowArgumentReporter(this.targetConnection.sourceBlock_) ||
-             this.targetConnection.sourceBlock_.canDuplicateOnDrag?.())) ||
-           (target.targetConnection?.sourceBlock_ &&
-            (Blockly.scratchBlocksUtils.isShadowArgumentReporter(target.targetConnection.sourceBlock_) ||
-             target.targetConnection.sourceBlock_.canDuplicateOnDrag?.()))) {
+  }
+
+  const thisConnection = this.targetConnection && this.targetConnection.sourceBlock_;
+  const targetConnection = target.targetConnection && target.targetConnection.sourceBlock_;
+  if (
+    (thisConnection && (Blockly.scratchBlocksUtils.isShadowArgumentReporter(thisConnection) || thisConnection.canDuplicateOnDrag())) ||
+    (targetConnection && (Blockly.scratchBlocksUtils.isShadowArgumentReporter(targetConnection) || targetConnection.canDuplicateOnDrag()))
+  ) {
     return Blockly.Connection.REASON_CUSTOM_PROCEDURE;
   }
   return Blockly.Connection.CAN_CONNECT;
