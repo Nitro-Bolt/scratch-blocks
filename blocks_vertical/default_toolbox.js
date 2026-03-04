@@ -556,26 +556,18 @@ Blockly.Blocks.defaultToolbox = '<xml id="toolbox-categories" style="display: no
         '</shadow>' +
       '</value>' +
     '</block>' +
+    '<block type="operator_cast">' +
+    '  <value name="VALUE">' +
+    '    <shadow type="text">' +
+    '        <field name="TEXT"/>' +
+    '    </shadow>' +
+    '  </value>' +
+    '</block>' +
   '</category>' +
   '<category name="%{BKY_CATEGORY_VARIABLES}" id="data" colour="#FF8C1A" secondaryColour="#DB6E00" custom="VARIABLE">' +
   '</category>' +
   '<category name="%{BKY_CATEGORY_JSON}" id="json" colour="#5755D4" secondaryColour="#4644AA">' +
     '<block type="json_new_object" id="json_new_object">' +
-    '</block>' +
-    '<block type="json_to_object" id="json_to_object">' +
-      '<value name="STR">' +
-        '<shadow type="text">' +
-          '<field name="TEXT">{"key":"value"}</field>' +
-        '</shadow>' +
-      '</value>' +
-    '</block>' +
-    '<block type="json_to_string" id="json_to_string">' +
-    '</block>' +
-    '<block type="json_keys" id="json_keys">' +
-    '</block>' +
-    '<block type="json_values" id="json_values">' +
-    '</block>' +
-    '<block type="json_entries" id="json_entries">' +
     '</block>' +
     '<block type="json_get_properties" id="json_get_properties">' +
     '</block>' +
@@ -615,13 +607,6 @@ Blockly.Blocks.defaultToolbox = '<xml id="toolbox-categories" style="display: no
       '</value>' +
     '</block>' +
     '<block type="json_new_array" id="json_new_array">' +
-    '</block>' +
-    '<block type="json_to_array" id="json_to_array">' +
-      '<value name="STR">' +
-        '<shadow type="text">' +
-          '<field name="TEXT">["foo", "bar"]</field>' +
-        '</shadow>' +
-      '</value>' +
     '</block>' +
     '<block type="json_value_of_index" id="json_value_of_index">' +
       '<value name="INDEX">' +

@@ -1,6 +1,6 @@
 ## Playgrounds
 
- - **Vertical blocks**: https://turbowarp.github.io/scratch-blocks/tests/vertical_playground_compressed.html
+ - **Vertical blocks**: https://nitro-bolt.github.io/scratch-blocks/tests/vertical_playground_compressed.html
 
 ## Local development
 

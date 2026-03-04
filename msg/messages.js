@@ -75,21 +75,35 @@ Blockly.Msg.DATA_HIDELIST = 'hide list %1';
 Blockly.Msg.DATA_INDEX_ALL = 'all';
 Blockly.Msg.DATA_INDEX_LAST = 'last';
 Blockly.Msg.DATA_INDEX_RANDOM = 'random';
+Blockly.Msg.DATA_ADDTOTABLE = 'add new %1 to %2';
+Blockly.Msg.DATA_INSERTDIMENSIONTOTABLE = 'insert new %1 at %2 of %3';
+Blockly.Msg.DATA_SETCELLINTABLE = 'set cell in column %1 row %2 of %3 to %4';
+Blockly.Msg.DATA_DELETECELLINTABLE = 'delete cell in column %1 row %2 of %3';
+Blockly.Msg.DATA_DELETEDIMENSIONINTABLE = 'delete %1 %2 in %3';
+Blockly.Msg.DATA_DELETEALLOFTABLE = 'delete all of %1';
+Blockly.Msg.DATA_ITEMINCELLOFTABLE = 'item in column %1 row %2 of %3';
+Blockly.Msg.DATA_ITEMSOFDIMENSIONOFTABLE = 'items of %1 %2 of %3';
+Blockly.Msg.DATA_LENGTHOFDIMENSIONOFTABLE = 'length of %1 %2 of %3';
+Blockly.Msg.DATA_DIMENSIONCOUNTOFTABLE = '%1 count of %2';
+Blockly.Msg.DATA_TABLECONTAINSITEMINCELL = '%1 contains %2 at column %3 row %4?';
+Blockly.Msg.DATA_TABLEASARRAY = '%1 as array';
+Blockly.Msg.DATA_SETTABLEUSINGARRAY = 'set %1 to %2';
+Blockly.Msg.DATA_SHOWTABLE = 'show table %1';
+Blockly.Msg.DATA_HIDETABLE = 'hide table %1';
+Blockly.Msg.DATA_COLUMN = 'column';
+Blockly.Msg.DATA_ROW = 'row';
 
 // JSON blocks
 Blockly.Msg.JSON_NEW_OBJECT = 'new object';
-Blockly.Msg.JSON_TO_OBJECT = '%1 to object';
-Blockly.Msg.JSON_TO_STRING = '%1 to string';
-Blockly.Msg.JSON_KEYS = 'keys of %1';
-Blockly.Msg.JSON_VALUES = 'values of %1';
-Blockly.Msg.JSON_ENTRIES = 'entries of %1';
 Blockly.Msg.JSON_GET_PROPERTIES = '%1 of %2';
+Blockly.Msg.JSON_GET_PROPERTIES_KEYS = "keys";
+Blockly.Msg.JSON_GET_PROPERTIES_VALUES = "values";
+Blockly.Msg.JSON_GET_PROPERTIES_ENTRIES = "entries";
 Blockly.Msg.JSON_VALUE_OF_KEY = 'value of %1 in %2';
 Blockly.Msg.JSON_SET_KEY = 'set %1 in %2 to %3';
 Blockly.Msg.JSON_DELETE_KEY = 'delete %1 in %2';
 Blockly.Msg.JSON_HAS_KEY = '%1 has key %2?';
 Blockly.Msg.JSON_NEW_ARRAY = 'new array';
-Blockly.Msg.JSON_TO_ARRAY = '%1 to array';
 Blockly.Msg.JSON_VALUE_OF_INDEX = 'item %1 of %2';
 Blockly.Msg.JSON_INDEX_OF_VALUE = 'index of %1 in %2';
 Blockly.Msg.JSON_ADD_ITEM = 'add %1 to %2';
@@ -247,6 +261,12 @@ Blockly.Msg.OPERATORS_MATHOP_LN = 'ln';
 Blockly.Msg.OPERATORS_MATHOP_LOG = 'log';
 Blockly.Msg.OPERATORS_MATHOP_EEXP = 'e ^';
 Blockly.Msg.OPERATORS_MATHOP_10EXP = '10 ^';
+Blockly.Msg.OPERATORS_CAST = '%1 as %2';
+Blockly.Msg.OPERATORS_CAST_STRING = 'string';
+Blockly.Msg.OPERATORS_CAST_NUMBER = 'number';
+Blockly.Msg.OPERATORS_CAST_BOOLEAN = 'boolean';
+Blockly.Msg.OPERATORS_CAST_ARRAY = 'array';
+Blockly.Msg.OPERATORS_CAST_OBJECT = 'object';
 
 // Procedures blocks
 Blockly.Msg.PROCEDURES_DEFINITION = 'define %1';
@@ -400,6 +420,18 @@ Blockly.Msg.RENAME_LIST_MODAL_TITLE = 'Rename List';
 Blockly.Msg.DEFAULT_LIST_ITEM = 'thing';
 Blockly.Msg.DELETE_LIST = 'Delete the "%1" list';
 Blockly.Msg.RENAME_LIST = 'Rename list';
+
+// Tables
+// @todo Remove these once fully managed by Scratch VM / Scratch GUI
+Blockly.Msg.NEW_TABLE = 'Make a Table';
+Blockly.Msg.NEW_TABLE_TITLE = 'New table name:';
+Blockly.Msg.TABLE_MODAL_TITLE = 'New Table';
+Blockly.Msg.TABLE_ALREADY_EXISTS = 'A table named "%1" already exists.';
+Blockly.Msg.RENAME_TABLE_TITLE = 'Rename all "%1" tables to:';
+Blockly.Msg.RENAME_TABLE_MODAL_TITLE = 'Rename Table';
+Blockly.Msg.DEFAULT_TABLE_ITEM = 'thing';
+Blockly.Msg.DELETE_TABLE = 'Delete the "%1" table';
+Blockly.Msg.RENAME_TABLE = 'Rename table';
 
 // Broadcast Messages
 // @todo Remove these once fully managed by Scratch VM / Scratch GUI

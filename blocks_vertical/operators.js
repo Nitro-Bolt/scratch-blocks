@@ -468,3 +468,36 @@ Blockly.Blocks['operator_mathop'] = {
     });
   }
 };
+
+Blockly.Blocks['operator_cast'] = {
+  /**
+   * Block for casting a value to a specific type.
+   * @this Blockly.Block
+   */
+  init: function() {
+    this.jsonInit({
+      "message0": Blockly.Msg.OPERATORS_CAST,
+      "args0": [
+        {
+          "type": "input_value",
+          "name": "VALUE"
+        },
+        {
+          "type": "field_dropdown",
+          "name": "TYPE",
+          "options": [
+            [Blockly.Msg.OPERATORS_CAST_STRING, "string"],
+            [Blockly.Msg.OPERATORS_CAST_NUMBER, "number"],
+            [Blockly.Msg.OPERATORS_CAST_BOOLEAN, "boolean"],
+            [Blockly.Msg.OPERATORS_CAST_ARRAY, "array"],
+            [Blockly.Msg.OPERATORS_CAST_OBJECT, "object"]
+          ]
+        }
+      ],
+      "output": null,
+      "outputShape": Blockly.OUTPUT_SHAPE_ROUND,
+      "category": Blockly.Categories.operators,
+      "extensions": ["colours_operators"],
+    });
+  }
+};
