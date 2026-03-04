@@ -507,6 +507,13 @@ Blockly.Blocks['json_map'] = {
           "name": "INDEX"
         },
         {
+          "type": "field_image",
+          "src": Blockly.mainWorkspace.options.pathToMedia + "icons/arrow_straight.svg",
+          "width": 27,
+          "height": 27,
+          "alt": "Convert to"
+        },
+        {
           "type": "input_value",
           "name": "METHOD"
         },
