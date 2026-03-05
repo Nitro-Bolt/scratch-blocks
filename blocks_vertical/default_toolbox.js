@@ -295,6 +295,22 @@ Blockly.Blocks.defaultToolbox = '<xml id="toolbox-categories" style="display: no
         '</shadow>' +
       '</value>' +
     '</block>' +
+    '<block type="control_foreach_in_range" id="control_foreach_in_range">' +
+      '<value name="ITEM">' +
+        '<shadow type="control_foreach_in_range_item">' +
+        '</shadow>' +
+      '</value>' +
+      '<value name="FROM">' +
+        '<shadow type="math_number">' +
+          '<field name="NUM">1</field>' +
+        '</shadow>' +
+      '</value>' +
+      '<value name="TO">' +
+        '<shadow type="math_number">' +
+          '<field name="NUM">10</field>' +
+        '</shadow>' +
+      '</value>' +
+    '</block>' +
     '<block type="control_forever" id="control_forever"></block>' +
     '<block type="control_if" id="control_if"></block>' +
     '<block type="control_if_else" id="control_if_else"></block>' +
@@ -652,6 +668,16 @@ Blockly.Blocks.defaultToolbox = '<xml id="toolbox-categories" style="display: no
       '<value name="METHOD">' +
         '<shadow type="text">' +
           '<field name="TEXT">bar</field>' +
+        '</shadow>' +
+      '</value>' +
+    '</block>' +
+    '<block type="json_foreach" id="json_foreach">' +
+      '<value name="VALUE">' +
+        '<shadow type="json_foreach_value">' +
+        '</shadow>' +
+      '</value>' +
+      '<value name="INDEX">' +
+        '<shadow type="json_foreach_index">' +
         '</shadow>' +
       '</value>' +
     '</block>' +

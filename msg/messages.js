@@ -55,6 +55,8 @@ Blockly.Msg.CONTROL_COUNTER = 'counter';
 Blockly.Msg.CONTROL_INCRCOUNTER = 'increment counter';
 Blockly.Msg.CONTROL_CLEARCOUNTER = 'clear counter';
 Blockly.Msg.CONTROL_ALLATONCE = 'all at once';
+Blockly.Msg.CONTROL_FOREACHINRANGE = 'for each %1 in range %2 to %3';
+Blockly.Msg.CONTROL_FOREACHINRANGE_ITEM = 'i';
 
 // Data blocks
 Blockly.Msg.DATA_SETVARIABLETO = 'set %1 to %2';
@@ -117,7 +119,8 @@ Blockly.Msg.JSON_SLICE_ARRAY = 'items %1 to %2 in %3';
 Blockly.Msg.JSON_REVERSE_ARRAY = 'reverse %1';
 Blockly.Msg.JSON_MAP = 'map %1 using %2 %3 %4 %5';
 Blockly.Msg.JSON_MAP_VALUE = 'value';
-Blockly.Msg.JSON_MAP_INDEX = 'index'
+Blockly.Msg.JSON_MAP_INDEX = 'index';
+Blockly.Msg.JSON_FOREACH = 'for each %1 %2 in %3';
 Blockly.Msg.JSON_KEY = 'key';
 Blockly.Msg.JSON_BAR = 'bar';
 Blockly.Msg.JSON_BAZ = 'baz';
