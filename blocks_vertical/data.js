@@ -497,6 +497,53 @@ Blockly.Blocks['data_hidelist'] = {
   }
 };
 
+Blockly.Blocks['data_listasarray'] = {
+  /**
+   * Block for turning list into array.
+   * @this Blockly.Block
+   */
+  init: function() {
+    this.jsonInit({
+      "message0": Blockly.Msg.DATA_LISTASARRAY,
+      "args0": [
+        {
+          "type": "field_variable",
+          "name": "LIST",
+          "variableTypes": [Blockly.LIST_VARIABLE_TYPE]
+        }
+      ],
+      "category": Blockly.Categories.dataLists,
+      "extensions": ["colours_data_lists", "output_array"]
+    });
+  }
+};
+
+Blockly.Blocks['data_setlistarray'] = {
+  /**
+   * Block to set a list to array.
+   * @this Blockly.Block
+   */
+  init: function() {
+    this.jsonInit({
+      "message0": Blockly.Msg.DATA_SETLISTARRAY,
+      "args0": [
+        {
+          "type": "field_variable",
+          "name": "LIST",
+          "variableTypes": [Blockly.LIST_VARIABLE_TYPE]
+        },
+        {
+          "type": "input_value",
+          "name": "ARRAY",
+          "check": "Array"
+        },
+      ],
+      "category": Blockly.Categories.dataLists,
+      "extensions": ["colours_data_lists", "shape_statement"]
+    });
+  }
+};
+
 Blockly.Blocks['data_tablecontents'] = {
   /**
    * Table reporter.
