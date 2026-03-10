@@ -226,6 +226,35 @@ Blockly.Blocks['data_listindexrandom'] = {
   }
 };
 
+Blockly.Blocks['data_listindex'] = {
+  /**
+   * List index menu, with all secret options.
+   * @this Blockly.Block
+   */
+  init: function() {
+    this.jsonInit({
+      "message0": "%1",
+      "args0": [
+        {
+          "type": "field_numberdropdown",
+          "name": "INDEX",
+          "value": "1",
+          "min": 1,
+          "precision": 1,
+          "options": [
+            ["1", "1"],
+            [Blockly.Msg.DATA_INDEX_LAST, "last"],
+            [Blockly.Msg.DATA_INDEX_ALL, "all"],
+            [Blockly.Msg.DATA_INDEX_RANDOM, "random"]
+          ]
+        }
+      ],
+      "category": Blockly.Categories.data,
+      "extensions": ["colours_textfield", "output_string"]
+    });
+  }
+};
+
 Blockly.Blocks['data_addtolist'] = {
   /**
    * Block to add item to list.
