@@ -76,7 +76,7 @@ Blockly.DataCategory = function(workspace) {
     Blockly.DataCategory.addAddToList(xmlList, firstVariable);
     Blockly.DataCategory.addSep(xmlList);
     Blockly.DataCategory.addDeleteOfList(xmlList, firstVariable);
-    Blockly.DataCategory.addDeleteAllOfList(xmlList, firstVariable);
+    // Blockly.DataCategory.addDeleteAllOfList(xmlList, firstVariable);
     Blockly.DataCategory.addInsertAtList(xmlList, firstVariable);
     Blockly.DataCategory.addReplaceItemOfList(xmlList, firstVariable);
     Blockly.DataCategory.addSep(xmlList);
@@ -249,20 +249,22 @@ Blockly.DataCategory.addDeleteOfList = function(xmlList, variable) {
   // <block type="data_deleteoflist">
   //   <field name="LIST" variabletype="list" id="">variablename</field>
   //   <value name="INDEX">
-  //     <shadow type="math_integer">
+  //     <shadow type="data_listindex">
   //       <field name="NUM">1</field>
   //     </shadow>
   //   </value>
   // </block>
   Blockly.DataCategory.addBlock(xmlList, variable, 'data_deleteoflist', 'LIST',
-      [['INDEX', 'math_integer', 1]]);
+      [['INDEX', 'data_listindex', 1]]);
 };
 
 /**
  * Construct and add a data_deleteoflist block to xmlList.
+ * Removed from NitroBolt
  * @param {!Array.<!Element>} xmlList Array of XML block elements.
  * @param {?Blockly.VariableModel} variable Variable to select in the field.
  */
+/*
 Blockly.DataCategory.addDeleteAllOfList = function(xmlList, variable) {
   // <block type="data_deletealloflist">
   //   <field name="LIST" variabletype="list" id="">variablename</field>
@@ -270,6 +272,7 @@ Blockly.DataCategory.addDeleteAllOfList = function(xmlList, variable) {
   Blockly.DataCategory.addBlock(xmlList, variable, 'data_deletealloflist',
       'LIST');
 };
+*/
 
 /**
  * Construct and add a data_insertatlist block to xmlList.
@@ -280,7 +283,7 @@ Blockly.DataCategory.addInsertAtList = function(xmlList, variable) {
   // <block type="data_insertatlist">
   //   <field name="LIST" variabletype="list" id="">variablename</field>
   //   <value name="INDEX">
-  //     <shadow type="math_integer">
+  //     <shadow type="data_listindexrandom">
   //       <field name="NUM">1</field>
   //     </shadow>
   //   </value>
@@ -291,7 +294,7 @@ Blockly.DataCategory.addInsertAtList = function(xmlList, variable) {
   //   </value>
   // </block>
   Blockly.DataCategory.addBlock(xmlList, variable, 'data_insertatlist', 'LIST',
-      [['INDEX', 'math_integer', 1], ['ITEM', 'text', Blockly.Msg.DEFAULT_LIST_ITEM]]);
+      [['INDEX', 'data_listindexrandom', 1], ['ITEM', 'text', Blockly.Msg.DEFAULT_LIST_ITEM]]);
 };
 
 /**
@@ -303,7 +306,7 @@ Blockly.DataCategory.addReplaceItemOfList = function(xmlList, variable) {
   // <block type="data_replaceitemoflist">
   //   <field name="LIST" variabletype="list" id="">variablename</field>
   //   <value name="INDEX">
-  //     <shadow type="math_integer">
+  //     <shadow type="data_listindexrandom">
   //       <field name="NUM">1</field>
   //     </shadow>
   //   </value>
@@ -314,7 +317,7 @@ Blockly.DataCategory.addReplaceItemOfList = function(xmlList, variable) {
   //   </value>
   // </block>
   Blockly.DataCategory.addBlock(xmlList, variable, 'data_replaceitemoflist',
-      'LIST', [['INDEX', 'math_integer', 1], ['ITEM', 'text', Blockly.Msg.DEFAULT_LIST_ITEM]]);
+      'LIST', [['INDEX', 'data_listindexrandom', 1], ['ITEM', 'text', Blockly.Msg.DEFAULT_LIST_ITEM]]);
 };
 
 /**
@@ -326,13 +329,13 @@ Blockly.DataCategory.addItemOfList = function(xmlList, variable) {
   // <block type="data_itemoflist">
   //   <field name="LIST" variabletype="list" id="">variablename</field>
   //   <value name="INDEX">
-  //     <shadow type="math_integer">
+  //     <shadow type="data_listindexrandom">
   //       <field name="NUM">1</field>
   //     </shadow>
   //   </value>
   // </block>
   Blockly.DataCategory.addBlock(xmlList, variable, 'data_itemoflist', 'LIST',
-      [['INDEX', 'math_integer', 1]]);
+      [['INDEX', 'data_listindexrandom', 1]]);
 };
 
 /** Construct and add a data_itemnumoflist block to xmlList.
@@ -510,13 +513,13 @@ Blockly.DataCategory.addDeleteDimensionInTable = function(xmlList, variable) {
   // <block type="data_deletedimensionintable">
   //   <field name="TABLE" variabletype="table" id="">variablename</field>
   //   <value name="INDEX">
-  //     <shadow type="math_integer">
+  //     <shadow type="data_listindexrandom">
   //       <field name="NUM">1</field>
   //     </shadow>
   //   </value>
   // </block>
   Blockly.DataCategory.addBlock(xmlList, variable, 'data_deletedimensionintable', 'TABLE',
-      [['INDEX', 'math_integer', 1]]);
+      [['INDEX', 'data_listindexrandom', 1]]);
 };
 
 /**
@@ -564,13 +567,13 @@ Blockly.DataCategory.addItemsOfDimensionOfTable = function(xmlList, variable) {
   // <block type="data_itemsofdimensionoftable">
   //   <field name="TABLE" variabletype="table" id="">variablename</field>
   //   <value name="INDEX">
-  //     <shadow type="math_integer">
+  //     <shadow type="data_listindexrandom">
   //       <field name="NUM">1</field>
   //     </shadow>
   //   </value>
   // </block>
   Blockly.DataCategory.addBlock(xmlList, variable, 'data_itemsofdimensionoftable', 'TABLE',
-      [['INDEX', 'math_integer', 1]]);
+      [['INDEX', 'data_listindexrandom', 1]]);
 };
 
 /**
@@ -582,13 +585,13 @@ Blockly.DataCategory.addLengthOfDimensionOfTable = function(xmlList, variable) {
   // <block type="data_lengthofdimensionoftable">
   //   <field name="TABLE" variabletype="table" id="">variablename</field>
   //   <value name="INDEX">
-  //     <shadow type="math_integer">
+  //     <shadow type="data_listindexrandom">
   //       <field name="NUM">1</field>
   //     </shadow>
   //   </value>
   // </block>
   Blockly.DataCategory.addBlock(xmlList, variable, 'data_lengthofdimensionoftable', 'TABLE',
-      [['INDEX', 'math_integer', 1]]);
+      [['INDEX', 'data_listindexrandom', 1]]);
 };
 
 /**
