@@ -517,22 +517,8 @@ Blockly.Blocks['control_all_at_once'] = {
    */
   init: function() {
     this.jsonInit({
-      "message0": Blockly.Msg.CONTROL_FOREACHINRANGE,
+      "message0": Blockly.Msg.CONTROL_ALLATONCE,
       "message1": "%1", // Statement
-      "args0": [
-        {
-          "type": "input_value",
-          "name": "ITEM"
-        },
-        {
-          "type": "input_value",
-          "name": "FROM"
-        },
-        {
-          "type": "input_value",
-          "name": "TO"
-        }
-      ],
       "args1": [
         {
           "type": "input_statement",
