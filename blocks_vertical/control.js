@@ -530,3 +530,52 @@ Blockly.Blocks['control_all_at_once'] = {
     });
   }
 };
+
+Blockly.Blocks['control_foreach_in_range'] = {
+  /**
+   * Block for each number from range.
+   * @this Blockly.Block
+   */
+  init: function() {
+    this.jsonInit({
+      "message0": Blockly.Msg.CONTROL_FOREACHINRANGE,
+      "message1": "%1", // Statement
+      "args0": [
+        {
+          "type": "input_value",
+          "name": "ITEM"
+        },
+        {
+          "type": "input_value",
+          "name": "FROM",
+        },
+        {
+          "type": "input_value",
+          "name": "TO",
+        },
+      ],
+      "args1": [
+        {
+          "type": "input_statement",
+          "name": "SUBSTACK"
+        }
+      ],
+      "category": Blockly.Categories.json,
+      "extensions": ["colours_control", "shape_statement"],
+    });
+  }
+};
+
+Blockly.Blocks['control_foreach_in_range_item'] = {
+  /**
+   * @this Blockly.Block
+   */
+  init: function() {
+    this.jsonInit({
+      "message0": Blockly.Msg.CONTROL_FOREACHINRANGE_ITEM,
+      "category": Blockly.Categories.json,
+      "duplicateOnDrag": true,
+      "extensions": ["colours_control", "output_number"]
+    });
+  }
+};
