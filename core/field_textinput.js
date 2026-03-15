@@ -97,6 +97,22 @@ Blockly.FieldTextInput.TEXT_MEASURE_PADDING_MAGIC = 45;
 Blockly.FieldTextInput.htmlInput_ = null;
 
 /**
+ * Select caret asset for text menus based on native theme mode.
+ * In default mode, keep the original text-dropdown caret.
+ * In non-default modes, use the regular dropdown caret.
+ *
+ * This is a bit hacky, but it works
+ * @returns {string} Relative media file name.
+ * @package
+ */
+Blockly.FieldTextInput.getTextMenuArrowAsset = function() {
+  var textField = String(Blockly.Colours.textField || '').trim().toLowerCase();
+  var textFieldText = String(Blockly.Colours.textFieldText || '').trim().toLowerCase();
+  var defaultTheme = textField === '#ffffff' && textFieldText === '#575e75';
+  return defaultTheme ? 'dropdown-arrow-dark.svg' : 'dropdown-arrow.svg';
+};
+
+/**
  * Mouse cursor style when over the hotspot that initiates the editor.
  */
 Blockly.FieldTextInput.prototype.CURSOR = 'text';
@@ -248,7 +264,8 @@ Blockly.FieldTextInput.prototype.showEditor_ = function(
     var dropDownArrow =
         goog.dom.createDom(goog.dom.TagName.IMG, 'blocklyTextDropDownArrow');
     dropDownArrow.setAttribute('src',
-        Blockly.mainWorkspace.options.pathToMedia + 'dropdown-arrow-dark.svg');
+      Blockly.mainWorkspace.options.pathToMedia +
+      Blockly.FieldTextInput.getTextMenuArrowAsset());
     dropDownArrow.style.width = this.arrowSize_ + 'px';
     dropDownArrow.style.height = this.arrowSize_ + 'px';
     dropDownArrow.style.top = this.arrowY_ + 'px';
