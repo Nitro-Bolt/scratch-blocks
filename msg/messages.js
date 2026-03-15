@@ -55,6 +55,8 @@ Blockly.Msg.CONTROL_COUNTER = 'counter';
 Blockly.Msg.CONTROL_INCRCOUNTER = 'increment counter';
 Blockly.Msg.CONTROL_CLEARCOUNTER = 'clear counter';
 Blockly.Msg.CONTROL_ALLATONCE = 'all at once';
+Blockly.Msg.CONTROL_FOREACHINRANGE = 'for each %1 in range %2 to %3';
+Blockly.Msg.CONTROL_FOREACHINRANGE_ITEM = 'i';
 
 // Data blocks
 Blockly.Msg.DATA_SETVARIABLETO = 'set %1 to %2';
@@ -70,6 +72,8 @@ Blockly.Msg.DATA_ITEMOFLIST = 'item %1 of %2';
 Blockly.Msg.DATA_ITEMNUMOFLIST = 'item # of %1 in %2';
 Blockly.Msg.DATA_LENGTHOFLIST = 'length of %1';
 Blockly.Msg.DATA_LISTCONTAINSITEM = '%1 contains %2?';
+Blockly.Msg.DATA_LISTASARRAY = '%1 as array';
+Blockly.Msg.DATA_SETLISTARRAY = 'set list %1 to %2';
 Blockly.Msg.DATA_SHOWLIST = 'show list %1';
 Blockly.Msg.DATA_HIDELIST = 'hide list %1';
 Blockly.Msg.DATA_INDEX_ALL = 'all';
@@ -115,8 +119,9 @@ Blockly.Msg.JSON_MERGE = 'merge %1 %2';
 Blockly.Msg.JSON_ARRAY_LENGTH = 'length of %1';
 Blockly.Msg.JSON_SLICE_ARRAY = 'items %1 to %2 in %3';
 Blockly.Msg.JSON_REVERSE_ARRAY = 'reverse %1';
-Blockly.Msg.JSON_OBJECT = '{"key":"value"}';
-Blockly.Msg.JSON_ARRAY = '["foo","bar"]';
+Blockly.Msg.JSON_FOREACH_VALUE = 'value';
+Blockly.Msg.JSON_FOREACH_INDEX = 'index';
+Blockly.Msg.JSON_FOREACH = 'for each %1 %2 in %3';
 Blockly.Msg.JSON_KEY = 'key';
 Blockly.Msg.JSON_BAR = 'bar';
 Blockly.Msg.JSON_BAZ = 'baz';
@@ -267,6 +272,7 @@ Blockly.Msg.OPERATORS_CAST_NUMBER = 'number';
 Blockly.Msg.OPERATORS_CAST_BOOLEAN = 'boolean';
 Blockly.Msg.OPERATORS_CAST_ARRAY = 'array';
 Blockly.Msg.OPERATORS_CAST_OBJECT = 'object';
+Blockly.Msg.OPERATORS_TYPEOF = 'type of %1';
 
 // Procedures blocks
 Blockly.Msg.PROCEDURES_DEFINITION = 'define %1';

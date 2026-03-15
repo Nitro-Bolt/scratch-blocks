@@ -142,6 +142,12 @@ Blockly.Block = function(workspace, prototypeName, opt_id) {
    */
   this.outputShape_ = null;
 
+   /**
+   * @type {boolean} 
+   * @private
+   */
+  this.duplicateOnDrag_ = false;
+
   /**
    * @type {?string}
    * @private
@@ -1325,6 +1331,9 @@ Blockly.Block.prototype.jsonInit = function(json) {
     var localizedValue = Blockly.utils.replaceMessageReferences(rawValue);
     this.setHelpUrl(localizedValue);
   }
+  if (json['duplicateOnDrag'] !== undefined) {
+    this.setDuplicateOnDrag(json['duplicateOnDrag']);
+  }
   if (goog.isString(json['extensions'])) {
     console.warn('JSON attribute \'extensions\' should be an array of ' +
       'strings. Found raw string in JSON for \'' + json['type'] + '\' block.');
@@ -1838,4 +1847,20 @@ Blockly.Block.prototype.toDevString = function() {
     msg += ' (id="' + this.id + '")';
   }
   return msg;
+};
+
+/**
+ * Set whether this block can duplicate on drag and if it's a shadow block.
+ * @param {boolean} value True if this block should duplicate on drag.
+ */
+Blockly.Block.prototype.setDuplicateOnDrag = function(value) {
+  this.duplicateOnDrag_ = value;
+};
+
+/**
+ * Get whether this block can duplicate on drag and if it's a shadow block.
+ * @return {boolean} True if this block can duplicate on drag.
+ */
+Blockly.Block.prototype.canDuplicateOnDrag = function() {
+  return this.duplicateOnDrag_ && this.isShadow();
 };

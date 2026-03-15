@@ -295,6 +295,22 @@ Blockly.Blocks.defaultToolbox = '<xml id="toolbox-categories" style="display: no
         '</shadow>' +
       '</value>' +
     '</block>' +
+    '<block type="control_foreach_in_range" id="control_foreach_in_range">' +
+      '<value name="ITEM">' +
+        '<shadow type="control_foreach_in_range_item">' +
+        '</shadow>' +
+      '</value>' +
+      '<value name="FROM">' +
+        '<shadow type="math_number">' +
+          '<field name="NUM">1</field>' +
+        '</shadow>' +
+      '</value>' +
+      '<value name="TO">' +
+        '<shadow type="math_number">' +
+          '<field name="NUM">10</field>' +
+        '</shadow>' +
+      '</value>' +
+    '</block>' +
     '<block type="control_forever" id="control_forever"></block>' +
     '<block type="control_if" id="control_if"></block>' +
     '<block type="control_if_else" id="control_if_else"></block>' +
@@ -531,6 +547,8 @@ Blockly.Blocks.defaultToolbox = '<xml id="toolbox-categories" style="display: no
     '    </shadow>' +
     '  </value>' +
     '</block>' +
+    '<block type="operator_typeof">' +
+    '</block>' +
   '</category>' +
   '<category name="%{BKY_CATEGORY_VARIABLES}" id="data" colour="#FF8C1A" secondaryColour="#DB6E00" custom="VARIABLE">' +
   '</category>' +
@@ -629,10 +647,22 @@ Blockly.Blocks.defaultToolbox = '<xml id="toolbox-categories" style="display: no
     '</block>' +
     '<block type="json_merge_array" id="json_merge_array">' +
     '</block>' +
+    '<block type="json_reverse_array" id="json_reverse_array">' +
+    '</block>' +
     '<block type="json_has_item" id="json_has_item">' +
       '<value name="ITEM">' +
         '<shadow type="text">' +
           '<field name="TEXT">bar</field>' +
+        '</shadow>' +
+      '</value>' +
+    '</block>' +
+    '<block type="json_foreach" id="json_foreach">' +
+      '<value name="VALUE">' +
+        '<shadow type="json_foreach_value">' +
+        '</shadow>' +
+      '</value>' +
+      '<value name="INDEX">' +
+        '<shadow type="json_foreach_index">' +
         '</shadow>' +
       '</value>' +
     '</block>' +
@@ -718,6 +748,12 @@ Blockly.Blocks.defaultToolbox = '<xml id="toolbox-categories" style="display: no
           '<field name="CHECKBOX">FALSE</field>' + // this should instantly turn off
         '</shadow>' +
       '</value>' +
+    '</block>' +
+    '<block type="extension_input">' +
+    '  <value name="VALUE">' +
+    '    <shadow type="extension_blockduplicateondrag">' +
+    '    </shadow>' +
+    '  </value>' +
     '</block>' +
     '<sep gap="36"></sep>' +
     '<block type="extension_pen_down" id="extension_pen_down"></block>' +
