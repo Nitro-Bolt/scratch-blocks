@@ -83,12 +83,12 @@ Blockly.DataCategory = function(workspace) {
     Blockly.DataCategory.addItemOfList(xmlList, firstVariable);
     Blockly.DataCategory.addItemNumberOfList(xmlList, firstVariable);
     Blockly.DataCategory.addLengthOfList(xmlList, firstVariable);
-    Blockly.DataCategory.addListAsArray(xmlList, firstVariable);
     Blockly.DataCategory.addListContainsItem(xmlList, firstVariable);
     Blockly.DataCategory.addSep(xmlList);
+    Blockly.DataCategory.addListAsArray(xmlList, firstVariable);
+    Blockly.DataCategory.addSetListArray(xmlList, firstVariable);
     Blockly.DataCategory.addShowList(xmlList, firstVariable);
     Blockly.DataCategory.addHideList(xmlList, firstVariable);
-    Blockly.DataCategory.addSetListArray(xmlList, firstVariable);
   }
 
   // Now add table variables to the flyout
@@ -385,30 +385,6 @@ Blockly.DataCategory.addListContainsItem = function(xmlList, variable) {
 };
 
 /**
- * Construct and add a data_showlist block to xmlList.
- * @param {!Array.<!Element>} xmlList Array of XML block elements.
- * @param {?Blockly.VariableModel} variable Variable to select in the field.
- */
-Blockly.DataCategory.addShowList = function(xmlList, variable) {
-  // <block type="data_showlist">
-  //   <field name="LIST" variabletype="list" id="">variablename</field>
-  // </block>
-  Blockly.DataCategory.addBlock(xmlList, variable, 'data_showlist', 'LIST');
-};
-
-/**
- * Construct and add a data_hidelist block to xmlList.
- * @param {!Array.<!Element>} xmlList Array of XML block elements.
- * @param {?Blockly.VariableModel} variable Variable to select in the field.
- */
-Blockly.DataCategory.addHideList = function(xmlList, variable) {
-  // <block type="data_hidelist">
-  //   <field name="LIST" variabletype="list" id="">variablename</field>
-  // </block>
-  Blockly.DataCategory.addBlock(xmlList, variable, 'data_hidelist', 'LIST');
-};
-
-/**
  * Construct and add a data_lengthoflist block to xmlList.
  * @param {!Array.<!Element>} xmlList Array of XML block elements.
  * @param {?Blockly.VariableModel} variable Variable to select in the field.
@@ -430,6 +406,30 @@ Blockly.DataCategory.addSetListArray = function(xmlList, variable) {
   //   <field name="LIST" variabletype="list" id="">variablename</field>
   // </block>
   Blockly.DataCategory.addBlock(xmlList, variable, 'data_setlistarray', 'LIST');
+};
+
+/**
+ * Construct and add a data_showlist block to xmlList.
+ * @param {!Array.<!Element>} xmlList Array of XML block elements.
+ * @param {?Blockly.VariableModel} variable Variable to select in the field.
+ */
+Blockly.DataCategory.addShowList = function(xmlList, variable) {
+  // <block type="data_showlist">
+  //   <field name="LIST" variabletype="list" id="">variablename</field>
+  // </block>
+  Blockly.DataCategory.addBlock(xmlList, variable, 'data_showlist', 'LIST');
+};
+
+/**
+ * Construct and add a data_hidelist block to xmlList.
+ * @param {!Array.<!Element>} xmlList Array of XML block elements.
+ * @param {?Blockly.VariableModel} variable Variable to select in the field.
+ */
+Blockly.DataCategory.addHideList = function(xmlList, variable) {
+  // <block type="data_hidelist">
+  //   <field name="LIST" variabletype="list" id="">variablename</field>
+  // </block>
+  Blockly.DataCategory.addBlock(xmlList, variable, 'data_hidelist', 'LIST');
 };
 
 /**
