@@ -223,6 +223,20 @@ Blockly.Procedures.flyoutCategory = function(workspace) {
 
   Blockly.Procedures.addCreateButton_(workspace, xmlList);
 
+  var setParamBlock = goog.dom.createDom('block');
+  setParamBlock.setAttribute('type', 'procedures_set_param');
+  setParamBlock.setAttribute('gap', 12);
+  var setParamBlockValue = goog.dom.createDom('value');
+  setParamBlockValue.setAttribute('name', 'VALUE');
+  var setParamBlockShadow = goog.dom.createDom('shadow');
+  setParamBlockShadow.setAttribute('type', 'text');
+  var setParamBlockField = goog.dom.createDom('field');
+  setParamBlockField.setAttribute('name', 'TEXT');
+  setParamBlockShadow.appendChild(setParamBlockField);
+  setParamBlockValue.appendChild(setParamBlockShadow);
+  setParamBlock.appendChild(setParamBlockValue);
+  xmlList.push(setParamBlock);
+
   var returnBlock = goog.dom.createDom('block');
   returnBlock.setAttribute('type', Blockly.PROCEDURES_RETURN_BLOCK_TYPE);
   returnBlock.setAttribute('gap', 12);
