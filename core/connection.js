@@ -334,10 +334,10 @@ Blockly.Connection.prototype.canConnectWithReason_ = function(target) {
   const thisConnection = this.targetConnection && this.targetConnection.sourceBlock_;
   const targetConnection = target.targetConnection && target.targetConnection.sourceBlock_;
   if (
-    (thisConnection && (Blockly.scratchBlocksUtils.isShadowArgumentReporter(thisConnection) || thisConnection.canDuplicateOnDrag())) ||
-    (targetConnection && (Blockly.scratchBlocksUtils.isShadowArgumentReporter(targetConnection) || targetConnection.canDuplicateOnDrag()))
+    (thisConnection && (thisConnection.isShadow() || thisConnection.canDuplicateOnDrag())) ||
+    (targetConnection && (targetConnection.isShadow() || targetConnection.canDuplicateOnDrag()))
   ) {
-    return Blockly.Connection.REASON_CUSTOM_PROCEDURE;
+    return Blockly.Connection.REASON_CHECKS_FAILED;
   }
   return Blockly.Connection.CAN_CONNECT;
 };
