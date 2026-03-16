@@ -1488,6 +1488,9 @@ Blockly.BlockSvg.prototype.renderInputShape_ = function(input, x, y) {
  */
 Blockly.BlockSvg.prototype.renderDrawBottom_ = function(steps, cursorY) {
   this.height = cursorY;
+  if (this.edgeShapeWidth_) {
+    this.edgeShapeWidth_ = this.height / 2;
+  }
   if (!this.edgeShape_ || this.inputList.find(v => v.type == Blockly.NEXT_STATEMENT)) {
     steps.push(Blockly.BlockSvg.BOTTOM_RIGHT_CORNER);
   }
