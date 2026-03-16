@@ -1862,5 +1862,5 @@ Blockly.Block.prototype.setDuplicateOnDrag = function(value) {
  * @return {boolean} True if this block can duplicate on drag.
  */
 Blockly.Block.prototype.canDuplicateOnDrag = function() {
-  return this.duplicateOnDrag_ && this.isShadow();
+  return this.duplicateOnDrag_ === true && this.isShadow();
 };
