@@ -67,7 +67,7 @@ Blockly.Connection.REASON_DIFFERENT_WORKSPACES = 5;
 Blockly.Connection.REASON_SHADOW_PARENT = 6;
 // Fixes #1127, but may be the wrong solution.
 Blockly.Connection.REASON_CUSTOM_PROCEDURE = 7;
-Blockly.Connection.REASON_DRAG_TO_DUPLICATE = 9;
+Blockly.Connection.REASON_DRAG_TO_DUPLICATE = 8;
 
 /**
  * Connection this connection connects to.  Null if not connected.
