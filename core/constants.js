@@ -426,6 +426,12 @@ Blockly.PROCEDURES_CALL_TYPE_ARRAY = 4;
 Blockly.PROCEDURES_RETURN_BLOCK_TYPE = 'procedures_return';
 
 /**
+ * The type of all procedure set parameter blocks.
+ * @const {string}
+ */
+Blockly.PROCEDURES_SET_PARAM_BLOCK_TYPE = 'procedures_set_param';
+
+/**
  * ENUM for flyout status button states.
  * @const
  */
