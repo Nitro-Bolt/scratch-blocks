@@ -861,8 +861,9 @@ Blockly.Gesture.prototype.setStartBlock = function(block) {
   // If the gesture already went through a bubble, don't set the start block.
   if (!this.startBlock_ && !this.startBubble_) {
     this.startBlock_ = block;
-    this.shouldDuplicateOnDrag_ =
-        Blockly.scratchBlocksUtils.isShadowArgumentReporter(block) || block.canDuplicateOnDrag();
+    this.shouldDuplicateOnDrag_ = !block.isInFlyout &&
+        (Blockly.scratchBlocksUtils.isShadowArgumentReporter(block) ||
+         block.canDuplicateOnDrag());
     if (block.isInFlyout && block != block.getRootBlock()) {
       this.setTargetBlock_(block.getRootBlock());
     } else {
