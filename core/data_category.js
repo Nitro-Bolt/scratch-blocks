@@ -87,6 +87,7 @@ Blockly.DataCategory = function(workspace) {
     Blockly.DataCategory.addSep(xmlList);
     Blockly.DataCategory.addListAsArray(xmlList, firstVariable);
     Blockly.DataCategory.addSetListArray(xmlList, firstVariable);
+    Blockly.DataCategory.addSep(xmlList);
     Blockly.DataCategory.addShowList(xmlList, firstVariable);
     Blockly.DataCategory.addHideList(xmlList, firstVariable);
   }
