@@ -218,6 +218,34 @@ Blockly.Blocks['json_new_array'] = {
   }
 };
 
+Blockly.Blocks['json_indexmenu'] = {
+  /**
+   * JSON index menu
+   * @this Blockly.Block
+   */
+  init: function() {
+    this.jsonInit({
+      "message0": "%1",
+      "args0": [
+        {
+          "type": "field_numberdropdown",
+          "name": "INDEX",
+          "value": "0",
+          "min": 0,
+          "precision": 1,
+          "options": [
+            ["0", "0"],
+            [Blockly.Msg.DATA_INDEX_LAST, "last"],
+            [Blockly.Msg.DATA_INDEX_RANDOM, "random"]
+          ]
+        }
+      ],
+      "category": Blockly.Categories.json,
+      "extensions": ["colours_textfield", "output_string"]
+    });
+  }
+};
+
 Blockly.Blocks['json_value_of_index'] = {
   /**
    * Fetches the value of the given index

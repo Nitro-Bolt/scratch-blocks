@@ -87,7 +87,7 @@ Blockly.scratchBlocksUtils.isShadowArgumentReporter = function(block) {
       block.type == 'argument_reporter_object' ||
       block.type == 'argument_reporter_array' ||
       block.type == 'argument_reporter_string_number'
-    ));
+  ));
 };
 
 /**

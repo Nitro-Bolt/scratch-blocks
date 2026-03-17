@@ -264,7 +264,7 @@ Blockly.FieldTextInput.prototype.showEditor_ = function(
     var dropDownArrow =
         goog.dom.createDom(goog.dom.TagName.IMG, 'blocklyTextDropDownArrow');
     dropDownArrow.setAttribute('src',
-      Blockly.mainWorkspace.options.pathToMedia +
+        Blockly.mainWorkspace.options.pathToMedia +
       Blockly.FieldTextInput.getTextMenuArrowAsset());
     dropDownArrow.style.width = this.arrowSize_ + 'px';
     dropDownArrow.style.height = this.arrowSize_ + 'px';

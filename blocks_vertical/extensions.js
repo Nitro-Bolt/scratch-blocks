@@ -110,7 +110,7 @@ Blockly.Blocks['extension_checkbox_test_legacy_json2'] = {
 };
 
 Blockly.Blocks['extension_input'] = {
-  init: function () {
+  init: function() {
     this.jsonInit({
       "message0": 'input %1',
       "args0": [
@@ -126,7 +126,7 @@ Blockly.Blocks['extension_input'] = {
 };
 
 Blockly.Blocks['extension_blockduplicateondrag'] = {
-  init: function () {
+  init: function() {
     this.jsonInit({
       "message0": 'duplicate on drag',
       "duplicateOnDrag": true,

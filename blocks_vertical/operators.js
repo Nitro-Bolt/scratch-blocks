@@ -507,7 +507,7 @@ Blockly.Blocks['operator_typeof'] = {
    * Get the specific type of a value.
    * @this Blockly.Block
    */
-  init: function () {
+  init: function() {
     this.jsonInit({
       message0: Blockly.Msg.OPERATORS_TYPEOF,
       args0: [

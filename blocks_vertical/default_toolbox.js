@@ -596,7 +596,7 @@ Blockly.Blocks.defaultToolbox = '<xml id="toolbox-categories" style="display: no
     '</block>' +
     '<block type="json_value_of_index" id="json_value_of_index">' +
       '<value name="INDEX">' +
-        '<shadow type="math_number">' +
+        '<shadow type="json_indexmenu">' +
           '<field name="NUM">0</field>' +
         '</shadow>' +
       '</value>' +
@@ -619,8 +619,8 @@ Blockly.Blocks.defaultToolbox = '<xml id="toolbox-categories" style="display: no
     '</block>' +
     '<block type="json_replace_index" id="json_replace_index">' +
       '<value name="INDEX">' +
-        '<shadow type="math_number">' +
-          '<field name="NUM">1</field>' +
+        '<shadow type="json_indexmenu">' +
+          '<field name="NUM">0</field>' +
         '</shadow>' +
       '</value>' +
       '<value name="ITEM">' +
@@ -631,7 +631,7 @@ Blockly.Blocks.defaultToolbox = '<xml id="toolbox-categories" style="display: no
     '</block>' +
     '<block type="json_delete_index" id="json_delete_index">' +
       '<value name="INDEX">' +
-        '<shadow type="math_number">' +
+        '<shadow type="json_indexmenu">' +
           '<field name="NUM">0</field>' +
         '</shadow>' +
       '</value>' +
@@ -644,6 +644,16 @@ Blockly.Blocks.defaultToolbox = '<xml id="toolbox-categories" style="display: no
       '</value>' +
     '</block>' +
     '<block type="json_slice_array" id="json_slice_array">' +
+      '<value name="START">' +
+        '<shadow type="json_indexmenu">' +
+          '<field name="NUM">1</field>' +
+        '</shadow>' +
+      '</value>' +
+      '<value name="END">' +
+        '<shadow type="json_indexmenu">' +
+          '<field name="NUM">2</field>' +
+        '</shadow>' +
+      '</value>' +
     '</block>' +
     '<block type="json_merge_array" id="json_merge_array">' +
     '</block>' +
