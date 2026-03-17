@@ -142,8 +142,8 @@ Blockly.Block = function(workspace, prototypeName, opt_id) {
    */
   this.outputShape_ = null;
 
-   /**
-   * @type {boolean} 
+  /**
+   * @type {boolean}
    * @private
    */
   this.duplicateOnDrag_ = false;
