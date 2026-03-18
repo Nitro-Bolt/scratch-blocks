@@ -46,6 +46,38 @@ goog.require('Blockly.Workspace');
 Blockly.Procedures.NAME_TYPE = Blockly.PROCEDURE_CATEGORY_NAME;
 
 /**
+ * External provider for procedure blocks across targets.
+ * This should be overridden by integration code (e.g. GUI/VM glue) when
+ * cross-target global procedure data is available.
+ * @param {!Blockly.Workspace} _workspace Active workspace.
+ * @return {!Array<!object>} Procedure block-like records.
+ * @private
+ */
+Blockly.Procedures.getProcedureBlocksAcrossTargetsCallback_ = function(_workspace) {
+  return [];
+};
+
+/**
+ * Set external provider used for cross-target procedure block access.
+ * @param {function(!Blockly.Workspace):!Array<!object>} callback Provider callback.
+ * @package
+ */
+Blockly.Procedures.setProcedureBlocksAcrossTargetsCallback = function(callback) {
+  Blockly.Procedures.getProcedureBlocksAcrossTargetsCallback_ = callback;
+};
+
+/**
+ * Get procedure blocks across targets through the external provider.
+ * @param {!Blockly.Workspace} workspace Active workspace.
+ * @return {!Array<!object>} Procedure block-like records.
+ * @private
+ */
+Blockly.Procedures.getProcedureBlocksAcrossTargets_ = function(workspace) {
+  var result = Blockly.Procedures.getProcedureBlocksAcrossTargetsCallback_(workspace);
+  return Array.isArray(result) ? result : [];
+};
+
+/**
  * Find all user-created procedure definitions in a workspace.
  * @param {!Blockly.Workspace} root Root workspace.
  * @return {!Array.<!Array.<!Array>>} Pair of arrays, the
@@ -101,63 +133,48 @@ Blockly.Procedures.allProcedureMutations = function(root) {
  * @package
  */
 Blockly.Procedures.allGlobalProcedureMutations = function(root) {
-  var vm = root && (root.vm || (root.options && root.options.vm) ||
-      (root.targetWorkspace && root.targetWorkspace.vm));
-  if (!vm || !vm.runtime || !vm.runtime.targets) {
-    return [];
-  }
-
   var mutations = [];
-  for (var i = 0; i < vm.runtime.targets.length; i++) {
-    var target = vm.runtime.targets[i];
-    var targetBlocks = target && target.blocks && target.blocks._blocks;
-    if (!targetBlocks) {
+  var procedureBlocks = Blockly.Procedures.getProcedureBlocksAcrossTargets_(root);
+  for (var i = 0; i < procedureBlocks.length; i++) {
+    var block = procedureBlocks[i];
+    if (!block || block.opcode !== 'procedures_prototype' || !block.mutation) {
       continue;
     }
-    for (var blockId in targetBlocks) {
-      if (!Object.prototype.hasOwnProperty.call(targetBlocks, blockId)) {
-        continue;
-      }
-      var block = targetBlocks[blockId];
-      if (!block || block.opcode !== 'procedures_prototype' || !block.mutation) {
-        continue;
-      }
-      var globalFlag = block.mutation.global;
-      var isGlobal = globalFlag === true || globalFlag === 'true';
-      if (!isGlobal) {
-        continue;
-      }
-
-      var mutation = goog.dom.createDom('mutation');
-      var rawMutation = block.mutation;
-
-      // Caller blocks expect these fields to be present and JSON-encoded.
-      var encodeJson = function(value, fallback) {
-        if (value === null || typeof value === 'undefined') {
-          return JSON.stringify(fallback);
-        }
-        if (typeof value === 'string') {
-          return value;
-        }
-        return JSON.stringify(value);
-      };
-
-      mutation.setAttribute('generateshadows', 'true');
-      mutation.setAttribute('proccode', String(rawMutation.proccode || ''));
-      mutation.setAttribute('argumentids', encodeJson(rawMutation.argumentids, []));
-      mutation.setAttribute('argumentnames', encodeJson(rawMutation.argumentnames, []));
-      mutation.setAttribute('argumentdefaults', encodeJson(rawMutation.argumentdefaults, []));
-      mutation.setAttribute('warp', encodeJson(rawMutation.warp, false));
-      mutation.setAttribute('global', encodeJson(rawMutation.global, true));
-
-      if (rawMutation.colour !== null && typeof rawMutation.colour !== 'undefined') {
-        mutation.setAttribute('colour', String(rawMutation.colour));
-      }
-      if (rawMutation.return !== null && typeof rawMutation.return !== 'undefined') {
-        mutation.setAttribute('return', String(rawMutation.return));
-      }
-      mutations.push(mutation);
+    var globalFlag = block.mutation.global;
+    var isGlobal = globalFlag === true || globalFlag === 'true';
+    if (!isGlobal) {
+      continue;
     }
+
+    var mutation = goog.dom.createDom('mutation');
+    var rawMutation = block.mutation;
+
+    // Caller blocks expect these fields to be present and JSON-encoded.
+    var encodeJson = function(value, fallback) {
+      if (value === null || typeof value === 'undefined') {
+        return JSON.stringify(fallback);
+      }
+      if (typeof value === 'string') {
+        return value;
+      }
+      return JSON.stringify(value);
+    };
+
+    mutation.setAttribute('generateshadows', 'true');
+    mutation.setAttribute('proccode', String(rawMutation.proccode || ''));
+    mutation.setAttribute('argumentids', encodeJson(rawMutation.argumentids, []));
+    mutation.setAttribute('argumentnames', encodeJson(rawMutation.argumentnames, []));
+    mutation.setAttribute('argumentdefaults', encodeJson(rawMutation.argumentdefaults, []));
+    mutation.setAttribute('warp', encodeJson(rawMutation.warp, false));
+    mutation.setAttribute('global', encodeJson(rawMutation.global, true));
+
+    if (rawMutation.colour !== null && typeof rawMutation.colour !== 'undefined') {
+      mutation.setAttribute('colour', String(rawMutation.colour));
+    }
+    if (rawMutation.return !== null && typeof rawMutation.return !== 'undefined') {
+      mutation.setAttribute('return', String(rawMutation.return));
+    }
+    mutations.push(mutation);
   }
   return mutations;
 };
@@ -303,9 +320,8 @@ Blockly.Procedures.syncGlobalProcedureMutationsAcrossTargets_ = function(
     return;
   }
 
-  var vm = workspace && (workspace.vm || (workspace.options && workspace.options.vm) ||
-      (workspace.targetWorkspace && workspace.targetWorkspace.vm));
-  if (!vm || !vm.runtime || !vm.runtime.targets) {
+  var procedureBlocks = Blockly.Procedures.getProcedureBlocksAcrossTargets_(workspace);
+  if (!procedureBlocks.length) {
     return;
   }
 
@@ -321,74 +337,63 @@ Blockly.Procedures.syncGlobalProcedureMutationsAcrossTargets_ = function(
     'return'
   ];
 
-  for (var t = 0; t < vm.runtime.targets.length; t++) {
-    var target = vm.runtime.targets[t];
-    var targetBlocks = target && target.blocks && target.blocks._blocks;
-    if (!targetBlocks) {
+  for (var b = 0; b < procedureBlocks.length; b++) {
+    var targetBlock = procedureBlocks[b];
+    if (!targetBlock || !targetBlock.mutation) {
+      continue;
+    }
+    if (targetBlock.opcode !== 'procedures_prototype' &&
+        targetBlock.opcode !== Blockly.PROCEDURES_CALL_BLOCK_TYPE) {
       continue;
     }
 
-    for (var blockId in targetBlocks) {
-      if (!Object.prototype.hasOwnProperty.call(targetBlocks, blockId)) {
-        continue;
-      }
-      var targetBlock = targetBlocks[blockId];
-      if (!targetBlock || !targetBlock.mutation) {
-        continue;
-      }
-      if (targetBlock.opcode !== 'procedures_prototype' &&
-          targetBlock.opcode !== Blockly.PROCEDURES_CALL_BLOCK_TYPE) {
-        continue;
-      }
+    var procCode = targetBlock.mutation.proccode;
+    if (procCode !== oldProcCode && procCode !== newProcCode) {
+      continue;
+    }
 
-      var procCode = targetBlock.mutation.proccode;
-      if (procCode !== oldProcCode && procCode !== newProcCode) {
-        continue;
-      }
+    var globalFlag = targetBlock.mutation.global;
+    var isGlobal = globalFlag === true || globalFlag === 'true';
+    if (!isGlobal && !wasGlobal) {
+      continue;
+    }
 
-      var globalFlag = targetBlock.mutation.global;
-      var isGlobal = globalFlag === true || globalFlag === 'true';
-      if (!isGlobal && !wasGlobal) {
-        continue;
-      }
-
-      for (var i = 0; i < attributesToSync.length; i++) {
-        var attr = attributesToSync[i];
-        if (attr === 'return' && targetBlock.opcode === Blockly.PROCEDURES_CALL_BLOCK_TYPE) {
-          // Match workspace behavior: avoid forcing return-shape changes on
-          // embedded calls to prevent breaking input connections.
-          var isTopLevelStandalone = !!targetBlock.topLevel && !targetBlock.next;
-          if (!isTopLevelStandalone) {
-            continue;
-          }
-        }
-        if (mutation.hasAttribute(attr)) {
-          targetBlock.mutation[attr] = mutation.getAttribute(attr);
+    for (var i = 0; i < attributesToSync.length; i++) {
+      var attr = attributesToSync[i];
+      if (attr === 'return' && targetBlock.opcode === Blockly.PROCEDURES_CALL_BLOCK_TYPE) {
+        // Match workspace behavior: avoid forcing return-shape changes on
+        // embedded calls to prevent breaking input connections.
+        var isTopLevelStandalone = !!targetBlock.topLevel && !targetBlock.next;
+        if (!isTopLevelStandalone) {
+          continue;
         }
       }
+      if (mutation.hasAttribute(attr)) {
+        targetBlock.mutation[attr] = mutation.getAttribute(attr);
+      }
+    }
 
-      // Keep serialized call inputs aligned with argument IDs after
-      // add/remove argument edits.
-      if (targetBlock.opcode === Blockly.PROCEDURES_CALL_BLOCK_TYPE && targetBlock.inputs) {
-        var argumentIdsRaw = targetBlock.mutation.argumentids;
-        var argumentIds = [];
-        if (typeof argumentIdsRaw === 'string') {
-          try {
-            argumentIds = JSON.parse(argumentIdsRaw);
-          } catch (e) {
-            argumentIds = [];
-          }
-        } else if (Array.isArray(argumentIdsRaw)) {
-          argumentIds = argumentIdsRaw;
+    // Keep serialized call inputs aligned with argument IDs after
+    // add/remove argument edits.
+    if (targetBlock.opcode === Blockly.PROCEDURES_CALL_BLOCK_TYPE && targetBlock.inputs) {
+      var argumentIdsRaw = targetBlock.mutation.argumentids;
+      var argumentIds = [];
+      if (typeof argumentIdsRaw === 'string') {
+        try {
+          argumentIds = JSON.parse(argumentIdsRaw);
+        } catch (e) {
+          argumentIds = [];
         }
+      } else if (Array.isArray(argumentIdsRaw)) {
+        argumentIds = argumentIdsRaw;
+      }
 
-        for (var inputName in targetBlock.inputs) {
-          if (!Object.prototype.hasOwnProperty.call(targetBlock.inputs, inputName)) {
-            continue;
-          }
-          if (argumentIds.indexOf(inputName) === -1) {
-            delete targetBlock.inputs[inputName];
-          }
+      for (var inputName in targetBlock.inputs) {
+        if (!Object.prototype.hasOwnProperty.call(targetBlock.inputs, inputName)) {
+          continue;
+        }
+        if (argumentIds.indexOf(inputName) === -1) {
+          delete targetBlock.inputs[inputName];
         }
       }
     }
@@ -400,11 +405,14 @@ Blockly.Procedures.syncGlobalProcedureMutationsAcrossTargets_ = function(
  * @param {string} procCode The procedure signature to check.
  * @param {!Blockly.Workspace} workspace The workspace to scan for collisions.
  * @param {Blockly.Block=} opt_excludeDefinition Optional definition block to exclude.
+ * @param {boolean=} opt_includeLocalAcrossTargets Whether to include local procedures across targets.
+ * @param {string=} opt_excludeGlobalProcCode Optional global proccode to exclude from duplicate check.
  * @return {boolean} True if an existing definition already uses this signature.
  * @package
  */
 Blockly.Procedures.isProcCodeDefined = function(
-    procCode, workspace, opt_excludeDefinition, opt_includeLocalAcrossTargets) {
+    procCode, workspace, opt_excludeDefinition, opt_includeLocalAcrossTargets,
+    opt_excludeGlobalProcCode) {
   if (!procCode) {
     return false;
   }
@@ -412,9 +420,6 @@ Blockly.Procedures.isProcCodeDefined = function(
   var isSameProcCode = function(candidateProcCode) {
     return Blockly.Names.equals(candidateProcCode, procCode);
   };
-  var vm = workspace && (workspace.vm || (workspace.options && workspace.options.vm) ||
-      (workspace.targetWorkspace && workspace.targetWorkspace.vm));
-  var editingTarget = vm && vm.editingTarget;
   var excludePrototypeId = Blockly.Procedures.getProcedurePrototypeId_(opt_excludeDefinition);
 
   var blocks = workspace.getTopBlocks(false);
@@ -433,68 +438,52 @@ Blockly.Procedures.isProcCodeDefined = function(
   }
 
   if (opt_includeLocalAcrossTargets) {
-    if (vm && vm.runtime && vm.runtime.targets) {
-      for (var t = 0; t < vm.runtime.targets.length; t++) {
-        var target = vm.runtime.targets[t];
-        var targetBlocks = target && target.blocks && target.blocks._blocks;
-        if (!targetBlocks) {
-          continue;
-        }
-        for (var blockId in targetBlocks) {
-          if (!Object.prototype.hasOwnProperty.call(targetBlocks, blockId)) {
-            continue;
-          }
-          if (editingTarget && target.id === editingTarget.id &&
-              excludePrototypeId && blockId === excludePrototypeId) {
-            continue;
-          }
-          var targetBlock = targetBlocks[blockId];
-          if (!targetBlock || targetBlock.opcode !== 'procedures_prototype' || !targetBlock.mutation) {
-            continue;
-          }
-          if (isSameProcCode(targetBlock.mutation.proccode)) {
-            return true;
-          }
-        }
+    var allTargetBlocks = Blockly.Procedures.getProcedureBlocksAcrossTargets_(workspace);
+    for (var t = 0; t < allTargetBlocks.length; t++) {
+      var targetBlock = allTargetBlocks[t];
+      if (!targetBlock || targetBlock.opcode !== 'procedures_prototype' || !targetBlock.mutation) {
+        continue;
+      }
+      if (excludePrototypeId && targetBlock.id === excludePrototypeId) {
+        continue;
+      }
+      if (isSameProcCode(targetBlock.mutation.proccode)) {
+        return true;
       }
     }
   } else {
-    if (vm && vm.runtime && vm.runtime.targets) {
-      for (var j = 0; j < vm.runtime.targets.length; j++) {
-        var globalTarget = vm.runtime.targets[j];
-        var globalTargetBlocks = globalTarget && globalTarget.blocks && globalTarget.blocks._blocks;
-        if (!globalTargetBlocks) {
-          continue;
-        }
-        for (var globalBlockId in globalTargetBlocks) {
-          if (!Object.prototype.hasOwnProperty.call(globalTargetBlocks, globalBlockId)) {
-            continue;
-          }
-          if (editingTarget && globalTarget.id === editingTarget.id &&
-              excludePrototypeId && globalBlockId === excludePrototypeId) {
-            continue;
-          }
-          var globalTargetBlock = globalTargetBlocks[globalBlockId];
-          if (!globalTargetBlock || globalTargetBlock.opcode !== 'procedures_prototype' || !globalTargetBlock.mutation) {
-            continue;
-          }
-          var globalFlag = globalTargetBlock.mutation.global;
-          var isGlobal = globalFlag === true || globalFlag === 'true';
-          if (!isGlobal) {
-            continue;
-          }
-          if (isSameProcCode(globalTargetBlock.mutation.proccode)) {
-            return true;
-          }
-        }
+    var globalTargetBlocks = Blockly.Procedures.getProcedureBlocksAcrossTargets_(workspace);
+    for (var j = 0; j < globalTargetBlocks.length; j++) {
+      var globalTargetBlock = globalTargetBlocks[j];
+      if (!globalTargetBlock || globalTargetBlock.opcode !== 'procedures_prototype' || !globalTargetBlock.mutation) {
+        continue;
       }
-    } else {
-      var globalMutations = Blockly.Procedures.allGlobalProcedureMutations(workspace);
-      for (var k = 0; k < globalMutations.length; k++) {
-        var globalProcCode = globalMutations[k].getAttribute('proccode');
-        if (isSameProcCode(globalProcCode)) {
-          return true;
-        }
+      if (excludePrototypeId && globalTargetBlock.id === excludePrototypeId) {
+        continue;
+      }
+      var globalFlag = globalTargetBlock.mutation.global;
+      var isGlobal = globalFlag === true || globalFlag === 'true';
+      if (!isGlobal) {
+        continue;
+      }
+      if (opt_excludeGlobalProcCode &&
+          Blockly.Names.equals(globalTargetBlock.mutation.proccode, opt_excludeGlobalProcCode)) {
+        continue;
+      }
+      if (isSameProcCode(globalTargetBlock.mutation.proccode)) {
+        return true;
+      }
+    }
+
+    var globalMutations = Blockly.Procedures.allGlobalProcedureMutations(workspace);
+    for (var k = 0; k < globalMutations.length; k++) {
+      var globalProcCode = globalMutations[k].getAttribute('proccode');
+      if (opt_excludeGlobalProcCode &&
+          Blockly.Names.equals(globalProcCode, opt_excludeGlobalProcCode)) {
+        continue;
+      }
+      if (isSameProcCode(globalProcCode)) {
+        return true;
       }
     }
   }
@@ -891,7 +880,13 @@ Blockly.Procedures.editProcedureCallbackFactory_ = function(block) {
       var willBeGlobal = Blockly.Procedures.isGlobalProcedureMutation_(mutation);
       var signatureOrScopeChanged = !Blockly.Names.equals(newProcCode, oldProcCode) || (wasGlobal !== willBeGlobal);
       if (signatureOrScopeChanged) {
-        if (Blockly.Procedures.isProcCodeDefined(newProcCode, block.workspace, currentDefinition, willBeGlobal)) {
+        var excludeGlobalProcCode = wasGlobal && !willBeGlobal ? oldProcCode : null;
+        if (Blockly.Procedures.isProcCodeDefined(
+            newProcCode,
+            block.workspace,
+            currentDefinition,
+            willBeGlobal,
+            excludeGlobalProcCode)) {
           alert(Blockly.Msg.PROCEDURE_ALREADY_EXISTS.replace('%1', newProcCode));
           return;
         }
