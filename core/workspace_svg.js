@@ -756,6 +756,76 @@ Blockly.WorkspaceSvg.prototype.processProcedureReturnsChanged_ = function() {
       Blockly.Procedures.changeReturnType(block, actualReturnType);
     }
   }
+
+  // Keep prototype mutation return attributes synchronized so global
+  // procedure flyouts in other targets can pick up the latest shape.
+  for (var procCode in finalTypes) {
+    if (!Object.prototype.hasOwnProperty.call(finalTypes, procCode)) continue;
+
+    var prototype = Blockly.Procedures.getPrototypeBlock(procCode, this);
+    if (!prototype || prototype.isInsertionMarker()) continue;
+
+    var oldMutationDom = prototype.mutationToDom();
+    if (!oldMutationDom) continue;
+    var oldMutation = Blockly.Xml.domToText(oldMutationDom);
+
+    var newMutationDom = oldMutationDom.cloneNode(false);
+    newMutationDom.setAttribute('return', finalTypes[procCode]);
+    var newMutation = Blockly.Xml.domToText(newMutationDom);
+
+    if (oldMutation !== newMutation) {
+      prototype.domToMutation(newMutationDom);
+      Blockly.Events.fire(new Blockly.Events.BlockChange(
+          prototype, 'mutation', null, oldMutation, newMutation));
+    }
+  }
+
+  // Also update stored call-block mutations in all targets so switching sprites
+  // shows the latest shape for global procedure calls already in use.
+  var vm = this.vm || (this.options && this.options.vm) ||
+      (this.targetWorkspace && this.targetWorkspace.vm);
+  if (vm && vm.runtime && vm.runtime.targets) {
+    for (var procCode in finalTypes) {
+      if (!Object.prototype.hasOwnProperty.call(finalTypes, procCode)) continue;
+      if (
+        !Object.prototype.hasOwnProperty.call(initialTypes, procCode) ||
+        initialTypes[procCode] === finalTypes[procCode]
+      ) {
+        continue;
+      }
+
+      var returnType = String(finalTypes[procCode]);
+      for (var t = 0; t < vm.runtime.targets.length; t++) {
+        var target = vm.runtime.targets[t];
+        var targetBlocks = target && target.blocks && target.blocks._blocks;
+        if (!targetBlocks) continue;
+
+        for (var blockId in targetBlocks) {
+          if (!Object.prototype.hasOwnProperty.call(targetBlocks, blockId)) continue;
+
+          var targetBlock = targetBlocks[blockId];
+          if (
+            !targetBlock ||
+            targetBlock.opcode !== Blockly.PROCEDURES_CALL_BLOCK_TYPE ||
+            !targetBlock.mutation ||
+            targetBlock.mutation.proccode !== procCode
+          ) {
+            continue;
+          }
+
+          var globalFlag = targetBlock.mutation.global;
+          var isGlobal = globalFlag === true || globalFlag === 'true';
+          if (!isGlobal) continue;
+
+          var isTopLevelStandalone = !!targetBlock.topLevel && !targetBlock.next;
+          if (!isTopLevelStandalone) continue;
+
+          targetBlock.mutation.return = returnType;
+        }
+      }
+    }
+  }
+
   Blockly.Events.setGroup(false);
 
   // Toolbox refresh can be slow, so only do when needed.

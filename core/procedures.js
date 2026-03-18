@@ -287,6 +287,115 @@ Blockly.Procedures.getProcedurePrototypeId_ = function(definition) {
 };
 
 /**
+ * Sync a global procedure mutation edit across all runtime targets.
+ * This updates serialized procedure prototype/call mutations so switching
+ * between sprites reflects edits like added/removed inputs immediately.
+ * @param {!Blockly.Workspace} workspace Active workspace.
+ * @param {string} oldProcCode Procedure code before edit.
+ * @param {!Element} mutation New prototype mutation xml.
+ * @param {boolean} wasGlobal Whether procedure was global before edit.
+ * @param {boolean} willBeGlobal Whether procedure is global after edit.
+ * @private
+ */
+Blockly.Procedures.syncGlobalProcedureMutationsAcrossTargets_ = function(
+    workspace, oldProcCode, mutation, wasGlobal, willBeGlobal) {
+  if (!workspace || (!wasGlobal && !willBeGlobal)) {
+    return;
+  }
+
+  var vm = workspace && (workspace.vm || (workspace.options && workspace.options.vm) ||
+      (workspace.targetWorkspace && workspace.targetWorkspace.vm));
+  if (!vm || !vm.runtime || !vm.runtime.targets) {
+    return;
+  }
+
+  var newProcCode = mutation.getAttribute('proccode');
+  var attributesToSync = [
+    'proccode',
+    'argumentids',
+    'argumentnames',
+    'argumentdefaults',
+    'warp',
+    'global',
+    'colour',
+    'return'
+  ];
+
+  for (var t = 0; t < vm.runtime.targets.length; t++) {
+    var target = vm.runtime.targets[t];
+    var targetBlocks = target && target.blocks && target.blocks._blocks;
+    if (!targetBlocks) {
+      continue;
+    }
+
+    for (var blockId in targetBlocks) {
+      if (!Object.prototype.hasOwnProperty.call(targetBlocks, blockId)) {
+        continue;
+      }
+      var targetBlock = targetBlocks[blockId];
+      if (!targetBlock || !targetBlock.mutation) {
+        continue;
+      }
+      if (targetBlock.opcode !== 'procedures_prototype' &&
+          targetBlock.opcode !== Blockly.PROCEDURES_CALL_BLOCK_TYPE) {
+        continue;
+      }
+
+      var procCode = targetBlock.mutation.proccode;
+      if (procCode !== oldProcCode && procCode !== newProcCode) {
+        continue;
+      }
+
+      var globalFlag = targetBlock.mutation.global;
+      var isGlobal = globalFlag === true || globalFlag === 'true';
+      if (!isGlobal && !wasGlobal) {
+        continue;
+      }
+
+      for (var i = 0; i < attributesToSync.length; i++) {
+        var attr = attributesToSync[i];
+        if (attr === 'return' && targetBlock.opcode === Blockly.PROCEDURES_CALL_BLOCK_TYPE) {
+          // Match workspace behavior: avoid forcing return-shape changes on
+          // embedded calls to prevent breaking input connections.
+          var isTopLevelStandalone = !!targetBlock.topLevel && !targetBlock.next;
+          if (!isTopLevelStandalone) {
+            continue;
+          }
+        }
+        if (mutation.hasAttribute(attr)) {
+          targetBlock.mutation[attr] = mutation.getAttribute(attr);
+        }
+      }
+
+      // Keep serialized call inputs aligned with argument IDs after
+      // add/remove argument edits.
+      if (targetBlock.opcode === Blockly.PROCEDURES_CALL_BLOCK_TYPE && targetBlock.inputs) {
+        var argumentIdsRaw = targetBlock.mutation.argumentids;
+        var argumentIds = [];
+        if (typeof argumentIdsRaw === 'string') {
+          try {
+            argumentIds = JSON.parse(argumentIdsRaw);
+          } catch (e) {
+            argumentIds = [];
+          }
+        } else if (Array.isArray(argumentIdsRaw)) {
+          argumentIds = argumentIdsRaw;
+        }
+
+        for (var inputName in targetBlock.inputs) {
+          if (!Object.prototype.hasOwnProperty.call(targetBlock.inputs, inputName)) {
+            continue;
+          }
+          if (argumentIds.indexOf(inputName) === -1) {
+            delete targetBlock.inputs[inputName];
+          }
+        }
+      }
+    }
+  }
+};
+
+/**
  * Return whether a procedure signature is already defined on this workspace.
  * @param {string} procCode The procedure signature to check.
  * @param {!Blockly.Workspace} workspace The workspace to scan for collisions.
@@ -791,6 +900,9 @@ Blockly.Procedures.editProcedureCallbackFactory_ = function(block) {
       Blockly.Procedures.mutateCallersAndPrototype(oldProcCode,
           block.workspace, mutation);
 
+      Blockly.Procedures.syncGlobalProcedureMutationsAcrossTargets_(
+          block.workspace, oldProcCode, mutation, wasGlobal, willBeGlobal);
+
       if (block.workspace.refreshToolboxSelection_) {
         block.workspace.refreshToolboxSelection_();
       }
@@ -968,10 +1080,21 @@ Blockly.Procedures.ENFORCE_TYPES = false;
  */
 Blockly.Procedures.getProcedureReturnType = function(procCode, workspace) {
   var defineBlock = Blockly.Procedures.getDefineBlock(procCode, workspace);
-  if (!defineBlock) {
-    return Blockly.PROCEDURES_CALL_TYPE_STATEMENT;
+  if (defineBlock) {
+    return Blockly.Procedures.getBlockReturnType(defineBlock);
   }
-  return Blockly.Procedures.getBlockReturnType(defineBlock);
+
+  // Fallback for global procedures whose definition is owned by another target.
+  var globalMutations = Blockly.Procedures.allGlobalProcedureMutations(workspace);
+  for (var i = 0; i < globalMutations.length; i++) {
+    var mutation = globalMutations[i];
+    if (!mutation || mutation.getAttribute('proccode') !== procCode) {
+      continue;
+    }
+    return Blockly.ScratchBlocks.ProcedureUtils.parseReturnMutation(mutation);
+  }
+
+  return Blockly.PROCEDURES_CALL_TYPE_STATEMENT;
 };
 
 /**
