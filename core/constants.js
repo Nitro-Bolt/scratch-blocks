@@ -277,8 +277,7 @@ Blockly.Categories = {
   "control": "control",
   "sensing": "sensing",
   "operators": "operators",
-  "more": "more",
-  "comments": "comments"
+  "more": "more"
 };
 
 /**
