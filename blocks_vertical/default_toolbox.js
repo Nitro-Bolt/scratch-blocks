@@ -679,62 +679,6 @@ Blockly.Blocks.defaultToolbox = '<xml id="toolbox-categories" style="display: no
   '</category>' +
   '<category name="%{BKY_CATEGORY_MYBLOCKS}" id="more" colour="#FF6680" secondaryColour="#FF4D6A" custom="PROCEDURE">' +
   '</category>' +
-  '<category name="%{BKY_CATEGORY_COMMENTS}" id="comments" colour="#E4DB8C" secondaryColour="#C6BE79">' +
-    '<block type="comments_hat" id="comments_hat">' +
-      '<value name="COMMENT">' +
-        '<shadow type="text">' +
-          '<field name="TEXT"></field>' +
-        '</shadow>' +
-      '</value>' +
-    '</block>' +
-    '<block type="comments_command" id="comments_command">' +
-      '<value name="COMMENT">' +
-        '<shadow type="text">' +
-          '<field name="TEXT"></field>' +
-        '</shadow>' +
-      '</value>' +
-    '</block>' +
-    '<block type="comments_loop" id="comments_loop">' +
-      '<value name="COMMENT">' +
-        '<shadow type="text">' +
-          '<field name="TEXT"></field>' +
-        '</shadow>' +
-      '</value>' +
-    '</block>' +
-    '<block type="comments_reporter" id="comments_reporter">' +
-      '<value name="VALUE">' +
-        '<shadow type="text">' +
-          '<field name="TEXT"></field>' +
-        '</shadow>' +
-      '</value>' +
-      '<value name="COMMENT">' +
-        '<shadow type="text">' +
-          '<field name="TEXT"></field>' +
-        '</shadow>' +
-      '</value>' +
-    '</block>' +
-    '<block type="comments_boolean" id="comments_boolean">' +
-      '<value name="COMMENT">' +
-        '<shadow type="text">' +
-          '<field name="TEXT"></field>' +
-        '</shadow>' +
-      '</value>' +
-    '</block>' +
-    '<block type="comments_object" id="comments_object">' +
-      '<value name="COMMENT">' +
-        '<shadow type="text">' +
-          '<field name="TEXT"></field>' +
-        '</shadow>' +
-      '</value>' +
-    '</block>' +
-    '<block type="comments_array" id="comments_array">' +
-      '<value name="COMMENT">' +
-        '<shadow type="text">' +
-          '<field name="TEXT"></field>' +
-        '</shadow>' +
-      '</value>' +
-    '</block>' +
-  '</category>' +
   '<category name="Extensions" id="extensions" colour="#FF6680" secondaryColour="#FF4D6A" ' +
     'iconURI="../media/extensions/wedo2-block-icon.svg" showStatusButton="true">' +
     /* checkbox testing */
