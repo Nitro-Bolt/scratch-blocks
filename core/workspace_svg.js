@@ -782,8 +782,9 @@ Blockly.WorkspaceSvg.prototype.processProcedureReturnsChanged_ = function() {
 
   // Also update stored call-block mutations in all targets so switching sprites
   // shows the latest shape for global procedure calls already in use.
-  var procedureBlocks = Blockly.Procedures.getProcedureBlocksAcrossTargets_(this);
-  if (procedureBlocks.length) {
+  var vm = this.vm || (this.options && this.options.vm) ||
+      (this.targetWorkspace && this.targetWorkspace.vm);
+  if (vm && vm.runtime && vm.runtime.targets) {
     for (var procCode in finalTypes) {
       if (!Object.prototype.hasOwnProperty.call(finalTypes, procCode)) continue;
       if (
@@ -794,25 +795,33 @@ Blockly.WorkspaceSvg.prototype.processProcedureReturnsChanged_ = function() {
       }
 
       var returnType = String(finalTypes[procCode]);
-      for (var b = 0; b < procedureBlocks.length; b++) {
-        var targetBlock = procedureBlocks[b];
-        if (
-          !targetBlock ||
-          targetBlock.opcode !== Blockly.PROCEDURES_CALL_BLOCK_TYPE ||
-          !targetBlock.mutation ||
-          targetBlock.mutation.proccode !== procCode
-        ) {
-          continue;
+      for (var t = 0; t < vm.runtime.targets.length; t++) {
+        var target = vm.runtime.targets[t];
+        var targetBlocks = target && target.blocks && target.blocks._blocks;
+        if (!targetBlocks) continue;
+
+        for (var blockId in targetBlocks) {
+          if (!Object.prototype.hasOwnProperty.call(targetBlocks, blockId)) continue;
+
+          var targetBlock = targetBlocks[blockId];
+          if (
+            !targetBlock ||
+            targetBlock.opcode !== Blockly.PROCEDURES_CALL_BLOCK_TYPE ||
+            !targetBlock.mutation ||
+            targetBlock.mutation.proccode !== procCode
+          ) {
+            continue;
+          }
+
+          var globalFlag = targetBlock.mutation.global;
+          var isGlobal = globalFlag === true || globalFlag === 'true';
+          if (!isGlobal) continue;
+
+          var isTopLevelStandalone = !!targetBlock.topLevel && !targetBlock.next;
+          if (!isTopLevelStandalone) continue;
+
+          targetBlock.mutation.return = returnType;
         }
-
-        var globalFlag = targetBlock.mutation.global;
-        var isGlobal = globalFlag === true || globalFlag === 'true';
-        if (!isGlobal) continue;
-
-        var isTopLevelStandalone = !!targetBlock.topLevel && !targetBlock.next;
-        if (!isTopLevelStandalone) continue;
-
-        targetBlock.mutation.return = returnType;
       }
     }
   }
