@@ -757,6 +757,30 @@ Blockly.Gesture.prototype.doInputClick_ = function() {
  * @private
  */
 Blockly.Gesture.prototype.doBlockClick_ = function() {
+  // For jumping to custom block definition if middle mouse button is used or if shift is held
+  // Below code is a slight modification of:
+  // https://github.com/TurboWarp/scratch-gui/blob/552dc5584164989d9752e847c23833bf057430f4/src/addons/addons/jump-to-def/userscript.js#L14
+  if (this.mostRecentEvent_.button === 1 || this.mostRecentEvent_.shiftKey) {
+    var block = this.startBlock_;
+    for (; block; block = block.getSurroundParent()) {
+      if (block.type !== "procedures_call") continue;
+
+      var findProcCode = block.getProcCode();
+      var topBlocks = this.startWorkspace_.getTopBlocks();
+      for(var i = 0; i < topBlocks.length; i++) {
+        var root = topBlocks[i];
+        if (root.type !== "procedures_definition") continue;
+
+        var label = root.getChildren()[0];
+        var procCode = label.getProcCode();
+        if (procCode && procCode === findProcCode) {
+          this.startWorkspace_.centerOnBlock(root.id);
+          return;
+        }
+      }
+    }
+  }
+
   // Block click in an autoclosing flyout.
   if (this.flyout_ && this.flyout_.autoClose) {
     if (!this.targetBlock_.disabled) {
