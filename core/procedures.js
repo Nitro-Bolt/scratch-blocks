@@ -548,8 +548,14 @@ Blockly.Procedures.externalProcedureDefCallback = function(/** mutator, callback
  * @package
  */
 Blockly.Procedures.makeEditOption = function(block) {
+  var canEdit = true;
+  if (block.type == Blockly.PROCEDURES_CALL_BLOCK_TYPE) {
+    var workspaceToSearch = block.workspace.isFlyout ?
+        block.workspace.targetWorkspace : block.workspace;
+    canEdit = !!Blockly.Procedures.getPrototypeBlock(block.getProcCode(), workspaceToSearch);
+  }
   var editOption = {
-    enabled: true,
+    enabled: canEdit,
     text: Blockly.Msg.EDIT_PROCEDURE,
     callback: function() {
       Blockly.Procedures.editProcedureCallback_(block);
