@@ -1092,6 +1092,25 @@ Blockly.WorkspaceSvg.prototype.reportValue = function(id, value, error = false) 
     valueReportBox.classList.add('errorReportBox');
   }
   valueReportBox.textContent = value;
+  // use to get focus and event priority
+  valueReportBox.setAttribute("tabindex", "0");
+  // if the user pressed Ctrl+C, prevent propagation to Blockly
+  valueReportBox.onkeydown = (event) => {
+    if ((event.altKey || event.ctrlKey || event.metaKey) && event.code === "KeyC") {
+      event.stopPropagation();
+    }
+  };
+
+  if (value.length !== 0) {
+    const copyButton = document.createElement("img");
+    copyButton.setAttribute("role", "button");
+    copyButton.setAttribute("tabindex", "0");
+    copyButton.setAttribute("alt", "Copy to clipboard");
+    copyButton.setAttribute("src", Blockly.mainWorkspace.options.pathToMedia + "icons/copy.svg");
+    copyButton.classList.add("copyReporterIcon");
+    copyButton.onclick = () => navigator.clipboard.writeText(value);
+    valueReportBox.appendChild(copyButton);
+  }
   contentDiv.appendChild(valueReportBox);
   Blockly.DropDownDiv.setColour(
       Blockly.Colours[!error ? 'valueReportBackground' : 'errorReportBackground'],
