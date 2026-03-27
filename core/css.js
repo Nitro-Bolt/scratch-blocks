@@ -360,6 +360,10 @@ Blockly.Css.CONTENT = [
     'font-size: .8em;',
   '}',
 
+  '.errorReportBox {',
+    'color: $colour_errorReportForeground;',
+  '}',
+
   '.blocklyResizeSE {',
     'cursor: se-resize;',
     'fill: #aaa;',
