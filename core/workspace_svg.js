@@ -1076,8 +1076,9 @@ Blockly.WorkspaceSvg.prototype.glowStack = function(id, isGlowingStack) {
  * In Scratch, appears as a pop-up next to the block when a reporter block is clicked.
  * @param {?string} id ID of block to report associated value.
  * @param {?string} value String value to visually report.
+ * @param {?boolean} error Is the thing being reported an error?
  */
-Blockly.WorkspaceSvg.prototype.reportValue = function(id, value) {
+Blockly.WorkspaceSvg.prototype.reportValue = function(id, value, error = false) {
   var block = this.getBlockById(id);
   if (!block) {
     throw 'Tried to report value on block that does not exist.';
@@ -1087,11 +1088,14 @@ Blockly.WorkspaceSvg.prototype.reportValue = function(id, value) {
   var contentDiv = Blockly.DropDownDiv.getContentDiv();
   var valueReportBox = goog.dom.createElement('div');
   valueReportBox.setAttribute('class', 'valueReportBox');
+  if (error) {
+    valueReportBox.classList.add('errorReportBox');
+  }
   valueReportBox.textContent = value;
   contentDiv.appendChild(valueReportBox);
   Blockly.DropDownDiv.setColour(
-      Blockly.Colours.valueReportBackground,
-      Blockly.Colours.valueReportBorder
+      Blockly.Colours[!error ? 'valueReportBackground' : 'errorReportBackground'],
+      Blockly.Colours[!error ? 'valueReportBorder' : 'errorReportBorder']
   );
   Blockly.DropDownDiv.showPositionedByBlock(this, block);
 };

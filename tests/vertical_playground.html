@@ -301,7 +301,8 @@
         if (Blockly.selected) {
           workspace.reportValue(
             Blockly.selected.id,
-            document.getElementById('reportValue').value
+            document.getElementById('reportValue').value,
+            document.getElementById('reportError').checked
           );
         }
       }
@@ -620,6 +621,9 @@
       Report:
       <input id="reportValue" type="text" value="123" />
       <input type="button" value="Report last clicked block" onclick="reportDemo()" />
+      <br/>
+      Report as error:
+      <input id="reportError" type="checkbox" />
     </p>
 
     <p>
