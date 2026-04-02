@@ -391,6 +391,7 @@ Blockly.Msg.RENAME_VARIABLE = 'Rename variable';
 Blockly.Msg.RENAME_VARIABLE_TITLE = 'Rename all "%1" variables to:';
 Blockly.Msg.RENAME_VARIABLE_MODAL_TITLE = 'Rename Variable';
 Blockly.Msg.NEW_VARIABLE = 'Make a Variable';
+Blockly.Msg.NEW_VARIABLE_OPTION = 'New variable';
 Blockly.Msg.NEW_VARIABLE_TITLE = 'New variable name:';
 Blockly.Msg.VARIABLE_MODAL_TITLE = 'New Variable';
 Blockly.Msg.VARIABLE_ALREADY_EXISTS = 'A variable named "%1" already exists.';
@@ -409,6 +410,7 @@ Blockly.Msg.PROCEDURE_USED = 'To delete a block definition, first remove all use
 // Lists
 // @todo Remove these once fully managed by Scratch VM / Scratch GUI
 Blockly.Msg.NEW_LIST = 'Make a List';
+Blockly.Msg.NEW_LIST_OPTION = 'New list';
 Blockly.Msg.NEW_LIST_TITLE = 'New list name:';
 Blockly.Msg.LIST_MODAL_TITLE = 'New List';
 Blockly.Msg.LIST_ALREADY_EXISTS = 'A list named "%1" already exists.';
@@ -421,6 +423,7 @@ Blockly.Msg.RENAME_LIST = 'Rename list';
 // Tables
 // @todo Remove these once fully managed by Scratch VM / Scratch GUI
 Blockly.Msg.NEW_TABLE = 'Make a Table';
+Blockly.Msg.NEW_TABLE_OPTION = 'New table';
 Blockly.Msg.NEW_TABLE_TITLE = 'New table name:';
 Blockly.Msg.TABLE_MODAL_TITLE = 'New Table';
 Blockly.Msg.TABLE_ALREADY_EXISTS = 'A table named "%1" already exists.';
