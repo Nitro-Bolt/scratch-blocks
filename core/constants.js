@@ -342,6 +342,15 @@ Blockly.DELETE_VARIABLE_ID = 'DELETE_VARIABLE_ID';
 Blockly.NEW_BROADCAST_MESSAGE_ID = 'NEW_BROADCAST_MESSAGE_ID';
 
 /**
+ * String for use in the dropdown created in field_variable,
+ * specifically for scalar/list/table variables.
+ * This string indicates that this option in the dropdown is a create action
+ * and if selected, should trigger the prompt to create a new variable.
+ * @const {string}
+ */
+Blockly.NEW_VARIABLE_OPTION_ID = 'NEW_VARIABLE_OPTION_ID';
+
+/**
  * String representing the variable type of broadcast message blocks.
  * This string, for use in differentiating between types of variables,
  * indicates that the current variable is a broadcast message.
