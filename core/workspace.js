@@ -26,6 +26,7 @@
 
 goog.provide('Blockly.Workspace');
 
+goog.require('Blockly.ProceduresMap');
 goog.require('Blockly.VariableMap');
 goog.require('Blockly.WorkspaceComment');
 goog.require('goog.array');
@@ -101,6 +102,13 @@ Blockly.Workspace = function(opt_options) {
    * @private
    */
   this.variableMap_ = new Blockly.VariableMap(this);
+
+  /**
+   * A map of global procedure mutations available from other targets.
+   * @type {!Blockly.ProceduresMap}
+   * @private
+   */
+  this.globalProcedureMap_ = new Blockly.ProceduresMap(this);
 
   /**
    * Blocks in the flyout can refer to variables that don't exist in the main
@@ -317,7 +325,37 @@ Blockly.Workspace.prototype.clear = function() {
   if (this.potentialVariableMap_) {
     this.potentialVariableMap_.clear();
   }
+  if (this.globalProcedureMap_) {
+    this.globalProcedureMap_.clear();
+  }
   this.isClearing = false;
+};
+
+/**
+ * Track a global procedure mutation on this workspace.
+ * @param {!Element} mutation Procedure mutation XML.
+ */
+Blockly.Workspace.prototype.createGlobalProcedure = function(mutation) {
+  this.globalProcedureMap_.createProcedureMutation(mutation);
+};
+
+/**
+ * Get all globally scoped procedure mutations available to this workspace.
+ * @return {!Array<!Element>} Mutation XML elements.
+ */
+Blockly.Workspace.prototype.getAllGlobalProcedureMutations = function() {
+  this.globalProcedureMap_.refreshFromVM();
+  return this.globalProcedureMap_.getAllProcedureMutations();
+};
+
+/**
+ * Get a global procedure mutation by proccode.
+ * @param {string} proccode Procedure identifier.
+ * @return {?Element} Mutation XML element if found.
+ */
+Blockly.Workspace.prototype.getGlobalProcedureMutationByProccode = function(proccode) {
+  this.globalProcedureMap_.refreshFromVM();
+  return this.globalProcedureMap_.getProcedureMutationByProccode(proccode);
 };
 
 /* Begin functions that are just pass-throughs to the variable map. */

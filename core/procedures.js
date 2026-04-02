@@ -83,10 +83,32 @@ Blockly.Procedures.allProcedures = function(root) {
 Blockly.Procedures.allProcedureMutations = function(root) {
   var blocks = root.getAllBlocks();
   var mutations = [];
+  var globalByProcCode = Object.create(null);
+
+  if (root.getAllGlobalProcedureMutations) {
+    var globalMutations = root.getAllGlobalProcedureMutations();
+    for (var j = 0; j < globalMutations.length; j++) {
+      var globalMutation = globalMutations[j];
+      if (!globalMutation) {
+        continue;
+      }
+      var globalProcCode = globalMutation.getAttribute('proccode');
+      if (globalProcCode) {
+        globalByProcCode[globalProcCode] = true;
+      }
+      mutations.push(globalMutation);
+    }
+  }
+
   for (var i = 0; i < blocks.length; i++) {
     if (blocks[i].type == Blockly.PROCEDURES_PROTOTYPE_BLOCK_TYPE) {
       var mutation = blocks[i].mutationToDom(/* opt_generateShadows */ true);
       if (mutation) {
+        var localProcCode = mutation.getAttribute('proccode');
+        if (localProcCode && globalByProcCode[localProcCode]) {
+          // Prefer local definitions over globally imported procedures.
+          continue;
+        }
         mutations.push(mutation);
       }
     }
@@ -211,6 +233,94 @@ Blockly.Procedures.rename = function(name) {
     }
   }
   return legalName;
+};
+
+/**
+ * Check whether a mutation is globally scoped.
+ * @param {?Element} mutation Procedure mutation XML.
+ * @return {boolean} True when global="true".
+ * @private
+ */
+Blockly.Procedures.isGlobalMutation_ = function(mutation) {
+  return !!(mutation && mutation.getAttribute('global') === 'true');
+};
+
+/**
+ * Return whether creating a procedure with this mutation would conflict.
+ * Rules:
+ * - local procedures conflict only with existing local procedures in this workspace.
+ * - global procedures conflict with any procedure layout (local/global) in any sprite.
+ * @param {!Element} mutation Procedure mutation XML.
+ * @param {!Blockly.Workspace} workspace Current workspace.
+ * @return {boolean} True if conflict exists.
+ * @private
+ */
+Blockly.Procedures.hasProcedureLayoutConflict_ = function(mutation, workspace) {
+  var procCode = mutation.getAttribute('proccode');
+  if (!procCode) {
+    return false;
+  }
+
+  var isGlobal = Blockly.Procedures.isGlobalMutation_(mutation);
+  var blocks = workspace.getAllBlocks(false);
+  for (var i = 0; i < blocks.length; i++) {
+    var block = blocks[i];
+    if (block.type !== Blockly.PROCEDURES_PROTOTYPE_BLOCK_TYPE || !block.getProcCode) {
+      continue;
+    }
+    if (block.getProcCode() !== procCode) {
+      continue;
+    }
+
+    if (!isGlobal) {
+      // Local creation only conflicts with existing local procedures.
+      if (!block.getGlobal || !block.getGlobal()) {
+        return true;
+      }
+      continue;
+    }
+
+    // Global creation conflicts with any matching local/global procedure.
+    return true;
+  }
+
+  // Cross-target checks:
+  // - local creation conflicts with existing globals in any target.
+  // - global creation conflicts with any matching local/global in any target.
+  var vm = workspace.vm;
+  var runtime = vm && vm.runtime;
+  if (!runtime || !runtime.targets) {
+    return false;
+  }
+
+  for (var t = 0; t < runtime.targets.length; t++) {
+    var target = runtime.targets[t];
+    if (!target || !target.isOriginal || !target.blocks || !target.blocks._blocks) {
+      continue;
+    }
+
+    var targetBlocks = target.blocks._blocks;
+    for (var blockId in targetBlocks) {
+      if (!Object.prototype.hasOwnProperty.call(targetBlocks, blockId)) continue;
+      var targetBlock = targetBlocks[blockId];
+      if (!targetBlock || targetBlock.opcode !== 'procedures_prototype' || !targetBlock.mutation) {
+        continue;
+      }
+      if (targetBlock.mutation.proccode !== procCode) {
+        continue;
+      }
+
+      var targetIsGlobal = targetBlock.mutation.global === true ||
+          targetBlock.mutation.global === 'true';
+      if (!isGlobal && !targetIsGlobal) {
+        // Local creation does not conflict with other targets' local procedures.
+        continue;
+      }
+      return true;
+    }
+  }
+
+  return false;
 };
 
 /**
@@ -447,6 +557,11 @@ Blockly.Procedures.createProcedureDefCallback_ = function(workspace) {
 Blockly.Procedures.createProcedureCallbackFactory_ = function(workspace) {
   return function(mutation) {
     if (mutation) {
+      if (Blockly.Procedures.hasProcedureLayoutConflict_(mutation, workspace)) {
+        alert(Blockly.Msg.PROCEDURE_ALREADY_EXISTS.replace('%1', mutation.getAttribute('proccode')));
+        return false;
+      }
+
       var blockText = '<xml>' +
           '<block type="procedures_definition">' +
           '<statement name="custom_block">' +
@@ -471,6 +586,7 @@ Blockly.Procedures.createProcedureCallbackFactory_ = function(workspace) {
       block.moveBy(posX / scale, (-workspace.scrollY + 30) / scale);
       block.scheduleSnapAndBump();
       Blockly.Events.setGroup(false);
+      return true;
     }
   };
 };
