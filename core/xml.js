@@ -850,16 +850,8 @@ Blockly.Xml.domToFieldVariable_ = function(workspace, xml, text, field) {
     type = '';
   }
 
-  var fieldTypes = field.getVariableTypes_ ? field.getVariableTypes_() : null;
-  var isBroadcastField = fieldTypes && fieldTypes.length == 1 &&
-      fieldTypes[0] == Blockly.BROADCAST_MESSAGE_VARIABLE_TYPE;
-
-  if (!type && isBroadcastField) {
-    type = Blockly.BROADCAST_MESSAGE_VARIABLE_TYPE;
-  }
-
   // Broadcast menus should resolve to an existing/default message instead of staying blank.
-  if (type == Blockly.BROADCAST_MESSAGE_VARIABLE_TYPE || isBroadcastField) {
+  if (type == Blockly.BROADCAST_MESSAGE_VARIABLE_TYPE) {
     allowEmpty = false;
   }
 
