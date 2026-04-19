@@ -128,7 +128,7 @@ Blockly.Blocks['extension_input'] = {
 Blockly.Blocks['extension_blockduplicateondrag'] = {
   init: function() {
     this.jsonInit({
-      "message0": 'duplicate-on-drag',
+      "message0": 'duplicate on drag',
       "duplicateOnDrag": true,
       "category": Blockly.Categories.more,
       "extensions": ["colours_more", "output_string"]
