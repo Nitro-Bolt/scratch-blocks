@@ -1,0 +1,42 @@
+name: Deploy from main
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+  pull-requests: write
+
+jobs:
+  deploy:
+    if: startsWith(github.event.head_commit.message, 'deploy:')
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout develop-builds branch
+        uses: actions/checkout@v4
+        with:
+          ref: develop-builds
+          fetch-depth: 0
+
+      - name: Set up GitHub user
+        run: |
+          git config --local user.name "GitHub Action"
+          git config --local user.email "action@github.com"
+
+      - name: Merge main into develop-builds
+        run: |
+          git fetch origin main:main
+          git merge --no-ff --no-edit main || {
+            echo "Merge conflict detected. Please resolve manually.";
+            exit 1;
+          }
+
+      - name: Push to develop-builds
+        if: success()
+        run: |
+          git push origin develop-builds
