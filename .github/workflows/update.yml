@@ -1,6 +1,9 @@
 name: Update develop-builds
 
 on:
+  push:
+    branches:
+      - develop
   workflow_dispatch:
     inputs: {}
 
