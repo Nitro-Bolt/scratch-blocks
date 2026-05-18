@@ -724,6 +724,11 @@ Blockly.BlockSvg.prototype.showContextMenu_ = function(e) {
     return;
   }
 
+  if (!block.isInFlyout && this.getSwitches && this.getSwitches().length > 0) {
+    var switchOptions = Blockly.ContextMenu.blockSwitchOption(this);
+    menuOptions.push.apply(menuOptions, switchOptions);
+  }
+
   // Allow the block to add or modify menuOptions.
   if (this.customContextMenu) {
     this.customContextMenu(menuOptions);

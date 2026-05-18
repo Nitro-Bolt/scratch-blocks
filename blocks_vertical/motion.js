@@ -69,7 +69,8 @@ Blockly.Blocks['motion_turnright'] = {
         }
       ],
       "category": Blockly.Categories.motion,
-      "extensions": ["colours_motion", "shape_statement"]
+      "extensions": ["colours_motion", "shape_statement"],
+      "switches": ["motion_turnleft"]
     });
   }
 };
@@ -95,7 +96,8 @@ Blockly.Blocks['motion_turnleft'] = {
         }
       ],
       "category": Blockly.Categories.motion,
-      "extensions": ["colours_motion", "shape_statement"]
+      "extensions": ["colours_motion", "shape_statement"],
+      "switches": ["motion_turnright"]
     });
   }
 };
@@ -332,7 +334,13 @@ Blockly.Blocks['motion_changexby'] = {
         }
       ],
       "category": Blockly.Categories.motion,
-      "extensions": ["colours_motion", "shape_statement"]
+      "extensions": ["colours_motion", "shape_statement"],
+      "switches": [{
+        id: "motion_changeyby",
+        inputs: [
+          ["DX", "DY"]
+        ]
+      }]
     });
   }
 };
@@ -352,7 +360,13 @@ Blockly.Blocks['motion_setx'] = {
         }
       ],
       "category": Blockly.Categories.motion,
-      "extensions": ["colours_motion", "shape_statement"]
+      "extensions": ["colours_motion", "shape_statement"],
+      "switches": [{
+        id: "motion_sety",
+        inputs: [
+          ["X", "Y"]
+        ]
+      }]
     });
   }
 };
@@ -372,7 +386,13 @@ Blockly.Blocks['motion_changeyby'] = {
         }
       ],
       "category": Blockly.Categories.motion,
-      "extensions": ["colours_motion", "shape_statement"]
+      "extensions": ["colours_motion", "shape_statement"],
+      "switches": [{
+        id: "motion_changexby",
+        inputs: [
+          ["DY", "DX"]
+        ]
+      }]
     });
   }
 };
@@ -392,7 +412,13 @@ Blockly.Blocks['motion_sety'] = {
         }
       ],
       "category": Blockly.Categories.motion,
-      "extensions": ["colours_motion", "shape_statement"]
+      "extensions": ["colours_motion", "shape_statement"],
+      "switches": [{
+        id: "motion_setx",
+        inputs: [
+          ["Y", "X"]
+        ]
+      }]
     });
   }
 };

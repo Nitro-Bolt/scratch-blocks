@@ -371,6 +371,7 @@ Blockly.Msg.COLLAPSE_X_BLOCKS = 'Collapse %1 Blocks';
 Blockly.Msg.EXPAND_ALL = 'Expand All';
 Blockly.Msg.EXPAND_BLOCK = 'Expand Block';
 Blockly.Msg.EXPAND_X_BLOCKS = 'Expand %1 Blocks';
+Blockly.Msg.SWITCH_BLOCK = 'Switch to %1';
 Blockly.Msg.CLEAN_UP = 'Clean up Blocks';
 Blockly.Msg.HELP = 'Help';
 Blockly.Msg.UNDO = 'Undo';

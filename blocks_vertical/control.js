@@ -127,7 +127,8 @@ Blockly.Blocks['control_if'] = {
         }
       ],
       "category": Blockly.Categories.control,
-      "extensions": ["colours_control", "shape_statement"]
+      "extensions": ["colours_control", "shape_statement"],
+      "switches": ["control_if_else"]
     });
   }
 };
@@ -164,7 +165,8 @@ Blockly.Blocks['control_if_else'] = {
         }
       ],
       "category": Blockly.Categories.control,
-      "extensions": ["colours_control", "shape_statement"]
+      "extensions": ["colours_control", "shape_statement"],
+      "switches": ["control_if"]
     });
   }
 };

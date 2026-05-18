@@ -569,4 +569,184 @@ Blockly.ContextMenu.workspaceCommentOption = function(ws, e) {
   return wsCommentOption;
 };
 
+/**
+ * Make context menu options for switching this block to another type.
+ * @param {!Blockly.BlockSvg} block The block where the right-click originated.
+ * @return {!Array.<!Object>} An array of menu options for each switch target.
+ * @package
+ */
+Blockly.ContextMenu.blockSwitchOption = function(block) {
+  var switches = block.getSwitches();
+
+  if (!switches || switches.length === 0) {
+    return [];
+  }
+
+  var options = [];
+
+  switches.forEach(function(switchData) {
+
+    var targetType;
+    var inputMappings = [];
+
+    if (typeof switchData === 'string') {
+      targetType = switchData;
+    } else {
+      targetType = switchData.id;
+      inputMappings = switchData.inputs || [];
+    }
+
+    options.push({
+      text: Blockly.Msg.SWITCH_BLOCK.replace('%1', targetType),
+      enabled: true,
+
+      callback: function() {
+        var workspace = block.workspace;
+        var xy = block.getRelativeToSurfaceXY();
+
+        Blockly.Events.setGroup(true);
+
+        var parentConnection = null;
+
+        if (
+          block.previousConnection &&
+          block.previousConnection.isConnected()
+        ) {
+          parentConnection = block.previousConnection.targetConnection;
+          block.previousConnection.disconnect();
+        }
+
+        var nextBlock = block.getNextBlock();
+
+        if (
+          nextBlock &&
+          block.nextConnection &&
+          block.nextConnection.isConnected()
+        ) {
+          block.nextConnection.disconnect();
+        }
+
+        var tempBlock = workspace.newBlock(targetType);
+        var validInputs = new Set(
+          tempBlock.inputList.map(i => i.name)
+        );
+        tempBlock.dispose();
+
+        var mappedConnections = [];
+        inputMappings.forEach(function(mapping) {
+          var oldInputName = mapping[0];
+          var newInputName = mapping[1];
+
+          var oldInput = block.getInput(oldInputName);
+
+          if (
+            oldInput &&
+            oldInput.connection &&
+            oldInput.connection.isConnected()
+          ) {
+            mappedConnections.push({
+              newInput: newInputName,
+              connection: oldInput.connection.targetConnection,
+              shadowDom: oldInput.connection.getShadowDom()
+            });
+          }
+        });
+
+        block.inputList.forEach(function(input) {
+
+          if (
+            input.connection &&
+            input.connection.isConnected()
+          ) {
+            var isMapped = inputMappings.some(function(mapping) {
+              return mapping[0] === input.name;
+            });
+
+            if (isMapped) {
+              return;
+            }
+
+            if (!validInputs.has(input.name)) {
+              var child = input.connection.targetBlock();
+
+              if (child && child.isShadow()) {
+                child.dispose(false);
+              } else {
+                input.connection.disconnect();
+              }
+            }
+          }
+        });
+
+        block.bumpNeighbours_();
+
+        var xml = Blockly.Xml.blockToDom(block);
+        xml.setAttribute('type', targetType);
+        if (xml.getAttribute('id')) {
+          xml.removeAttribute('id');
+        }
+
+        block.dispose(false);
+
+        var newBlock = Blockly.Xml.domToBlock(xml, workspace);
+        newBlock.moveBy(xy.x, xy.y);
+
+        mappedConnections.forEach(function(data) {
+          var input = newBlock.getInput(data.newInput);
+
+          if (
+            input &&
+            input.connection &&
+            !input.connection.isConnected()
+          ) {
+            input.connection.connect(data.connection);
+
+            if (data.shadowDom) {
+              input.connection.setShadowDom(data.shadowDom);
+              if (!input.connection.getShadowDom()) {
+                input.connection.respawnShadow_();
+              }
+            }
+          }
+        });
+
+        if (
+          parentConnection &&
+          newBlock.previousConnection
+        ) {
+          parentConnection.connect(
+            newBlock.previousConnection
+          );
+        }
+
+        if (
+          nextBlock &&
+          nextBlock.previousConnection &&
+          newBlock.nextConnection
+        ) {
+          newBlock.nextConnection.connect(
+            nextBlock.previousConnection
+          );
+        }
+
+        newBlock.inputList.forEach(function(input) {
+          if (input.connection) input.connection.respawnShadow_();
+        });
+
+        Blockly.Events.setGroup(false);
+
+        if (Blockly.Events.isEnabled()) {
+          Blockly.Events.fire(
+            new Blockly.Events.BlockCreate(newBlock)
+          );
+        }
+
+        newBlock.select();
+      }
+    });
+  });
+
+  return options;
+};
+
 // End helper functions for creating context menu options.
