@@ -582,165 +582,103 @@ Blockly.ContextMenu.blockSwitchOption = function(block) {
     return [];
   }
 
-  var options = [];
+  var options =[];
+
+  function maybePretty(id) {
+    const blockDef = Blockly.Blocks[id];
+    if (blockDef && blockDef.jsonInit) {
+      const json = blockDef.jsonInit;
+      for (let key in json) {
+        if (key.startsWith('message') && typeof json[key] === 'string') {
+          const match = json[key].match(/%{BKY_(.*?)}/);
+          if (match && match[1] && Blockly.Msg[match[1]]) {
+            return Blockly.Msg[match[1]];
+          }
+        }
+      }
+    }
+    return id.split("_").slice(1).join(" ");
+  }
+
+  function getShadowFieldName(shadowType) {
+    if (shadowType === "text") return "TEXT";
+    if (shadowType === "colour_picker") return "COLOUR";
+    return "NUM";
+  }
+
+  function callIfFunction(value) {
+    return typeof value === "function" ? value() : value;
+  }
 
   switches.forEach(function(switchData) {
-
-    var targetType;
-    var inputMappings = [];
-
-    if (typeof switchData === 'string') {
-      targetType = switchData;
-    } else {
-      targetType = switchData.id;
-      inputMappings = switchData.inputs || [];
-    }
+    var opcodeData = (typeof switchData === 'string') ? { opcode: switchData } : switchData;
+    var targetType = opcodeData.opcode || opcodeData.id;
 
     options.push({
-      text: Blockly.Msg.SWITCH_BLOCK.replace('%1', targetType),
+      text: Blockly.Msg.SWITCH_BLOCK.replace('%1', maybePretty(targetType)),
       enabled: true,
-
       callback: function() {
-        var workspace = block.workspace;
-        var xy = block.getRelativeToSurfaceXY();
+        if (opcodeData.isNoop) return;
 
         Blockly.Events.setGroup(true);
-
-        var parentConnection = null;
-
-        if (
-          block.previousConnection &&
-          block.previousConnection.isConnected()
-        ) {
-          parentConnection = block.previousConnection.targetConnection;
-          block.previousConnection.disconnect();
-        }
-
-        var nextBlock = block.getNextBlock();
-
-        if (
-          nextBlock &&
-          block.nextConnection &&
-          block.nextConnection.isConnected()
-        ) {
-          block.nextConnection.disconnect();
-        }
-
-        var tempBlock = workspace.newBlock(targetType);
-        var validInputs = new Set(
-          tempBlock.inputList.map(i => i.name)
-        );
-        tempBlock.dispose();
-
-        var mappedConnections = [];
-        inputMappings.forEach(function(mapping) {
-          var oldInputName = mapping[0];
-          var newInputName = mapping[1];
-
-          var oldInput = block.getInput(oldInputName);
-
-          if (
-            oldInput &&
-            oldInput.connection &&
-            oldInput.connection.isConnected()
-          ) {
-            mappedConnections.push({
-              newInput: newInputName,
-              connection: oldInput.connection.targetConnection,
-              shadowDom: oldInput.connection.getShadowDom()
-            });
-          }
-        });
-
-        block.inputList.forEach(function(input) {
-
-          if (
-            input.connection &&
-            input.connection.isConnected()
-          ) {
-            var isMapped = inputMappings.some(function(mapping) {
-              return mapping[0] === input.name;
-            });
-
-            if (isMapped) {
-              return;
-            }
-
-            if (!validInputs.has(input.name)) {
-              var child = input.connection.targetBlock();
-
-              if (child && child.isShadow()) {
-                child.dispose(false);
-              } else {
-                input.connection.disconnect();
-              }
-            }
-          }
-        });
-
-        block.bumpNeighbours_();
-
+        var workspace = block.workspace;
         var xml = Blockly.Xml.blockToDom(block);
-        xml.setAttribute('type', targetType);
-        if (xml.getAttribute('id')) {
-          xml.removeAttribute('id');
-        }
+        var position = block.getRelativeToSurfaceXY();
+        
+        xml.setAttribute("x", position.x);
+        xml.setAttribute("y", position.y);
+        if (targetType) xml.setAttribute("type", targetType);
 
-        block.dispose(false);
-
-        var newBlock = Blockly.Xml.domToBlock(xml, workspace);
-        newBlock.moveBy(xy.x, xy.y);
-
-        mappedConnections.forEach(function(data) {
-          var input = newBlock.getInput(data.newInput);
-
-          if (
-            input &&
-            input.connection &&
-            !input.connection.isConnected()
-          ) {
-            input.connection.connect(data.connection);
-
-            if (data.shadowDom) {
-              input.connection.setShadowDom(data.shadowDom);
-              if (!input.connection.getShadowDom()) {
-                input.connection.respawnShadow_();
-              }
-            }
+        for (const child of Array.from(xml.children)) {
+          const oldName = child.getAttribute("name");
+          if (opcodeData.splitInputs && opcodeData.splitInputs.includes(oldName)) {
+            xml.removeChild(child);
+            continue;
           }
-        });
-
-        if (
-          parentConnection &&
-          newBlock.previousConnection
-        ) {
-          parentConnection.connect(
-            newBlock.previousConnection
-          );
+          if (opcodeData.remapInputName && opcodeData.remapInputName[oldName]) {
+            child.setAttribute("name", opcodeData.remapInputName[oldName]);
+          }
+          if (opcodeData.remapShadowType && opcodeData.remapShadowType[oldName]) {
+            const valueNode = child.firstChild;
+            const fieldNode = valueNode.firstChild;
+            valueNode.setAttribute("type", opcodeData.remapShadowType[oldName]);
+            fieldNode.setAttribute("name", getShadowFieldName(opcodeData.remapShadowType[oldName]));
+          }
+          if (opcodeData.mapFieldValues && opcodeData.mapFieldValues[oldName] && child.tagName === "FIELD") {
+            const newValue = opcodeData.mapFieldValues[oldName][child.innerText];
+            if (typeof newValue === "string") child.innerText = newValue;
+          }
         }
 
-        if (
-          nextBlock &&
-          nextBlock.previousConnection &&
-          newBlock.nextConnection
-        ) {
-          newBlock.nextConnection.connect(
-            nextBlock.previousConnection
-          );
+        if (opcodeData.mutate) {
+          const mutation = xml.querySelector("mutation");
+          for (const [key, value] of Object.entries(opcodeData.mutate)) {
+            mutation.setAttribute(key, value);
+          }
         }
 
-        newBlock.inputList.forEach(function(input) {
-          if (input.connection) input.connection.respawnShadow_();
-        });
+        if (opcodeData.createInputs) {
+          for (const [inputName, inputData] of Object.entries(opcodeData.createInputs)) {
+            const valueElement = document.createElement("value");
+            valueElement.setAttribute("name", inputName);
+            const shadowElement = document.createElement("shadow");
+            shadowElement.setAttribute("type", inputData.shadowType);
+            const shadowFieldElement = document.createElement("field");
+            shadowFieldElement.setAttribute("name", getShadowFieldName(inputData.shadowType));
+            shadowFieldElement.innerText = callIfFunction(inputData.value);
+            shadowElement.appendChild(shadowFieldElement);
+            valueElement.appendChild(shadowElement);
+            xml.appendChild(valueElement);
+          }
+        }
 
+        block.dispose();
+        var newBlock = Blockly.Xml.domToBlock(xml, workspace);
+        newBlock.moveBy(position.x, position.y);
         Blockly.Events.setGroup(false);
-
         if (Blockly.Events.isEnabled()) {
-          Blockly.Events.fire(
-            new Blockly.Events.BlockCreate(newBlock)
-          );
+          Blockly.Events.fire(new Blockly.Events.BlockCreate(newBlock));
         }
-
         newBlock.select();
       }
     });
