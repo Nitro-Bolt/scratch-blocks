@@ -489,8 +489,8 @@ Blockly.Blocks['operator_cast'] = {
             [Blockly.Msg.OPERATORS_CAST_STRING, "string"],
             [Blockly.Msg.OPERATORS_CAST_NUMBER, "number"],
             [Blockly.Msg.OPERATORS_CAST_BOOLEAN, "boolean"],
-            [Blockly.Msg.OPERATORS_CAST_ARRAY, "array"],
-            [Blockly.Msg.OPERATORS_CAST_OBJECT, "object"]
+            [Blockly.Msg.OPERATORS_CAST_OBJECT, "object"],
+            [Blockly.Msg.OPERATORS_CAST_ARRAY, "array"]
           ]
         }
       ],
@@ -498,6 +498,26 @@ Blockly.Blocks['operator_cast'] = {
       "outputShape": Blockly.OUTPUT_SHAPE_ROUND,
       "category": Blockly.Categories.operators,
       "extensions": ["colours_operators"],
+    });
+  }
+};
+
+Blockly.Blocks['operator_typeof'] = {
+  /**
+   * Get the specific type of a value.
+   * @this Blockly.Block
+   */
+  init: function() {
+    this.jsonInit({
+      message0: Blockly.Msg.OPERATORS_TYPEOF,
+      args0: [
+        {
+          type: "input_value",
+          name: "VALUE"
+        }
+      ],
+      category: Blockly.Categories.operators,
+      extensions: ["colours_operators", "output_string"]
     });
   }
 };

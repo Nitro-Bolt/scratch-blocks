@@ -360,6 +360,20 @@ Blockly.Css.CONTENT = [
     'font-size: .8em;',
   '}',
 
+  '.errorReportBox {',
+    'color: $colour_errorReportForeground;',
+  '}',
+
+  '.valueReportBox .copyReporterIcon {',
+    'margin-left: 3px;',
+    'cursor: pointer;',
+    'float: right;',
+    'display: block;',
+    'user-select: none;',
+    'width: 14px;',
+    'height: 14px;',
+  '}',
+
   '.blocklyResizeSE {',
     'cursor: se-resize;',
     'fill: #aaa;',

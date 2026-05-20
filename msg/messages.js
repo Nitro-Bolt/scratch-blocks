@@ -55,6 +55,8 @@ Blockly.Msg.CONTROL_COUNTER = 'counter';
 Blockly.Msg.CONTROL_INCRCOUNTER = 'increment counter';
 Blockly.Msg.CONTROL_CLEARCOUNTER = 'clear counter';
 Blockly.Msg.CONTROL_ALLATONCE = 'all at once';
+Blockly.Msg.CONTROL_FOREACHINRANGE = 'for each %1 in range %2 to %3';
+Blockly.Msg.CONTROL_FOREACHINRANGE_ITEM = 'i';
 
 // Data blocks
 Blockly.Msg.DATA_SETVARIABLETO = 'set %1 to %2';
@@ -70,6 +72,8 @@ Blockly.Msg.DATA_ITEMOFLIST = 'item %1 of %2';
 Blockly.Msg.DATA_ITEMNUMOFLIST = 'item # of %1 in %2';
 Blockly.Msg.DATA_LENGTHOFLIST = 'length of %1';
 Blockly.Msg.DATA_LISTCONTAINSITEM = '%1 contains %2?';
+Blockly.Msg.DATA_LISTASARRAY = '%1 as array';
+Blockly.Msg.DATA_SETLISTARRAY = 'set list %1 to %2';
 Blockly.Msg.DATA_SHOWLIST = 'show list %1';
 Blockly.Msg.DATA_HIDELIST = 'hide list %1';
 Blockly.Msg.DATA_INDEX_ALL = 'all';
@@ -115,8 +119,9 @@ Blockly.Msg.JSON_MERGE = 'merge %1 %2';
 Blockly.Msg.JSON_ARRAY_LENGTH = 'length of %1';
 Blockly.Msg.JSON_SLICE_ARRAY = 'items %1 to %2 in %3';
 Blockly.Msg.JSON_REVERSE_ARRAY = 'reverse %1';
-Blockly.Msg.JSON_OBJECT = '{"key":"value"}';
-Blockly.Msg.JSON_ARRAY = '["foo","bar"]';
+Blockly.Msg.JSON_FOREACH_VALUE = 'value';
+Blockly.Msg.JSON_FOREACH_INDEX = 'index';
+Blockly.Msg.JSON_FOREACH = 'for each %1 %2 in %3';
 Blockly.Msg.JSON_KEY = 'key';
 Blockly.Msg.JSON_BAR = 'bar';
 Blockly.Msg.JSON_BAZ = 'baz';
@@ -267,6 +272,7 @@ Blockly.Msg.OPERATORS_CAST_NUMBER = 'number';
 Blockly.Msg.OPERATORS_CAST_BOOLEAN = 'boolean';
 Blockly.Msg.OPERATORS_CAST_ARRAY = 'array';
 Blockly.Msg.OPERATORS_CAST_OBJECT = 'object';
+Blockly.Msg.OPERATORS_TYPEOF = 'type of %1';
 
 // Procedures blocks
 Blockly.Msg.PROCEDURES_DEFINITION = 'define %1';
@@ -276,6 +282,9 @@ Blockly.Msg.PROCEDURES_RETURN = 'return %1';
 Blockly.Msg.PROCEDURES_TO_REPORTER = 'Change To Reporter';
 Blockly.Msg.PROCEDURES_TO_STATEMENT = 'Change To Stacked Block';
 Blockly.Msg.PROCEDURES_DOCS = 'How to use return';
+
+// NB Procedures blocks
+Blockly.Msg.PROCEDURES_SET_PARAM = 'set %1 to %2';
 
 // Sensing blocks
 Blockly.Msg.SENSING_TOUCHINGOBJECT = 'touching %1?';
@@ -342,10 +351,6 @@ Blockly.Msg.ASSETS_METADATA = '%1 of %2';
 Blockly.Msg.ASSETS_SET = 'set %1 of %2 to %3';
 Blockly.Msg.ASSETS_WRITE = 'write %1 as %2 to %3';
 
-// Comment Blocks
-Blockly.Msg.COMMENTS_DEFAULT = '// %1';
-Blockly.Msg.COMMENTS_ALTERNATE = '%1 // %2';
-
 // Category labels
 Blockly.Msg.CATEGORY_MOTION = 'Motion';
 Blockly.Msg.CATEGORY_LOOKS = 'Looks';
@@ -358,7 +363,6 @@ Blockly.Msg.CATEGORY_OPERATORS = 'Operators';
 Blockly.Msg.CATEGORY_VARIABLES = 'Variables';
 Blockly.Msg.CATEGORY_JSON = "JSON";
 Blockly.Msg.CATEGORY_MYBLOCKS = 'My Blocks';
-Blockly.Msg.CATEGORY_COMMENTS = 'Comments';
 
 // Context menus
 Blockly.Msg.DUPLICATE = 'Duplicate';
@@ -394,6 +398,7 @@ Blockly.Msg.RENAME_VARIABLE = 'Rename variable';
 Blockly.Msg.RENAME_VARIABLE_TITLE = 'Rename all "%1" variables to:';
 Blockly.Msg.RENAME_VARIABLE_MODAL_TITLE = 'Rename Variable';
 Blockly.Msg.NEW_VARIABLE = 'Make a Variable';
+Blockly.Msg.NEW_VARIABLE_OPTION = 'New variable';
 Blockly.Msg.NEW_VARIABLE_TITLE = 'New variable name:';
 Blockly.Msg.VARIABLE_MODAL_TITLE = 'New Variable';
 Blockly.Msg.VARIABLE_ALREADY_EXISTS = 'A variable named "%1" already exists.';
@@ -412,6 +417,7 @@ Blockly.Msg.PROCEDURE_USED = 'To delete a block definition, first remove all use
 // Lists
 // @todo Remove these once fully managed by Scratch VM / Scratch GUI
 Blockly.Msg.NEW_LIST = 'Make a List';
+Blockly.Msg.NEW_LIST_OPTION = 'New list';
 Blockly.Msg.NEW_LIST_TITLE = 'New list name:';
 Blockly.Msg.LIST_MODAL_TITLE = 'New List';
 Blockly.Msg.LIST_ALREADY_EXISTS = 'A list named "%1" already exists.';
@@ -424,6 +430,7 @@ Blockly.Msg.RENAME_LIST = 'Rename list';
 // Tables
 // @todo Remove these once fully managed by Scratch VM / Scratch GUI
 Blockly.Msg.NEW_TABLE = 'Make a Table';
+Blockly.Msg.NEW_TABLE_OPTION = 'New table';
 Blockly.Msg.NEW_TABLE_TITLE = 'New table name:';
 Blockly.Msg.TABLE_MODAL_TITLE = 'New Table';
 Blockly.Msg.TABLE_ALREADY_EXISTS = 'A table named "%1" already exists.';

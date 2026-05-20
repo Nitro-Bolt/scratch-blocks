@@ -112,12 +112,6 @@ Blockly.Colours = {
     "tertiary": "#FF3355",
     "quaternary": "#FF3355"
   },
-  "comments": {
-    "primary": "#E4DB8C",
-    "secondary": "#C6BE79",
-    "tertiary": "#A8A167",
-    "quaternary": "#A8A167"
-  },
   "text": "#FFFFFF",
   "workspace": "#F9F9F9",
   "toolboxHover": "#4C97FF",
@@ -150,6 +144,9 @@ Blockly.Colours = {
   "valueReportBackground": "#FFFFFF",
   "valueReportBorder": "#AAAAAA",
   "valueReportForeground": "#000000",
+  "errorReportBackground": "#FFEEEE",
+  "errorReportBorder": "#FF4444",
+  "errorReportForeground": "#441111",
   "menuHover": "rgba(0, 0, 0, 0.2)",
   "contextMenuBackground": "#ffffff",
   "contextMenuBorder": "#cccccc",

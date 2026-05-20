@@ -327,6 +327,22 @@ Blockly.Blocks.defaultToolbox = '<xml id="toolbox-categories" style="display: no
         '</shadow>' +
       '</value>' +
     '</block>' +
+    '<block type="control_foreach_in_range" id="control_foreach_in_range">' +
+      '<value name="ITEM">' +
+        '<shadow type="control_foreach_in_range_item">' +
+        '</shadow>' +
+      '</value>' +
+      '<value name="FROM">' +
+        '<shadow type="math_number">' +
+          '<field name="NUM">1</field>' +
+        '</shadow>' +
+      '</value>' +
+      '<value name="TO">' +
+        '<shadow type="math_number">' +
+          '<field name="NUM">10</field>' +
+        '</shadow>' +
+      '</value>' +
+    '</block>' +
     '<block type="control_forever" id="control_forever"></block>' +
     '<block type="control_if" id="control_if"></block>' +
     '<block type="control_if_else" id="control_if_else"></block>' +
@@ -563,6 +579,8 @@ Blockly.Blocks.defaultToolbox = '<xml id="toolbox-categories" style="display: no
     '    </shadow>' +
     '  </value>' +
     '</block>' +
+    '<block type="operator_typeof">' +
+    '</block>' +
   '</category>' +
   '<category name="%{BKY_CATEGORY_VARIABLES}" id="data" colour="#FF8C1A" secondaryColour="#DB6E00" custom="VARIABLE">' +
   '</category>' +
@@ -610,7 +628,7 @@ Blockly.Blocks.defaultToolbox = '<xml id="toolbox-categories" style="display: no
     '</block>' +
     '<block type="json_value_of_index" id="json_value_of_index">' +
       '<value name="INDEX">' +
-        '<shadow type="math_number">' +
+        '<shadow type="json_indexmenu">' +
           '<field name="NUM">0</field>' +
         '</shadow>' +
       '</value>' +
@@ -633,8 +651,8 @@ Blockly.Blocks.defaultToolbox = '<xml id="toolbox-categories" style="display: no
     '</block>' +
     '<block type="json_replace_index" id="json_replace_index">' +
       '<value name="INDEX">' +
-        '<shadow type="math_number">' +
-          '<field name="NUM">1</field>' +
+        '<shadow type="json_indexmenu">' +
+          '<field name="NUM">0</field>' +
         '</shadow>' +
       '</value>' +
       '<value name="ITEM">' +
@@ -645,7 +663,7 @@ Blockly.Blocks.defaultToolbox = '<xml id="toolbox-categories" style="display: no
     '</block>' +
     '<block type="json_delete_index" id="json_delete_index">' +
       '<value name="INDEX">' +
-        '<shadow type="math_number">' +
+        '<shadow type="json_indexmenu">' +
           '<field name="NUM">0</field>' +
         '</shadow>' +
       '</value>' +
@@ -658,8 +676,20 @@ Blockly.Blocks.defaultToolbox = '<xml id="toolbox-categories" style="display: no
       '</value>' +
     '</block>' +
     '<block type="json_slice_array" id="json_slice_array">' +
+      '<value name="START">' +
+        '<shadow type="json_indexmenu">' +
+          '<field name="NUM">1</field>' +
+        '</shadow>' +
+      '</value>' +
+      '<value name="END">' +
+        '<shadow type="json_indexmenu">' +
+          '<field name="NUM">2</field>' +
+        '</shadow>' +
+      '</value>' +
     '</block>' +
     '<block type="json_merge_array" id="json_merge_array">' +
+    '</block>' +
+    '<block type="json_reverse_array" id="json_reverse_array">' +
     '</block>' +
     '<block type="json_has_item" id="json_has_item">' +
       '<value name="ITEM">' +
@@ -668,64 +698,18 @@ Blockly.Blocks.defaultToolbox = '<xml id="toolbox-categories" style="display: no
         '</shadow>' +
       '</value>' +
     '</block>' +
+    '<block type="json_foreach" id="json_foreach">' +
+      '<value name="VALUE">' +
+        '<shadow type="json_foreach_value">' +
+        '</shadow>' +
+      '</value>' +
+      '<value name="INDEX">' +
+        '<shadow type="json_foreach_index">' +
+        '</shadow>' +
+      '</value>' +
+    '</block>' +
   '</category>' +
   '<category name="%{BKY_CATEGORY_MYBLOCKS}" id="more" colour="#FF6680" secondaryColour="#FF4D6A" custom="PROCEDURE">' +
-  '</category>' +
-  '<category name="%{BKY_CATEGORY_COMMENTS}" id="comments" colour="#E4DB8C" secondaryColour="#C6BE79">' +
-    '<block type="comments_hat" id="comments_hat">' +
-      '<value name="COMMENT">' +
-        '<shadow type="text">' +
-          '<field name="TEXT"></field>' +
-        '</shadow>' +
-      '</value>' +
-    '</block>' +
-    '<block type="comments_command" id="comments_command">' +
-      '<value name="COMMENT">' +
-        '<shadow type="text">' +
-          '<field name="TEXT"></field>' +
-        '</shadow>' +
-      '</value>' +
-    '</block>' +
-    '<block type="comments_loop" id="comments_loop">' +
-      '<value name="COMMENT">' +
-        '<shadow type="text">' +
-          '<field name="TEXT"></field>' +
-        '</shadow>' +
-      '</value>' +
-    '</block>' +
-    '<block type="comments_reporter" id="comments_reporter">' +
-      '<value name="VALUE">' +
-        '<shadow type="text">' +
-          '<field name="TEXT"></field>' +
-        '</shadow>' +
-      '</value>' +
-      '<value name="COMMENT">' +
-        '<shadow type="text">' +
-          '<field name="TEXT"></field>' +
-        '</shadow>' +
-      '</value>' +
-    '</block>' +
-    '<block type="comments_boolean" id="comments_boolean">' +
-      '<value name="COMMENT">' +
-        '<shadow type="text">' +
-          '<field name="TEXT"></field>' +
-        '</shadow>' +
-      '</value>' +
-    '</block>' +
-    '<block type="comments_object" id="comments_object">' +
-      '<value name="COMMENT">' +
-        '<shadow type="text">' +
-          '<field name="TEXT"></field>' +
-        '</shadow>' +
-      '</value>' +
-    '</block>' +
-    '<block type="comments_array" id="comments_array">' +
-      '<value name="COMMENT">' +
-        '<shadow type="text">' +
-          '<field name="TEXT"></field>' +
-        '</shadow>' +
-      '</value>' +
-    '</block>' +
   '</category>' +
   '<category name="Extensions" id="extensions" colour="#FF6680" secondaryColour="#FF4D6A" ' +
     'iconURI="../media/extensions/wedo2-block-icon.svg" showStatusButton="true">' +
@@ -750,6 +734,12 @@ Blockly.Blocks.defaultToolbox = '<xml id="toolbox-categories" style="display: no
           '<field name="CHECKBOX">FALSE</field>' + // this should instantly turn off
         '</shadow>' +
       '</value>' +
+    '</block>' +
+    '<block type="extension_input">' +
+    '  <value name="VALUE">' +
+    '    <shadow type="extension_blockduplicateondrag">' +
+    '    </shadow>' +
+    '  </value>' +
     '</block>' +
     '<sep gap="36"></sep>' +
     '<block type="extension_pen_down" id="extension_pen_down"></block>' +

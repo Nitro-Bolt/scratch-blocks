@@ -1076,8 +1076,9 @@ Blockly.WorkspaceSvg.prototype.glowStack = function(id, isGlowingStack) {
  * In Scratch, appears as a pop-up next to the block when a reporter block is clicked.
  * @param {?string} id ID of block to report associated value.
  * @param {?string} value String value to visually report.
+ * @param {?boolean} error Is the thing being reported an error?
  */
-Blockly.WorkspaceSvg.prototype.reportValue = function(id, value) {
+Blockly.WorkspaceSvg.prototype.reportValue = function(id, value, error = false) {
   var block = this.getBlockById(id);
   if (!block) {
     throw 'Tried to report value on block that does not exist.';
@@ -1087,11 +1088,33 @@ Blockly.WorkspaceSvg.prototype.reportValue = function(id, value) {
   var contentDiv = Blockly.DropDownDiv.getContentDiv();
   var valueReportBox = goog.dom.createElement('div');
   valueReportBox.setAttribute('class', 'valueReportBox');
+  if (error) {
+    valueReportBox.classList.add('errorReportBox');
+  }
   valueReportBox.textContent = value;
+  // use to get focus and event priority
+  valueReportBox.setAttribute("tabindex", "0");
+  // if the user pressed Ctrl+C, prevent propagation to Blockly
+  valueReportBox.onkeydown = (event) => {
+    if ((event.altKey || event.ctrlKey || event.metaKey) && event.code === "KeyC") {
+      event.stopPropagation();
+    }
+  };
+
+  if (value.length !== 0) {
+    const copyButton = document.createElement("img");
+    copyButton.setAttribute("role", "button");
+    copyButton.setAttribute("tabindex", "0");
+    copyButton.setAttribute("alt", "Copy to clipboard");
+    copyButton.setAttribute("src", Blockly.mainWorkspace.options.pathToMedia + "icons/copy.svg");
+    copyButton.classList.add("copyReporterIcon");
+    copyButton.onclick = () => navigator.clipboard.writeText(value);
+    valueReportBox.appendChild(copyButton);
+  }
   contentDiv.appendChild(valueReportBox);
   Blockly.DropDownDiv.setColour(
-      Blockly.Colours.valueReportBackground,
-      Blockly.Colours.valueReportBorder
+      Blockly.Colours[!error ? 'valueReportBackground' : 'errorReportBackground'],
+      Blockly.Colours[!error ? 'valueReportBorder' : 'errorReportBorder']
   );
   Blockly.DropDownDiv.showPositionedByBlock(this, block);
 };

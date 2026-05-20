@@ -1248,6 +1248,25 @@ Blockly.Blocks['argument_editor_string_number'] = {
   removeFieldCallback: Blockly.ScratchBlocks.ProcedureUtils.removeArgumentCallback_
 };
 
+Blockly.Blocks['procedures_set_param'] = {
+  init: function() {
+    this.jsonInit({
+      "message0": Blockly.Msg.PROCEDURES_SET_PARAM,
+      "args0": [
+        {
+          "type": "input_value",
+          "name": "PARAM"
+        },
+        {
+          "type": "input_value",
+          "name": "VALUE"
+        }
+      ],
+      "extensions": ["colours_more", "shape_statement"]
+    });
+  }
+};
+
 Blockly.Blocks['procedures_return'] = {
   /**
    * Point towards drop-down menu.

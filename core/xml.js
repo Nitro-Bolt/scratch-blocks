@@ -112,6 +112,12 @@ Blockly.Xml.fieldToDomVariable_ = function(field) {
   // The new block will be serialized for the first time when firing a block
   // creation event.
   if (id == null) {
+    if (field.allowEmpty_) {
+      var emptyContainer = goog.dom.createDom('field', null, '');
+      emptyContainer.setAttribute('name', field.name);
+      emptyContainer.setAttribute('allowEmpty', 'true');
+      return emptyContainer;
+    }
     field.initModel();
     id = field.getValue();
   }
@@ -838,9 +844,22 @@ Blockly.Xml.domToBlockHeadless_ = function(xmlBlock, workspace) {
  */
 Blockly.Xml.domToFieldVariable_ = function(workspace, xml, text, field) {
   var type = xml.getAttribute('variabletype') || '';
+  var allowEmpty = xml.getAttribute('allowEmpty') === 'true';
   // TODO (fenichel): Does this need to be explicit or not?
   if (type == '\'\'') {
     type = '';
+  }
+
+  // Broadcast menus should resolve to an existing/default message instead of staying blank.
+  if (type == Blockly.BROADCAST_MESSAGE_VARIABLE_TYPE) {
+    allowEmpty = false;
+  }
+
+  if (allowEmpty && !xml.id && !text) {
+    field.variable_ = null;
+    field.value_ = null;
+    field.setText('');
+    return;
   }
 
   var variable;
@@ -851,6 +870,21 @@ Blockly.Xml.domToFieldVariable_ = function(workspace, xml, text, field) {
     var flyoutWs = workspace.getFlyout().getWorkspace();
     variable = Blockly.Variables.realizePotentialVar(text, type, flyoutWs, true);
   }
+  if (!variable) {
+    if (allowEmpty) {
+      variable = workspace.getVariable(text, type) ||
+          (workspace.getPotentialVariableMap() &&
+              workspace.getPotentialVariableMap().getVariable(text, type)) ||
+          null;
+      if (!variable) {
+        field.variable_ = null;
+        field.value_ = null;
+        field.setText('');
+        return;
+      }
+    }
+  }
+
   if (!variable) {
     variable = Blockly.Variables.getOrCreateVariablePackage(workspace, xml.id,
         text, type);

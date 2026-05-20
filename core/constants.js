@@ -278,8 +278,7 @@ Blockly.Categories = {
   "control": "control",
   "sensing": "sensing",
   "operators": "operators",
-  "more": "more",
-  "comments": "comments"
+  "more": "more"
 };
 
 /**
@@ -342,6 +341,15 @@ Blockly.DELETE_VARIABLE_ID = 'DELETE_VARIABLE_ID';
  * @const {string}
  */
 Blockly.NEW_BROADCAST_MESSAGE_ID = 'NEW_BROADCAST_MESSAGE_ID';
+
+/**
+ * String for use in the dropdown created in field_variable,
+ * specifically for scalar/list/table variables.
+ * This string indicates that this option in the dropdown is a create action
+ * and if selected, should trigger the prompt to create a new variable.
+ * @const {string}
+ */
+Blockly.NEW_VARIABLE_OPTION_ID = 'NEW_VARIABLE_OPTION_ID';
 
 /**
  * String representing the variable type of broadcast message blocks.
@@ -425,6 +433,12 @@ Blockly.PROCEDURES_CALL_TYPE_ARRAY = 4;
  * @const {string}
  */
 Blockly.PROCEDURES_RETURN_BLOCK_TYPE = 'procedures_return';
+
+/**
+ * The type of all procedure set parameter blocks.
+ * @const {string}
+ */
+Blockly.PROCEDURES_SET_PARAM_BLOCK_TYPE = 'procedures_set_param';
 
 /**
  * ENUM for flyout status button states.
