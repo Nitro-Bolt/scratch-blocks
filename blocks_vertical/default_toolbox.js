@@ -253,6 +253,38 @@ Blockly.Blocks.defaultToolbox = '<xml id="toolbox-categories" style="display: no
     '</block>' +
     '<block type="sound_volume" id="sound_volume"></block>' +
   '</category>' +
+  '<category name="%{BKY_CATEGORY_ASSETS}" id="assets" colour="#FCB103" secondaryColour="#DB9A37">' +
+    '<block type="assets_file_as_type" id="assets_file_as_type">' +
+      '<value name="ASSET_MENU">' +
+        '<shadow type="assets_menu"></shadow>' +
+      '</value>' +
+    '</block>' +
+    '<block type="assets_metadata" id="assets_metadata">' +
+      '<value name="ASSET_MENU">' +
+        '<shadow type="assets_menu"></shadow>' +
+      '</value>' +
+    '</block>' +
+    '<block type="assets_set" id="assets_set">' +
+      '<value name="ASSET_MENU">' +
+        '<shadow type="assets_menu"></shadow>' +
+      '</value>' +
+      '<value name="VALUE">' +
+        '<shadow type="text">' +
+            '<field name="TEXT">Hello</field>' +
+        '</shadow>' +
+      '</value>' +
+    '</block>' +
+    '<block type="assets_write" id="assets_write">' +
+      '<value name="VALUE">' +
+        '<shadow type="text">' +
+            '<field name="TEXT">Hello</field>' +
+        '</shadow>' +
+      '</value>' +
+      '<value name="ASSET_MENU">' +
+        '<shadow type="assets_menu"></shadow>' +
+      '</value>' +
+    '</block>' +
+  '</category>' +
   '<category name="%{BKY_CATEGORY_EVENTS}" id="events" colour="#FFD500" secondaryColour="#CC9900">' +
     '<block type="event_whenflagclicked" id="event_whenflagclicked"></block>' +
     '<block type="event_whenkeypressed" id="event_whenkeypressed">' +
