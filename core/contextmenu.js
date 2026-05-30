@@ -654,6 +654,20 @@ Blockly.ContextMenu.blockSwitchOption = function(block) {
 
         Blockly.Events.setGroup(true);
         var workspace = block.workspace;
+
+        if (opcodeData.splitInputs) {
+          opcodeData.splitInputs.forEach(function(inputName) {
+            var input = block.getInput(inputName);
+            if (!input || !input.connection) return;
+            var target = input.connection.targetBlock();
+            if (target && !target.isShadow()) {
+              input.connection.disconnect();
+              var metrics = block.getHeightWidth();
+              target.moveBy(4, metrics.height);
+            }
+          });
+        }
+
         var xml = Blockly.Xml.blockToDom(block);
         var position = block.getRelativeToSurfaceXY();
         
@@ -704,9 +718,23 @@ Blockly.ContextMenu.blockSwitchOption = function(block) {
           }
         }
 
+        var nextXml = xml.querySelector(":scope > next");
+        if (nextXml) xml.removeChild(nextXml);
+        
         block.dispose();
         var newBlock = Blockly.Xml.domToBlock(xml, workspace);
         newBlock.moveBy(position.x, position.y);
+        
+        if (nextXml) {
+          var nextBlock = Blockly.Xml.domToBlock(nextXml.firstElementChild, workspace);
+          if (newBlock.nextConnection && nextBlock.previousConnection) {
+            newBlock.nextConnection.connect(nextBlock.previousConnection);
+          } else {
+            var metrics = newBlock.getHeightWidth();
+            nextBlock.moveBy(position.x, position.y + metrics.height + 8);
+          }
+        }
+        
         Blockly.Events.setGroup(false);
         if (Blockly.Events.isEnabled()) {
           Blockly.Events.fire(new Blockly.Events.BlockCreate(newBlock));
