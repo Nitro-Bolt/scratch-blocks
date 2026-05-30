@@ -1286,8 +1286,8 @@ Blockly.Css.CONTENT = [
 
   '.blocklyWidgetDiv .goog-menuseparator, ',
   '.blocklyDropDownDiv .goog-menuseparator {',
-    'border-top: 1px solid #ccc;',
-    'margin: 4px 0;',
+    'border-top: 1px solid var(--ui-black-transparent);',
+    'margin: 2px 0;',
     'padding: 0;',
   '}',
 
