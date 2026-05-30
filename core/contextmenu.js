@@ -614,6 +614,14 @@ Blockly.ContextMenu.blockSwitchOption = function(block) {
     var opcodeData = (typeof switchData === 'string') ? { opcode: switchData } : switchData;
     var targetType = opcodeData.opcode || opcodeData.id;
 
+    var remapInputName = opcodeData.remapInputName || {};
+    if (Array.isArray(opcodeData.inputs)) {
+      remapInputName = {};
+      opcodeData.inputs.forEach(function(pair) {
+        remapInputName[pair[0]] = pair[1];
+      });
+    }
+
     options.push({
       text: Blockly.Msg.SWITCH_BLOCK.replace('%1', maybePretty(targetType)),
       enabled: true,
@@ -635,8 +643,8 @@ Blockly.ContextMenu.blockSwitchOption = function(block) {
             xml.removeChild(child);
             continue;
           }
-          if (opcodeData.remapInputName && opcodeData.remapInputName[oldName]) {
-            child.setAttribute("name", opcodeData.remapInputName[oldName]);
+          if (remapInputName[oldName]) {
+            child.setAttribute("name", remapInputName[oldName]);
           }
           if (opcodeData.remapShadowType && opcodeData.remapShadowType[oldName]) {
             const valueNode = child.firstChild;

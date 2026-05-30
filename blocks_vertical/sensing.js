@@ -86,7 +86,18 @@ Blockly.Blocks['sensing_touchingcolor'] = {
         }
       ],
       "category": Blockly.Categories.sensing,
-      "extensions": ["colours_sensing", "output_boolean"]
+      "extensions": ["colours_sensing", "output_boolean"],
+      "switches": [
+        {
+          id: 'sensing_coloristouchingcolor',
+          createInputs: {
+            COLOR2: { shadowType: 'colour_picker', value: function() {
+              var num = Math.floor(Math.random() * 256 * 256 * 256);
+              return '#' + num.toString(16).padStart(6, '0');
+            }}
+          }
+        }
+      ]
     });
   }
 };
@@ -110,7 +121,10 @@ Blockly.Blocks['sensing_coloristouchingcolor'] = {
         }
       ],
       "category": Blockly.Categories.sensing,
-      "extensions": ["colours_sensing", "output_boolean"]
+      "extensions": ["colours_sensing", "output_boolean"],
+      "switches": [
+        { id: 'sensing_touchingcolor', splitInputs: ['COLOR2'] }
+      ]
     });
   }
 };
