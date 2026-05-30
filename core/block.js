@@ -149,6 +149,12 @@ Blockly.Block = function(workspace, prototypeName, opt_id) {
   this.duplicateOnDrag_ = false;
 
   /**
+   * @type {Array<string>}
+   * @private
+   */
+  this.switches_ = false;
+
+  /**
    * @type {?string}
    * @private
    */
@@ -1334,6 +1340,9 @@ Blockly.Block.prototype.jsonInit = function(json) {
   if (json['duplicateOnDrag'] !== undefined) {
     this.setDuplicateOnDrag(json['duplicateOnDrag']);
   }
+  if (json['switches'] !== undefined) {
+    this.setSwitches(json['switches']);
+  }
   if (goog.isString(json['extensions'])) {
     console.warn('JSON attribute \'extensions\' should be an array of ' +
       'strings. Found raw string in JSON for \'' + json['type'] + '\' block.');
@@ -1863,4 +1872,20 @@ Blockly.Block.prototype.setDuplicateOnDrag = function(value) {
  */
 Blockly.Block.prototype.canDuplicateOnDrag = function() {
   return this.duplicateOnDrag_ === true && this.isShadow();
+};
+
+/**
+ * Set the blocks this block can be switched to (Example: repeat until -> while.)
+ * @param {Array<string|object>} value The blocks to be able to switch to.
+ */
+Blockly.Block.prototype.setSwitches = function(value) {
+  this.switches_ = Array.isArray(value) ? value : [];
+};
+
+/**
+ * Get the blocks this block can be switched to (Example: repeat until -> while.)
+ * @return {Array<string|object>} The blocks this block can be switched to.
+ */
+Blockly.Block.prototype.getSwitches = function() {
+  return this.switches_ || [];
 };
