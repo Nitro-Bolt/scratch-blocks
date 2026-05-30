@@ -654,6 +654,20 @@ Blockly.ContextMenu.blockSwitchOption = function(block) {
 
         Blockly.Events.setGroup(true);
         var workspace = block.workspace;
+
+        if (opcodeData.splitInputs) {
+          opcodeData.splitInputs.forEach(function(inputName) {
+            var input = block.getInput(inputName);
+            if (!input || !input.connection) return;
+            var target = input.connection.targetBlock();
+            if (target && !target.isShadow()) {
+              input.connection.disconnect();
+              var metrics = block.getHeightWidth();
+              target.moveBy(4, metrics.height);
+            }
+          });
+        }
+
         var xml = Blockly.Xml.blockToDom(block);
         var position = block.getRelativeToSurfaceXY();
         
