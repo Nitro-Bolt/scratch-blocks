@@ -704,9 +704,23 @@ Blockly.ContextMenu.blockSwitchOption = function(block) {
           }
         }
 
+        var nextXml = xml.querySelector(":scope > next");
+        if (nextXml) xml.removeChild(nextXml);
+        
         block.dispose();
         var newBlock = Blockly.Xml.domToBlock(xml, workspace);
         newBlock.moveBy(position.x, position.y);
+        
+        if (nextXml) {
+          var nextBlock = Blockly.Xml.domToBlock(nextXml.firstElementChild, workspace);
+          if (newBlock.nextConnection && nextBlock.previousConnection) {
+            newBlock.nextConnection.connect(nextBlock.previousConnection);
+          } else {
+            var metrics = newBlock.getHeightWidth();
+            nextBlock.moveBy(position.x, position.y + metrics.height + 8);
+          }
+        }
+        
         Blockly.Events.setGroup(false);
         if (Blockly.Events.isEnabled()) {
           Blockly.Events.fire(new Blockly.Events.BlockCreate(newBlock));

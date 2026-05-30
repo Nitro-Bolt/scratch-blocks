@@ -94,7 +94,11 @@ Blockly.Blocks['json_value_of_key'] = {
       "output": null,
       "category": Blockly.Categories.json,
       "extensions": ["colours_json"],
-      "outputShape": Blockly.OUTPUT_SHAPE_ROUND
+      "outputShape": Blockly.OUTPUT_SHAPE_ROUND,
+      "switches": [
+        'json_set_key',
+        'json_delete_key'
+      ]
     });
   }
 };
@@ -123,7 +127,11 @@ Blockly.Blocks['json_set_key'] = {
         }
       ],
       "category": Blockly.Categories.json,
-      "extensions": ["colours_json", "output_object"]
+      "extensions": ["colours_json", "output_object"],
+      "switches": [
+        { id: 'json_value_of_key', splitInputs: ['VALUE'] },
+        { id: 'json_delete_key', splitInputs: ['VALUE'] }
+      ]
     });
   }
 };
@@ -148,7 +156,11 @@ Blockly.Blocks['json_delete_key'] = {
         }
       ],
       "category": Blockly.Categories.json,
-      "extensions": ["colours_json", "output_object"]
+      "extensions": ["colours_json", "output_object"],
+      "switches": [
+        'json_value_of_key',
+        'json_set_key'
+      ]
     });
   }
 };
@@ -268,7 +280,11 @@ Blockly.Blocks['json_value_of_index'] = {
       "output": null,
       "category": Blockly.Categories.json,
       "extensions": ["colours_json"],
-      "outputShape": Blockly.OUTPUT_SHAPE_ROUND
+      "outputShape": Blockly.OUTPUT_SHAPE_ROUND,
+      "switches": [
+        'json_replace_index',
+        'json_delete_index'
+      ]
     });
   }
 };
@@ -347,7 +363,11 @@ Blockly.Blocks['json_replace_index'] = {
         }
       ],
       "category": Blockly.Categories.json,
-      "extensions": ["colours_json", "output_array"]
+      "extensions": ["colours_json", "output_array"],
+      "switches": [
+        { id: 'json_value_of_index', splitInputs: ['ITEM'] },
+        { id: 'json_delete_index', splitInputs: ['ITEM'] }
+      ]
     });
   }
 };
@@ -372,7 +392,11 @@ Blockly.Blocks['json_delete_index'] = {
         }
       ],
       "category": Blockly.Categories.json,
-      "extensions": ["colours_json", "output_array"]
+      "extensions": ["colours_json", "output_array"],
+      "switches": [
+        'json_value_of_index',
+        'json_replace_index'
+      ]
     });
   }
 };
