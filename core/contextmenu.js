@@ -40,6 +40,7 @@ goog.require('goog.events');
 goog.require('goog.style');
 goog.require('goog.ui.Menu');
 goog.require('goog.ui.MenuItem');
+goog.require('goog.ui.MenuSeparator');
 goog.require('goog.userAgent');
 
 
@@ -105,6 +106,10 @@ Blockly.ContextMenu.populate_ = function(options, rtl) {
   });
 
   for (var i = 0, option; option = options[i]; i++) {
+    if (option.separator === true) {
+      var separator = new goog.ui.MenuSeparator();
+      menu.addChild(separator, true);
+    }
     var menuItem = new goog.ui.MenuItem(option.text);
     menuItem.setRightToLeft(rtl);
     menu.addChild(menuItem, true);
@@ -567,6 +572,151 @@ Blockly.ContextMenu.workspaceCommentOption = function(ws, e) {
     addWsComment();
   };
   return wsCommentOption;
+};
+
+Blockly.ContextMenu.prettyNameCache = {};
+
+/**
+ * Make context menu options for switching this block to another type.
+ * @param {!Blockly.BlockSvg} block The block where the right-click originated.
+ * @return {!Array.<!Object>} An array of menu options for each switch target.
+ * @package
+ */
+Blockly.ContextMenu.blockSwitchOption = function(block) {
+  var switches = block.getSwitches();
+
+  if (!switches || switches.length === 0) {
+    return [];
+  }
+
+  var options =[];
+
+  function maybePretty(id) {
+    if (Blockly.ContextMenu.prettyNameCache[id]) {
+      return Blockly.ContextMenu.prettyNameCache[id];
+    }
+  
+    const blockDef = Blockly.Blocks[id];
+    if (!blockDef) {
+      return id.split("_").slice(1).join(" ");
+    }
+  
+    let prettyText = '';
+    let tempWorkspace = null;
+    let tempBlock = null;
+  
+    try {
+      tempWorkspace = new Blockly.Workspace();
+      tempBlock = tempWorkspace.newBlock(id);
+      if (tempBlock) {
+        prettyText = tempBlock.toString();
+      }
+    } catch (err) {
+      console.warn(`Could not resolve block text for: ${id}`, err);
+    } finally {
+      if (tempBlock) tempBlock.dispose(false);
+      if (tempWorkspace) tempWorkspace.dispose();
+    }
+  
+    const result = prettyText || id.split("_").slice(1).join(" ");
+    Blockly.ContextMenu.prettyNameCache[id] = result;
+    return result;
+  }
+
+  function getShadowFieldName(shadowType) {
+    if (shadowType === "text") return "TEXT";
+    if (shadowType === "colour_picker") return "COLOUR";
+    return "NUM";
+  }
+
+  function callIfFunction(value) {
+    return typeof value === "function" ? value() : value;
+  }
+
+  switches.forEach(function(switchData) {
+    var opcodeData = (typeof switchData === 'string') ? { opcode: switchData } : switchData;
+    var targetType = opcodeData.opcode || opcodeData.id;
+
+    var remapInputName = opcodeData.remapInputName || {};
+    if (Array.isArray(opcodeData.inputs)) {
+      remapInputName = {};
+      opcodeData.inputs.forEach(function(pair) {
+        remapInputName[pair[0]] = pair[1];
+      });
+    }
+
+    options.push({
+      text: Blockly.Msg.SWITCH_BLOCK.replace('%1', maybePretty(targetType)),
+      enabled: true,
+      separator: options.length === 0,
+      callback: function() {
+        if (opcodeData.isNoop) return;
+
+        Blockly.Events.setGroup(true);
+        var workspace = block.workspace;
+        var xml = Blockly.Xml.blockToDom(block);
+        var position = block.getRelativeToSurfaceXY();
+        
+        xml.setAttribute("x", position.x);
+        xml.setAttribute("y", position.y);
+        if (targetType) xml.setAttribute("type", targetType);
+
+        for (const child of Array.from(xml.children)) {
+          const oldName = child.getAttribute("name");
+          if (opcodeData.splitInputs && opcodeData.splitInputs.includes(oldName)) {
+            xml.removeChild(child);
+            continue;
+          }
+          if (remapInputName[oldName]) {
+            child.setAttribute("name", remapInputName[oldName]);
+          }
+          if (opcodeData.remapShadowType && opcodeData.remapShadowType[oldName]) {
+            const valueNode = child.firstChild;
+            const fieldNode = valueNode.firstChild;
+            valueNode.setAttribute("type", opcodeData.remapShadowType[oldName]);
+            fieldNode.setAttribute("name", getShadowFieldName(opcodeData.remapShadowType[oldName]));
+          }
+          if (opcodeData.mapFieldValues && opcodeData.mapFieldValues[oldName] && child.tagName === "FIELD") {
+            const newValue = opcodeData.mapFieldValues[oldName][child.innerText];
+            if (typeof newValue === "string") child.innerText = newValue;
+          }
+        }
+
+        if (opcodeData.mutate) {
+          const mutation = xml.querySelector("mutation");
+          for (const [key, value] of Object.entries(opcodeData.mutate)) {
+            mutation.setAttribute(key, value);
+          }
+        }
+
+        if (opcodeData.createInputs) {
+          for (const [inputName, inputData] of Object.entries(opcodeData.createInputs)) {
+            const valueElement = document.createElement("value");
+            valueElement.setAttribute("name", inputName);
+            const shadowElement = document.createElement("shadow");
+            shadowElement.setAttribute("type", inputData.shadowType);
+            const shadowFieldElement = document.createElement("field");
+            shadowFieldElement.setAttribute("name", getShadowFieldName(inputData.shadowType));
+            shadowFieldElement.innerText = callIfFunction(inputData.value);
+            shadowElement.appendChild(shadowFieldElement);
+            valueElement.appendChild(shadowElement);
+            xml.appendChild(valueElement);
+          }
+        }
+
+        block.dispose();
+        var newBlock = Blockly.Xml.domToBlock(xml, workspace);
+        newBlock.moveBy(position.x, position.y);
+        Blockly.Events.setGroup(false);
+        if (Blockly.Events.isEnabled()) {
+          Blockly.Events.fire(new Blockly.Events.BlockCreate(newBlock));
+        }
+        newBlock.select();
+      }
+    });
+  });
+
+  return options;
 };
 
 // End helper functions for creating context menu options.
