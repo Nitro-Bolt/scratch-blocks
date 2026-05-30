@@ -40,6 +40,7 @@ goog.require('goog.events');
 goog.require('goog.style');
 goog.require('goog.ui.Menu');
 goog.require('goog.ui.MenuItem');
+goog.require('goog.ui.MenuSeparator');
 goog.require('goog.userAgent');
 
 
@@ -105,6 +106,10 @@ Blockly.ContextMenu.populate_ = function(options, rtl) {
   });
 
   for (var i = 0, option; option = options[i]; i++) {
+    if (option.separator === true) {
+      var separator = new goog.ui.MenuSeparator();
+      menu.addChild(separator, true);
+    }
     var menuItem = new goog.ui.MenuItem(option.text);
     menuItem.setRightToLeft(rtl);
     menu.addChild(menuItem, true);
@@ -569,6 +574,8 @@ Blockly.ContextMenu.workspaceCommentOption = function(ws, e) {
   return wsCommentOption;
 };
 
+Blockly.ContextMenu.prettyNameCache = {};
+
 /**
  * Make context menu options for switching this block to another type.
  * @param {!Blockly.BlockSvg} block The block where the right-click originated.
@@ -585,19 +592,35 @@ Blockly.ContextMenu.blockSwitchOption = function(block) {
   var options =[];
 
   function maybePretty(id) {
-    const blockDef = Blockly.Blocks[id];
-    if (blockDef && blockDef.jsonInit) {
-      const json = blockDef.jsonInit;
-      for (let key in json) {
-        if (key.startsWith('message') && typeof json[key] === 'string') {
-          const match = json[key].match(/%{BKY_(.*?)}/);
-          if (match && match[1] && Blockly.Msg[match[1]]) {
-            return Blockly.Msg[match[1]];
-          }
-        }
-      }
+    if (Blockly.ContextMenu.prettyNameCache[id]) {
+      return Blockly.ContextMenu.prettyNameCache[id];
     }
-    return id.split("_").slice(1).join(" ");
+  
+    const blockDef = Blockly.Blocks[id];
+    if (!blockDef) {
+      return id.split("_").slice(1).join(" ");
+    }
+  
+    let prettyText = '';
+    let tempWorkspace = null;
+    let tempBlock = null;
+  
+    try {
+      tempWorkspace = new Blockly.Workspace();
+      tempBlock = tempWorkspace.newBlock(id);
+      if (tempBlock) {
+        prettyText = tempBlock.toString();
+      }
+    } catch (err) {
+      console.warn(`Could not resolve block text for: ${id}`, err);
+    } finally {
+      if (tempBlock) tempBlock.dispose(false);
+      if (tempWorkspace) tempWorkspace.dispose();
+    }
+  
+    const result = prettyText || id.split("_").slice(1).join(" ");
+    Blockly.ContextMenu.prettyNameCache[id] = result;
+    return result;
   }
 
   function getShadowFieldName(shadowType) {
@@ -625,6 +648,7 @@ Blockly.ContextMenu.blockSwitchOption = function(block) {
     options.push({
       text: Blockly.Msg.SWITCH_BLOCK.replace('%1', maybePretty(targetType)),
       enabled: true,
+      separator: options.length === 0,
       callback: function() {
         if (opcodeData.isNoop) return;
 
