@@ -806,7 +806,8 @@ Blockly.Blocks['operator_and_extendable'] = {
         },
       ],
       "category": Blockly.Categories.operators,
-      "extensions": ["colours_operators", "output_boolean"]
+      "extensions": ["colours_operators", "output_boolean"],
+      "switches": ["operator_or_extendable"]
     });
   }
 };
@@ -834,7 +835,8 @@ Blockly.Blocks['operator_or_extendable'] = {
         },
       ],
       "category": Blockly.Categories.operators,
-      "extensions": ["colours_operators", "output_boolean"]
+      "extensions": ["colours_operators", "output_boolean"],
+      "switches": ["operator_and_extendable"]
     });
   }
 };
