@@ -404,65 +404,15 @@ Blockly.Blocks.defaultToolbox = '<xml id="toolbox-categories" style="display: no
     '<block type="sensing_username" id="sensing_username"></block>' +
   '</category>' +
   '<category name="%{BKY_CATEGORY_OPERATORS}" id="operators" colour="#40BF4A" secondaryColour="#389438">' +
-    '<block type="operator_add" id="operator_add">' +
-      '<value name="NUM1">' +
-        '<shadow type="math_number">' +
-          '<field name="NUM"></field>' +
-        '</shadow>' +
-      '</value>' +
-      '<value name="NUM2">' +
-        '<shadow type="math_number">' +
-          '<field name="NUM"></field>' +
-        '</shadow>' +
-      '</value>' +
+    '<block type="operator_add_extendable" id="operator_add_extendable">' +
     '</block>' +
-    '<block type="operator_subtract" id="operator_subtract">' +
-      '<value name="NUM1">' +
-        '<shadow type="math_number">' +
-          '<field name="NUM"></field>' +
-        '</shadow>' +
-      '</value>' +
-      '<value name="NUM2">' +
-        '<shadow type="math_number">' +
-          '<field name="NUM"></field>' +
-        '</shadow>' +
-      '</value>' +
+    '<block type="operator_subtract_extendable" id="operator_subtract_extendable">' +
     '</block>' +
-    '<block type="operator_multiply" id="operator_multiply">' +
-      '<value name="NUM1">' +
-        '<shadow type="math_number">' +
-          '<field name="NUM"></field>' +
-        '</shadow>' +
-      '</value>' +
-      '<value name="NUM2">' +
-        '<shadow type="math_number">' +
-          '<field name="NUM"></field>' +
-        '</shadow>' +
-      '</value>' +
+    '<block type="operator_multiply_extendable" id="operator_multiply_extendable">' +
     '</block>' +
-    '<block type="operator_divide" id="operator_divide">' +
-      '<value name="NUM1">' +
-        '<shadow type="math_number">' +
-          '<field name="NUM"></field>' +
-        '</shadow>' +
-      '</value>' +
-      '<value name="NUM2">' +
-        '<shadow type="math_number">' +
-          '<field name="NUM"></field>' +
-        '</shadow>' +
-      '</value>' +
+    '<block type="operator_divide_extendable" id="operator_divide_extendable">' +
     '</block>' +
-    '<block type="operator_power" id="operator_power">' +
-      '<value name="NUM1">' +
-        '<shadow type="math_number">' +
-          '<field name="NUM"></field>' +
-        '</shadow>' +
-      '</value>' +
-      '<value name="NUM2">' +
-        '<shadow type="math_number">' +
-          '<field name="NUM"></field>' +
-        '</shadow>' +
-      '</value>' +
+    '<block type="operator_power_extendable" id="operator_power_extendable">' +
     '</block>' +
     '<block type="operator_random" id="operator_random">' +
       '<value name="FROM">' +
@@ -512,8 +462,8 @@ Blockly.Blocks.defaultToolbox = '<xml id="toolbox-categories" style="display: no
         '</shadow>' +
       '</value>' +
     '</block>' +
-    '<block type="operator_and" id="operator_and"></block>' +
-    '<block type="operator_or" id="operator_or"></block>' +
+    '<block type="operator_and_extendable" id="operator_and_extendable"></block>' +
+    '<block type="operator_or_extendable" id="operator_or_extendable"></block>' +
     '<block type="operator_not" id="operator_not"></block>' +
     '<block type="operator_join" id="operator_join">' +
       '<value name="STRING1">' +
