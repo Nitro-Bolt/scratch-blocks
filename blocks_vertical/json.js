@@ -42,6 +42,48 @@ Blockly.Blocks['json_new_object'] = {
   }
 };
 
+Blockly.Blocks['json_object_extendable'] = {
+  /**
+   * @this Blockly.Block
+   */
+  init: function() {
+    this.jsonInit({
+      "message0": Blockly.Msg.JSON_OBJECT_EXTENDABLE,
+      "args0": [
+        {
+          "type": "extendable",
+          "name": "ITEMS",
+          "args": [
+            {
+              "type": "input_value",
+              "name": "KEY",
+              "shadowOpcode": "text",
+              "shadowFieldName": "TEXT",
+              "shadowFieldValue": ""
+            },
+            {
+              "type": "field_label",
+              "text": ":"
+            },
+            {
+              "type": "input_value",
+              "name": "VALUE",
+              "shadowOpcode": "text",
+              "shadowFieldName": "TEXT",
+              "shadowFieldValue": ""
+            },
+          ],
+          "separator": ",",
+          "minInputs": 0
+        },
+      ],
+      "category": Blockly.Categories.json,
+      "extensions": ["colours_json", "output_object"],
+      "switches": ["json_array_extendable"]
+    });
+  }
+};
+
 Blockly.Blocks['json_get_properties'] = {
   /**
    * Fetches keys, values, or entries of an object based on selection.
@@ -226,6 +268,37 @@ Blockly.Blocks['json_new_array'] = {
       "message0": Blockly.Msg.JSON_NEW_ARRAY,
       "category": Blockly.Categories.json,
       "extensions": ["colours_json", "output_array"]
+    });
+  }
+};
+
+Blockly.Blocks['json_array_extendable'] = {
+  /**
+   * @this Blockly.Block
+   */
+  init: function() {
+    this.jsonInit({
+      "message0": Blockly.Msg.JSON_ARRAY_EXTENDABLE,
+      "args0": [
+        {
+          "type": "extendable",
+          "name": "ITEMS",
+          "args": [
+            {
+              "type": "input_value",
+              "name": "ITEM",
+              "shadowOpcode": "text",
+              "shadowFieldName": "TEXT",
+              "shadowFieldValue": ""
+            },
+          ],
+          "separator": "",
+          "minInputs": 0
+        },
+      ],
+      "category": Blockly.Categories.json,
+      "extensions": ["colours_json", "output_array"],
+      "switches": ["json_object_extendable"]
     });
   }
 };

@@ -344,8 +344,8 @@ Blockly.Blocks.defaultToolbox = '<xml id="toolbox-categories" style="display: no
       '</value>' +
     '</block>' +
     '<block type="control_forever" id="control_forever"></block>' +
-    '<block type="control_if" id="control_if"></block>' +
-    '<block type="control_if_else" id="control_if_else"></block>' +
+    '<block type="control_if_extendable" id="control_if_extendable"></block>' +
+    '<block type="control_if_else_extendable" id="control_if_else_extendable"></block>' +
     '<block type="control_wait_until" id="control_wait_until"></block>' +
     '<block type="control_repeat_until" id="control_repeat_until"></block>' +
     '<block type="control_stop" id="control_stop"></block>' +
@@ -465,17 +465,7 @@ Blockly.Blocks.defaultToolbox = '<xml id="toolbox-categories" style="display: no
     '<block type="operator_and_extendable" id="operator_and_extendable"></block>' +
     '<block type="operator_or_extendable" id="operator_or_extendable"></block>' +
     '<block type="operator_not" id="operator_not"></block>' +
-    '<block type="operator_join" id="operator_join">' +
-      '<value name="STRING1">' +
-        '<shadow type="text">' +
-          '<field name="TEXT">hello</field>' +
-        '</shadow>' +
-      '</value>' +
-      '<value name="STRING2">' +
-        '<shadow type="text">' +
-          '<field name="TEXT">world</field>' +
-        '</shadow>' +
-      '</value>' +
+    '<block type="operator_join_extendable" id="operator_join_extendable">' +
     '</block>' +
     '<block type="operator_letter_of" id="operator_letter_of">' +
       '<value name="LETTER">' +
@@ -547,7 +537,7 @@ Blockly.Blocks.defaultToolbox = '<xml id="toolbox-categories" style="display: no
   '<category name="%{BKY_CATEGORY_VARIABLES}" id="data" colour="#FF8C1A" secondaryColour="#DB6E00" custom="VARIABLE">' +
   '</category>' +
   '<category name="%{BKY_CATEGORY_JSON}" id="json" colour="#5755D4" secondaryColour="#4644AA">' +
-    '<block type="json_new_object" id="json_new_object">' +
+    '<block type="json_object_extendable" id="json_object_extendable">' +
     '</block>' +
     '<block type="json_get_properties" id="json_get_properties">' +
     '</block>' +
@@ -586,7 +576,7 @@ Blockly.Blocks.defaultToolbox = '<xml id="toolbox-categories" style="display: no
         '</shadow>' +
       '</value>' +
     '</block>' +
-    '<block type="json_new_array" id="json_new_array">' +
+    '<block type="json_array_extendable" id="json_array_extendable">' +
     '</block>' +
     '<block type="json_value_of_index" id="json_value_of_index">' +
       '<value name="INDEX">' +

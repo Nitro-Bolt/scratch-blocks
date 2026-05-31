@@ -47,8 +47,7 @@ Blockly.Blocks['operator_add'] = {
         }
       ],
       "category": Blockly.Categories.operators,
-      "switches": ["operator_subtract", "operator_multiply", "operator_divide",
-        "operator_power", 'operator_mod'],
+      "switches": ["operator_subtract", "operator_multiply", "operator_divide", 'operator_mod'],
       "extensions": ["colours_operators", "output_number"]
     });
   }
@@ -73,8 +72,7 @@ Blockly.Blocks['operator_subtract'] = {
         }
       ],
       "category": Blockly.Categories.operators,
-      "switches": ["operator_add", "operator_multiply", "operator_divide",
-        "operator_power", 'operator_mod'],
+      "switches": ["operator_add", "operator_multiply", "operator_divide", 'operator_mod'],
       "extensions": ["colours_operators", "output_number"]
     });
   }
@@ -99,8 +97,7 @@ Blockly.Blocks['operator_multiply'] = {
         }
       ],
       "category": Blockly.Categories.operators,
-      "switches": ["operator_add", "operator_subtract", "operator_divide",
-        "operator_power", 'operator_mod'],
+      "switches": ["operator_add", "operator_subtract", "operator_divide", 'operator_mod'],
       "extensions": ["colours_operators", "output_number"]
     });
   }
@@ -125,34 +122,7 @@ Blockly.Blocks['operator_divide'] = {
         }
       ],
       "category": Blockly.Categories.operators,
-      "switches": ["operator_add", "operator_subtract", "operator_multiply",
-        "operator_power", 'operator_mod'],
-      "extensions": ["colours_operators", "output_number"]
-    });
-  }
-};
-
-Blockly.Blocks['operator_power'] = {
-  /**
-   * Block for dividing two numbers.
-   * @this Blockly.Block
-   */
-  init: function() {
-    this.jsonInit({
-      "message0": Blockly.Msg.OPERATORS_POWER,
-      "args0": [
-        {
-          "type": "input_value",
-          "name": "NUM1"
-        },
-        {
-          "type": "input_value",
-          "name": "NUM2"
-        }
-      ],
-      "category": Blockly.Categories.operators,
-      "switches": ["operator_add", "operator_subtract", "operator_multiply",
-        'operator_mod'],
+      "switches": ["operator_add", "operator_subtract", "operator_multiply", 'operator_mod'],
       "extensions": ["colours_operators", "output_number"]
     });
   }
