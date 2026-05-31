@@ -214,7 +214,7 @@ Blockly.Blocks['extension_extendable_if_test'] = {
       "args0": [
         {
           "type": "extendable",
-          "name": "SUBSTACKS",
+          "name": "ABCSUBSTACKS",
           "args": [
             "if",
             {
@@ -225,7 +225,7 @@ Blockly.Blocks['extension_extendable_if_test'] = {
             "then",
             {
               "type": "input_statement",
-              "name": "SUBSTACK",
+              "name": "ABCSUBSTACK",
             },
           ],
           "separator": "else",
