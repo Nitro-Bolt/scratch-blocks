@@ -1218,16 +1218,19 @@ Blockly.Block.prototype.setCollapsed = function(collapsed) {
  * @param {number=} opt_maxLength Truncate the string to this length.
  * @param {string=} opt_emptyToken The placeholder string used to denote an
  *     empty field. If not specified, '?' is used.
+ * @param {boolean=} opt_showImageAlts Whether to show the alt text of icons.
  * @return {string} Text of block.
  */
-Blockly.Block.prototype.toString = function(opt_maxLength, opt_emptyToken) {
+Blockly.Block.prototype.toString = function(opt_maxLength, opt_emptyToken, opt_showImageAlts) {
   var text = [];
   var emptyFieldPlaceholder = opt_emptyToken || '?';
+  var showImageAlts = opt_showImageAlt != null ? opt_showImageAlt : true;
   if (this.collapsed_) {
     text.push(this.getInput('_TEMP_COLLAPSED_INPUT').fieldRow[0].text_);
   } else {
     for (var i = 0, input; input = this.inputList[i]; i++) {
       for (var j = 0, field; field = input.fieldRow[j]; j++) {
+        if (field instanceof Blockly.FieldImage && !showImageAlts) continue;
         if (field instanceof Blockly.FieldDropdown && !field.getValue()) {
           text.push(emptyFieldPlaceholder);
         } else {
@@ -1237,8 +1240,8 @@ Blockly.Block.prototype.toString = function(opt_maxLength, opt_emptyToken) {
       if (input.connection) {
         var child = input.connection.targetBlock();
         if (child) {
-          text.push(child.toString(undefined, emptyFieldPlaceholder));
-        } else {
+          text.push(child.toString(undefined, emptyFieldPlaceholder, showImageAlts));
+        } else if (text[text.length - 1] != "...") {
           text.push('...');
         }
       }
