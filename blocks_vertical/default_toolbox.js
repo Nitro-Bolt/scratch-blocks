@@ -345,7 +345,7 @@ Blockly.Blocks.defaultToolbox = '<xml id="toolbox-categories" style="display: no
     '</block>' +
     '<block type="control_forever" id="control_forever"></block>' +
     '<block type="control_if_extendable" id="control_if_extendable"></block>' +
-    '<block type="control_if_else_extendable" id="control_if_else_extendable"></block>' +
+    '<block type="control_switch" id="control_switch"></block>' +
     '<block type="control_wait_until" id="control_wait_until"></block>' +
     '<block type="control_repeat_until" id="control_repeat_until"></block>' +
     '<block type="control_stop" id="control_stop"></block>' +
@@ -567,7 +567,7 @@ Blockly.Blocks.defaultToolbox = '<xml id="toolbox-categories" style="display: no
         '</shadow>' +
       '</value>' +
     '</block>' +
-    '<block type="json_merge_object" id="json_merge_object">' +
+    '<block type="json_merge_object_extendable" id="json_merge_object_extendable">' +
     '</block>' +
     '<block type="json_has_key" id="json_has_key">' +
       '<value name="KEY">' +
@@ -639,7 +639,7 @@ Blockly.Blocks.defaultToolbox = '<xml id="toolbox-categories" style="display: no
         '</shadow>' +
       '</value>' +
     '</block>' +
-    '<block type="json_merge_array" id="json_merge_array">' +
+    '<block type="json_merge_array_extendable" id="json_merge_array_extendable">' +
     '</block>' +
     '<block type="json_reverse_array" id="json_reverse_array">' +
     '</block>' +

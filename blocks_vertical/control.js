@@ -626,7 +626,7 @@ Blockly.Blocks['control_if_extendable'] = {
               "name": "BRANCH",
             },
           ],
-          "separator": Blockly.Msg.CONTROL_ELSE_SEPARATOR,
+          "separator": Blockly.Msg.CONTROL_EXTENDABLE_ELSE_SEPARATOR,
           "minInputs": 1,
         }
       ],
@@ -636,42 +636,47 @@ Blockly.Blocks['control_if_extendable'] = {
   }
 };
 
-Blockly.Blocks['control_if_else_extendable'] = {
+Blockly.Blocks['control_switch'] = {
   /**
-   * Block for if-else.
+   * Block for switch-case.
    * @this Blockly.Block
    */
   init: function() {
     this.jsonInit({
-      "message0": "%1",
-      "message1": Blockly.Msg.CONTROL_EXTENDABLE_ELSE_END,
-      "message2": "%1",
+      "id": "control_switch",
+      "message0": Blockly.Msg.CONTROL_SWITCH,
+      "message1": "%1",  
       "args0": [
         {
+          "type": "input_value",
+          "name": "SWITCH",
+          "shadowOpcode": "text",
+          "shadowFieldName": "TEXT",
+          "shadowFieldValue": Blockly.Msg.OPERATORS_JOIN_APPLE
+        }
+      ],
+      "args1": [
+        {
           "type": "extendable",
-          "name": "BRANCHES",
+          "name": "CASES",
+          "forceNewline": true,
+          "defaultInputs": 1,
+          "minInputs": 1,
           "args": [
-            Blockly.Msg.CONTROL_EXTENDABLE_IF,
+            Blockly.Msg.CONTROL_SWITCH_CASE,
             {
               "type": "input_value",
-              "name": "CONDITION",
-              "check": "Boolean"
+              "name": "CASE",
+              "shadowOpcode": "text",
+              "shadowFieldName": "TEXT",
+              "shadowFieldValue": ""
             },
-            Blockly.Msg.CONTROL_EXTENDABLE_THEN,
             {
               "type": "input_statement",
-              "name": "BRANCH",
-            },
-          ],
-          "separator": Blockly.Msg.CONTROL_EXTENDABLE_ELSE_SEPARATOR,
-          "minInputs": 1,
-        },
-      ],
-      "args2": [
-        {
-          "type": "input_statement",
-          "name": "SUBSTACKELSE",
-        },
+              "name": "BRANCH"
+            }
+          ]
+        }
       ],
       "category": Blockly.Categories.control,
       "extensions": ["colours_control", "shape_statement"]

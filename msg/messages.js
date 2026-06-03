@@ -61,6 +61,8 @@ Blockly.Msg.CONTROL_EXTENDABLE_IF = 'if';
 Blockly.Msg.CONTROL_EXTENDABLE_THEN = 'then';
 Blockly.Msg.CONTROL_EXTENDABLE_ELSE_SEPARATOR = 'else';
 Blockly.Msg.CONTROL_EXTENDABLE_ELSE_END = 'else';
+Blockly.Msg.CONTROL_SWITCH = 'switch %1';
+Blockly.Msg.CONTROL_SWITCH_CASE = 'case';
 
 // Data blocks
 Blockly.Msg.DATA_SETVARIABLETO = 'set %1 to %2';
@@ -122,6 +124,7 @@ Blockly.Msg.JSON_DELETE_INDEX = 'delete index %1 from %2';
 Blockly.Msg.JSON_DELETE_ALL_OCCURRENCES = 'delete all %1 from %2';
 Blockly.Msg.JSON_HAS_ITEM = '%1 has item %2?';
 Blockly.Msg.JSON_MERGE = 'merge %1 %2';
+Blockly.Msg.JSON_MERGE_EXTENDABLE = 'merge %1';
 Blockly.Msg.JSON_ARRAY_LENGTH = 'length of %1';
 Blockly.Msg.JSON_SLICE_ARRAY = 'items %1 to %2 in %3';
 Blockly.Msg.JSON_REVERSE_ARRAY = 'reverse %1';
