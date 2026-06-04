@@ -835,9 +835,9 @@ Blockly.BlockSvg.prototype.renderCompute_ = function(iconWidth) {
     // See github.com/LLK/scratch-blocks/issues/1658
     // In all other cases, statement and value inputs catch all preceding dummy
     // inputs, and cause a line break before following inputs.
-    if (!isSecondInputOnProcedure &&
+    if (input.isNewRow == undefined ? (!isSecondInputOnProcedure &&
         (!lastType || lastType == Blockly.NEXT_STATEMENT ||
-        input.type == Blockly.NEXT_STATEMENT)) {
+        input.type == Blockly.NEXT_STATEMENT)) : input.isNewRow) {
       lastType = input.type;
       row = this.createRowForInput_(input);
       inputRows.push(row);
@@ -1322,7 +1322,7 @@ Blockly.BlockSvg.prototype.renderDrawRight_ = function(steps,
       cursorX += this.RTL ? -iconWidth : iconWidth;
     }
 
-    if (row.type == Blockly.BlockSvg.INLINE) {
+    if (row.type == Blockly.BlockSvg.INLINE && !row[0].isNewRow) {
       // Inline inputs.
       for (var x = 0, input; input = row[x]; x++) {
         // Align fields vertically within the row.
@@ -1407,6 +1407,55 @@ Blockly.BlockSvg.prototype.renderDrawRight_ = function(steps,
         steps.push(Blockly.BlockSvg.TOP_RIGHT_CORNER);
         steps.push('v', Blockly.BlockSvg.EXTRA_STATEMENT_ROW_Y - 2 * Blockly.BlockSvg.CORNER_RADIUS);
         cursorY += Blockly.BlockSvg.EXTRA_STATEMENT_ROW_Y;
+      }
+    } else if (row[0].isNewRow) {
+      // Inline inputs. But on a new row.
+      var input = row[0];
+      // Align fields vertically within the row.
+      // In renderFields_, the field is further centered by its own height.
+      cursorY -= 4;
+
+      for (var x = 0, input; input = row[x]; x++) {
+        // Align fields vertically within the row.
+        // Moves the field to half of the row's height.
+        // In renderFields_, the field is further centered
+        // by its own rendered height.
+        var fieldY = cursorY + row.height / 2;
+        var fieldX = Blockly.BlockSvg.getAlignedCursor_(cursorX, input,
+            inputRows.rightEdge);
+
+        cursorX = this.renderFields_(input.fieldRow, fieldX, fieldY);
+        if (input.type == Blockly.INPUT_VALUE) {
+          connectionX = this.RTL ? -cursorX : cursorX;
+          // Attempt to center the connection vertically.
+          var connectionYOffset = row.height / 2;
+          connectionY = cursorY + connectionYOffset;
+          input.connection.setOffsetInBlock(connectionX, connectionY);
+          this.renderInputShape_(input, cursorX, cursorY + connectionYOffset);
+          cursorX += input.renderWidth + Blockly.BlockSvg.SEP_SPACE_X;
+        }
+      }
+      // Remove final separator and replace it with right-padding.
+      cursorX -= Blockly.BlockSvg.SEP_SPACE_X;
+      cursorX += row.paddingEnd;
+      // Update right edge for all inputs, such that all rows
+      // stretch to be at least the size of all previous rows.
+      inputRows.rightEdge = Math.max(cursorX, inputRows.rightEdge);
+      // Move to the right edge
+      cursorX = Math.max(cursorX, inputRows.rightEdge);
+      this.width = Math.max(this.width, cursorX);
+      if (!this.edgeShape_) {
+        // Include corner radius in drawing the horizontal line.
+        steps.push('H', cursorX - Blockly.BlockSvg.CORNER_RADIUS - this.edgeShapeWidth_);
+        steps.push(Blockly.BlockSvg.TOP_RIGHT_CORNER);
+      } else {
+        // Don't include corner radius - no corner (edge shape drawn).
+        steps.push('H', cursorX - this.edgeShapeWidth_);
+      }
+      // Subtract CORNER_RADIUS * 2 to account for the top right corner
+      // and also the bottom right corner. Only move vertically the non-corner length.
+      if (!this.edgeShape_) {
+        steps.push('v', row.height - Blockly.BlockSvg.CORNER_RADIUS * 2);
       }
     }
     cursorY += row.height;

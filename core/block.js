@@ -1454,6 +1454,7 @@ Blockly.Block.prototype.setColourFromJson_ = function(json) {
  */
 Blockly.Block.prototype.interpolate_ = function(message, args, lastDummyAlign) {
   var tokens = Blockly.utils.tokenizeInterpolation(message);
+  if (message.includes("switc")) console.log(tokens);
   // Interpolate the arguments.  Build a list of elements.
   var indexDup = [];
   var indexCount = 0;
@@ -1473,7 +1474,9 @@ Blockly.Block.prototype.interpolate_ = function(message, args, lastDummyAlign) {
       indexCount++;
       elements.push(args[token - 1]);
     } else {
-      token = token.trim();
+      var hasNewlineStart = token.startsWith("\n") ? "\n" : "";
+      var hasNewlineEnd = token.endsWith("\n") ? "\n" : "";
+      token = hasNewlineStart + token.trim() + hasNewlineEnd;
       if (token) {
         elements.push(token);
       }
@@ -1549,88 +1552,122 @@ Blockly.Block.prototype.appendArgsList = function(
     }
   }).bind(this);
 
-  for (var i = 0; i < numElements; i++) {
+  var extraElements = [];
+  for (var i = 0; i < numElements || extraElements.length > 0; extraElements.length == 0 && i++) {
     var element = elements[i];
+    if (extraElements.length > 0) {
+      element = extraElements.shift();
+    }
     if (i == elements.length) element = dummyInput;
     if (typeof element == 'string') {
-      fieldStack.push([element, undefined]);
+      if (element.includes('\n')) {
+        var split = element.split('\n');
+        for (var j = 0; j < split.length; j++) {
+          if (j == 0 || j == split.length) {
+            extraElements.push(split[j]);
+          } else {
+            extraElements.push({type: 'field_label', text: split[j], isNewRow: true});
+          }
+        }
+        continue;
+      } else {
+        fieldStack.push([element, undefined]);
+      }
     } else {
       var field = null;
       var input = null;
       do {
         var altRepeat = false;
-        if (typeof element == 'string') {
-          field = new Blockly.FieldLabel(element);
-        } else {
-          var name = element['name'] ? (opt_namePrefix + element['name']) : element['name'];
-          switch (element['type']) {
-            case 'input_value':
-              input = this.appendValueInput(name, opt_position);
+        var name = element['name'] ? (opt_namePrefix + element['name']) : element['name'];
+        switch (element['type']) {
+          case 'input_value':
+            if (element['isNewRow'] != undefined) {
               if (opt_position !== undefined) opt_position++;
-              if (opt_populate && element.shadowOpcode) {
-                var blockType = element.shadowOpcode;
-                Blockly.Events.disable();
-                try {
-                  var newBlock = this.workspace.newBlock(blockType);
-                  if (element.shadowFieldName) {
-                    newBlock.setFieldValue(element.shadowFieldValue, element.shadowFieldName);
-                  }
-                  newBlock.setShadow(true);
-                  if (!this.isInsertionMarker()) {
-                    newBlock.initSvg();
-                    newBlock.render(false);
-                  }
-                } finally {
-                  Blockly.Events.enable();
-                }
-                if (Blockly.Events.isEnabled()) {
-                  Blockly.Events.fire(new Blockly.Events.BlockCreate(newBlock));
-                }
-                newBlock.outputConnection.connect(input.connection);
-              }
-              break;
-            case 'input_statement':
-              if (opt_position !== undefined) emptyFieldStack();
-              if (opt_isExtendable) name = "SUBSTACK" + name;
-              input = this.appendStatementInput(name, opt_position);
-              if (opt_position !== undefined) opt_position++;
-              if (opt_position !== undefined) emptyFieldStack();
-              break;
-            case 'input_dummy':
-              input = this.appendDummyInput(name, opt_position);
-              if (opt_position !== undefined) opt_position++;
-              break;
-            case 'extendable':
-              // Extendable inputs should always get their own inputs
-              if (!element['name']) {
-                throw new Error('Block "' + this.type + '": ' +
-                    'Extendable inputs must have a name.');
-              }
-              if (element['name'].startsWith("SUBSTACK")) {
-                throw new Error('Block "' + this.type + '": ' +
-                    'Extendable input names must not start with "SUBSTACK".');
-              }
               emptyFieldStack();
-              input = this.appendDummyInput(name, opt_position);
-              if (opt_position !== undefined) opt_position++;
-              field = Blockly.Field.fromJson(element);
-              break;
-            default:
-              field = Blockly.Field.fromJson(element);
-
-              // Unknown field.
-              if (!field) {
-                if (element['alt']) {
-                  element = element['alt'];
-                  altRepeat = true;
-                } else {
-                  console.warn('Blockly could not create a field of type ' +
-                      element['type'] +
-                      '. You may need to register your custom field.  See ' +
-                      'github.com/google/blockly/issues/1584');
+            }
+            input = this.appendValueInput(name, opt_position);
+            if (element['isNewRow'] != undefined) input.isNewRow = element['isNewRow'];
+            if (opt_position !== undefined) opt_position++;
+            if (opt_populate && element.shadowOpcode) {
+              var blockType = element.shadowOpcode;
+              Blockly.Events.disable();
+              try {
+                var newBlock = this.workspace.newBlock(blockType);
+                if (element.shadowFieldName) {
+                  newBlock.setFieldValue(element.shadowFieldValue, element.shadowFieldName);
                 }
+                newBlock.setShadow(true);
+                if (!this.isInsertionMarker()) {
+                  newBlock.initSvg();
+                  newBlock.render(false);
+                }
+              } finally {
+                Blockly.Events.enable();
               }
-          }
+              if (Blockly.Events.isEnabled()) {
+                Blockly.Events.fire(new Blockly.Events.BlockCreate(newBlock));
+              }
+              newBlock.outputConnection.connect(input.connection);
+            }
+            break;
+          case 'input_statement':
+            if (opt_position !== undefined) emptyFieldStack();
+            if (opt_isExtendable) name = "SUBSTACK" + name;
+            input = this.appendStatementInput(name, opt_position);
+            if (element['isNewRow'] != undefined) input.isNewRow = element['isNewRow'];
+            if (opt_position !== undefined) opt_position++;
+            if (opt_position !== undefined) emptyFieldStack();
+            break;
+          case 'input_dummy':
+            if (element['isNewRow'] != undefined) {
+              if (opt_position !== undefined) opt_position++;
+              emptyFieldStack();
+            }
+            input = this.appendDummyInput(name, opt_position);
+            if (element['isNewRow'] != undefined) input.isNewRow = element['isNewRow'];
+            if (opt_position !== undefined) opt_position++;
+            break;
+          case 'extendable':
+            // Extendable inputs should always get their own inputs
+            if (!element['name']) {
+              throw new Error('Block "' + this.type + '": ' +
+                  'Extendable inputs must have a name.');
+            }
+            if (element['name'].startsWith("SUBSTACK")) {
+              throw new Error('Block "' + this.type + '": ' +
+                  'Extendable input names must not start with "SUBSTACK".');
+            }
+            emptyFieldStack();
+            input = this.appendDummyInput(name, opt_position);
+            if (element['isNewRow'] != undefined) input.isNewRow = element['isNewRow'];
+            if (opt_position !== undefined) opt_position++;
+            field = Blockly.Field.fromJson(element);
+            break;
+          default:
+            // Place isNewRow fields in a new input, always
+            if (element['isNewRow'] != undefined) {
+              if (opt_position !== undefined) opt_position++;
+              emptyFieldStack();
+              if (!input) {
+                if (opt_position !== undefined) opt_position++;
+                input = this.appendDummyInput(name, opt_position);
+              }
+              input['isNewRow'] = element['isNewRow'];
+            }
+            field = Blockly.Field.fromJson(element);
+
+            // Unknown field.
+            if (!field) {
+              if (element['alt']) {
+                element = element['alt'];
+                altRepeat = true;
+              } else {
+                console.warn('Blockly could not create a field of type ' +
+                    element['type'] +
+                    '. You may need to register your custom field.  See ' +
+                    'github.com/google/blockly/issues/1584');
+              }
+            }
         }
       } while (altRepeat);
       if (field) {

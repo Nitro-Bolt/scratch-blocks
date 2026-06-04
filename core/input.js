@@ -59,6 +59,9 @@ Blockly.Input = function(type, name, block, connection) {
   /** @type {!Array.<!Blockly.Field>} */
   this.fieldRow = [];
 
+  /** @type {boolean?} */
+  this.isNewRow = null;
+
   /**
    * The shape that is displayed when this input is rendered but not filled.
    * @type {SVGElement}
