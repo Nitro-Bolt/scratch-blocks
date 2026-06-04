@@ -345,9 +345,11 @@ Blockly.Blocks.defaultToolbox = '<xml id="toolbox-categories" style="display: no
     '</block>' +
     '<block type="control_forever" id="control_forever"></block>' +
     '<block type="control_if_extendable" id="control_if_extendable"></block>' +
+    '<block type="control_if_else_extendable" id="control_if_else_extendable"></block>' +
     '<block type="control_switch" id="control_switch"></block>' +
     '<block type="control_wait_until" id="control_wait_until"></block>' +
     '<block type="control_repeat_until" id="control_repeat_until"></block>' +
+    '<block type="control_while" id="control_while"></block>' +
     '<block type="control_stop" id="control_stop"></block>' +
     '<block type="control_start_as_clone" id="control_start_as_clone"></block>' +
     '<block type="control_create_clone_of" id="control_create_clone_of">' +

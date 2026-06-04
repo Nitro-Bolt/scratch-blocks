@@ -1224,7 +1224,7 @@ Blockly.Block.prototype.setCollapsed = function(collapsed) {
 Blockly.Block.prototype.toString = function(opt_maxLength, opt_emptyToken, opt_showImageAlts) {
   var text = [];
   var emptyFieldPlaceholder = opt_emptyToken || '?';
-  var showImageAlts = opt_showImageAlt != null ? opt_showImageAlt : true;
+  var showImageAlts = opt_showImageAlts != null ? opt_showImageAlts : true;
   if (this.collapsed_) {
     text.push(this.getInput('_TEMP_COLLAPSED_INPUT').fieldRow[0].text_);
   } else {

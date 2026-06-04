@@ -568,6 +568,7 @@ Blockly.Blocks['operator_join_extendable'] = {
             },
           ],
           "minInputs": 1,
+          "defaultInputs": 2
         },
       ],
       "category": Blockly.Categories.operators,

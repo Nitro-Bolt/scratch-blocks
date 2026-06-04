@@ -155,7 +155,10 @@ Blockly.Blocks['json_set_key'] = {
       "args0": [
         {
           "type": "input_value",
-          "name": "KEY"
+          "name": "KEY",
+          "shadowOpcode": "text",
+          "shadowFieldName": "TEXT",
+          "shadowFieldValue": ""
         },
         {
           "type": "input_value",
@@ -164,7 +167,10 @@ Blockly.Blocks['json_set_key'] = {
         },
         {
           "type": "input_value",
-          "name": "VALUE"
+          "name": "VALUE",
+          "shadowOpcode": "text",
+          "shadowFieldName": "TEXT",
+          "shadowFieldValue": ""
         }
       ],
       "category": Blockly.Categories.json,

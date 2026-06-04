@@ -631,7 +631,52 @@ Blockly.Blocks['control_if_extendable'] = {
         }
       ],
       "category": Blockly.Categories.control,
-      "extensions": ["colours_control", "shape_statement"]
+      "extensions": ["colours_control", "shape_statement"],
+      "switches": ["control_if_else_extendable"]
+    });
+  }
+};
+
+Blockly.Blocks['control_if_else_extendable'] = {
+  /**
+   * Block for if-else.
+   * @this Blockly.Block
+   */
+  init: function() {
+    this.jsonInit({
+      "message0": "%1",
+      "message1": Blockly.Msg.CONTROL_ELSE,
+      "message2": "%1",
+      "args0": [
+        {
+          "type": "extendable",
+          "name": "BRANCHES",
+          "args": [
+            Blockly.Msg.CONTROL_EXTENDABLE_IF,
+            {
+              "type": "input_value",
+              "name": "CONDITION",
+              "check": "Boolean"
+            },
+            Blockly.Msg.CONTROL_EXTENDABLE_THEN,
+            {
+              "type": "input_statement",
+              "name": "BRANCH",
+            },
+          ],
+          "separator": Blockly.Msg.CONTROL_EXTENDABLE_ELSE_SEPARATOR,
+          "minInputs": 1,
+        }
+      ],
+      "args2": [
+        {
+          "type": "input_statement",
+          "name": "ELSE_BRANCH"
+        }
+      ],
+      "category": Blockly.Categories.control,
+      "extensions": ["colours_control", "shape_statement"],
+      "switches": ["control_if_extendable"]
     });
   }
 };
@@ -646,6 +691,8 @@ Blockly.Blocks['control_switch'] = {
       "id": "control_switch",
       "message0": Blockly.Msg.CONTROL_SWITCH,
       "message1": "%1",  
+      "message2": Blockly.Msg.CONTROL_SWITCH_DEFAULT,
+      "message3": "%1",  
       "args0": [
         {
           "type": "input_value",
@@ -676,6 +723,12 @@ Blockly.Blocks['control_switch'] = {
               "name": "BRANCH"
             }
           ]
+        }
+      ],
+      "args3": [
+        {
+          "type": "input_statement",
+          "name": "DEFAULT_BRANCH"
         }
       ],
       "category": Blockly.Categories.control,

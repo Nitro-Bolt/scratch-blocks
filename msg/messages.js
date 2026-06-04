@@ -63,6 +63,7 @@ Blockly.Msg.CONTROL_EXTENDABLE_ELSE_SEPARATOR = 'else';
 Blockly.Msg.CONTROL_EXTENDABLE_ELSE_END = 'else';
 Blockly.Msg.CONTROL_SWITCH = 'switch %1';
 Blockly.Msg.CONTROL_SWITCH_CASE = 'case';
+Blockly.Msg.CONTROL_SWITCH_DEFAULT = 'default';
 
 // Data blocks
 Blockly.Msg.DATA_SETVARIABLETO = 'set %1 to %2';
