@@ -1454,7 +1454,6 @@ Blockly.Block.prototype.setColourFromJson_ = function(json) {
  */
 Blockly.Block.prototype.interpolate_ = function(message, args, lastDummyAlign) {
   var tokens = Blockly.utils.tokenizeInterpolation(message);
-  if (message.includes("switc")) console.log(tokens);
   // Interpolate the arguments.  Build a list of elements.
   var indexDup = [];
   var indexCount = 0;
@@ -1474,11 +1473,15 @@ Blockly.Block.prototype.interpolate_ = function(message, args, lastDummyAlign) {
       indexCount++;
       elements.push(args[token - 1]);
     } else {
-      var hasNewlineStart = token.startsWith("\n") ? "\n" : "";
-      var hasNewlineEnd = token.endsWith("\n") ? "\n" : "";
-      token = hasNewlineStart + token.trim() + hasNewlineEnd;
-      if (token) {
-        elements.push(token);
+      if (token === "\n") {
+        elements.push("\n");
+      } else {
+        var hasNewlineStart = token.startsWith("\n") ? "\n" : "";
+        var hasNewlineEnd = token.endsWith("\n") ? "\n" : "";
+        token = hasNewlineStart + token.trim() + hasNewlineEnd;
+        if (token) {
+          elements.push(token);
+        }
       }
     }
   }
@@ -1563,10 +1566,16 @@ Blockly.Block.prototype.appendArgsList = function(
       if (element.includes('\n')) {
         var split = element.split('\n');
         for (var j = 0; j < split.length; j++) {
-          if (j == 0 || j == split.length) {
-            extraElements.push(split[j]);
+          if (j == 0) {
+            if (split[j] !== '') {
+              extraElements.push(split[j]);
+            }
           } else {
-            extraElements.push({type: 'field_label', text: split[j], isNewRow: true});
+            if (split[j] !== '') {
+              extraElements.push({type: 'field_label', text: split[j], isNewRow: true});
+            } else {
+              extraElements.push({type: 'input_dummy', isNewRow: true});
+            }
           }
         }
         continue;

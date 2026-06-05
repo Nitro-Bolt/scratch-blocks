@@ -35,7 +35,7 @@ Blockly.Blocks['motion_movesteps'] = {
    */
   init: function() {
     this.jsonInit({
-      "message0": 'move %1 steps',
+      "message0": Blockly.Msg.MOTION_MOVESTEPS,
       "args0": [
         {
           "type": "input_value",
