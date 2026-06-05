@@ -1316,6 +1316,7 @@ Blockly.BlockSvg.prototype.renderDrawRight_ = function(steps,
   var cursorX = 0;
   var cursorY = 0;
   var connectionX, connectionY;
+  var prevRowWidth = 0;
   for (var y = 0, row; row = inputRows[y]; y++) {
     cursorX = row.paddingStart;
     if (y == 0) {
@@ -1373,6 +1374,7 @@ Blockly.BlockSvg.prototype.renderDrawRight_ = function(steps,
       if (!this.edgeShape_) {
         steps.push('v', row.height - Blockly.BlockSvg.CORNER_RADIUS * 2);
       }
+      prevRowWidth = cursorX;
     } else if (row.type == Blockly.NEXT_STATEMENT) {
       // Nested statement.
       var input = row[0];
@@ -1408,6 +1410,7 @@ Blockly.BlockSvg.prototype.renderDrawRight_ = function(steps,
         steps.push('v', Blockly.BlockSvg.EXTRA_STATEMENT_ROW_Y - 2 * Blockly.BlockSvg.CORNER_RADIUS);
         cursorY += Blockly.BlockSvg.EXTRA_STATEMENT_ROW_Y;
       }
+      prevRowWidth = cursorX;
     } else if (row[0].isNewRow) {
       // Inline inputs. But on a new row.
       var input = row[0];
@@ -1445,9 +1448,15 @@ Blockly.BlockSvg.prototype.renderDrawRight_ = function(steps,
       cursorX = Math.max(cursorX, inputRows.rightEdge);
       this.width = Math.max(this.width, cursorX);
       if (!this.edgeShape_) {
-        // Include corner radius in drawing the horizontal line.
-        steps.push('H', cursorX - Blockly.BlockSvg.CORNER_RADIUS - this.edgeShapeWidth_);
-        steps.push(Blockly.BlockSvg.TOP_RIGHT_CORNER);
+        if (cursorX > prevRowWidth) {
+          // Include corner radius in drawing the horizontal line.
+          steps.push('H', cursorX - Blockly.BlockSvg.CORNER_RADIUS - this.edgeShapeWidth_);
+          steps.push(Blockly.BlockSvg.TOP_RIGHT_CORNER);
+        } else {
+          // Don't include corner radius - no corner (edge shape drawn).
+          steps.push('H', cursorX - this.edgeShapeWidth_);
+          steps.push('v', Blockly.BlockSvg.CORNER_RADIUS);
+        }
       } else {
         // Don't include corner radius - no corner (edge shape drawn).
         steps.push('H', cursorX - this.edgeShapeWidth_);
@@ -1457,6 +1466,7 @@ Blockly.BlockSvg.prototype.renderDrawRight_ = function(steps,
       if (!this.edgeShape_) {
         steps.push('v', row.height - Blockly.BlockSvg.CORNER_RADIUS * 2);
       }
+      prevRowWidth = cursorX;
     }
     cursorY += row.height;
   }
