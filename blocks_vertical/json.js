@@ -430,8 +430,19 @@ Blockly.Blocks['json_add_item'] = {
       "message0": Blockly.Msg.JSON_ADD_ITEM,
       "args0": [
         {
-          "type": "input_value",
-          "name": "ITEM"
+          "type": "extendable",
+          "name": "ITEMS",
+          "args": [
+            {
+              "type": "input_value",
+              "name": "ITEM",
+              "shadowOpcode": "text",
+              "shadowFieldName": "TEXT",
+              "shadowFieldValue": Blockly.Msg.JSON_BAR
+            },
+          ],
+          "separator": "",
+          "minInputs": 1
         },
         {
           "type": "input_value",

@@ -597,11 +597,6 @@ Blockly.Blocks.defaultToolbox = '<xml id="toolbox-categories" style="display: no
     '<block type="json_array_length" id="json_array_length">' +
     '</block>' +
     '<block type="json_add_item" id="json_add_item">' +
-      '<value name="ITEM">' +
-        '<shadow type="text">' +
-          '<field name="TEXT">bar</field>' +
-        '</shadow>' +
-      '</value>' +
     '</block>' +
     '<block type="json_replace_index" id="json_replace_index">' +
       '<value name="INDEX">' +
