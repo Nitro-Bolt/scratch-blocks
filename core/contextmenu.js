@@ -659,6 +659,22 @@ Blockly.ContextMenu.blockSwitchOption = function(block) {
         Blockly.Events.setGroup(true);
         var workspace = block.workspace;
 
+        // Save the parent connection and next connection so they can be re-connected afterwards.
+        var parentConnection = null;
+        if (block.previousConnection && block.previousConnection.isConnected()) {
+          parentConnection = block.previousConnection.targetConnection;
+          block.previousConnection.disconnect();
+        } else if (block.outputConnection && block.outputConnection.isConnected()) {
+          parentConnection = block.outputConnection.targetConnection;
+          block.outputConnection.disconnect();
+        }
+
+        var nextConnection = null;
+        if (block.nextConnection && block.nextConnection.isConnected()) {
+          nextConnection = block.nextConnection.targetConnection;
+          block.nextConnection.disconnect();
+        }
+
         if (opcodeData.splitInputs) {
           opcodeData.splitInputs.forEach(function(inputName) {
             var input = block.getInput(inputName);
@@ -722,20 +738,29 @@ Blockly.ContextMenu.blockSwitchOption = function(block) {
           }
         }
 
-        var nextXml = xml.querySelector(":scope > next");
-        if (nextXml) xml.removeChild(nextXml);
-        
         block.dispose();
         var newBlock = Blockly.Xml.domToBlock(xml, workspace);
         newBlock.moveBy(position.x, position.y);
         
-        if (nextXml) {
-          var nextBlock = Blockly.Xml.domToBlock(nextXml.firstElementChild, workspace);
-          if (newBlock.nextConnection && nextBlock.previousConnection) {
-            newBlock.nextConnection.connect(nextBlock.previousConnection);
-          } else {
-            var metrics = newBlock.getHeightWidth();
-            nextBlock.moveBy(position.x, position.y + metrics.height + 8);
+        // Reconnect back to the parent chain.
+        if (parentConnection) {
+          try {
+            if (newBlock.previousConnection) {
+              newBlock.previousConnection.connect(parentConnection);
+            } else if (newBlock.outputConnection) {
+              newBlock.outputConnection.connect(parentConnection);
+            }
+          } catch (e) {
+            console.warn("Failed to reconnect swapped block to its parent:", e);
+          }
+        }
+
+        // Reconnect to the next block chain.
+        if (nextConnection && newBlock.nextConnection) {
+          try {
+            newBlock.nextConnection.connect(nextConnection);
+          } catch (e) {
+            console.warn("Failed to reconnect swapped block to the next block:", e);
           }
         }
         
