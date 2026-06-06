@@ -106,7 +106,7 @@ Blockly.Msg.DATA_ROW = 'row';
 
 // JSON blocks
 Blockly.Msg.JSON_NEW_OBJECT = 'new object';
-Blockly.Msg.JSON_OBJECT_EXTENDABLE = 'new object %1';
+Blockly.Msg.JSON_OBJECT = 'new object %1';
 Blockly.Msg.JSON_GET_PROPERTIES = '%1 of %2';
 Blockly.Msg.JSON_GET_PROPERTIES_KEYS = "keys";
 Blockly.Msg.JSON_GET_PROPERTIES_VALUES = "values";
@@ -116,7 +116,7 @@ Blockly.Msg.JSON_SET_KEY = 'set %1 in %2 to %3';
 Blockly.Msg.JSON_DELETE_KEY = 'delete %1 in %2';
 Blockly.Msg.JSON_HAS_KEY = '%1 has key %2?';
 Blockly.Msg.JSON_NEW_ARRAY = 'new array';
-Blockly.Msg.JSON_ARRAY_EXTENDABLE = 'new array %1';
+Blockly.Msg.JSON_ARRAY = 'new array %1';
 Blockly.Msg.JSON_VALUE_OF_INDEX = 'item %1 of %2';
 Blockly.Msg.JSON_INDEX_OF_VALUE = 'index of %1 in %2';
 Blockly.Msg.JSON_ADD_ITEM = 'add %1 to %2';
@@ -124,8 +124,7 @@ Blockly.Msg.JSON_REPLACE_INDEX = 'replace index %1 in %2 with %3';
 Blockly.Msg.JSON_DELETE_INDEX = 'delete index %1 from %2';
 Blockly.Msg.JSON_DELETE_ALL_OCCURRENCES = 'delete all %1 from %2';
 Blockly.Msg.JSON_HAS_ITEM = '%1 has item %2?';
-Blockly.Msg.JSON_MERGE = 'merge %1 %2';
-Blockly.Msg.JSON_MERGE_EXTENDABLE = 'merge %1';
+Blockly.Msg.JSON_MERGE = 'merge %1';
 Blockly.Msg.JSON_ARRAY_LENGTH = 'length of %1';
 Blockly.Msg.JSON_SLICE_ARRAY = 'items %1 to %2 in %3';
 Blockly.Msg.JSON_REVERSE_ARRAY = 'reverse %1';

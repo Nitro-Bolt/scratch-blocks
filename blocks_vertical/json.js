@@ -42,13 +42,13 @@ Blockly.Blocks['json_new_object'] = {
   }
 };
 
-Blockly.Blocks['json_object_extendable'] = {
+Blockly.Blocks['json_object'] = {
   /**
    * @this Blockly.Block
    */
   init: function() {
     this.jsonInit({
-      "message0": Blockly.Msg.JSON_OBJECT_EXTENDABLE,
+      "message0": Blockly.Msg.JSON_OBJECT,
       "args0": [
         {
           "type": "extendable",
@@ -214,38 +214,12 @@ Blockly.Blocks['json_delete_key'] = {
 
 Blockly.Blocks['json_merge_object'] = {
   /**
-   * Merges two Objects
-   * @this Blockly.Block
-   */
-  init: function() {
-    this.jsonInit({
-      "message0": Blockly.Msg.JSON_MERGE,
-      "args0": [
-        {
-          "type": "input_value",
-          "name": "OBJ1",
-          "check": "Object"
-        },
-        {
-          "type": "input_value",
-          "name": "OBJ2",
-          "check": "Object"
-        }
-      ],
-      "category": Blockly.Categories.json,
-      "extensions": ["colours_json", "output_object"]
-    });
-  }
-};
-
-Blockly.Blocks['json_merge_object_extendable'] = {
-  /**
    * Merge objects
    * @this Blockly.Block
    */
   init: function() {
     this.jsonInit({
-      "message0": Blockly.Msg.JSON_MERGE_EXTENDABLE,
+      "message0": Blockly.Msg.JSON_MERGE,
       "args0": [
         {
           "type": "extendable",
@@ -306,13 +280,13 @@ Blockly.Blocks['json_new_array'] = {
   }
 };
 
-Blockly.Blocks['json_array_extendable'] = {
+Blockly.Blocks['json_array'] = {
   /**
    * @this Blockly.Block
    */
   init: function() {
     this.jsonInit({
-      "message0": Blockly.Msg.JSON_ARRAY_EXTENDABLE,
+      "message0": Blockly.Msg.JSON_ARRAY,
       "args0": [
         {
           "type": "extendable",
@@ -545,38 +519,12 @@ Blockly.Blocks['json_delete_all_occurrences'] = {
 
 Blockly.Blocks['json_merge_array'] = {
   /**
-   * Merges two Arrays
-   * @this Blockly.Block
-   */
-  init: function() {
-    this.jsonInit({
-      "message0": Blockly.Msg.JSON_MERGE,
-      "args0": [
-        {
-          "type": "input_value",
-          "name": "ARR1",
-          "check": "Array"
-        },
-        {
-          "type": "input_value",
-          "name": "ARR2",
-          "check": "Array"
-        }
-      ],
-      "category": Blockly.Categories.json,
-      "extensions": ["colours_json", "output_array"]
-    });
-  }
-};
-
-Blockly.Blocks['json_merge_array_extendable'] = {
-  /**
    * Merge arrays
    * @this Blockly.Block
    */
   init: function() {
     this.jsonInit({
-      "message0": Blockly.Msg.JSON_MERGE_EXTENDABLE,
+      "message0": Blockly.Msg.JSON_MERGE,
       "args0": [
         {
           "type": "extendable",

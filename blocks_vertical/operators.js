@@ -607,7 +607,7 @@ Blockly.Blocks['operator_add_extendable'] = {
         "operator_subtract_extendable",
         "operator_multiply_extendable",
         "operator_divide_extendable",
-        "operator_power_extendable"
+        "operator_power"
       ]
     });
   }
@@ -642,7 +642,7 @@ Blockly.Blocks['operator_subtract_extendable'] = {
         "operator_add_extendable",
         "operator_multiply_extendable",
         "operator_divide_extendable",
-        "operator_power_extendable"
+        "operator_power"
       ]
     });
   }
@@ -677,7 +677,7 @@ Blockly.Blocks['operator_multiply_extendable'] = {
         "operator_add_extendable",
         "operator_subtract_extendable",
         "operator_divide_extendable",
-        "operator_power_extendable"
+        "operator_power"
       ]
     });
   }
@@ -712,12 +712,12 @@ Blockly.Blocks['operator_divide_extendable'] = {
         "operator_add_extendable",
         "operator_subtract_extendable",
         "operator_multiply_extendable",
-        "operator_power_extendable"
+        "operator_power"
       ]
     });
   }
 };
-Blockly.Blocks['operator_power_extendable'] = {
+Blockly.Blocks['operator_power'] = {
   /**
    * @this Blockly.Block
    */

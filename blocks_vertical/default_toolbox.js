@@ -414,7 +414,7 @@ Blockly.Blocks.defaultToolbox = '<xml id="toolbox-categories" style="display: no
     '</block>' +
     '<block type="operator_divide_extendable" id="operator_divide_extendable">' +
     '</block>' +
-    '<block type="operator_power_extendable" id="operator_power_extendable">' +
+    '<block type="operator_power" id="operator_power">' +
     '</block>' +
     '<block type="operator_random" id="operator_random">' +
       '<value name="FROM">' +
@@ -539,7 +539,7 @@ Blockly.Blocks.defaultToolbox = '<xml id="toolbox-categories" style="display: no
   '<category name="%{BKY_CATEGORY_VARIABLES}" id="data" colour="#FF8C1A" secondaryColour="#DB6E00" custom="VARIABLE">' +
   '</category>' +
   '<category name="%{BKY_CATEGORY_JSON}" id="json" colour="#5755D4" secondaryColour="#4644AA">' +
-    '<block type="json_object_extendable" id="json_object_extendable">' +
+    '<block type="json_object" id="json_object">' +
     '</block>' +
     '<block type="json_get_properties" id="json_get_properties">' +
     '</block>' +
@@ -569,7 +569,7 @@ Blockly.Blocks.defaultToolbox = '<xml id="toolbox-categories" style="display: no
         '</shadow>' +
       '</value>' +
     '</block>' +
-    '<block type="json_merge_object_extendable" id="json_merge_object_extendable">' +
+    '<block type="json_merge_object" id="json_merge_object">' +
     '</block>' +
     '<block type="json_has_key" id="json_has_key">' +
       '<value name="KEY">' +
@@ -578,7 +578,7 @@ Blockly.Blocks.defaultToolbox = '<xml id="toolbox-categories" style="display: no
         '</shadow>' +
       '</value>' +
     '</block>' +
-    '<block type="json_array_extendable" id="json_array_extendable">' +
+    '<block type="json_array" id="json_array">' +
     '</block>' +
     '<block type="json_value_of_index" id="json_value_of_index">' +
       '<value name="INDEX">' +
@@ -636,7 +636,7 @@ Blockly.Blocks.defaultToolbox = '<xml id="toolbox-categories" style="display: no
         '</shadow>' +
       '</value>' +
     '</block>' +
-    '<block type="json_merge_array_extendable" id="json_merge_array_extendable">' +
+    '<block type="json_merge_array" id="json_merge_array">' +
     '</block>' +
     '<block type="json_reverse_array" id="json_reverse_array">' +
     '</block>' +
