@@ -428,37 +428,14 @@ Blockly.Blocks.defaultToolbox = '<xml id="toolbox-categories" style="display: no
         '</shadow>' +
       '</value>' +
     '</block>' +
-    '<block type="operator_lt" id="operator_lt">' +
-      '<value name="OPERAND1">' +
-        '<shadow type="text">' +
-          '<field name="TEXT"></field>' +
-        '</shadow>' +
-      '</value>' +
-      '<value name="OPERAND2">' +
-        '<shadow type="text">' +
-          '<field name="TEXT"></field>' +
-        '</shadow>' +
-      '</value>' +
+    '<block type="operator_lt_extendable" id="operator_lt_extendable">' +
     '</block>' +
-    '<block type="operator_equals" id="operator_equals">' +
-      '<value name="OPERAND1">' +
-        '<shadow type="text">' +
-          '<field name="TEXT"></field>' +
-        '</shadow>' +
-      '</value>' +
-      '<value name="OPERAND2">' +
-        '<shadow type="text">' +
-          '<field name="TEXT"></field>' +
-        '</shadow>' +
-      '</value>' +
+    '<block type="operator_equals_extendable" id="operator_equals_extendable">' +
     '</block>' +
-    '<block type="operator_gt" id="operator_gt">' +
+    '<block type="operator_gt_extendable" id="operator_gt_extendable">' +
+    '</block>' +
+    '<block type="operator_compare" id="operator_compare">' +
       '<value name="OPERAND1">' +
-        '<shadow type="text">' +
-          '<field name="TEXT"></field>' +
-        '</shadow>' +
-      '</value>' +
-      '<value name="OPERAND2">' +
         '<shadow type="text">' +
           '<field name="TEXT"></field>' +
         '</shadow>' +
