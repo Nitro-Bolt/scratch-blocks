@@ -1460,7 +1460,7 @@ Blockly.BlockSvg.prototype.renderDrawRight_ = function(steps,
       // Align fields vertically within the row.
       // In renderFields_, the field is further centered by its own height.
       if (!this.outputConnection) {
-        cursorY -= 4; 
+        cursorY -= Blockly.BlockSvg.CORNER_RADIUS; 
       }
 
       for (var x = 0, input; input = row[x]; x++) {
