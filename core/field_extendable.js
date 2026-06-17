@@ -131,10 +131,10 @@ Blockly.FieldExtendable.prototype.init = function() {
       this.arrowRight, 'mousedown', this, this.onMouseDown_
   );
   this.mouseDownWrapperLeft_ = Blockly.bindEventWithChecks_(
-      this.arrowLeft, 'mousedown', this, (ev) => this.onClick(-1, ev)
+      this.arrowLeft, 'mouseup', this, (ev) => this.onClick(-1, ev)
   );
   this.mouseDownWrapperRight_ = Blockly.bindEventWithChecks_(
-      this.arrowRight, 'mousedown', this, (ev) => this.onClick(1, ev)
+      this.arrowRight, 'mouseup', this, (ev) => this.onClick(1, ev)
   );
 
   this.sourceBlock_.getSvgRoot().appendChild(this.fieldGroup_);
@@ -289,6 +289,8 @@ Blockly.FieldExtendable.prototype.setValue = function(newValue, opt_force, opt_n
  */
 Blockly.FieldExtendable.prototype.onClick = function(inputs, ev) {
   if (this.disabled || !this.isCurrentlyEditable()) return;
+  if (this.sourceBlock_ && this.sourceBlock_.workspace &&
+      this.sourceBlock_.workspace.isDragging()) return;
   this.setValue(this.inputs + (inputs * (ev && ev.shiftKey ? 3 : 1)));
 };
 
