@@ -640,6 +640,8 @@ Blockly.ContextMenu.blockSwitchOption = function(block) {
   switches.forEach(function(switchData) {
     var opcodeData = (typeof switchData === 'string') ? { opcode: switchData } : switchData;
     var targetType = opcodeData.opcode || opcodeData.id;
+    
+    if (targetType === block.type) return;
 
     var remapInputName = opcodeData.remapInputName || {};
     if (Array.isArray(opcodeData.inputs)) {

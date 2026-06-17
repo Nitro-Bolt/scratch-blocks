@@ -430,16 +430,13 @@ Blockly.Blocks.defaultToolbox = '<xml id="toolbox-categories" style="display: no
     '</block>' +
     '<block type="operator_lt_extendable" id="operator_lt_extendable">' +
     '</block>' +
+    '<block type="operator_lte" id="operator_lte">' +
+    '</block>' +
     '<block type="operator_equals_extendable" id="operator_equals_extendable">' +
     '</block>' +
     '<block type="operator_gt_extendable" id="operator_gt_extendable">' +
     '</block>' +
-    '<block type="operator_compare" id="operator_compare">' +
-      '<value name="OPERAND1">' +
-        '<shadow type="text">' +
-          '<field name="TEXT"></field>' +
-        '</shadow>' +
-      '</value>' +
+    '<block type="operator_gte" id="operator_gte">' +
     '</block>' +
     '<block type="operator_and_extendable" id="operator_and_extendable"></block>' +
     '<block type="operator_or_extendable" id="operator_or_extendable"></block>' +
