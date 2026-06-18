@@ -778,7 +778,7 @@ Blockly.Blocks['operator_and_extendable'] = {
       ],
       "category": Blockly.Categories.operators,
       "extensions": ["colours_operators", "output_boolean"],
-      "switches": ["operator_or_extendable"]
+      "switches": ["operator_or_extendable","operator_xor_extendable"]
     });
   }
 };
@@ -807,7 +807,36 @@ Blockly.Blocks['operator_or_extendable'] = {
       ],
       "category": Blockly.Categories.operators,
       "extensions": ["colours_operators", "output_boolean"],
-      "switches": ["operator_and_extendable"]
+      "switches": ["operator_and_extendable","operator_xor_extendable"]
+    });
+  }
+};
+Blockly.Blocks['operator_xor_extendable'] = {
+  /**
+   * Block for extendable "xor" boolean comparator.
+   * @this Blockly.Block
+   */
+  init: function() {
+    this.jsonInit({
+      "message0": Blockly.Msg.OPERATORS_XOR_EXTENDABLE,
+      "args0": [
+        {
+          "type": "extendable",
+          "name": "OPERANDS",
+          "args": [
+            {
+              "type": "input_value",
+              "name": "OPERAND",
+              "check": "Boolean"
+            },
+          ],
+          "separator": Blockly.Msg.OPERATORS_XOR_EXTENDABLE_SEPARATOR,
+          "minInputs": 2
+        },
+      ],
+      "category": Blockly.Categories.operators,
+      "extensions": ["colours_operators", "output_boolean"],
+      "switches": ["operator_and_extendable","operator_or_extendable"]
     });
   }
 };

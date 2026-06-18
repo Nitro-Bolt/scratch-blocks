@@ -440,6 +440,7 @@ Blockly.Blocks.defaultToolbox = '<xml id="toolbox-categories" style="display: no
     '</block>' +
     '<block type="operator_and_extendable" id="operator_and_extendable"></block>' +
     '<block type="operator_or_extendable" id="operator_or_extendable"></block>' +
+    '<block type="operator_xor_extendable" id="operator_xor_extendable"></block>' +
     '<block type="operator_not" id="operator_not"></block>' +
     '<block type="operator_join_extendable" id="operator_join_extendable">' +
     '</block>' +
