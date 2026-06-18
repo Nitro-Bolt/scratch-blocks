@@ -57,6 +57,13 @@ Blockly.Msg.CONTROL_CLEARCOUNTER = 'clear counter';
 Blockly.Msg.CONTROL_ALLATONCE = 'all at once';
 Blockly.Msg.CONTROL_FOREACHINRANGE = 'for each %1 in range %2 to %3';
 Blockly.Msg.CONTROL_FOREACHINRANGE_ITEM = 'i';
+Blockly.Msg.CONTROL_EXTENDABLE_IF = 'if';
+Blockly.Msg.CONTROL_EXTENDABLE_THEN = 'then';
+Blockly.Msg.CONTROL_EXTENDABLE_ELSE_SEPARATOR = 'else';
+Blockly.Msg.CONTROL_EXTENDABLE_ELSE_END = 'else';
+Blockly.Msg.CONTROL_SWITCH = 'switch %1';
+Blockly.Msg.CONTROL_SWITCH_CASE = 'case';
+Blockly.Msg.CONTROL_SWITCH_DEFAULT = 'default';
 
 // Data blocks
 Blockly.Msg.DATA_SETVARIABLETO = 'set %1 to %2';
@@ -99,6 +106,7 @@ Blockly.Msg.DATA_ROW = 'row';
 
 // JSON blocks
 Blockly.Msg.JSON_NEW_OBJECT = 'new object';
+Blockly.Msg.JSON_OBJECT = 'new object %1';
 Blockly.Msg.JSON_GET_PROPERTIES = '%1 of %2';
 Blockly.Msg.JSON_GET_PROPERTIES_KEYS = "keys";
 Blockly.Msg.JSON_GET_PROPERTIES_VALUES = "values";
@@ -108,6 +116,7 @@ Blockly.Msg.JSON_SET_KEY = 'set %1 in %2 to %3';
 Blockly.Msg.JSON_DELETE_KEY = 'delete %1 in %2';
 Blockly.Msg.JSON_HAS_KEY = '%1 has key %2?';
 Blockly.Msg.JSON_NEW_ARRAY = 'new array';
+Blockly.Msg.JSON_ARRAY = 'new array %1';
 Blockly.Msg.JSON_VALUE_OF_INDEX = 'item %1 of %2';
 Blockly.Msg.JSON_INDEX_OF_VALUE = 'index of %1 in %2';
 Blockly.Msg.JSON_ADD_ITEM = 'add %1 to %2';
@@ -115,7 +124,7 @@ Blockly.Msg.JSON_REPLACE_INDEX = 'replace index %1 in %2 with %3';
 Blockly.Msg.JSON_DELETE_INDEX = 'delete index %1 from %2';
 Blockly.Msg.JSON_DELETE_ALL_OCCURRENCES = 'delete all %1 from %2';
 Blockly.Msg.JSON_HAS_ITEM = '%1 has item %2?';
-Blockly.Msg.JSON_MERGE = 'merge %1 %2';
+Blockly.Msg.JSON_MERGE = 'merge %1';
 Blockly.Msg.JSON_ARRAY_LENGTH = 'length of %1';
 Blockly.Msg.JSON_SLICE_ARRAY = 'items %1 to %2 in %3';
 Blockly.Msg.JSON_REVERSE_ARRAY = 'reverse %1';
@@ -274,6 +283,24 @@ Blockly.Msg.OPERATORS_CAST_BOOLEAN = 'boolean';
 Blockly.Msg.OPERATORS_CAST_ARRAY = 'array';
 Blockly.Msg.OPERATORS_CAST_OBJECT = 'object';
 Blockly.Msg.OPERATORS_TYPEOF = 'type of %1';
+Blockly.Msg.OPERATORS_JOIN_EXTENDABLE = 'join %1';
+Blockly.Msg.OPERATORS_JOIN_EXTENDABLE_APPLE = 'apple';
+Blockly.Msg.OPERATORS_AND_EXTENDABLE = '%1';
+Blockly.Msg.OPERATORS_AND_EXTENDABLE_SEPARATOR = 'and';
+Blockly.Msg.OPERATORS_OR_EXTENDABLE = '%1';
+Blockly.Msg.OPERATORS_OR_EXTENDABLE_SEPARATOR = 'or';
+Blockly.Msg.OPERATORS_XOR_EXTENDABLE = '%1';
+Blockly.Msg.OPERATORS_XOR_EXTENDABLE_SEPARATOR = 'xor';
+Blockly.Msg.OPERATORS_LT_EXTENDABLE = '%1';
+Blockly.Msg.OPERATORS_LT_EXTENDABLE_SEPARATOR = '<';
+Blockly.Msg.OPERATORS_EQUALS_EXTENDABLE = '%1';
+Blockly.Msg.OPERATORS_EQUALS_EXTENDABLE_SEPARATOR = '=';
+Blockly.Msg.OPERATORS_GT_EXTENDABLE = '%1';
+Blockly.Msg.OPERATORS_GT_EXTENDABLE_SEPARATOR = '>';
+Blockly.Msg.OPERATORS_LTE = '%1';
+Blockly.Msg.OPERATORS_LTE_SEPARATOR = '≤';
+Blockly.Msg.OPERATORS_GTE = '%1';
+Blockly.Msg.OPERATORS_GTE_SEPARATOR = '≥';
 
 // Procedures blocks
 Blockly.Msg.PROCEDURES_DEFINITION = 'define %1';
