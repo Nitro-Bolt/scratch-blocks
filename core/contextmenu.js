@@ -609,7 +609,11 @@ Blockly.ContextMenu.blockSwitchOption = function(block) {
       tempWorkspace = new Blockly.Workspace();
       tempBlock = tempWorkspace.newBlock(id);
       if (tempBlock) {
-        prettyText = tempBlock.toString();
+        prettyText = tempBlock.toString(
+          50 /*opt_maxLength*/,
+          null /*opt_emptyToken*/,
+          false /*opt_showImageAlts*/
+        );
       }
     } catch (err) {
       console.warn(`Could not resolve block text for: ${id}`, err);
@@ -636,6 +640,8 @@ Blockly.ContextMenu.blockSwitchOption = function(block) {
   switches.forEach(function(switchData) {
     var opcodeData = (typeof switchData === 'string') ? { opcode: switchData } : switchData;
     var targetType = opcodeData.opcode || opcodeData.id;
+    
+    if (targetType === block.type) return;
 
     var remapInputName = opcodeData.remapInputName || {};
     if (Array.isArray(opcodeData.inputs)) {

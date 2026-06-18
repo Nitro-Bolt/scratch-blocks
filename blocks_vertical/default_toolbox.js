@@ -344,10 +344,12 @@ Blockly.Blocks.defaultToolbox = '<xml id="toolbox-categories" style="display: no
       '</value>' +
     '</block>' +
     '<block type="control_forever" id="control_forever"></block>' +
-    '<block type="control_if" id="control_if"></block>' +
-    '<block type="control_if_else" id="control_if_else"></block>' +
+    '<block type="control_if_extendable" id="control_if_extendable"></block>' +
+    '<block type="control_if_else_extendable" id="control_if_else_extendable"></block>' +
+    '<block type="control_switch" id="control_switch"></block>' +
     '<block type="control_wait_until" id="control_wait_until"></block>' +
     '<block type="control_repeat_until" id="control_repeat_until"></block>' +
+    '<block type="control_while" id="control_while"></block>' +
     '<block type="control_stop" id="control_stop"></block>' +
     '<block type="control_start_as_clone" id="control_start_as_clone"></block>' +
     '<block type="control_create_clone_of" id="control_create_clone_of">' +
@@ -404,65 +406,15 @@ Blockly.Blocks.defaultToolbox = '<xml id="toolbox-categories" style="display: no
     '<block type="sensing_username" id="sensing_username"></block>' +
   '</category>' +
   '<category name="%{BKY_CATEGORY_OPERATORS}" id="operators" colour="#40BF4A" secondaryColour="#389438">' +
-    '<block type="operator_add" id="operator_add">' +
-      '<value name="NUM1">' +
-        '<shadow type="math_number">' +
-          '<field name="NUM"></field>' +
-        '</shadow>' +
-      '</value>' +
-      '<value name="NUM2">' +
-        '<shadow type="math_number">' +
-          '<field name="NUM"></field>' +
-        '</shadow>' +
-      '</value>' +
+    '<block type="operator_add_extendable" id="operator_add_extendable">' +
     '</block>' +
-    '<block type="operator_subtract" id="operator_subtract">' +
-      '<value name="NUM1">' +
-        '<shadow type="math_number">' +
-          '<field name="NUM"></field>' +
-        '</shadow>' +
-      '</value>' +
-      '<value name="NUM2">' +
-        '<shadow type="math_number">' +
-          '<field name="NUM"></field>' +
-        '</shadow>' +
-      '</value>' +
+    '<block type="operator_subtract_extendable" id="operator_subtract_extendable">' +
     '</block>' +
-    '<block type="operator_multiply" id="operator_multiply">' +
-      '<value name="NUM1">' +
-        '<shadow type="math_number">' +
-          '<field name="NUM"></field>' +
-        '</shadow>' +
-      '</value>' +
-      '<value name="NUM2">' +
-        '<shadow type="math_number">' +
-          '<field name="NUM"></field>' +
-        '</shadow>' +
-      '</value>' +
+    '<block type="operator_multiply_extendable" id="operator_multiply_extendable">' +
     '</block>' +
-    '<block type="operator_divide" id="operator_divide">' +
-      '<value name="NUM1">' +
-        '<shadow type="math_number">' +
-          '<field name="NUM"></field>' +
-        '</shadow>' +
-      '</value>' +
-      '<value name="NUM2">' +
-        '<shadow type="math_number">' +
-          '<field name="NUM"></field>' +
-        '</shadow>' +
-      '</value>' +
+    '<block type="operator_divide_extendable" id="operator_divide_extendable">' +
     '</block>' +
     '<block type="operator_power" id="operator_power">' +
-      '<value name="NUM1">' +
-        '<shadow type="math_number">' +
-          '<field name="NUM"></field>' +
-        '</shadow>' +
-      '</value>' +
-      '<value name="NUM2">' +
-        '<shadow type="math_number">' +
-          '<field name="NUM"></field>' +
-        '</shadow>' +
-      '</value>' +
     '</block>' +
     '<block type="operator_random" id="operator_random">' +
       '<value name="FROM">' +
@@ -476,56 +428,21 @@ Blockly.Blocks.defaultToolbox = '<xml id="toolbox-categories" style="display: no
         '</shadow>' +
       '</value>' +
     '</block>' +
-    '<block type="operator_lt" id="operator_lt">' +
-      '<value name="OPERAND1">' +
-        '<shadow type="text">' +
-          '<field name="TEXT"></field>' +
-        '</shadow>' +
-      '</value>' +
-      '<value name="OPERAND2">' +
-        '<shadow type="text">' +
-          '<field name="TEXT"></field>' +
-        '</shadow>' +
-      '</value>' +
+    '<block type="operator_lt_extendable" id="operator_lt_extendable">' +
     '</block>' +
-    '<block type="operator_equals" id="operator_equals">' +
-      '<value name="OPERAND1">' +
-        '<shadow type="text">' +
-          '<field name="TEXT"></field>' +
-        '</shadow>' +
-      '</value>' +
-      '<value name="OPERAND2">' +
-        '<shadow type="text">' +
-          '<field name="TEXT"></field>' +
-        '</shadow>' +
-      '</value>' +
+    '<block type="operator_lte" id="operator_lte">' +
     '</block>' +
-    '<block type="operator_gt" id="operator_gt">' +
-      '<value name="OPERAND1">' +
-        '<shadow type="text">' +
-          '<field name="TEXT"></field>' +
-        '</shadow>' +
-      '</value>' +
-      '<value name="OPERAND2">' +
-        '<shadow type="text">' +
-          '<field name="TEXT"></field>' +
-        '</shadow>' +
-      '</value>' +
+    '<block type="operator_equals_extendable" id="operator_equals_extendable">' +
     '</block>' +
-    '<block type="operator_and" id="operator_and"></block>' +
-    '<block type="operator_or" id="operator_or"></block>' +
+    '<block type="operator_gt_extendable" id="operator_gt_extendable">' +
+    '</block>' +
+    '<block type="operator_gte" id="operator_gte">' +
+    '</block>' +
+    '<block type="operator_and_extendable" id="operator_and_extendable"></block>' +
+    '<block type="operator_or_extendable" id="operator_or_extendable"></block>' +
+    '<block type="operator_xor_extendable" id="operator_xor_extendable"></block>' +
     '<block type="operator_not" id="operator_not"></block>' +
-    '<block type="operator_join" id="operator_join">' +
-      '<value name="STRING1">' +
-        '<shadow type="text">' +
-          '<field name="TEXT">hello</field>' +
-        '</shadow>' +
-      '</value>' +
-      '<value name="STRING2">' +
-        '<shadow type="text">' +
-          '<field name="TEXT">world</field>' +
-        '</shadow>' +
-      '</value>' +
+    '<block type="operator_join_extendable" id="operator_join_extendable">' +
     '</block>' +
     '<block type="operator_letter_of" id="operator_letter_of">' +
       '<value name="LETTER">' +
@@ -597,7 +514,7 @@ Blockly.Blocks.defaultToolbox = '<xml id="toolbox-categories" style="display: no
   '<category name="%{BKY_CATEGORY_VARIABLES}" id="data" colour="#FF8C1A" secondaryColour="#DB6E00" custom="VARIABLE">' +
   '</category>' +
   '<category name="%{BKY_CATEGORY_JSON}" id="json" colour="#5755D4" secondaryColour="#4644AA">' +
-    '<block type="json_new_object" id="json_new_object">' +
+    '<block type="json_object" id="json_object">' +
     '</block>' +
     '<block type="json_get_properties" id="json_get_properties">' +
     '</block>' +
@@ -636,7 +553,7 @@ Blockly.Blocks.defaultToolbox = '<xml id="toolbox-categories" style="display: no
         '</shadow>' +
       '</value>' +
     '</block>' +
-    '<block type="json_new_array" id="json_new_array">' +
+    '<block type="json_array" id="json_array">' +
     '</block>' +
     '<block type="json_value_of_index" id="json_value_of_index">' +
       '<value name="INDEX">' +
@@ -655,11 +572,6 @@ Blockly.Blocks.defaultToolbox = '<xml id="toolbox-categories" style="display: no
     '<block type="json_array_length" id="json_array_length">' +
     '</block>' +
     '<block type="json_add_item" id="json_add_item">' +
-      '<value name="ITEM">' +
-        '<shadow type="text">' +
-          '<field name="TEXT">bar</field>' +
-        '</shadow>' +
-      '</value>' +
     '</block>' +
     '<block type="json_replace_index" id="json_replace_index">' +
       '<value name="INDEX">' +
@@ -725,34 +637,12 @@ Blockly.Blocks.defaultToolbox = '<xml id="toolbox-categories" style="display: no
   '</category>' +
   '<category name="Extensions" id="extensions" colour="#FF6680" secondaryColour="#FF4D6A" ' +
     'iconURI="../media/extensions/wedo2-block-icon.svg" showStatusButton="true">' +
-    /* checkbox testing */
-    '<block type="extension_checkbox_test">' + // enabled
-      '<value name="CHECKBOX">' +
-        '<shadow type="checkbox"></shadow>' +
-      '</value>' +
-    '</block>' +
-    '<block type="extension_checkbox_test">' + // disabled
-    '</block>' +
-    '<block type="extension_checkbox_test_legacy">' + // enabled legacy
-      '<value name="CHECKBOX">' +
-        '<shadow type="checkbox">' +
-          '<field name="CHECKBOX">TRUE</field>' +
-        '</shadow>' +
-      '</value>' +
-    '</block>' +
-    '<block type="extension_checkbox_test_legacy">' + // disabled legacy
-      '<value name="CHECKBOX">' +
-        '<shadow type="checkbox">' +
-          '<field name="CHECKBOX">FALSE</field>' + // this should instantly turn off
-        '</shadow>' +
-      '</value>' +
-    '</block>' +
-    '<block type="extension_input">' +
-    '  <value name="VALUE">' +
-    '    <shadow type="extension_blockduplicateondrag">' +
-    '    </shadow>' +
-    '  </value>' +
-    '</block>' +
+    '<block type="extension_extendable_test" id="extension_extendable_test"></block>' +
+    '<block type="extension_nested_extendable_test" id="extension_nested_extendable_test"></block>' +
+    '<block type="extension_nested_extendable_inputs_test" id="extension_nested_extendable_inputs_test"></block>' +
+    '<block type="extension_recursive_extendable_test" id="extension_recursive_extendable_test"></block>' +
+    '<block type="extension_extendable_if_test" id="extension_extendable_if_test"></block>' +
+    '<block type="extension_extendable_reporter_test" id="extension_extendable_reporter_test"></block>' +
     '<sep gap="36"></sep>' +
     '<block type="extension_pen_down" id="extension_pen_down"></block>' +
     '<block type="extension_music_drum" id="extension_music_drum">' +

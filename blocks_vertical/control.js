@@ -599,3 +599,139 @@ Blockly.Blocks['control_foreach_in_range_item'] = {
     });
   }
 };
+
+
+Blockly.Blocks['control_if_extendable'] = {
+  /**
+   * Block for if-then.
+   * @this Blockly.Block
+   */
+  init: function() {
+    this.jsonInit({
+      "message0": "%1",
+      "args0": [
+        {
+          "type": "extendable",
+          "name": "BRANCHES",
+          "args": [
+            Blockly.Msg.CONTROL_EXTENDABLE_IF,
+            {
+              "type": "input_value",
+              "name": "CONDITION",
+              "check": "Boolean"
+            },
+            Blockly.Msg.CONTROL_EXTENDABLE_THEN,
+            {
+              "type": "input_statement",
+              "name": "BRANCH",
+            },
+          ],
+          "separator": Blockly.Msg.CONTROL_EXTENDABLE_ELSE_SEPARATOR,
+          "minInputs": 1,
+        }
+      ],
+      "category": Blockly.Categories.control,
+      "extensions": ["colours_control", "shape_statement"],
+      "switches": ["control_if_else_extendable"]
+    });
+  }
+};
+
+Blockly.Blocks['control_if_else_extendable'] = {
+  /**
+   * Block for if-else.
+   * @this Blockly.Block
+   */
+  init: function() {
+    this.jsonInit({
+      "message0": "%1",
+      "message1": Blockly.Msg.CONTROL_ELSE,
+      "message2": "%1",
+      "args0": [
+        {
+          "type": "extendable",
+          "name": "BRANCHES",
+          "args": [
+            Blockly.Msg.CONTROL_EXTENDABLE_IF,
+            {
+              "type": "input_value",
+              "name": "CONDITION",
+              "check": "Boolean"
+            },
+            Blockly.Msg.CONTROL_EXTENDABLE_THEN,
+            {
+              "type": "input_statement",
+              "name": "BRANCH",
+            },
+          ],
+          "separator": Blockly.Msg.CONTROL_EXTENDABLE_ELSE_SEPARATOR,
+          "minInputs": 1,
+        }
+      ],
+      "args2": [
+        {
+          "type": "input_statement",
+          "name": "ELSE_BRANCH"
+        }
+      ],
+      "category": Blockly.Categories.control,
+      "extensions": ["colours_control", "shape_statement"],
+      "switches": ["control_if_extendable"]
+    });
+  }
+};
+
+Blockly.Blocks['control_switch'] = {
+  /**
+   * Block for switch-case.
+   * @this Blockly.Block
+   */
+  init: function() {
+    this.jsonInit({
+      "id": "control_switch",
+      "message0": Blockly.Msg.CONTROL_SWITCH,
+      "message1": "\n%1",  
+      "message2": Blockly.Msg.CONTROL_SWITCH_DEFAULT,
+      "message3": "%1",  
+      "args0": [
+        {
+          "type": "input_value",
+          "name": "SWITCH",
+          "shadowOpcode": "text",
+          "shadowFieldName": "TEXT",
+          "shadowFieldValue": Blockly.Msg.OPERATORS_JOIN_APPLE
+        }
+      ],
+      "args1": [
+        {
+          "type": "extendable",
+          "name": "CASES",
+          "defaultInputs": 1,
+          "minInputs": 1,
+          "args": [
+            Blockly.Msg.CONTROL_SWITCH_CASE,
+            {
+              "type": "input_value",
+              "name": "CASE",
+              "shadowOpcode": "text",
+              "shadowFieldName": "TEXT",
+              "shadowFieldValue": ""
+            },
+            {
+              "type": "input_statement",
+              "name": "BRANCH"
+            }
+          ]
+        }
+      ],
+      "args3": [
+        {
+          "type": "input_statement",
+          "name": "DEFAULT_BRANCH"
+        }
+      ],
+      "category": Blockly.Categories.control,
+      "extensions": ["colours_control", "shape_statement"]
+    });
+  }
+};

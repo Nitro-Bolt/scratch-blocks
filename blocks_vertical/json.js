@@ -42,6 +42,47 @@ Blockly.Blocks['json_new_object'] = {
   }
 };
 
+Blockly.Blocks['json_object'] = {
+  /**
+   * @this Blockly.Block
+   */
+  init: function() {
+    this.jsonInit({
+      "message0": Blockly.Msg.JSON_OBJECT,
+      "args0": [
+        {
+          "type": "extendable",
+          "name": "ITEMS",
+          "args": [
+            {
+              "type": "input_value",
+              "name": "KEY",
+              "shadowOpcode": "text",
+              "shadowFieldName": "TEXT",
+              "shadowFieldValue": ""
+            },
+            {
+              "type": "field_label",
+              "text": ":"
+            },
+            {
+              "type": "input_value",
+              "name": "VALUE",
+              "shadowOpcode": "text",
+              "shadowFieldName": "TEXT",
+              "shadowFieldValue": ""
+            },
+          ],
+          "separator": ",",
+          "minInputs": 0
+        },
+      ],
+      "category": Blockly.Categories.json,
+      "extensions": ["colours_json", "output_object"]
+    });
+  }
+};
+
 Blockly.Blocks['json_get_properties'] = {
   /**
    * Fetches keys, values, or entries of an object based on selection.
@@ -114,7 +155,10 @@ Blockly.Blocks['json_set_key'] = {
       "args0": [
         {
           "type": "input_value",
-          "name": "KEY"
+          "name": "KEY",
+          "shadowOpcode": "text",
+          "shadowFieldName": "TEXT",
+          "shadowFieldValue": ""
         },
         {
           "type": "input_value",
@@ -123,7 +167,10 @@ Blockly.Blocks['json_set_key'] = {
         },
         {
           "type": "input_value",
-          "name": "VALUE"
+          "name": "VALUE",
+          "shadowOpcode": "text",
+          "shadowFieldName": "TEXT",
+          "shadowFieldValue": ""
         }
       ],
       "category": Blockly.Categories.json,
@@ -167,7 +214,7 @@ Blockly.Blocks['json_delete_key'] = {
 
 Blockly.Blocks['json_merge_object'] = {
   /**
-   * Merges two Objects
+   * Merge objects
    * @this Blockly.Block
    */
   init: function() {
@@ -175,15 +222,18 @@ Blockly.Blocks['json_merge_object'] = {
       "message0": Blockly.Msg.JSON_MERGE,
       "args0": [
         {
-          "type": "input_value",
-          "name": "OBJ1",
-          "check": "Object"
+          "type": "extendable",
+          "name": "ITEMS",
+          "args": [
+            {
+              "type": "input_value",
+              "name": "ITEM",
+              "check": "Object"
+            },
+          ],
+          "separator": "",
+          "minInputs": 2
         },
-        {
-          "type": "input_value",
-          "name": "OBJ2",
-          "check": "Object"
-        }
       ],
       "category": Blockly.Categories.json,
       "extensions": ["colours_json", "output_object"]
@@ -224,6 +274,36 @@ Blockly.Blocks['json_new_array'] = {
   init: function() {
     this.jsonInit({
       "message0": Blockly.Msg.JSON_NEW_ARRAY,
+      "category": Blockly.Categories.json,
+      "extensions": ["colours_json", "output_array"]
+    });
+  }
+};
+
+Blockly.Blocks['json_array'] = {
+  /**
+   * @this Blockly.Block
+   */
+  init: function() {
+    this.jsonInit({
+      "message0": Blockly.Msg.JSON_ARRAY,
+      "args0": [
+        {
+          "type": "extendable",
+          "name": "ITEMS",
+          "args": [
+            {
+              "type": "input_value",
+              "name": "ITEM",
+              "shadowOpcode": "text",
+              "shadowFieldName": "TEXT",
+              "shadowFieldValue": ""
+            },
+          ],
+          "separator": "",
+          "minInputs": 0
+        },
+      ],
       "category": Blockly.Categories.json,
       "extensions": ["colours_json", "output_array"]
     });
@@ -324,8 +404,19 @@ Blockly.Blocks['json_add_item'] = {
       "message0": Blockly.Msg.JSON_ADD_ITEM,
       "args0": [
         {
-          "type": "input_value",
-          "name": "ITEM"
+          "type": "extendable",
+          "name": "ITEMS",
+          "args": [
+            {
+              "type": "input_value",
+              "name": "ITEM",
+              "shadowOpcode": "text",
+              "shadowFieldName": "TEXT",
+              "shadowFieldValue": Blockly.Msg.JSON_BAR
+            },
+          ],
+          "separator": "",
+          "minInputs": 1
         },
         {
           "type": "input_value",
@@ -428,7 +519,7 @@ Blockly.Blocks['json_delete_all_occurrences'] = {
 
 Blockly.Blocks['json_merge_array'] = {
   /**
-   * Merges two Arrays
+   * Merge arrays
    * @this Blockly.Block
    */
   init: function() {
@@ -436,15 +527,18 @@ Blockly.Blocks['json_merge_array'] = {
       "message0": Blockly.Msg.JSON_MERGE,
       "args0": [
         {
-          "type": "input_value",
-          "name": "ARR1",
-          "check": "Array"
+          "type": "extendable",
+          "name": "ITEMS",
+          "args": [
+            {
+              "type": "input_value",
+              "name": "ITEM",
+              "check": "Array"
+            },
+          ],
+          "separator": "",
+          "minInputs": 2
         },
-        {
-          "type": "input_value",
-          "name": "ARR2",
-          "check": "Array"
-        }
       ],
       "category": Blockly.Categories.json,
       "extensions": ["colours_json", "output_array"]
