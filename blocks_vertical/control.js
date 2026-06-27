@@ -671,7 +671,7 @@ Blockly.Blocks['control_if_else_extendable'] = {
       "args2": [
         {
           "type": "input_statement",
-          "name": "ELSE_BRANCH"
+          "name": "SUBSTACKELSE_BRANCH"
         }
       ],
       "category": Blockly.Categories.control,
@@ -727,7 +727,7 @@ Blockly.Blocks['control_switch'] = {
       "args3": [
         {
           "type": "input_statement",
-          "name": "DEFAULT_BRANCH"
+          "name": "SUBSTACKDEFAULT_BRANCH"
         }
       ],
       "category": Blockly.Categories.control,
