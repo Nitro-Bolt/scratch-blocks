@@ -343,6 +343,69 @@ Blockly.Blocks['looks_size'] = {
   }
 };
 
+Blockly.Blocks['looks_layer'] = {
+  /**
+   * Block to report sprite layer
+   * @this Blockly.Block
+   */
+  init: function() {
+    this.jsonInit({
+      "message0": Blockly.Msg.LOOKS_LAYER,
+      "category": Blockly.Categories.looks,
+      "checkboxInFlyout": true,
+      "extensions": ["colours_looks", "output_number"]
+    });
+  }
+};
+
+Blockly.Blocks['looks_changelayerby'] = {
+  /**
+   * Block to change sprite layer
+   * @this Blockly.Block
+   */
+  init: function() {
+    this.jsonInit({
+      "message0": Blockly.Msg.LOOKS_CHANGELAYERBY,
+      "args0": [
+        {
+          "type": "input_value",
+          "name": "NUM"
+        }
+      ],
+      "category": Blockly.Categories.looks,
+      "extensions": ["colours_looks", "shape_statement"],
+      "switches":[{
+        id: "looks_setlayerto",
+        inputs: [["NUM","NUM"]]
+      }]
+    });
+  }
+};
+
+Blockly.Blocks['looks_setlayerto'] = {
+  /**
+   * Block to set sprite layer
+   * @this Blockly.Block
+   */
+  init: function() {
+    this.jsonInit({
+      "message0": Blockly.Msg.LOOKS_SETLAYERTO,
+      "args0": [
+        {
+          "type": "input_value",
+          "name": "NUM"
+        }
+      ],
+      "category": Blockly.Categories.looks,
+      "extensions": ["colours_looks", "shape_statement"],
+      "switches":[{
+        id: "looks_changelayerby",
+        inputs: [["NUM","NUM"]]
+      }]
+    });
+  }
+};
+
 Blockly.Blocks['looks_changestretchby'] = {
   /**
    * Block to change stretch. Does not actually do anything. This is an
