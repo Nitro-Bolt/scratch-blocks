@@ -198,8 +198,10 @@ Blockly.Blocks['control_inline_if_else'] = {
           "name": "ELSE"
         }
       ],
+      "output": null,
+      "outputShape": Blockly.OUTPUT_SHAPE_ROUND,
       "category": Blockly.Categories.control,
-      "extensions": ["colours_control", "output_number"]
+      "extensions": ["colours_control"]
     });
   }
 };
@@ -719,9 +721,9 @@ Blockly.Blocks['control_switch'] = {
     this.jsonInit({
       "id": "control_switch",
       "message0": Blockly.Msg.CONTROL_SWITCH,
-      "message1": "\n%1",  
+      "message1": "\n%1",
       "message2": Blockly.Msg.CONTROL_SWITCH_DEFAULT,
-      "message3": "%1",  
+      "message3": "%1",
       "args0": [
         {
           "type": "input_value",
