@@ -56,6 +56,26 @@ Blockly.Blocks['assets_menu'] = {
   }
 };
 
+Blockly.Blocks['assets_sprite_menu'] = {
+  /**
+   * Sprite drop-down menu for assets.
+   * @this Blockly.Block
+   */
+  init: function() {
+    this.jsonInit({
+      "message0": "%1",
+      "args0": [
+        {
+          "type": "field_dropdown",
+          "name": "SPRITE_OPTION",
+          "options": []
+        }
+      ],
+      "extensions": ["colours_assets", "output_string"]
+    });
+  }
+};
+
 Blockly.Blocks['assets_file_as_type'] = {
   /**
    * Block to report the data of an asset
@@ -83,6 +103,26 @@ Blockly.Blocks['assets_file_as_type'] = {
     });
   }
 };
+
+Blockly.Blocks['assets_all'] = {
+  /**
+   * Block to report all asset names in a sprite
+   * @this Blockly.Block
+   */
+  init: function() {
+    this.jsonInit({
+      "message0": Blockly.Msg.ASSETS_ALL,
+      "args0": [
+        {
+          "type": "input_value",
+          "name": "SPRITE"
+        }
+      ],
+      "category": Blockly.Categories.assets,
+      "extensions": ["colours_assets", "output_array"]
+    })
+  }
+}
 
 Blockly.Blocks['assets_metadata'] = {
   /**

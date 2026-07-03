@@ -376,6 +376,7 @@ Blockly.Msg.SOUND_RECORD = 'record...';
 
 // Asset blocks
 Blockly.Msg.ASSETS_FILE_AS_TYPE = '%1 as %2';
+Blockly.Msg.ASSETS_ALL = 'all assets in %1';
 Blockly.Msg.ASSETS_METADATA = '%1 of %2';
 Blockly.Msg.ASSETS_SET = 'set %1 of %2 to %3';
 Blockly.Msg.ASSETS_WRITE = 'write %1 as %2 to %3';
