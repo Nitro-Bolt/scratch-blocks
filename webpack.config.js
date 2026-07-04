@@ -71,9 +71,6 @@ module.exports = [{
         from: 'blocks_common',
         to: 'playgrounds/blocks_common',
       }, {
-        from: 'blocks_horizontal',
-        to: 'playgrounds/blocks_horizontal',
-      }, {
         from: 'blocks_vertical',
         to: 'playgrounds/blocks_vertical',
       }, {

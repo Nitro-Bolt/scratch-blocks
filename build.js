@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+// Compresses the core Blockly files into a single JavaScript file.
 
 const onlyUncompressed = process.argv.includes("--uncompressed");
 
