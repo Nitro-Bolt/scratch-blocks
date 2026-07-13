@@ -356,6 +356,7 @@ Blockly.Msg.SENSING_CURRENT_DAYOFWEEK = 'day of week';
 Blockly.Msg.SENSING_CURRENT_HOUR = 'hour';
 Blockly.Msg.SENSING_CURRENT_MINUTE = 'minute';
 Blockly.Msg.SENSING_CURRENT_SECOND = 'second';
+Blockly.Msg.SENSING_CURRENT_REFRESHTIME = 'screen refresh time';
 Blockly.Msg.SENSING_DAYSSINCE2000 = 'days since 2000';
 Blockly.Msg.SENSING_USERNAME = 'username';
 Blockly.Msg.SENSING_USERID = 'user id';
