@@ -22,7 +22,13 @@ module.exports = [{
     filename: '[name].js'
   },
   optimization: {
-    minimize: false
+    minimizer: [
+      new UglifyJsPlugin({
+        uglifyOptions: {
+          mangle: false
+        }
+      })
+    ]
   },
   performance: {
     hints: false
