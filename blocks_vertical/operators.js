@@ -493,6 +493,35 @@ Blockly.Blocks['operator_mathop'] = {
   }
 };
 
+Blockly.Blocks['operator_constant'] = {
+  /**
+   * Block for a math constant (pi, e, etc.).
+   * @this Blockly.Block
+   */
+  init: function() {
+    this.jsonInit({
+      "message0": "%1",
+      "args0": [
+        {
+          "type": "field_dropdown",
+          "name": "CONSTANT",
+          "options": [
+            ["\u03C0", "pi"],
+            ["e", "e"],
+            ["\u03C6", "phi"],
+            ["\u221A2", "sqrt2"],
+            ["\u221A\u00BD", "sqrt1_2"],
+            ["ε", "epsilon"],
+            ["∞", "infinity"]
+          ]
+        }
+      ],
+      "category": Blockly.Categories.operators,
+      "extensions": ["colours_operators", "output_number"]
+    });
+  }
+};
+
 Blockly.Blocks['operator_cast'] = {
   /**
    * Block for casting a value to a specific type.

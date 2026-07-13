@@ -501,6 +501,10 @@ Blockly.Field.prototype.render_ = function() {
     this.box_.setAttribute('width', this.size_.width);
     this.box_.setAttribute('height', this.size_.height);
   }
+  // Update the hit area for dropdown-only blocks.
+  if (this.hitArea_) {
+    this.hitArea_.setAttribute('width', this.size_.width);
+  }
 };
 
 /**
@@ -814,7 +818,7 @@ Blockly.Field.prototype.getClickTarget_ = function() {
   for (var i = 0, input; input = this.sourceBlock_.inputList[i]; i++) {
     nFields += input.fieldRow.length;
   }
-  if (nFields <= 1 && this.sourceBlock_.outputConnection) {
+  if (nFields <= 1 && this.sourceBlock_.outputConnection && this.box_) {
     return this.sourceBlock_.getSvgRoot();
   } else {
     return this.getSvgRoot();
