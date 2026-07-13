@@ -518,6 +518,8 @@ Blockly.Blocks.defaultToolbox = '<xml id="toolbox-categories" style="display: no
         '</shadow>' +
       '</value>' +
     '</block>' +
+    '<block type="operator_constant" id="operator_constant">' +
+    '</block>' +
     '<block type="operator_cast">' +
     '  <value name="VALUE">' +
     '    <shadow type="text">' +

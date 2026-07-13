@@ -677,6 +677,27 @@ Blockly.Block.prototype.setShadow = function(newBoolean) {
 };
 
 /**
+ * Check whether a given field is the only field on this block.
+ * All inputs must be DUMMY_INPUTs and this must be the sole field across them.
+ * @param {!Blockly.Field} field The field to check.
+ * @return {boolean} True if the field is the only content on this block.
+ */
+Blockly.Block.prototype.isOnlyField = function(field) {
+  for (var i = 0; i < this.inputList.length; i++) {
+    var input = this.inputList[i];
+    if (input.type !== Blockly.DUMMY_INPUT) {
+      return false;
+    }
+    for (var j = 0; j < input.fieldRow.length; j++) {
+      if (input.fieldRow[j] !== field) {
+        return false;
+      }
+    }
+  }
+  return true;
+};
+
+/**
  * Get whether this block is an insertion marker block or not.
  * @return {boolean} True if an insertion marker.
  */
