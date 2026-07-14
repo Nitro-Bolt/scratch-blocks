@@ -359,6 +359,34 @@ Blockly.Blocks['operator_letter_of'] = {
   }
 };
 
+Blockly.Blocks['operator_letters_in'] = {
+  /**
+   * Block for "letters _ to _ of _" operator.
+   * @this Blockly.Block
+   */
+  init: function() {
+    this.jsonInit({
+      "message0": Blockly.Msg.OPERATORS_LETTERSIN,
+      "args0": [
+        {
+          "type": "input_value",
+          "name": "START"
+        },
+        {
+          "type": "input_value",
+          "name": "END"
+        },
+        {
+          "type": "input_value",
+          "name": "STRING"
+        }
+      ],
+      "category": Blockly.Categories.operators,
+      "extensions": ["colours_operators", "output_string"]
+    });
+  }
+};
+
 Blockly.Blocks['operator_length'] = {
   /**
    * Block for string length operator.
@@ -509,10 +537,7 @@ Blockly.Blocks['operator_constant'] = {
             ["\u03C0", "pi"],
             ["e", "e"],
             ["\u03C6", "phi"],
-            ["\u221A2", "sqrt2"],
-            ["\u221A\u00BD", "sqrt1_2"],
             ["ε", "epsilon"],
-            ["∞", "infinity"]
           ]
         }
       ],
