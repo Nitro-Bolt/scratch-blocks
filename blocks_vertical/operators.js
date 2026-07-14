@@ -537,10 +537,7 @@ Blockly.Blocks['operator_constant'] = {
             ["\u03C0", "pi"],
             ["e", "e"],
             ["\u03C6", "phi"],
-            ["\u221A2", "sqrt2"],
-            ["\u221A\u00BD", "sqrt1_2"],
             ["ε", "epsilon"],
-            ["∞", "infinity"]
           ]
         }
       ],
