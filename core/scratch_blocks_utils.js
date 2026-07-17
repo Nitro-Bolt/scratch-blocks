@@ -64,8 +64,19 @@ Blockly.scratchBlocksUtils.changeObscuredShadowIds = function(block) {
       if (connection) {
         var shadowDom = connection.getShadowDom();
         if (shadowDom) {
-          shadowDom.setAttribute('id', Blockly.utils.genUid());
+          var newId = Blockly.utils.genUid();
+          var oldId = shadowDom.getAttribute('id');
+          shadowDom.setAttribute('id', newId);
           connection.setShadowDom(shadowDom);
+          // Update the ID to match VM
+          var targetBlock = connection.targetBlock();
+          if (targetBlock && targetBlock.isShadow()) {
+            if (targetBlock.workspace) {
+              delete targetBlock.workspace.blockDB_[oldId];
+              targetBlock.workspace.blockDB_[newId] = targetBlock;
+            }
+            targetBlock.id = newId;
+          }
         }
       }
     }
