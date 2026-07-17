@@ -1435,7 +1435,6 @@ Blockly.WorkspaceSvg.prototype.onMouseMoveTrack_ = function(e) {
  * @private
  */
 Blockly.WorkspaceSvg.prototype.onMouseMoveTrackDoc_ = function(e) {
-  console.log(e.clientX, e.clientY)
   this.lastMouseClientXY_ = new goog.math.Coordinate(e.clientX, e.clientY);
 };
 
