@@ -402,6 +402,15 @@ Blockly.Workspace.prototype.deleteVariableInternal_ = function(variable, uses) {
 };
 
 /**
+ * Replace all uses of one variable with another existing variable.
+ * @param {string} oldId ID of the variable to replace.
+ * @param {string} newId ID of the variable to replace with.
+ */
+Blockly.Workspace.prototype.replaceVariableById = function(oldId, newId) {
+  this.variableMap_.replaceVariableById(oldId, newId);
+};
+
+/**
  * Check whether a variable exists with the given name.  The check is
  * case-insensitive.
  * @param {string} _name The name to check for.

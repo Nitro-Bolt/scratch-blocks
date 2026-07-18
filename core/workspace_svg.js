@@ -1298,6 +1298,17 @@ Blockly.WorkspaceSvg.prototype.deleteVariableById = function(id) {
 };
 
 /**
+ * Replace all uses of one variable with another existing variable.
+ * @param {string} oldId ID of the variable to replace.
+ * @param {string} newId ID of the variable to replace with.
+ * @package
+ */
+Blockly.WorkspaceSvg.prototype.replaceVariableById = function(oldId, newId) {
+  Blockly.WorkspaceSvg.superClass_.replaceVariableById.call(this, oldId, newId);
+  this.refreshToolboxSelection_();
+};
+
+/**
  * Create a new variable with the given name.  Update the flyout to show the new
  *     variable immediately.
  * @param {string} name The new variable's name.
@@ -1844,6 +1855,7 @@ Blockly.WorkspaceSvg.prototype.showContextMenu_ = function(e) {
   var map = ws.getVariableMap();
   var unusedVarCount = 0;
   var unusedListCount = 0;
+  var unusedTableCount = 0;
 
   var vars = map.getVariablesOfType('');
   for (var i = 0; i < vars.length; i++) {
@@ -1864,7 +1876,22 @@ Blockly.WorkspaceSvg.prototype.showContextMenu_ = function(e) {
       }
     }
   }
-  menuOptions.push(Blockly.ContextMenu.workspaceCleanupUnusedVarsOption(ws, unusedVarCount, unusedListCount));
+
+  var tables = map.getVariablesOfType(Blockly.TABLE_VARIABLE_TYPE);
+  for (var i = 0; i < tables.length; i++) {
+    if (tables[i].isLocal) {
+      var usages = map.getVariableUsesById(tables[i].getId());
+      if (!usages || usages.length === 0) {
+        unusedTableCount++;
+      }
+    }
+  }
+
+  menuOptions.push(
+      Blockly.ContextMenu.workspaceCleanupUnusedVarsOption(
+          ws, unusedVarCount, unusedListCount, unusedTableCount
+      )
+  );
 
   Blockly.ContextMenu.show(e, menuOptions, this.RTL);
 };

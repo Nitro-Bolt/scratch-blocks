@@ -358,6 +358,27 @@ Blockly.ContextMenu.blockCommentOption = function(block) {
 };
 
 /**
+ * Make a context menu option for making space for the block.
+ * @param {!Blockly.BlockSvg} block The block where the right-click originated.
+ * @return {!Object} A menu option, containing text, enabled, and a callback.
+ * @package
+ */
+Blockly.ContextMenu.blockMakeSpaceOption = function(block) {
+  var makeSpaceOption = {
+    text: Blockly.Msg.MAKE_SPACE,
+    enabled: true,
+    callback: function() {
+      if (block && block.workspace) {
+        Blockly.Events.setGroup(true);
+        block.workspace.cleanUp(block);
+        Blockly.Events.setGroup(false);
+      }
+    }
+  };
+  return makeSpaceOption;
+};
+
+/**
  * Make a context menu option for undoing the most recent action on the
  * workspace.
  * @param {!Blockly.WorkspaceSvg} ws The workspace where the right-click
@@ -623,10 +644,11 @@ Blockly.ContextMenu.workspaceDeleteOrphansOption = function(ws, orphanCount) {
  *     originated.
  * @param {!number} varCount Amount of unused local variables.
  * @param {!number} listCount Amount of unused local lists.
+ * @param {!number} tableCount Amount of unused local tables.
  * @return {!Object} A menu option, containing text, enabled, and a callback.
  * @package
  */
-Blockly.ContextMenu.workspaceCleanupUnusedVarsOption = function(ws, varCount, listCount) {
+Blockly.ContextMenu.workspaceCleanupUnusedVarsOption = function(ws, varCount, listCount, tableCount) {
   var deleteUnused = function() {
     Blockly.Events.setGroup(true);
 
@@ -651,6 +673,16 @@ Blockly.ContextMenu.workspaceCleanupUnusedVarsOption = function(ws, varCount, li
       }
     }
 
+    var tables = map.getVariablesOfType(Blockly.TABLE_VARIABLE_TYPE);
+    for (var i = 0; i < tables.length; i++) {
+      if (tables[i].isLocal) {
+        var usages = map.getVariableUsesById(tables[i].getId());
+        if (!usages || usages.length === 0) {
+          ws.deleteVariableById(tables[i].getId());
+        }
+      }
+    }
+
     Blockly.Events.setGroup(false);
   };
 
@@ -663,8 +695,13 @@ Blockly.ContextMenu.workspaceCleanupUnusedVarsOption = function(ws, varCount, li
     if (total < 2) {
       deleteUnused();
     } else {
+      var message = tableCount === 0
+        ? Blockly.Msg.DELETE_ALL_UNUSED_VARS.replace('%1', String(varCount)).replace('%2', String(listCount))
+        : Blockly.Msg.DELETE_ALL_UNUSED_TABLES
+            .replace('%1', String(varCount)).replace('%2', String(listCount)).replace('%3', String(tableCount));
+
       Blockly.confirm(
-          Blockly.Msg.DELETE_ALL_UNUSED_VARS.replace('%1', String(varCount)).replace('%2', String(listCount)),
+          message,
           function(ok) {
             if (ok) {
               deleteUnused();
