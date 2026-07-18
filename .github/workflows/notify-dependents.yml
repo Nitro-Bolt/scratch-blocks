@@ -5,6 +5,7 @@ on:
     branches:
       - develop-builds
   workflow_dispatch:
+  workflow_call:
     inputs: {}
 
 jobs:
