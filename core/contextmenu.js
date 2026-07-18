@@ -585,11 +585,7 @@ Blockly.ContextMenu.workspaceCommentOption = function(ws, e) {
  */
 Blockly.ContextMenu.workspaceDeleteOrphansOption = function(ws, orphanCount) {
   var deleteOrphans = function() {
-    var disabled = false;
-    if (Blockly.Events.isEnabled()) {
-      Blockly.Events.disable();
-      disabled = true;
-    }
+    Blockly.Events.setGroup(true);
 
     var blocks = ws.getTopBlocks(true);
     blocks.forEach(function(block) {
@@ -598,9 +594,7 @@ Blockly.ContextMenu.workspaceDeleteOrphansOption = function(ws, orphanCount) {
       }
     });
 
-    if (disabled) {
-      Blockly.Events.enable();
-    }
+    Blockly.Events.setGroup(false);
   };
 
   var wsDeleteOrphansOption = {enabled: orphanCount > 0};
@@ -634,8 +628,9 @@ Blockly.ContextMenu.workspaceDeleteOrphansOption = function(ws, orphanCount) {
  */
 Blockly.ContextMenu.workspaceCleanupUnusedVarsOption = function(ws, varCount, listCount) {
   var deleteUnused = function() {
-    var map = ws.getVariableMap();
+    Blockly.Events.setGroup(true);
 
+    var map = ws.getVariableMap();
     var vars = map.getVariablesOfType('');
     for (var i = 0; i < vars.length; i++) {
       if (vars[i].isLocal) {
@@ -655,6 +650,8 @@ Blockly.ContextMenu.workspaceCleanupUnusedVarsOption = function(ws, varCount, li
         }
       }
     }
+
+    Blockly.Events.setGroup(false);
   };
 
   var total = varCount + listCount;
