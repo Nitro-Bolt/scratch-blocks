@@ -1180,6 +1180,7 @@ Blockly.WorkspaceSvg.prototype.paste = function(xmlBlock) {
 /**
  * Paste the provided block onto the workspace.
  * @param {!Element} xmlBlock XML block element.
+ * @returns {!Blockly.BlockSvg} The pasted block.
  */
 Blockly.WorkspaceSvg.prototype.pasteBlock_ = function(xmlBlock) {
   Blockly.Events.disable();
@@ -1623,6 +1624,7 @@ Blockly.WorkspaceSvg.prototype.showContextMenu_ = function(e) {
   }
   var menuOptions = [];
   var topBlocks = this.getTopBlocks(true);
+  var allBlocks = this.getAllBlocks(true);
   var eventGroup = Blockly.utils.genUid();
   var ws = this;
 
@@ -1674,7 +1676,7 @@ Blockly.WorkspaceSvg.prototype.showContextMenu_ = function(e) {
     }
   }
 
-  var DELAY = 10;
+  var DELAY = 9;
   function deleteNext() {
     Blockly.Events.setGroup(eventGroup);
     var block = deleteList.shift();
@@ -1711,6 +1713,17 @@ Blockly.WorkspaceSvg.prototype.showContextMenu_ = function(e) {
     }
   };
   menuOptions.push(deleteOption);
+
+  // Option to delete all orphan blocks.
+  // Count the number of blocks that are orphaned.
+  var orphanCount = 0;
+  for (var i = 0; i < allBlocks.length; i++) {
+    const b = allBlocks[i];
+    if (!!b.outputConnection && !b.parentBlock_) {
+      orphanCount++;
+    }
+  }
+  menuOptions.push(Blockly.ContextMenu.workspaceDeleteOrphansOption(ws,orphanCount));
 
   Blockly.ContextMenu.show(e, menuOptions, this.RTL);
 };

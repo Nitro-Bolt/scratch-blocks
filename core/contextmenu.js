@@ -265,7 +265,7 @@ Blockly.ContextMenu.blockCollapseOption = function(block) {
   }
 
   // Disable collapsing for procedures definition.
-  const enabled = block.type !== Blockly.PROCEDURES_DEFINITION_BLOCK_TYPE;
+  var enabled = block.type !== Blockly.PROCEDURES_DEFINITION_BLOCK_TYPE;
 
   if (block.isCollapsed()) {
     var expandOption = {
@@ -292,7 +292,7 @@ Blockly.ContextMenu.blockCollapseOption = function(block) {
     };
     return collapseOption;
   }
-}
+};
 
 /**
  * Make a context menu option for showing help for the current block.
@@ -508,7 +508,7 @@ Blockly.ContextMenu.commentDuplicateOption = function(comment) {
 /**
  * Make a context menu option for adding a comment on the workspace.
  * @param {!Blockly.WorkspaceSvg} ws The workspace where the right-click
- *     originated.
+ * originated.
  * @param {!Event} e The right-click mouse event.
  * @return {!Object} A menu option, containing text, enabled, and a callback.
  * @package
@@ -574,6 +574,55 @@ Blockly.ContextMenu.workspaceCommentOption = function(ws, e) {
   return wsCommentOption;
 };
 
+/**
+ * Make context menu option for removing all blocks that are orphans
+ *     (output and no parent connection)
+ * @param {!Blockly.WorkspaceSvg} ws The workspace where the right-click
+ *     originated.
+ * @param {!number} orphanCount Amount of orphan blocks.
+ * @return {!Object} A menu option, containing text, enabled, and a callback.
+ * @package
+ */
+Blockly.ContextMenu.workspaceDeleteOrphansOption = function(ws, orphanCount) {
+  var deleteOrphans = function() {
+    var disabled = false;
+    if (Blockly.Events.isEnabled()) {
+      Blockly.Events.disable();
+      disabled = true;
+    }
+
+    var blocks = ws.getTopBlocks(true);
+    blocks.forEach(function(block) {
+      if (!!block.outputConnection && !block.parentBlock_) {
+        block.dispose();
+      }
+    });
+
+    if (disabled) {
+      Blockly.Events.enable();
+    }
+  };
+
+  var wsDeleteOrphansOption = {enabled: orphanCount > 0};
+  wsDeleteOrphansOption.text = orphanCount == 1
+      ? Blockly.Msg.DELETE_ORPHANS
+      : Blockly.Msg.DELETE_X_ORPHANS.replace('%1', String(orphanCount));
+  wsDeleteOrphansOption.callback = function() {
+    if (orphanCount < 2 ) {
+      deleteOrphans();
+    } else {
+      Blockly.confirm(
+          Blockly.Msg.DELETE_ALL_ORPHANS.replace('%1', String(orphanCount)),
+          function(ok) {
+            if (ok) {
+              deleteOrphans();
+            }
+          });
+    }
+  };
+  return wsDeleteOrphansOption;
+};
+
 Blockly.ContextMenu.prettyNameCache = {};
 
 /**
@@ -589,30 +638,30 @@ Blockly.ContextMenu.blockSwitchOption = function(block) {
     return [];
   }
 
-  var options =[];
+  var options = [];
 
   function maybePretty(id) {
     if (Blockly.ContextMenu.prettyNameCache[id]) {
       return Blockly.ContextMenu.prettyNameCache[id];
     }
-  
+
     const blockDef = Blockly.Blocks[id];
     if (!blockDef) {
       return id.split("_").slice(1).join(" ");
     }
-  
+
     let prettyText = '';
     let tempWorkspace = null;
     let tempBlock = null;
-  
+
     try {
       tempWorkspace = new Blockly.Workspace();
       tempBlock = tempWorkspace.newBlock(id);
       if (tempBlock) {
         prettyText = tempBlock.toString(
-          50 /*opt_maxLength*/,
-          null /*opt_emptyToken*/,
-          false /*opt_showImageAlts*/
+            50 /*opt_maxLength*/,
+            null /*opt_emptyToken*/,
+            false /*opt_showImageAlts*/
         );
       }
     } catch (err) {
@@ -621,7 +670,7 @@ Blockly.ContextMenu.blockSwitchOption = function(block) {
       if (tempBlock) tempBlock.dispose(false);
       if (tempWorkspace) tempWorkspace.dispose();
     }
-  
+
     const result = prettyText || id.split("_").slice(1).join(" ");
     Blockly.ContextMenu.prettyNameCache[id] = result;
     return result;
@@ -640,7 +689,7 @@ Blockly.ContextMenu.blockSwitchOption = function(block) {
   switches.forEach(function(switchData) {
     var opcodeData = (typeof switchData === 'string') ? { opcode: switchData } : switchData;
     var targetType = opcodeData.opcode || opcodeData.id;
-    
+
     if (targetType === block.type) return;
 
     var remapInputName = opcodeData.remapInputName || {};
@@ -692,7 +741,7 @@ Blockly.ContextMenu.blockSwitchOption = function(block) {
 
         var xml = Blockly.Xml.blockToDom(block);
         var position = block.getRelativeToSurfaceXY();
-        
+
         xml.setAttribute("x", position.x);
         xml.setAttribute("y", position.y);
         if (targetType) xml.setAttribute("type", targetType);
@@ -743,7 +792,7 @@ Blockly.ContextMenu.blockSwitchOption = function(block) {
         block.dispose();
         var newBlock = Blockly.Xml.domToBlock(xml, workspace);
         newBlock.moveBy(position.x, position.y);
-        
+
         // Reconnect back to the parent chain.
         if (parentConnection) {
           try {
@@ -765,7 +814,7 @@ Blockly.ContextMenu.blockSwitchOption = function(block) {
             console.warn("Failed to reconnect swapped block to the next block:", e);
           }
         }
-        
+
         Blockly.Events.setGroup(false);
         if (Blockly.Events.isEnabled()) {
           Blockly.Events.fire(new Blockly.Events.BlockCreate(newBlock));
