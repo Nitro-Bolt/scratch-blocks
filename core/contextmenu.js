@@ -623,6 +623,61 @@ Blockly.ContextMenu.workspaceDeleteOrphansOption = function(ws, orphanCount) {
   return wsDeleteOrphansOption;
 };
 
+/**
+ * Make context menu option for removing all unused local variables and lists.
+ * @param {!Blockly.WorkspaceSvg} ws The workspace where the right-click
+ *     originated.
+ * @param {!number} varCount Amount of unused local variables.
+ * @param {!number} listCount Amount of unused local lists.
+ * @return {!Object} A menu option, containing text, enabled, and a callback.
+ * @package
+ */
+Blockly.ContextMenu.workspaceCleanupUnusedVarsOption = function(ws, varCount, listCount) {
+  var deleteUnused = function() {
+    var map = ws.getVariableMap();
+
+    var vars = map.getVariablesOfType('');
+    for (var i = 0; i < vars.length; i++) {
+      if (vars[i].isLocal) {
+        var usages = map.getVariableUsesById(vars[i].getId());
+        if (!usages || usages.length === 0) {
+          ws.deleteVariableById(vars[i].getId());
+        }
+      }
+    }
+
+    var lists = map.getVariablesOfType(Blockly.LIST_VARIABLE_TYPE);
+    for (var i = 0; i < lists.length; i++) {
+      if (lists[i].isLocal) {
+        var usages = map.getVariableUsesById(lists[i].getId());
+        if (!usages || usages.length === 0) {
+          ws.deleteVariableById(lists[i].getId());
+        }
+      }
+    }
+  };
+
+  var total = varCount + listCount;
+  var wsCleanupOption = {enabled: total > 0};
+  wsCleanupOption.text = (total == 1)
+      ? Blockly.Msg.DELETE_UNUSED_VAR
+      : Blockly.Msg.DELETE_UNUSED_VARS;
+  wsCleanupOption.callback = function() {
+    if (total < 2) {
+      deleteUnused();
+    } else {
+      Blockly.confirm(
+          Blockly.Msg.DELETE_ALL_UNUSED_VARS.replace('%1', String(varCount)).replace('%2', String(listCount)),
+          function(ok) {
+            if (ok) {
+              deleteUnused();
+            }
+          });
+    }
+  };
+  return wsCleanupOption;
+};
+
 Blockly.ContextMenu.prettyNameCache = {};
 
 /**
