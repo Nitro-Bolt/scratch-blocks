@@ -376,6 +376,7 @@ Blockly.ContextMenu.blockMakeSpaceOption = function(block) {
     }
   };
   return makeSpaceOption;
+};
 
 /**
  * Make a context-menu option which fits a new group around this block stack.
