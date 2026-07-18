@@ -358,6 +358,27 @@ Blockly.ContextMenu.blockCommentOption = function(block) {
 };
 
 /**
+ * Make a context menu option for making space for the block.
+ * @param {!Blockly.BlockSvg} block The block where the right-click originated.
+ * @return {!Object} A menu option, containing text, enabled, and a callback.
+ * @package
+ */
+Blockly.ContextMenu.blockMakeSpaceOption = function(block) {
+  var makeSpaceOption = {
+    text: Blockly.Msg.MAKE_SPACE,
+    enabled: true,
+    callback: function() {
+      if (block && block.workspace) {
+        Blockly.Events.setGroup(true);
+        block.workspace.cleanUp(block);
+        Blockly.Events.setGroup(false);
+      }
+    }
+  };
+  return makeSpaceOption;
+};
+
+/**
  * Make a context menu option for undoing the most recent action on the
  * workspace.
  * @param {!Blockly.WorkspaceSvg} ws The workspace where the right-click
