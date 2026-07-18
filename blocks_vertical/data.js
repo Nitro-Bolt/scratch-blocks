@@ -1067,6 +1067,13 @@ Blockly.Constants.Data.CUSTOM_CONTEXT_MENU_GET_VARIABLE_MIXIN = {
                 variablesList[i].getId(), fieldName);
         options.push(option);
       }
+      options.push({
+        text: Blockly.Msg.REPLACE_VARIABLE,
+        enabled: true,
+        callback: Blockly.Constants.Data.REPLACE_OPTION_CALLBACK_FACTORY(
+            this, fieldName),
+        separator: true
+      });
     } else {
       var renameOption = {
         text: Blockly.Msg.RENAME_VARIABLE,
@@ -1126,6 +1133,14 @@ Blockly.Constants.Data.CUSTOM_CONTEXT_MENU_GET_LIST_MIXIN = {
                 variablesList[i].getId(), fieldName);
         options.push(option);
       }
+      options.push({separator: true});
+      options.push({
+        text: Blockly.Msg.REPLACE_LIST,
+        enabled: true,
+        callback: Blockly.Constants.Data.REPLACE_OPTION_CALLBACK_FACTORY(
+            this, fieldName),
+        separator: true
+      });
     } else {
       var renameOption = {
         text: Blockly.Msg.RENAME_LIST,
@@ -1184,6 +1199,14 @@ Blockly.Constants.Data.CUSTOM_CONTEXT_MENU_GET_TABLE_MIXIN = {
                 variablesList[i].getId(), fieldName);
         options.push(option);
       }
+      options.push({separator: true});
+      options.push({
+        text: Blockly.Msg.REPLACE_TABLE,
+        enabled: true,
+        callback: Blockly.Constants.Data.REPLACE_OPTION_CALLBACK_FACTORY(
+            this, fieldName),
+        separator: true
+      });
     } else {
       var renameOption = {
         text: Blockly.Msg.RENAME_TABLE,
@@ -1255,5 +1278,42 @@ Blockly.Constants.Data.DELETE_OPTION_CALLBACK_FACTORY = function(block,
     var workspace = block.workspace;
     var variable = block.getField(fieldName).getVariable();
     workspace.deleteVariableById(variable.getId());
+  };
+};
+
+/**
+ * Callback for replace variable dropdown menu option associated with a
+ * variable getter block.
+ * @param {!Blockly.Block} block The block with the variable to replace.
+ * @param {string} fieldName The name of the field to inspect on the block.
+ * @return {!function()} A function that replaces the variable references.
+ */
+Blockly.Constants.Data.REPLACE_OPTION_CALLBACK_FACTORY = function(block,
+    fieldName) {
+  return function() {
+    var workspace = block.workspace;
+    var variable = block.getField(fieldName).getVariable();
+    var varType = variable.type;
+    var promptMsg;
+    if (varType == Blockly.TABLE_VARIABLE_TYPE) {
+      promptMsg = Blockly.Msg.REPLACE_TABLE_TITLE;
+    } else if (varType == Blockly.LIST_VARIABLE_TYPE) {
+      promptMsg = Blockly.Msg.REPLACE_LIST_TITLE;
+    } else {
+      promptMsg = Blockly.Msg.REPLACE_VARIABLE_TITLE;
+    }
+    Blockly.prompt(promptMsg.replace('%1', variable.name), '',
+        function(newName) {
+          if (newName) {
+            var newVar = workspace.getVariable(newName, varType);
+            if (!newVar) {
+              Blockly.alert(
+                  Blockly.Msg.REPLACE_VARIABLE_DOES_NOT_EXIST.replace(
+                      '%1', newName));
+              return;
+            }
+            workspace.replaceVariableById(variable.getId(), newVar.getId());
+          }
+        });
   };
 };
