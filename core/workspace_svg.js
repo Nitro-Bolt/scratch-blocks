@@ -1180,6 +1180,7 @@ Blockly.WorkspaceSvg.prototype.paste = function(xmlBlock) {
 /**
  * Paste the provided block onto the workspace.
  * @param {!Element} xmlBlock XML block element.
+ * @returns {!Blockly.BlockSvg} The pasted block.
  */
 Blockly.WorkspaceSvg.prototype.pasteBlock_ = function(xmlBlock) {
   Blockly.Events.disable();
@@ -1595,21 +1596,136 @@ Blockly.WorkspaceSvg.prototype.getBlocksBoundingBox = function() {
 
 /**
  * Clean up the workspace by ordering all the blocks in a column.
+ * Enhanced version that groups blocks into columns based on their x position
+ * and handles comments and unused variables.
+ * @param {Blockly.Block=} opt_blockToMakeSpaceFor Optional block to make extra space around.
  */
-Blockly.WorkspaceSvg.prototype.cleanUp = function() {
+Blockly.WorkspaceSvg.prototype.cleanUp = function(opt_blockToMakeSpaceFor) {
+  // Only treat as a block if it's actually a block object (context menu passes true)
+  var makeSpaceForBlock = opt_blockToMakeSpaceFor && typeof opt_blockToMakeSpaceFor.getRootBlock === 'function'
+      ? opt_blockToMakeSpaceFor.getRootBlock() : null;
+
   this.setResizesEnabled(false);
   Blockly.Events.setGroup(true);
-  var topBlocks = this.getTopBlocks(true);
-  var cursorY = 0;
-  for (var i = 0, block; block = topBlocks[i]; i++) {
-    var xy = block.getRelativeToSurfaceXY();
-    block.moveBy(-xy.x, cursorY - xy.y);
-    block.snapToGrid();
-    cursorY = block.getRelativeToSurfaceXY().y +
-        block.getHeightWidth().height + Blockly.BlockSvg.MIN_BLOCK_Y;
+
+  // Get ordered top block columns
+  var result = this.getOrderedTopBlockColumns_();
+  var columns = result.cols;
+
+  // Position blocks in columns
+  var cursorX = 48;
+  var maxWidths = result.maxWidths;
+
+  for (var c = 0; c < columns.length; c++) {
+    var column = columns[c];
+    var cursorY = 64;
+    var maxWidth = 0;
+
+    for (var b = 0; b < column.blocks.length; b++) {
+      var block = column.blocks[b];
+      var extraWidth = block === makeSpaceForBlock ? 380 : 0;
+      var extraHeight = block === makeSpaceForBlock ? 480 : 72;
+      var xy = block.getRelativeToSurfaceXY();
+
+      if (cursorX - xy.x !== 0 || cursorY - xy.y !== 0) {
+        block.moveBy(cursorX - xy.x, cursorY - xy.y);
+      }
+
+      var heightWidth = block.getHeightWidth();
+      cursorY += heightWidth.height + extraHeight;
+
+      var maxWidthWithComments = maxWidths[block.id] || 0;
+      maxWidth = Math.max(maxWidth,
+          Math.max(heightWidth.width + extraWidth, maxWidthWithComments));
+    }
+
+    cursorX += maxWidth + 96;
   }
+
+  // Reposition comments
+  var topComments = this.getTopComments(false);
+  for (var i = 0; i < topComments.length; i++) {
+    var comment = topComments[i];
+    if (comment.setVisible) {
+      comment.setVisible(false);
+      comment.needsAutoPositioning_ = true;
+      comment.setVisible(true);
+    }
+  }
+
   Blockly.Events.setGroup(false);
   this.setResizesEnabled(true);
+};
+
+/**
+ * Split the top blocks into ordered columns based on their x position.
+ * @return {!Object} An object with cols and maxWidths.
+ * @private
+ */
+Blockly.WorkspaceSvg.prototype.getOrderedTopBlockColumns_ = function() {
+  var topBlocks = this.getTopBlocks(false);
+  var maxWidths = {};
+
+  var topComments = this.getTopComments(false);
+
+  // Calculate max widths from comments
+  for (var i = 0; i < topComments.length; i++) {
+    var comment = topComments[i];
+    if (comment.setVisible) {
+      comment.setVisible(false);
+      comment.needsAutoPositioning_ = true;
+      comment.setVisible(true);
+
+      var right = comment.getBoundingRectangle().bottomRight.x;
+
+      // Get top block for stack
+      var root = comment.block_.getRootBlock();
+      var left = root.getBoundingRectangle().topLeft.x;
+      maxWidths[root.id] = Math.max(right - left, maxWidths[root.id] || 0);
+    }
+  }
+
+  // Group blocks into columns based on x position tolerance
+  var cols = [];
+  var TOLERANCE = 256;
+
+  for (var i = 0; i < topBlocks.length; i++) {
+    var topBlock = topBlocks[i];
+    var position = topBlock.getRelativeToSurfaceXY();
+
+    // Find the best matching column
+    var bestCol = null;
+    var bestError = TOLERANCE;
+
+    for (var j = 0; j < cols.length; j++) {
+      var err = Math.abs(position.x - cols[j].x);
+      if (err < bestError) {
+        bestError = err;
+        bestCol = cols[j];
+      }
+    }
+
+    if (bestCol) {
+      // Add to existing column and update average x position
+      bestCol.x = (bestCol.x * bestCol.count + position.x) / ++bestCol.count;
+      bestCol.blocks.push(topBlock);
+    } else {
+      // Create a new column
+      cols.push({x: position.x, count: 1, blocks: [topBlock]});
+    }
+  }
+
+  // Sort columns by x position
+  cols.sort((a, b) => a.x - b.x);
+
+  // Sort blocks in columns by y position
+  for (var i = 0; i < cols.length; i++) {
+    cols[i].blocks.sort(function(a, b) {
+      return a.getRelativeToSurfaceXY().y - b.getRelativeToSurfaceXY().y;
+    });
+  }
+
+  return {cols: cols, maxWidths: maxWidths};
 };
 
 /**
@@ -1623,6 +1739,7 @@ Blockly.WorkspaceSvg.prototype.showContextMenu_ = function(e) {
   }
   var menuOptions = [];
   var topBlocks = this.getTopBlocks(true);
+  var allBlocks = this.getAllBlocks(true);
   var eventGroup = Blockly.utils.genUid();
   var ws = this;
 
@@ -1674,7 +1791,7 @@ Blockly.WorkspaceSvg.prototype.showContextMenu_ = function(e) {
     }
   }
 
-  var DELAY = 10;
+  var DELAY = 9;
   function deleteNext() {
     Blockly.Events.setGroup(eventGroup);
     var block = deleteList.shift();
@@ -1711,6 +1828,43 @@ Blockly.WorkspaceSvg.prototype.showContextMenu_ = function(e) {
     }
   };
   menuOptions.push(deleteOption);
+
+  // Option to delete all orphan blocks.
+  // Count the number of blocks that are orphaned.
+  var orphanCount = 0;
+  for (var i = 0; i < allBlocks.length; i++) {
+    const b = allBlocks[i];
+    if (!!b.outputConnection && !b.parentBlock_) {
+      orphanCount++;
+    }
+  }
+  menuOptions.push(Blockly.ContextMenu.workspaceDeleteOrphansOption(ws,orphanCount));
+
+  // Option to delete unused local variables and lists.
+  var map = ws.getVariableMap();
+  var unusedVarCount = 0;
+  var unusedListCount = 0;
+
+  var vars = map.getVariablesOfType('');
+  for (var i = 0; i < vars.length; i++) {
+    if (vars[i].isLocal) {
+      var usages = map.getVariableUsesById(vars[i].getId());
+      if (!usages || usages.length === 0) {
+        unusedVarCount++;
+      }
+    }
+  }
+
+  var lists = map.getVariablesOfType(Blockly.LIST_VARIABLE_TYPE);
+  for (var i = 0; i < lists.length; i++) {
+    if (lists[i].isLocal) {
+      var usages = map.getVariableUsesById(lists[i].getId());
+      if (!usages || usages.length === 0) {
+        unusedListCount++;
+      }
+    }
+  }
+  menuOptions.push(Blockly.ContextMenu.workspaceCleanupUnusedVarsOption(ws, unusedVarCount, unusedListCount));
 
   Blockly.ContextMenu.show(e, menuOptions, this.RTL);
 };
