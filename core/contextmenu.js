@@ -358,7 +358,6 @@ Blockly.ContextMenu.blockCommentOption = function(block) {
 };
 
 /**
-<<<<<<< Updated upstream
  * Make a context menu option for making space for the block.
  * @param {!Blockly.BlockSvg} block The block where the right-click originated.
  * @return {!Object} A menu option, containing text, enabled, and a callback.
@@ -377,7 +376,8 @@ Blockly.ContextMenu.blockMakeSpaceOption = function(block) {
     }
   };
   return makeSpaceOption;
-=======
+
+/**
  * Make a context-menu option which fits a new group around this block stack.
  * @param {!Blockly.BlockSvg} block Block where the menu originated.
  * @return {!Object} Context-menu option.
@@ -403,7 +403,6 @@ Blockly.ContextMenu.blockGroupOption = function(block) {
       }, true);
     }
   };
->>>>>>> Stashed changes
 };
 
 /**
