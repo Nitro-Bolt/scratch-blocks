@@ -727,6 +727,24 @@ Blockly.WorkspaceSvg.prototype.processProcedureReturnsChanged_ = function() {
   this.procedureReturnChangeTimeout_ = null;
 
   Blockly.Events.setGroup(true);
+  for (var changedProcCode in finalTypes) {
+    if (
+      !Object.prototype.hasOwnProperty.call(initialTypes, changedProcCode) ||
+      initialTypes[changedProcCode] === finalTypes[changedProcCode]
+    ) continue;
+
+    var prototype = Blockly.Procedures.getPrototypeBlock(changedProcCode, this);
+    if (!prototype) continue;
+    var oldPrototypeMutationDom = prototype.mutationToDom();
+    var oldPrototypeMutation = Blockly.Xml.domToText(oldPrototypeMutationDom);
+    prototype.return_ = finalTypes[changedProcCode];
+    var newPrototypeMutationDom = prototype.mutationToDom();
+    var newPrototypeMutation = Blockly.Xml.domToText(newPrototypeMutationDom);
+    if (oldPrototypeMutation !== newPrototypeMutation) {
+      Blockly.Events.fire(new Blockly.Events.BlockChange(
+          prototype, 'mutation', null, oldPrototypeMutation, newPrototypeMutation));
+    }
+  }
   var topBlocks = this.getTopBlocks(false);
   for (var i = 0; i < topBlocks.length; i++) {
     var block = topBlocks[i];

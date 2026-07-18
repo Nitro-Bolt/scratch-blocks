@@ -112,6 +112,9 @@ Blockly.ScratchBlocks.ProcedureUtils.definitionMutationToDom = function(
   container.setAttribute('warp', JSON.stringify(this.warp_));
   container.setAttribute('global', JSON.stringify(this.global_));
   container.setAttribute('colour', this.colour_);
+  if (this.return_ !== Blockly.PROCEDURES_CALL_TYPE_STATEMENT) {
+    container.setAttribute('return', this.return_);
+  }
   return container;
 }
 
@@ -159,6 +162,7 @@ Blockly.ScratchBlocks.ProcedureUtils.definitionDomToMutation = function(xmlEleme
   this.procCode_ = xmlElement.getAttribute('proccode');
   this.warp_ = JSON.parse(xmlElement.getAttribute('warp'));
   this.global_ = JSON.parse(xmlElement.getAttribute('global'));
+  this.return_ = Blockly.ScratchBlocks.ProcedureUtils.parseReturnMutation(xmlElement);
 
   if (xmlElement.getAttribute('colour')) {
     this.colours_ = Blockly.ScratchBlocks.ProcedureUtils.matchColours(
@@ -1041,6 +1045,7 @@ Blockly.Blocks['procedures_prototype'] = {
     this.argumentDefaults_ = [];
     this.warp_ = false;
     this.global_ = false;
+    this.return_ = Blockly.PROCEDURES_CALL_TYPE_STATEMENT;
   },
   // Shared.
   getProcCode: Blockly.ScratchBlocks.ProcedureUtils.getProcCode,
@@ -1077,6 +1082,7 @@ Blockly.Blocks['procedures_declaration'] = {
     this.argumentDefaults_ = [];
     this.warp_ = false;
     this.global_ = false;
+    this.return_ = Blockly.PROCEDURES_CALL_TYPE_STATEMENT;
   },
   // Shared.
   getProcCode: Blockly.ScratchBlocks.ProcedureUtils.getProcCode,

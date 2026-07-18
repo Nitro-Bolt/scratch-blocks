@@ -814,6 +814,12 @@ Blockly.Procedures.ENFORCE_TYPES = false;
 Blockly.Procedures.getProcedureReturnType = function(procCode, workspace) {
   var defineBlock = Blockly.Procedures.getDefineBlock(procCode, workspace);
   if (!defineBlock) {
+    if (workspace.getGlobalProcedureMutationByProccode) {
+      var globalMutation = workspace.getGlobalProcedureMutationByProccode(procCode);
+      if (globalMutation) {
+        return Blockly.ScratchBlocks.ProcedureUtils.parseReturnMutation(globalMutation);
+      }
+    }
     return Blockly.PROCEDURES_CALL_TYPE_STATEMENT;
   }
   return Blockly.Procedures.getBlockReturnType(defineBlock);
