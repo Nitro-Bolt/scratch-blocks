@@ -1102,10 +1102,11 @@ Blockly.WorkspaceSvg.prototype.glowStack = function(id, isGlowingStack) {
  * Visually report a value associated with a block.
  * In Scratch, appears as a pop-up next to the block when a reporter block is clicked.
  * @param {?string} id ID of block to report associated value.
- * @param {?string} value String value to visually report.
+ * @param {?string} value String value to visually report and to use for copy.
  * @param {?boolean} error Is the thing being reported an error?
+ * @param {?string} html HTML value to visually report.
  */
-Blockly.WorkspaceSvg.prototype.reportValue = function(id, value, error = false) {
+Blockly.WorkspaceSvg.prototype.reportValue = function(id, value, error = false, html) {
   var block = this.getBlockById(id);
   if (!block) {
     throw 'Tried to report value on block that does not exist.';
@@ -1118,7 +1119,8 @@ Blockly.WorkspaceSvg.prototype.reportValue = function(id, value, error = false) 
   if (error) {
     valueReportBox.classList.add('errorReportBox');
   }
-  valueReportBox.textContent = value;
+  if (html && typeof html !== "undefined") valueReportBox.innerHTML = html;
+  else valueReportBox.textContent = value;
   // use to get focus and event priority
   valueReportBox.setAttribute("tabindex", "0");
   // if the user pressed Ctrl+C, prevent propagation to Blockly
