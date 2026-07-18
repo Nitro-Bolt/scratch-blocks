@@ -533,6 +533,7 @@ Blockly.Workspace.prototype.hasRedoStack = function() {
 Blockly.Workspace.prototype.hasUndoStack = function() {
   return this.undoStack_.length != 0;
 };
+
 /**
  * When something in this workspace changes, call a function.
  * @param {!Function} func Function to call.
