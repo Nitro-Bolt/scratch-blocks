@@ -715,6 +715,7 @@ Blockly.BlockSvg.prototype.showContextMenu_ = function(e) {
     if (this.isEditable() && this.workspace.options.comments) {
       menuOptions.push(Blockly.ContextMenu.blockCommentOption(block));
     }
+    menuOptions.push(Blockly.ContextMenu.blockGroupOption(block));
     if (this.workspace.options.collapse) {
       menuOptions.push(Blockly.ContextMenu.blockCollapseOption(block));
     }
