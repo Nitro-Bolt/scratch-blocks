@@ -664,8 +664,15 @@ Blockly.BlockSvg.prototype.getHeightWidth = function() {
  * Lays out and reflows a block based on its contents and settings.
  * @param {boolean=} opt_bubble If false, just render this block.
  *   If true, also render block's parent, grandparent, etc.  Defaults to true.
+ * @param {boolean=} opt_force If true, forces a render even if
+ *   it doesn't intersect.
  */
-Blockly.BlockSvg.prototype.render = function(opt_bubble) {
+Blockly.BlockSvg.prototype.render = function(opt_bubble, opt_force) {
+  if (opt_force !== true && opt_bubble !== false && !this.intersects_ && !this.getParent()) {
+    this.needsRender_ = true;
+    return;
+  }
+
   Blockly.Field.startCache();
   this.rendered = true;
 
@@ -946,7 +953,7 @@ Blockly.BlockSvg.prototype.renderCompute_ = function(iconWidth) {
       }
 
       var h = totalHeight;
-      var w = h / 2; 
+      var w = h / 2;
       var currentY = 0;
       var safetyPadding = (Blockly.BlockSvg.INPUT_SHAPE_HEIGHT / 2) + Blockly.BlockSvg.GRID_UNIT;
       if (shape === Blockly.OUTPUT_SHAPE_OBJECT) {
@@ -1220,7 +1227,7 @@ Blockly.BlockSvg.prototype.renderDraw_ = function(iconWidth, inputRows) {
         this.edgeShapeWidth_ = inputRows.bottomEdge / 2;
       } else {
         this.edgeShapeWidth_ = Math.min(
-          inputRows.bottomEdge / 2, 
+          inputRows.bottomEdge / 2,
           Blockly.BlockSvg.MAX_REPORTER_CORNER_RADIUS
         );
       }
@@ -1236,7 +1243,7 @@ Blockly.BlockSvg.prototype.renderDraw_ = function(iconWidth, inputRows) {
   var cursorY = this.renderDrawRight_(steps, inputRows, iconWidth);
   this.renderDrawBottom_(steps, cursorY);
   this.renderDrawLeft_(steps);
-  
+
   // fix collapsed inputs
   if (this.isCollapsed()) this.svgGroup_.querySelectorAll('.blocklyInputOutline').forEach(v => v.setAttribute('style', 'visibility: hidden'));
 
@@ -1460,7 +1467,7 @@ Blockly.BlockSvg.prototype.renderDrawRight_ = function(steps,
       // Align fields vertically within the row.
       // In renderFields_, the field is further centered by its own height.
       if (!this.outputConnection) {
-        cursorY -= Blockly.BlockSvg.CORNER_RADIUS; 
+        cursorY -= Blockly.BlockSvg.CORNER_RADIUS;
       }
 
       for (var x = 0, input; input = row[x]; x++) {

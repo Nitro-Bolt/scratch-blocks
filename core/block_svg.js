@@ -72,6 +72,9 @@ Blockly.BlockSvg = function(workspace, prototypeName, opt_id) {
   /** @type {boolean} */
   this.rendered = false;
 
+  /** @type {boolean} */
+  this.needsRender_ = false;
+
   /**
    * Whether to move the block to the drag surface when it is dragged.
    * True if it should move, false if it should be translated directly.
@@ -292,6 +295,10 @@ Blockly.BlockSvg.prototype.setIntersects = function(intersects) {
   }
   if (intersects) {
     root.style.display = '';
+    if (this.needsRender_) {
+      this.needsRender_ = false;
+      this.render(true);
+    }
   } else {
     root.style.display = 'none';
   }
@@ -603,7 +610,7 @@ Blockly.BlockSvg.prototype.setCollapsed = function(collapsed) {
 
   if (this.rendered) {
     for (var i = 0, block; block = renderList[i]; i++) {
-      block.render();
+      block.render(false, true);
     }
     // Don't bump neighbours.
     // Although bumping neighbours would make sense, users often collapse
