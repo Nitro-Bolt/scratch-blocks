@@ -46,6 +46,9 @@ goog.require('goog.dom');
 Blockly.Xml.workspaceToDom = function(workspace, opt_noId) {
   var xml = goog.dom.createDom('xml');
   xml.appendChild(Blockly.Xml.variablesToDom(workspace.getAllVariables()));
+  workspace.getGroups().forEach(function(group) {
+    xml.appendChild(group.toXml());
+  });
   var comments = workspace.getTopComments(true).filter(function(topComment) {
     return topComment instanceof Blockly.WorkspaceComment;
   });
@@ -474,7 +477,14 @@ Blockly.Xml.domToWorkspace = function(xml, workspace) {
     for (var i = 0; i < childCount; i++) {
       var xmlChild = xml.childNodes[i];
       var name = xmlChild.nodeName.toLowerCase();
-      if (name == 'block' ||
+      if (name == 'group') {
+        var state = {};
+        ['id', 'title', 'x', 'y', 'width', 'height', 'expandedHeight',
+          'collapsed', 'blocks'].forEach(function(key) {
+          state[key] = xmlChild.getAttribute(key);
+        });
+        Blockly.Group.fromJSON(workspace, state, false);
+      } else if (name == 'block' ||
           (name == 'shadow' && !Blockly.Events.recordUndo)) {
         // Allow top-level shadow blocks if recordUndo is disabled since
         // that means an undo is in progress.  Such a block is expected
@@ -524,6 +534,11 @@ Blockly.Xml.domToWorkspace = function(xml, workspace) {
   if (workspace.setResizesEnabled) {
     workspace.setResizesEnabled(true);
   }
+  // Groups are decoded before their blocks. Reapply collapsed visibility only
+  // after every referenced block has been created and positioned.
+  workspace.getGroups().forEach(function(group) {
+    if (group.collapsed) group.restoreCollapsedBlocks_();
+  });
   return newBlockIds;
 };
 

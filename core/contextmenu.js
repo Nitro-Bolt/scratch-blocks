@@ -379,6 +379,34 @@ Blockly.ContextMenu.blockMakeSpaceOption = function(block) {
 };
 
 /**
+ * Make a context-menu option which fits a new group around this block stack.
+ * @param {!Blockly.BlockSvg} block Block where the menu originated.
+ * @return {!Object} Context-menu option.
+ */
+Blockly.ContextMenu.blockGroupOption = function(block) {
+  var root = block.getRootBlock();
+  var workspace = block.workspace;
+  return {
+    text: 'Add Group',
+    enabled: !workspace.getGroupForBlock(root.id),
+    callback: function() {
+      var bounds = root.getBoundingRectangle();
+      var padding = 16;
+      var headerHeight = 32;
+      Blockly.Group.fromJSON(workspace, {
+        title: 'Group',
+        x: bounds.topLeft.x - padding,
+        y: bounds.topLeft.y - headerHeight - padding,
+        width: bounds.bottomRight.x - bounds.topLeft.x + padding * 2,
+        height: bounds.bottomRight.y - bounds.topLeft.y +
+            headerHeight + padding * 2,
+        blocks: [root.id]
+      }, true);
+    }
+  };
+};
+
+/**
  * Make a context menu option for undoing the most recent action on the
  * workspace.
  * @param {!Blockly.WorkspaceSvg} ws The workspace where the right-click
@@ -593,6 +621,72 @@ Blockly.ContextMenu.workspaceCommentOption = function(ws, e) {
     addWsComment();
   };
   return wsCommentOption;
+};
+
+/**
+ * Make a context-menu option for duplicating a group and its blocks.
+ * @param {!Blockly.Group} group Group to duplicate.
+ * @param {!Event} event Event that opened the context menu.
+ * @return {!Object} Context-menu option.
+ */
+Blockly.ContextMenu.groupDuplicateOption = function(group, event) {
+  return {
+    text: Blockly.Msg.DUPLICATE,
+    enabled: true,
+    callback: function(e) {
+      // Let the menu's mouse-up finish before starting the synthetic drag.
+      setTimeout(function() {
+        group.duplicateGroup_(e, event);
+      }, 0);
+    }
+  };
+};
+
+/**
+ * Make a context-menu option for renaming a group.
+ * @param {!Blockly.Group} group Group to rename.
+ * @return {!Object} Context-menu option.
+ */
+Blockly.ContextMenu.groupRenameOption = function(group) {
+  return {
+    text: Blockly.Msg.RENAME || 'Rename',
+    enabled: true,
+    callback: function() {
+      group.rename_({stopPropagation: function() {}});
+    }
+  };
+};
+
+/**
+ * Make a context-menu option for deleting a group without deleting its blocks.
+ * @param {!Blockly.Group} group Group to delete.
+ * @return {!Object} Context-menu option.
+ */
+Blockly.ContextMenu.groupDeleteOption = function(group) {
+  return {
+    text: Blockly.Msg.DELETE,
+    enabled: true,
+    callback: function() {
+      group.deleteGroup_({stopPropagation: function() {}});
+    }
+  };
+};
+
+/**
+ * @param {!Blockly.WorkspaceSvg} ws Target workspace.
+ * @param {!Event} e Context-menu event.
+ * @return {!Object} Context-menu entry for creating a group.
+ */
+Blockly.ContextMenu.workspaceGroupOption = function(ws, e) {
+  return {text: 'Add Group', enabled: true, callback: function() {
+    var rect = ws.getInjectionDiv().getBoundingClientRect();
+    var point = new goog.math.Coordinate(e.clientX - rect.left,
+        e.clientY - rect.top);
+    var position = goog.math.Coordinate.difference(
+        point, ws.getOriginOffsetInPixels()).scale(1 / ws.scale);
+    Blockly.Group.fromJSON(ws, {title: 'Group', x: position.x,
+      y: position.y, width: 360, height: 240}, true);
+  }};
 };
 
 /**

@@ -464,6 +464,9 @@ Blockly.FieldTextInput.prototype.onHtmlInputChange_ = function(e) {
     this.sourceBlock_.render();
   }
   this.resizeEditor_();
+  if (this.sourceBlock_ && this.sourceBlock_.workspace.scheduleGroupFit) {
+    this.sourceBlock_.workspace.scheduleGroupFit(this.sourceBlock_);
+  }
 };
 
 /**
