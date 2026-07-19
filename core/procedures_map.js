@@ -30,6 +30,8 @@
  **/
 goog.provide('Blockly.ProceduresMap');
 
+goog.require('Blockly.Xml');
+
 /**
  * Map of globally scoped procedure mutations, keyed by proccode.
  * @param {!Blockly.Workspace} workspace Owning workspace.
@@ -108,7 +110,7 @@ Blockly.ProceduresMap.prototype.refreshFromVM = function() {
  * @private
  */
 Blockly.ProceduresMap.mutationDataToDom_ = function(data) {
-  var mutation = document.createElement('mutation');
+  var mutation = Blockly.Xml.textToDom('<xml><mutation/></xml>').firstChild;
   var keys = Object.keys(data || {});
   for (var i = 0; i < keys.length; i++) {
     var key = keys[i];
