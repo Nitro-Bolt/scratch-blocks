@@ -216,6 +216,20 @@ Blockly.WorkspaceSvg.prototype.startScrollX = 0;
 Blockly.WorkspaceSvg.prototype.startScrollY = 0;
 
 /**
+ * Whether a resizeSvgContents call is currently queued via rAF.
+ * @type {boolean}
+ * @private
+ */
+Blockly.WorkspaceSvg.prototype.resizeContentsQueued_ = false;
+
+/**
+ * The rAF id for a pending resizeSvgContents call.
+ * @type {number}
+ * @private
+ */
+Blockly.WorkspaceSvg.prototype.resizeContentsRafId_ = 0;
+
+/**
  * Distance from mouse to object being dragged.
  * @type {goog.math.Coordinate}
  * @private
@@ -532,6 +546,10 @@ Blockly.WorkspaceSvg.prototype.dispose = function() {
     this.intersectionObserver.dispose();
     this.intersectionObserver = null;
   }
+  if (this.resizeContentsRafId_) {
+    cancelAnimationFrame(this.resizeContentsRafId_);
+    this.resizeContentsQueued_ = false;
+  }
   Blockly.WorkspaceSvg.superClass_.dispose.call(this);
   if (this.svgGroup_) {
     goog.dom.removeNode(this.svgGroup_);
@@ -716,6 +734,23 @@ Blockly.WorkspaceSvg.prototype.resizeContents = function() {
     this.scrollbar.resize();
   }
   this.updateInverseScreenCTM();
+};
+
+/**
+ * Batch multiple resizeSvgContents calls into a single rAF callback.
+ * Avoids redundant layout reflows when many blocks render in one frame.
+ */
+Blockly.WorkspaceSvg.prototype.queueResizeContents = function() {
+  if (this.resizeContentsQueued_) {
+    return;
+  }
+  this.resizeContentsQueued_ = true;
+  var ws = this;
+  this.resizeContentsRafId_ = requestAnimationFrame(function() {
+    ws.resizeContentsRafId_ = 0;
+    ws.resizeContentsQueued_ = false;
+    ws.resizeContents();
+  });
 };
 
 Blockly.WorkspaceSvg.prototype.queueIntersectionCheck = function() {

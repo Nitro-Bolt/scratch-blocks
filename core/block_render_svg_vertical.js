@@ -584,13 +584,6 @@ Blockly.BlockSvg.prototype.updateColour = function() {
   for (var i = 0; i < icons.length; i++) {
     icons[i].updateColour();
   }
-
-  // Bump every dropdown to change its colour.
-  for (var x = 0, input; input = this.inputList[x]; x++) {
-    for (var y = 0, field; field = input.fieldRow[y]; y++) {
-      field.setText(null);
-    }
-  }
 };
 
 /**

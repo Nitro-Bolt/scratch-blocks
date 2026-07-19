@@ -143,7 +143,7 @@ Blockly.svgSize = function(svg) {
  * @param {!Blockly.WorkspaceSvg} workspace The workspace to resize.
  */
 Blockly.resizeSvgContents = function(workspace) {
-  workspace.resizeContents();
+  workspace.queueResizeContents();
 };
 
 /**
