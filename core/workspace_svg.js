@@ -1753,7 +1753,6 @@ Blockly.WorkspaceSvg.prototype.showContextMenu_ = function(e) {
   }
   var menuOptions = [];
   var topBlocks = this.getTopBlocks(true);
-  var allBlocks = this.getAllBlocks(true);
   var eventGroup = Blockly.utils.genUid();
   var ws = this;
 
@@ -1796,28 +1795,25 @@ Blockly.WorkspaceSvg.prototype.showContextMenu_ = function(e) {
 
   // Option to delete all blocks.
   // Count the number of blocks that are deletable.
-  var deleteList = Blockly.WorkspaceSvg.buildDeleteList_(topBlocks);
-  // Scratch-specific: don't count shadow blocks in delete count
-  var deleteCount = 0;
-  for (var i = 0; i < deleteList.length; i++) {
-    if (!deleteList[i].isShadow()) {
-      deleteCount++;
-    }
-  }
+  var deleteCount = Blockly.WorkspaceSvg.countDeleteBlocks_(topBlocks);
 
   var DELAY = 9;
   function deleteNext() {
     Blockly.Events.setGroup(eventGroup);
-    var block = deleteList.shift();
-    if (block) {
-      if (block.workspace) {
-        block.dispose(false, true);
-        setTimeout(deleteNext, DELAY);
-      } else {
-        deleteNext();
+    var deleteList = Blockly.WorkspaceSvg.buildDeleteList_(topBlocks);
+    function deleteOne() {
+      var block = deleteList.shift();
+      if (block) {
+        if (block.workspace) {
+          block.dispose(false, true);
+          setTimeout(deleteOne, DELAY);
+        } else {
+          deleteOne();
+        }
       }
+      Blockly.Events.setGroup(false);
     }
-    Blockly.Events.setGroup(false);
+    deleteOne();
   }
 
   var deleteOption = {
@@ -1846,8 +1842,8 @@ Blockly.WorkspaceSvg.prototype.showContextMenu_ = function(e) {
   // Option to delete all orphan blocks.
   // Count the number of blocks that are orphaned.
   var orphanCount = 0;
-  for (var i = 0; i < allBlocks.length; i++) {
-    const b = allBlocks[i];
+  for (var i = 0; i < topBlocks.length; i++) {
+    const b = topBlocks[i];
     if (!!b.outputConnection && !b.parentBlock_) {
       orphanCount++;
     }
@@ -1924,6 +1920,37 @@ Blockly.WorkspaceSvg.buildDeleteList_ = function(topBlocks) {
     addDeletableBlocks(topBlocks[i]);
   }
   return deleteList;
+};
+
+/**
+ * Count all deletable blocks from list of top blocks.
+ * Lightweight alternative to buildDeleteList_
+ * @param {!Array.<!Blockly.BlockSvg>} topBlocks The list of top blocks on the
+ *     workspace.
+ * @returns {number} The count of deletable blocks.
+ * @private
+ */
+Blockly.WorkspaceSvg.countDeleteBlocks_ = function(topBlocks) {
+  var count = 0;
+  function countDeletableBlocks(block) {
+    if (block.isDeletable()) {
+      var descendants = block.getDescendants(false);
+      for (var i = 0; i < descendants.length; i++) {
+        if (!descendants[i].isShadow()) {
+          count++;
+        }
+      }
+    } else {
+      var children = block.getChildren();
+      for (var i = 0; i < children.length; i++) {
+        countDeletableBlocks(children[i]);
+      }
+    }
+  }
+  for (var i = 0; i < topBlocks.length; i++) {
+    countDeletableBlocks(topBlocks[i]);
+  }
+  return count;
 };
 
 /**
