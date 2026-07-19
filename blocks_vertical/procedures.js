@@ -204,8 +204,20 @@ Blockly.ScratchBlocks.ProcedureUtils.updateDisplay_ = function() {
 
   // We don't wanna do this on any other block's.
   if (this.type == 'procedures_prototype' || this.type == 'procedures_call' || this.type === 'procedures_declaration') {
-    if (this.colours_) this.setColour(...this.colours_);
-    this.colours_ = null; // We don't wanna have a cache of this as it break's colour changing.
+    if (this.colours_) {
+      this.setColour(...this.colours_);
+
+      if (this.type == 'procedures_prototype') {
+        queueMicrotask(() => {
+          this.parentBlock_.setColour(...this.colours_);
+          this.updateColour();
+          this.colours_ = null;
+        });
+      } else {
+        this.colours_ = null;
+      }
+    }
+     // We delete this.colours_ so it doesn't break colour changing.
   }
 
   this.createAllInputs_(connectionMap);
