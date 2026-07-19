@@ -626,14 +626,18 @@ Blockly.ContextMenu.workspaceCommentOption = function(ws, e) {
 /**
  * Make a context-menu option for duplicating a group and its blocks.
  * @param {!Blockly.Group} group Group to duplicate.
+ * @param {!Event} event Event that opened the context menu.
  * @return {!Object} Context-menu option.
  */
-Blockly.ContextMenu.groupDuplicateOption = function(group) {
+Blockly.ContextMenu.groupDuplicateOption = function(group, event) {
   return {
     text: Blockly.Msg.DUPLICATE,
     enabled: true,
-    callback: function() {
-      group.duplicateGroup_({stopPropagation: function() {}});
+    callback: function(e) {
+      // Let the menu's mouse-up finish before starting the synthetic drag.
+      setTimeout(function() {
+        group.duplicateGroup_(e, event);
+      }, 0);
     }
   };
 };

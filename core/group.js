@@ -28,6 +28,7 @@ goog.provide('Blockly.Group');
 
 goog.require('Blockly.ContextMenu');
 goog.require('Blockly.Events.GroupChange');
+goog.require('Blockly.Touch');
 goog.require('goog.dom');
 goog.require('goog.math.Coordinate');
 
@@ -349,6 +350,7 @@ Blockly.Group.prototype.finishPointer_ = function(e) {
     });
   }
   state.event.recordNew(this);
+  state.event.group = Blockly.Events.getGroup();
   Blockly.Events.fire(state.event);
   Blockly.Events.setGroup(false);
   this.dragState_ = null;
@@ -510,7 +512,7 @@ Blockly.Group.prototype.restoreCollapsedBlocks_ = function() {
   this.updateCollapsedBlocks_();
 };
 
-Blockly.Group.prototype.duplicateGroup_ = function(e) {
+Blockly.Group.prototype.duplicateGroup_ = function(e, pointerEvent) {
   e.stopPropagation();
   var blocks = this.getContainedBlocks();
   var workspace = this.workspace;
@@ -544,6 +546,15 @@ Blockly.Group.prototype.duplicateGroup_ = function(e) {
   } finally {
     Blockly.Events.setGroup(false);
   }
+  if (pointerEvent &&
+      Blockly.Touch.getTouchIdentifierFromEvent(pointerEvent) === 'mouse') {
+    duplicate.startDrag_({
+      button: 0,
+      clientX: pointerEvent.clientX,
+      clientY: pointerEvent.clientY,
+      stopPropagation: function() { e.stopPropagation(); }
+    });
+  }
 };
 
 Blockly.Group.prototype.deleteGroup_ = function(e) {
@@ -556,7 +567,7 @@ Blockly.Group.prototype.showContextMenu_ = function(e) {
   e.stopPropagation();
   Blockly.ContextMenu.show(e, [
     Blockly.ContextMenu.groupRenameOption(this),
-    Blockly.ContextMenu.groupDuplicateOption(this),
+    Blockly.ContextMenu.groupDuplicateOption(this, e),
     Blockly.ContextMenu.groupDeleteOption(this)],
   this.workspace.RTL);
 };
