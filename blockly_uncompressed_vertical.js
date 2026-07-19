@@ -98,7 +98,7 @@ goog.addDependency("../../../../core/names.js", ["Blockly.Names"], []);
 goog.addDependency("../../../../core/options.js", ["Blockly.Options"], ["Blockly.Colours"]);
 goog.addDependency("../../../../core/polypatch.js", ["Polypatch","goog.isSafeFunction","goog.asserts.assertAtLeastLength","goog.queueMicrotask"], ["goog.color","goog.array","goog.asserts"]);
 goog.addDependency("../../../../core/procedures.js", ["Blockly.Procedures"], ["Blockly.Blocks","Blockly.constants","Blockly.Events.BlockChange","Blockly.Field","Blockly.Names","Blockly.Workspace"]);
-goog.addDependency("../../../../core/procedures_map.js", ["Blockly.ProceduresMap"], []);
+goog.addDependency("../../../../core/procedures_map.js", ["Blockly.ProceduresMap"], ["Blockly.Xml"]);
 goog.addDependency("../../../../core/rendered_connection.js", ["Blockly.RenderedConnection"], ["Blockly.Connection"]);
 goog.addDependency("../../../../core/scratch_block_comment.js", ["Blockly.ScratchBlockComment"], ["Blockly.Comment","Blockly.Events.BlockChange","Blockly.Events.Ui","Blockly.Icon","Blockly.ScratchBubble","goog.math.Coordinate","goog.userAgent"]);
 goog.addDependency("../../../../core/scratch_blocks_utils.js", ["Blockly.scratchBlocksUtils"], []);
