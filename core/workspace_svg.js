@@ -899,7 +899,10 @@ Blockly.WorkspaceSvg.prototype.translate = function(x, y) {
   if (this.blockDragSurface_) {
     this.blockDragSurface_.translateAndScaleGroup(x, y, this.scale);
   }
-  this.queueIntersectionCheck();
+  // Skip intersection checks while the drag surface is active
+  if (!this.isDragSurfaceActive_) {
+    this.queueIntersectionCheck();
+  }
 };
 
 /**
@@ -922,6 +925,10 @@ Blockly.WorkspaceSvg.prototype.resetDragSurface = function() {
       'scale(' + this.scale + ')';
   this.svgBlockCanvas_.setAttribute('transform', translation);
   this.svgBubbleCanvas_.setAttribute('transform', translation);
+
+  // Now that the drag has ended and the canvases are back in place,
+  // run a single intersection check to update block visibility.
+  this.queueIntersectionCheck();
 };
 
 /**
