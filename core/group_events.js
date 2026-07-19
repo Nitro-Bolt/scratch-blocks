@@ -25,9 +25,48 @@
 'use strict';
 
 goog.provide('Blockly.Events.GroupChange');
+goog.provide('Blockly.Events.GroupDragOutside');
+goog.provide('Blockly.Events.GroupEndDrag');
 
 goog.require('Blockly.Events');
 goog.require('Blockly.Events.Abstract');
+goog.require('Blockly.Xml');
+
+/**
+ * @param {Blockly.Group=} group Group being dragged.
+ * @param {boolean=} isOutside Whether it is outside the blocks area.
+ * @constructor
+ */
+Blockly.Events.GroupDragOutside = function(group, isOutside) {
+  Blockly.Events.GroupDragOutside.superClass_.constructor.call(this);
+  if (!group) return;
+  this.workspaceId = group.workspace.id;
+  this['groupId'] = group.id;
+  this['isOutside'] = !!isOutside;
+  this.recordUndo = false;
+};
+goog.inherits(Blockly.Events.GroupDragOutside, Blockly.Events.Abstract);
+Blockly.Events.GroupDragOutside.prototype.type = 'group_drag_outside';
+
+/**
+ * @param {Blockly.Group=} group Group whose drag ended.
+ * @param {boolean=} isOutside Whether it ended outside the blocks area.
+ * @constructor
+ */
+Blockly.Events.GroupEndDrag = function(group, isOutside) {
+  Blockly.Events.GroupEndDrag.superClass_.constructor.call(this);
+  if (!group) return;
+  this.workspaceId = group.workspace.id;
+  this['groupId'] = group.id;
+  this['isOutside'] = !!isOutside;
+  this['groupState'] = group.toJSON();
+  this['xmls'] = isOutside ? group.getOwnedTopBlocks_().map(function(block) {
+    return Blockly.Xml.blockToDom(block, true);
+  }) : [];
+  this.recordUndo = false;
+};
+goog.inherits(Blockly.Events.GroupEndDrag, Blockly.Events.Abstract);
+Blockly.Events.GroupEndDrag.prototype.type = 'group_end_drag';
 
 /**
  * @param {Blockly.Group=} group Group affected by this event.
@@ -99,4 +138,15 @@ Blockly.Events.GroupChange.prototype.run = function(forward) {
   } finally {
     Blockly.Events.enable();
   }
+
+  // applyState is intentionally silent, but the VM still needs the restored
+  // state after undo/redo so a later workspace reload does not revive the
+  // temporary drag geometry.
+  var syncEvent = new Blockly.Events.GroupChange();
+  syncEvent.workspaceId = this.workspaceId;
+  syncEvent['groupId'] = this['groupId'];
+  syncEvent['oldState'] = state;
+  syncEvent['newState'] = state;
+  syncEvent.recordUndo = false;
+  Blockly.Events.fire(syncEvent);
 };

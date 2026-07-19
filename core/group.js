@@ -28,6 +28,8 @@ goog.provide('Blockly.Group');
 
 goog.require('Blockly.ContextMenu');
 goog.require('Blockly.Events.GroupChange');
+goog.require('Blockly.Events.GroupDragOutside');
+goog.require('Blockly.Events.GroupEndDrag');
 goog.require('Blockly.Touch');
 goog.require('goog.dom');
 goog.require('goog.math.Coordinate');
@@ -200,6 +202,18 @@ Blockly.Group.prototype.getContainedBlocks = function() {
 };
 
 /**
+ * @return {!Array<!Blockly.BlockSvg>} Owned top-level stacks.
+ */
+Blockly.Group.prototype.getOwnedTopBlocks_ = function() {
+  var workspace = this.workspace;
+  return this.blockIds.map(function(id) {
+    return workspace.getBlockById(id);
+  }).filter(function(block) {
+    return !!block && !block.getParent();
+  });
+};
+
+/**
  * Check whether a complete top-level stack is inside this group's body.
  * @param {!Blockly.BlockSvg} block Top-level block.
  * @return {boolean} Whether the block is inside.
@@ -238,7 +252,7 @@ Blockly.Group.prototype.startPointer_ = function(e, resizing, blocks) {
     x: this.x, y: this.y, width: this.width, height: this.height,
     resizing: resizing, blocks: blocks,
     blockXY: blocks.map(function(block) { return block.getRelativeToSurfaceXY(); }),
-    event: event};
+    event: event, isOutside: false};
   if (!resizing) this.moveToDragSurface_();
   var move = function(moveEvent) { group.pointerMove_(moveEvent); };
   var up = function(upEvent) {
@@ -300,6 +314,13 @@ Blockly.Group.prototype.pointerMove_ = function(e) {
       });
     }
   }
+  if (!state.resizing) {
+    var isOutside = !this.workspace.isInsideBlocksArea(e);
+    if (isOutside !== state.isOutside) {
+      Blockly.Events.fire(new Blockly.Events.GroupDragOutside(this, isOutside));
+      state.isOutside = isOutside;
+    }
+  }
   if (!state.dragSurface) this.render();
 };
 
@@ -311,6 +332,16 @@ Blockly.Group.prototype.finishPointer_ = function(e) {
   if (!state) return;
   this.moveOffDragSurface_();
   Blockly.utils.removeClass(this.svgGroup_, 'blocklyDragging');
+  var isOutside = !state.resizing && e && !this.workspace.isInsideBlocksArea(e);
+  if (!state.resizing) {
+    Blockly.Events.fire(new Blockly.Events.GroupDragOutside(this, false));
+    var endEvent = new Blockly.Events.GroupEndDrag(this, isOutside);
+    // The block models still have their pre-drag coordinates at this point.
+    // Use the matching frame coordinates so their relative layout is retained.
+    endEvent['groupState'].x = state.x;
+    endEvent['groupState'].y = state.y;
+    Blockly.Events.fire(endEvent);
+  }
   if (!state.resizing && e && this.workspace.isDeleteArea(e)) {
     state.blocks.forEach(function(block, index) {
       block.translate(state.blockXY[index].x, state.blockXY[index].y);
@@ -354,6 +385,10 @@ Blockly.Group.prototype.finishPointer_ = function(e) {
   Blockly.Events.fire(state.event);
   Blockly.Events.setGroup(false);
   this.dragState_ = null;
+  if (isOutside) {
+    var workspace = this.workspace;
+    setTimeout(function() { workspace.undo(); }, 0);
+  }
 };
 
 /**
@@ -397,8 +432,13 @@ Blockly.Group.prototype.fitBlock = function(block) {
   Blockly.Events.fire(event);
 };
 
-// Remeasure owned stacks after block edits and mutations finish rendering.
-Blockly.Group.prototype.onWorkspaceChange_ = function() {
+/**
+ * Remeasure owned stacks after block edits and mutations finish rendering.
+ * @param {Blockly.Events.Abstract=} event Workspace event.
+ */
+Blockly.Group.prototype.onWorkspaceChange_ = function(event) {
+  if (event && ['dragOutside', 'endDrag', 'group_drag_outside',
+    'group_end_drag'].indexOf(event.type) !== -1) return;
   if (this.collapsed || this.dragState_) return;
   if (this.fitTimer_) clearTimeout(this.fitTimer_);
   var group = this;
