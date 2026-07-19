@@ -1797,23 +1797,16 @@ Blockly.WorkspaceSvg.prototype.showContextMenu_ = function(e) {
   // Count the number of blocks that are deletable.
   var deleteCount = Blockly.WorkspaceSvg.countDeleteBlocks_(topBlocks);
 
-  var DELAY = 9;
   function deleteNext() {
     Blockly.Events.setGroup(eventGroup);
     var deleteList = Blockly.WorkspaceSvg.buildDeleteList_(topBlocks);
-    function deleteOne() {
-      var block = deleteList.shift();
-      if (block) {
-        if (block.workspace) {
-          block.dispose(false, true);
-          setTimeout(deleteOne, DELAY);
-        } else {
-          deleteOne();
-        }
+    for (var i = 0; i < deleteList.length; i++) {
+      var block = deleteList[i];
+      if (block.workspace) {
+        block.dispose(false, true);
       }
-      Blockly.Events.setGroup(false);
     }
-    deleteOne();
+    Blockly.Events.setGroup(false);
   }
 
   var deleteOption = {
