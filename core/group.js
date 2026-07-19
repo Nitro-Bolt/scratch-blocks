@@ -387,7 +387,12 @@ Blockly.Group.prototype.finishPointer_ = function(e) {
   this.dragState_ = null;
   if (isOutside) {
     var workspace = this.workspace;
-    setTimeout(function() { workspace.undo(); }, 0);
+    var groupId = this.id;
+    setTimeout(function() {
+      workspace.undo();
+      var group = workspace.getGroupById(groupId);
+      if (group && group.collapsed) group.updateCollapsedBlocks_();
+    }, 0);
   }
 };
 
