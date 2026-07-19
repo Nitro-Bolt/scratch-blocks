@@ -211,6 +211,10 @@ Blockly.Css.CONTENT = [
     'overflow: visible;',
   '}',
 
+  '.blocklyBlockCanvas, .blocklyBubbleCanvas {',
+    'will-change: transform;',
+  '}',
+
   '.blocklyBlockDragSurface {',
     'display: none;',
     'position: absolute;',
