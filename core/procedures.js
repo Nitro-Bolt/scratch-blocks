@@ -83,7 +83,20 @@ Blockly.Procedures.allProcedures = function(root) {
 Blockly.Procedures.allProcedureMutations = function(root) {
   var blocks = root.getAllBlocks();
   var mutations = [];
-  var globalByProcCode = Object.create(null);
+  var localByProcCode = Object.create(null);
+
+  for (var i = 0; i < blocks.length; i++) {
+    if (blocks[i].type == Blockly.PROCEDURES_PROTOTYPE_BLOCK_TYPE) {
+      var mutation = blocks[i].mutationToDom(/* opt_generateShadows */ true);
+      if (mutation) {
+        var localProcCode = mutation.getAttribute('proccode');
+        if (localProcCode) {
+          localByProcCode[localProcCode] = true;
+        }
+        mutations.push(mutation);
+      }
+    }
+  }
 
   if (root.getAllGlobalProcedureMutations) {
     var globalMutations = root.getAllGlobalProcedureMutations();
@@ -93,24 +106,12 @@ Blockly.Procedures.allProcedureMutations = function(root) {
         continue;
       }
       var globalProcCode = globalMutation.getAttribute('proccode');
-      if (globalProcCode) {
-        globalByProcCode[globalProcCode] = true;
+      // The live workspace is authoritative for its own definitions. The VM
+      // may still contain the pre-edit snapshot while workspace events settle.
+      if (globalProcCode && localByProcCode[globalProcCode]) {
+        continue;
       }
       mutations.push(globalMutation);
-    }
-  }
-
-  for (var i = 0; i < blocks.length; i++) {
-    if (blocks[i].type == Blockly.PROCEDURES_PROTOTYPE_BLOCK_TYPE) {
-      var mutation = blocks[i].mutationToDom(/* opt_generateShadows */ true);
-      if (mutation) {
-        var localProcCode = mutation.getAttribute('proccode');
-        if (localProcCode && globalByProcCode[localProcCode]) {
-          // Prefer local definitions over globally imported procedures.
-          continue;
-        }
-        mutations.push(mutation);
-      }
     }
   }
   return mutations;
@@ -203,11 +204,11 @@ Blockly.Procedures.isNameUsed = function(name, workspace, opt_exclude) {
     if (blocks[i].getProcedureDef) {
       var procName = blocks[i].getProcedureDef();
       if (Blockly.Names.equals(procName[0], name)) {
-        return false;
+        return true;
       }
     }
   }
-  return true;
+  return false;
 };
 
 /**

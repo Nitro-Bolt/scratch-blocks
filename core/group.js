@@ -56,10 +56,25 @@ Blockly.Group = function(workspace, options) {
   if (this.collapsed) this.height = 32;
   this.svgGroup_ = null;
   this.dragState_ = null;
+  this.pressedButton_ = null;
+  this.buttonReleaseWrapper_ = null;
   this.fitTimer_ = null;
   this.workspaceChangeListener_ = this.onWorkspaceChange_.bind(this);
   workspace.addChangeListener(this.workspaceChangeListener_);
   workspace.addGroup(this);
+};
+
+/**
+ * Move this group above other workspace items, with its blocks above its frame.
+ * @private
+ */
+Blockly.Group.prototype.bringToFront_ = function() {
+  if (!this.svgGroup_ || !this.workspace) return;
+  var canvas = this.workspace.getCanvas();
+  canvas.appendChild(this.svgGroup_);
+  this.getOwnedTopBlocks_().forEach(function(block) {
+    if (block.getSvgRoot()) canvas.appendChild(block.getSvgRoot());
+  });
 };
 
 // Build and attach the SVG below the blocks.
@@ -87,8 +102,7 @@ Blockly.Group.prototype.initSvg = function() {
   this.resize_ = Blockly.utils.createSvgElement('path',
       {'class': 'scratchGroupResize', d: 'M0 12 L12 0 M5 12 L12 5'}, this.svgGroup_);
 
-  var canvas = this.workspace.getCanvas();
-  canvas.insertBefore(this.svgGroup_, canvas.firstChild);
+  this.bringToFront_();
   Blockly.bindEventWithChecks_(this.header_, 'mousedown', this,
       this.startDrag_);
   Blockly.bindEventWithChecks_(this.resize_, 'mousedown', this,
@@ -245,6 +259,7 @@ Blockly.Group.prototype.startResize_ = function(e) {
 };
 
 Blockly.Group.prototype.startPointer_ = function(e, resizing, blocks) {
+  this.bringToFront_();
   var group = this;
   var event = new Blockly.Events.GroupChange(this);
   event.recordOld(this);
@@ -286,10 +301,7 @@ Blockly.Group.prototype.moveOffDragSurface_ = function() {
   if (!state.dragSurface) return;
   var canvas = this.workspace.getCanvas();
   state.dragSurface.clearAndHide(canvas);
-  canvas.insertBefore(this.svgGroup_, canvas.firstChild);
-  state.blocks.forEach(function(block) {
-    if (block.getSvgRoot()) canvas.appendChild(block.getSvgRoot());
-  });
+  this.bringToFront_();
   goog.dom.removeNode(state.dragWrapper);
   state.dragSurface = null;
   state.dragWrapper = null;
@@ -343,6 +355,13 @@ Blockly.Group.prototype.finishPointer_ = function(e) {
     Blockly.Events.fire(endEvent);
   }
   if (!state.resizing && e && this.workspace.isDeleteArea(e)) {
+    var procedureCodes = state.blocks.filter(function(block) {
+      return block.type == Blockly.PROCEDURES_DEFINITION_BLOCK_TYPE;
+    }).map(function(block) {
+      var prototype = block.getInput('custom_block').connection.targetBlock();
+      return prototype && prototype.getProcCode();
+    }).filter(function(procCode) { return !!procCode; });
+    var deleteWorkspace = this.workspace;
     state.blocks.forEach(function(block, index) {
       block.translate(state.blockXY[index].x, state.blockXY[index].y);
     });
@@ -358,6 +377,20 @@ Blockly.Group.prototype.finishPointer_ = function(e) {
       this.dispose(true);
     } finally {
       Blockly.Events.setGroup(false);
+    }
+    if (procedureCodes.length) {
+      setTimeout(function() {
+        var hasOrphanedCall = deleteWorkspace.getAllBlocks().some(function(block) {
+          return block.type == Blockly.PROCEDURES_CALL_BLOCK_TYPE &&
+              procedureCodes.indexOf(block.getProcCode()) !== -1;
+        });
+        if (hasOrphanedCall) {
+          alert(Blockly.Msg.PROCEDURE_USED);
+          deleteWorkspace.undo();
+          return;
+        }
+        deleteWorkspace.refreshToolboxSelection_();
+      });
     }
     return;
   }
@@ -403,6 +436,31 @@ Blockly.Group.prototype.finishPointer_ = function(e) {
 Blockly.Group.prototype.buttonMouseDown_ = function(e) {
   e.preventDefault();
   e.stopPropagation();
+  this.pressedButton_ = e.currentTarget;
+  if (this.buttonReleaseWrapper_) {
+    Blockly.unbindEvent_(this.buttonReleaseWrapper_);
+  }
+  this.buttonReleaseWrapper_ = Blockly.bindEventWithChecks_(
+      document, 'mouseup', this, function() {
+        this.pressedButton_ = null;
+        this.buttonReleaseWrapper_ = null;
+      });
+};
+
+/**
+ * Check that a title-bar mouse-up belongs to a click started on that button.
+ * @param {!Event} e Mouse-up event.
+ * @return {boolean} Whether the button should be activated.
+ * @private
+ */
+Blockly.Group.prototype.isButtonClick_ = function(e) {
+  if (this.pressedButton_ !== e.currentTarget) return false;
+  this.pressedButton_ = null;
+  if (this.buttonReleaseWrapper_) {
+    Blockly.unbindEvent_(this.buttonReleaseWrapper_);
+    this.buttonReleaseWrapper_ = null;
+  }
+  return true;
 };
 
 /**
@@ -491,6 +549,7 @@ Blockly.Group.prototype.rename_ = function(e) {
 };
 
 Blockly.Group.prototype.toggleCollapsed_ = function(e) {
+  if (!this.isButtonClick_(e)) return;
   e.stopPropagation();
   var event = new Blockly.Events.GroupChange(this);
   event.recordOld(this);
@@ -603,6 +662,7 @@ Blockly.Group.prototype.duplicateGroup_ = function(e, pointerEvent) {
 };
 
 Blockly.Group.prototype.deleteGroup_ = function(e) {
+  if (!this.isButtonClick_(e)) return;
   e.stopPropagation();
   this.dispose(true);
 };
@@ -621,6 +681,10 @@ Blockly.Group.prototype.showContextMenu_ = function(e) {
 Blockly.Group.prototype.dispose = function(fireEvent) {
   if (!this.workspace) return;
   clearTimeout(this.fitTimer_);
+  if (this.buttonReleaseWrapper_) {
+    Blockly.unbindEvent_(this.buttonReleaseWrapper_);
+    this.buttonReleaseWrapper_ = null;
+  }
   this.workspace.removeChangeListener(this.workspaceChangeListener_);
   if (fireEvent && Blockly.Events.isEnabled()) {
     var event = new Blockly.Events.GroupChange(this);
