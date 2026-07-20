@@ -61,7 +61,7 @@ Blockly.Events.GroupEndDrag = function(group, isOutside) {
   this['isOutside'] = !!isOutside;
   this['groupState'] = group.toJSON();
   this['xmls'] = isOutside ? group.getOwnedTopBlocks_().map(function(block) {
-    return Blockly.Xml.blockToDom(block, true);
+    return Blockly.Xml.blockToDomWithXY(block, true);
   }) : [];
   this.recordUndo = false;
 };
