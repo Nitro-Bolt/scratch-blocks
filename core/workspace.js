@@ -183,7 +183,6 @@ Blockly.Workspace.SCAN_ANGLE = 3;
  */
 Blockly.Workspace.prototype.addTopBlock = function(block) {
   this.topBlocks_.push(block);
-  this.invalidateTopBlocksCache_();
 };
 
 /**
@@ -194,7 +193,6 @@ Blockly.Workspace.prototype.removeTopBlock = function(block) {
   if (!goog.array.remove(this.topBlocks_, block)) {
     throw 'Block not present in workspace\'s list of top-most blocks.';
   }
-  this.invalidateTopBlocksCache_();
 };
 
 /**
@@ -204,41 +202,20 @@ Blockly.Workspace.prototype.removeTopBlock = function(block) {
  * @return {!Array.<!Blockly.Block>} The top-level block objects.
  */
 Blockly.Workspace.prototype.getTopBlocks = function(ordered) {
-  if (ordered) {
-    if (this.topBlocksOrderedCache_) {
-      return this.topBlocksOrderedCache_;
-    }
-    // Copy the topBlocks_ list.
-    var blocks = [].concat(this.topBlocks_);
-    if (blocks.length > 1) {
-      var offset = Math.sin(goog.math.toRadians(Blockly.Workspace.SCAN_ANGLE));
-      if (this.RTL) {
-        offset *= -1;
-      }
-      blocks.sort(function(a, b) {
-        var aXY = a.getRelativeToSurfaceXY();
-        var bXY = b.getRelativeToSurfaceXY();
-        return (aXY.y + offset * aXY.x) - (bXY.y + offset * bXY.x);
-      });
-    }
-    this.topBlocksOrderedCache_ = blocks;
-    return blocks;
-  }
-  if (this.topBlocksUnorderedCache_) {
-    return this.topBlocksUnorderedCache_;
-  }
+  // Copy the topBlocks_ list.
   var blocks = [].concat(this.topBlocks_);
-  this.topBlocksUnorderedCache_ = blocks;
+  if (ordered && blocks.length > 1) {
+    var offset = Math.sin(goog.math.toRadians(Blockly.Workspace.SCAN_ANGLE));
+    if (this.RTL) {
+      offset *= -1;
+    }
+    blocks.sort(function(a, b) {
+      var aXY = a.getRelativeToSurfaceXY();
+      var bXY = b.getRelativeToSurfaceXY();
+      return (aXY.y + offset * aXY.x) - (bXY.y + offset * bXY.x);
+    });
+  }
   return blocks;
-};
-
-/**
- * Invalidate the cached top blocks lists.
- * @private
- */
-Blockly.Workspace.prototype.invalidateTopBlocksCache_ = function() {
-  this.topBlocksOrderedCache_ = null;
-  this.topBlocksUnorderedCache_ = null;
 };
 
 /**
