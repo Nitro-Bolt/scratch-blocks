@@ -51,6 +51,12 @@ goog.require('goog.userAgent');
 Blockly.ContextMenu.currentBlock = null;
 
 /**
+ * Which group is the context menu attached to?
+ * @type {Blockly.Group}
+ */
+Blockly.ContextMenu.currentGroup = null;
+
+/**
  * Opaque data that can be passed to unbindEvent_.
  * @type {Array.<!Array>}
  * @private
@@ -79,6 +85,7 @@ Blockly.ContextMenu.show = function(e, options, rtl) {
   // mouse event is still waiting in the queue and clears focus.
   setTimeout(function() {menu.getElement().focus();}, 1);
   Blockly.ContextMenu.currentBlock = null;  // May be set by Blockly.Block.
+  Blockly.ContextMenu.currentGroup = null;  // May be set by Blockly.Group.
 };
 
 /**
@@ -189,6 +196,7 @@ Blockly.ContextMenu.createWidget_ = function(menu) {
 Blockly.ContextMenu.hide = function() {
   Blockly.WidgetDiv.hideIfOwner(Blockly.ContextMenu);
   Blockly.ContextMenu.currentBlock = null;
+  Blockly.ContextMenu.currentGroup = null;
   if (Blockly.ContextMenu.eventWrapper_) {
     Blockly.unbindEvent_(Blockly.ContextMenu.eventWrapper_);
   }

@@ -610,6 +610,7 @@ Blockly.Group.prototype.deleteGroup_ = function(e) {
 Blockly.Group.prototype.showContextMenu_ = function(e) {
   e.preventDefault();
   e.stopPropagation();
+  Blockly.ContextMenu.currentGroup = this;
   Blockly.ContextMenu.show(e, [
     Blockly.ContextMenu.groupRenameOption(this),
     Blockly.ContextMenu.groupDuplicateOption(this, e),
