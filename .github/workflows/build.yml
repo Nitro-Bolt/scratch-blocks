@@ -1,9 +1,6 @@
 name: Build and Push
 
 on:
-  push:
-    branches:
-      - develop-builds
   workflow_dispatch:
     inputs: {}
 
