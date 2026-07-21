@@ -191,6 +191,20 @@ Blockly.Css.CONTENT = [
     'cursor: pointer;',
   '}',
 
+  '.blocklyTextShiftArrow {',
+    'position: absolute;',
+    'width: 20px;',
+    'height: 40px;',
+    'top: -48px;',
+    'cursor: pointer;',
+  '}',
+
+  '.blocklyTextShiftArrow path {',
+    'fill: none;',
+    'stroke: #ff661a;',
+    'stroke-width: 2;',
+  '}',
+
   '.blocklyNonSelectable {',
     'user-select: none;',
     '-moz-user-select: none;',
