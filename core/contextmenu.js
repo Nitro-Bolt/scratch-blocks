@@ -675,7 +675,7 @@ Blockly.ContextMenu.groupDeleteOption = function(group) {
     text: Blockly.Msg.DELETE,
     enabled: true,
     callback: function() {
-      group.deleteGroup_({stopPropagation: function() {}});
+      group.dispose(true);
     }
   };
 };
