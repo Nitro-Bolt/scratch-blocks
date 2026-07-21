@@ -1300,10 +1300,10 @@ Blockly.Blocks['argument_editor_dropdown'] = {
     this.jsonInit({ "message0": " %1",
       "args0": [
         {
-          "type": "field_textdropdown",
+          "type": "field_dropdowneditor",
           "name": "TEXT",
           "options": [
-            ['', '']
+            ['Option', 'Option']
           ]
         }
       ],
