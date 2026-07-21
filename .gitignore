@@ -25,7 +25,6 @@ python_compressed.js
 .idx
 
 /accessible/*
-/dist
 /msg/js/*
 !/msg/js/en.js
 /msg/json/*
