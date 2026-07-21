@@ -318,8 +318,10 @@ Blockly.ScratchBlocks.ProcedureUtils.removeAllInputs_ = function() {
  * @this Blockly.Block
  */
 Blockly.ScratchBlocks.ProcedureUtils.createAllInputs_ = function(connectionMap) {
-  // Split the proc into components, by %n, %b, %o, %a, and %s (ignoring escaped).
-  var procComponents = this.procCode_.split(/(?=[^\\]%[nboas])/);
+  // Split the proc into components, by arguments and the internal %l label
+  // delimiter (ignoring escaped percent signs). The delimiter keeps adjacent
+  // labels separate while inputs are being rearranged in the declaration UI.
+  var procComponents = this.procCode_.split(/(?=[^\\]%[nboasl])/);
   procComponents = procComponents.map(function(c) {
     return c.trim(); // Strip whitespace.
   });
@@ -328,9 +330,12 @@ Blockly.ScratchBlocks.ProcedureUtils.createAllInputs_ = function(connectionMap) 
   var hasAnyField = false;
   for (var i = 0, component; component = procComponents[i]; i++) {
     var labelText;
-    if (component.substring(0, 1) == '%') {
+    if (component.substring(0, 1) == '%' &&
+        component.substring(1, 2) != 'l') {
       var argumentType = component.substring(1, 2);
-      if (!(argumentType == 'n' || argumentType == 'b' || argumentType == 'o' || argumentType == 'a' || argumentType == 's')) {
+      if (!(argumentType == 'n' || argumentType == 'b' ||
+          argumentType == 'o' || argumentType == 'a' ||
+          argumentType == 's')) {
         throw new Error(
             'Found an custom procedure with an invalid type: ' + argumentType);
       }
@@ -351,7 +356,8 @@ Blockly.ScratchBlocks.ProcedureUtils.createAllInputs_ = function(connectionMap) 
       hasAnyField = true;
       argumentCount++;
     } else {
-      labelText = component.trim();
+      labelText = component == '%l' ? ' ' :
+        component.replace('%l', '').trim();
     }
     labelText = labelText.replace(/\\%/, '%');
     // don't add empty labels which will just waste space
@@ -364,6 +370,9 @@ Blockly.ScratchBlocks.ProcedureUtils.createAllInputs_ = function(connectionMap) 
   if (!hasAnyField) {
     this.addProcedureLabel_(' ');
   }
+  // %l is only an editor delimiter; it must never become part of a saved
+  // procedure code.
+  this.procCode_ = this.procCode_.replace(/%l /g, '');
 };
 
 /**
@@ -715,8 +724,10 @@ Blockly.ScratchBlocks.ProcedureUtils.createArgumentEditor_ = function(
 /**
  * Update the serializable information on the block based on the existing inputs
  * and their text.
+ * @param {boolean=} opt_separateLabels Whether to delimit adjacent labels while
+ *     rebuilding the declaration editor.
  */
-Blockly.ScratchBlocks.ProcedureUtils.updateDeclarationProcCode_ = function() {
+Blockly.ScratchBlocks.ProcedureUtils.updateDeclarationProcCode_ = function(opt_separateLabels) {
   this.procCode_ = '';
   this.displayNames_ = [];
   this.argumentIds_ = [];
@@ -726,7 +737,8 @@ Blockly.ScratchBlocks.ProcedureUtils.updateDeclarationProcCode_ = function() {
     }
     var input = this.inputList[i];
     if (input.type == Blockly.DUMMY_INPUT) {
-      this.procCode_ += input.fieldRow[0].getValue();
+      this.procCode_ += (opt_separateLabels ? '%l ' : '') +
+        input.fieldRow[0].getValue();
     } else if (input.type == Blockly.INPUT_VALUE) {
       // Inspect the argument editor.
       var target = input.connection.targetBlock();
@@ -745,6 +757,55 @@ Blockly.ScratchBlocks.ProcedureUtils.updateDeclarationProcCode_ = function() {
       throw new Error(
           'Unexpected input type on a procedure mutator root: ' + input.type);
     }
+  }
+};
+
+/**
+ * Move the input containing a field one place in either direction.
+ * @param {Blockly.Field} field Field whose containing input should move.
+ * @param {number} direction -1 to move left, 1 to move right.
+ * @public
+ */
+Blockly.ScratchBlocks.ProcedureUtils.shiftFieldCallback = function(field, direction) {
+  var declaration = this.parentBlock_ || this;
+  if (declaration.type != 'procedures_declaration' ||
+      declaration.inputList.length <= 1) {
+    return;
+  }
+
+  var oldIndex = -1;
+  for (var i = 0; i < declaration.inputList.length; i++) {
+    var input = declaration.inputList[i];
+    var containsField = input.connection ?
+      input.connection.targetBlock().getField(field.name) == field :
+      input.fieldRow.indexOf(field) != -1;
+    if (containsField) {
+      oldIndex = i;
+      break;
+    }
+  }
+
+  var newIndex = oldIndex + direction;
+  if (oldIndex < 0 || newIndex < 0 ||
+      newIndex >= declaration.inputList.length) {
+    return;
+  }
+
+  var movedInput = declaration.inputList.splice(oldIndex, 1)[0];
+  declaration.inputList.splice(newIndex, 0, movedInput);
+  Blockly.Events.disable();
+  try {
+    declaration.onChangeFn(true);
+    declaration.updateDisplay_();
+  } finally {
+    Blockly.Events.enable();
+  }
+
+  var focusedInput = declaration.inputList[newIndex];
+  if (focusedInput.type == Blockly.DUMMY_INPUT) {
+    focusedInput.fieldRow[0].showEditor_();
+  } else {
+    focusedInput.connection.targetBlock().getField('TEXT').showEditor_();
   }
 };
 
@@ -909,7 +970,8 @@ Blockly.ScratchBlocks.ProcedureUtils.removeFieldCallback = function(field) {
   if (inputNameToRemove) {
     Blockly.WidgetDiv.hide(true);
     this.removeInput(inputNameToRemove);
-    this.onChangeFn();
+    // Keep adjacent labels distinct while rebuilding the reordered input list.
+    this.onChangeFn(true);
     this.updateDisplay_();
   }
 };
@@ -1112,6 +1174,7 @@ Blockly.Blocks['procedures_declaration'] = {
 
   // Exist on declaration and arguments editors, with different implementations.
   removeFieldCallback: Blockly.ScratchBlocks.ProcedureUtils.removeFieldCallback,
+  shiftFieldCallback: Blockly.ScratchBlocks.ProcedureUtils.shiftFieldCallback,
 
   // Only exist on procedures_declaration.
   createArgumentEditor_: Blockly.ScratchBlocks.ProcedureUtils.createArgumentEditor_,
@@ -1227,7 +1290,8 @@ Blockly.Blocks['argument_editor_boolean'] = {
     });
   },
   // Exist on declaration and arguments editors, with different implementations.
-  removeFieldCallback: Blockly.ScratchBlocks.ProcedureUtils.removeArgumentCallback_
+  removeFieldCallback: Blockly.ScratchBlocks.ProcedureUtils.removeArgumentCallback_,
+  shiftFieldCallback: Blockly.ScratchBlocks.ProcedureUtils.shiftFieldCallback
 };
 
 Blockly.Blocks['argument_editor_object'] = {
@@ -1248,7 +1312,8 @@ Blockly.Blocks['argument_editor_object'] = {
     });
   },
   // Exist on declaration and arguments editors, with different implementations.
-  removeFieldCallback: Blockly.ScratchBlocks.ProcedureUtils.removeArgumentCallback_
+  removeFieldCallback: Blockly.ScratchBlocks.ProcedureUtils.removeArgumentCallback_,
+  shiftFieldCallback: Blockly.ScratchBlocks.ProcedureUtils.shiftFieldCallback
 };
 
 Blockly.Blocks['argument_editor_array'] = {
@@ -1269,7 +1334,8 @@ Blockly.Blocks['argument_editor_array'] = {
     });
   },
   // Exist on declaration and arguments editors, with different implementations.
-  removeFieldCallback: Blockly.ScratchBlocks.ProcedureUtils.removeArgumentCallback_
+  removeFieldCallback: Blockly.ScratchBlocks.ProcedureUtils.removeArgumentCallback_,
+  shiftFieldCallback: Blockly.ScratchBlocks.ProcedureUtils.shiftFieldCallback
 };
 
 Blockly.Blocks['argument_editor_string_number'] = {
@@ -1290,7 +1356,8 @@ Blockly.Blocks['argument_editor_string_number'] = {
     });
   },
   // Exist on declaration and arguments editors, with different implementations.
-  removeFieldCallback: Blockly.ScratchBlocks.ProcedureUtils.removeArgumentCallback_
+  removeFieldCallback: Blockly.ScratchBlocks.ProcedureUtils.removeArgumentCallback_,
+  shiftFieldCallback: Blockly.ScratchBlocks.ProcedureUtils.shiftFieldCallback
 };
 
 Blockly.Blocks['procedures_set_param'] = {
