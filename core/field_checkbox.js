@@ -28,6 +28,8 @@
 goog.provide('Blockly.FieldCheckbox');
 
 goog.require('Blockly.Events');
+goog.require('Blockly.Events.BlockCreate');
+goog.require('Blockly.Events.BlockMove');
 
 goog.require('Blockly.Field');
 
@@ -73,9 +75,8 @@ Blockly.FieldCheckbox.connectBoolean = function(input) {
   Blockly.Events.setGroup(true);
   var block = Blockly.Xml.domToBlock(
     Blockly.Xml.textToDom('<xml><shadow type="checkbox"><field name="CHECKBOX"> </field></shadow></xml>').querySelector('shadow'),
-    input.sourceBlock_.workspace,
+    input.sourceBlock_.workspace
   );
-  block.render();
   block.outputConnection.connect(input.connection);
   Blockly.Events.setGroup(false);
 };
@@ -159,19 +160,24 @@ Blockly.FieldCheckbox.prototype.setValue = function(value) {
  * @private
  */
 Blockly.FieldCheckbox.prototype.showEditor_ = function() {
+  Blockly.Events.setGroup(true);
   var source = this.sourceBlock_;
   this.dispose(); // Dispose of the field.
   var input = source && source.getParent() && source.getParent().getInputWithBlock(source);
   // Make sure we have a parent and are in an input, otherwise something.. weird is going on.
   if (!source || !input) {
+    Blockly.Events.setGroup(false);
     console.warn('Orphaned checkbox field was clicked.');
     return;
   }
   // Remove the shadow dom from the connection. (to prevent regeneration)
   input.connection.setShadowDom();
+  // Un-shadow the block so the VM will properly delete it.
+  source.setShadow(false);
   // Dispose of our shadow parent.
   source.unplug(false);
   source.dispose(false, false);
+  Blockly.Events.setGroup(false);
 };
 
 Blockly.FieldCheckbox.prototype.updateWidth = function() {

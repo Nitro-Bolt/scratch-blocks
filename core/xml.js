@@ -46,6 +46,9 @@ goog.require('goog.dom');
 Blockly.Xml.workspaceToDom = function(workspace, opt_noId) {
   var xml = goog.dom.createDom('xml');
   xml.appendChild(Blockly.Xml.variablesToDom(workspace.getAllVariables()));
+  workspace.getGroups().forEach(function(group) {
+    xml.appendChild(group.toXml());
+  });
   var comments = workspace.getTopComments(true).filter(function(topComment) {
     return topComment instanceof Blockly.WorkspaceComment;
   });
@@ -112,6 +115,12 @@ Blockly.Xml.fieldToDomVariable_ = function(field) {
   // The new block will be serialized for the first time when firing a block
   // creation event.
   if (id == null) {
+    if (field.allowEmpty_) {
+      var emptyContainer = goog.dom.createDom('field', null, '');
+      emptyContainer.setAttribute('name', field.name);
+      emptyContainer.setAttribute('allowEmpty', 'true');
+      return emptyContainer;
+    }
     field.initModel();
     id = field.getValue();
   }
@@ -165,7 +174,11 @@ Blockly.Xml.allFieldsToDom_ = function(block, element) {
     for (var j = 0, field; field = input.fieldRow[j]; j++) {
       var fieldDom = Blockly.Xml.fieldToDom_(field);
       if (fieldDom) {
-        element.appendChild(fieldDom);
+        if (field.REVERSE_SERIALIZE) {
+          element.insertBefore(fieldDom, element.children[0] || null);
+        } else {
+          element.appendChild(fieldDom);
+        }
       }
     }
   }
@@ -388,10 +401,21 @@ Blockly.Xml.domToPrettyText = function(dom) {
 Blockly.Xml.textToDom = function(text) {
   var oParser = new DOMParser();
   var dom = oParser.parseFromString(text, 'text/xml');
-  // The DOM should have one and only one top-level node, an XML tag.
+  // The DOM should have one and only one top-level node, an XML tag, and no
+  // parse error (some invalid characters cause document to be truncated and
+  // a <parsererror> is generated)
   if (!dom || !dom.firstChild ||
       dom.firstChild.nodeName.toLowerCase() != 'xml' ||
-      dom.firstChild !== dom.lastChild) {
+      dom.firstChild !== dom.lastChild ||
+      dom.getElementsByTagName('parsererror').length) {
+    // Matching Scratch, fall back to the lenient HTML parser when the text is
+    // not valid XML. Some "interesting" projects put control characters in
+    // inputs, which are illegal in XML 1.0 but tolerated by the HTML parser.
+    var htmlDom = oParser.parseFromString(text, 'text/html');
+    if (htmlDom && htmlDom.body.firstChild &&
+        htmlDom.body.firstChild.nodeName.toLowerCase() == 'xml') {
+      return htmlDom.body.firstChild;
+    }
     // Whatever we got back from the parser is not XML.
     goog.asserts.fail('Blockly.Xml.textToDom did not obtain a valid XML tree.');
   }
@@ -453,7 +477,14 @@ Blockly.Xml.domToWorkspace = function(xml, workspace) {
     for (var i = 0; i < childCount; i++) {
       var xmlChild = xml.childNodes[i];
       var name = xmlChild.nodeName.toLowerCase();
-      if (name == 'block' ||
+      if (name == 'group') {
+        var state = {};
+        ['id', 'title', 'x', 'y', 'width', 'height', 'expandedHeight',
+          'collapsed', 'blocks'].forEach(function(key) {
+          state[key] = xmlChild.getAttribute(key);
+        });
+        Blockly.Group.fromJSON(workspace, state, false);
+      } else if (name == 'block' ||
           (name == 'shadow' && !Blockly.Events.recordUndo)) {
         // Allow top-level shadow blocks if recordUndo is disabled since
         // that means an undo is in progress.  Such a block is expected
@@ -503,6 +534,11 @@ Blockly.Xml.domToWorkspace = function(xml, workspace) {
   if (workspace.setResizesEnabled) {
     workspace.setResizesEnabled(true);
   }
+  // Groups are decoded before their blocks. Reapply collapsed visibility only
+  // after every referenced block has been created and positioned.
+  workspace.getGroups().forEach(function(group) {
+    if (group.collapsed) group.restoreCollapsedBlocks_();
+  });
   return newBlockIds;
 };
 
@@ -838,9 +874,22 @@ Blockly.Xml.domToBlockHeadless_ = function(xmlBlock, workspace) {
  */
 Blockly.Xml.domToFieldVariable_ = function(workspace, xml, text, field) {
   var type = xml.getAttribute('variabletype') || '';
+  var allowEmpty = xml.getAttribute('allowEmpty') === 'true';
   // TODO (fenichel): Does this need to be explicit or not?
   if (type == '\'\'') {
     type = '';
+  }
+
+  // Broadcast menus should resolve to an existing/default message instead of staying blank.
+  if (type == Blockly.BROADCAST_MESSAGE_VARIABLE_TYPE) {
+    allowEmpty = false;
+  }
+
+  if (allowEmpty && !xml.id && !text) {
+    field.variable_ = null;
+    field.value_ = null;
+    field.setText('');
+    return;
   }
 
   var variable;
@@ -851,6 +900,21 @@ Blockly.Xml.domToFieldVariable_ = function(workspace, xml, text, field) {
     var flyoutWs = workspace.getFlyout().getWorkspace();
     variable = Blockly.Variables.realizePotentialVar(text, type, flyoutWs, true);
   }
+  if (!variable) {
+    if (allowEmpty) {
+      variable = workspace.getVariable(text, type) ||
+          (workspace.getPotentialVariableMap() &&
+              workspace.getPotentialVariableMap().getVariable(text, type)) ||
+          null;
+      if (!variable) {
+        field.variable_ = null;
+        field.value_ = null;
+        field.setText('');
+        return;
+      }
+    }
+  }
+
   if (!variable) {
     variable = Blockly.Variables.getOrCreateVariablePackage(workspace, xml.id,
         text, type);

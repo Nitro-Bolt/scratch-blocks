@@ -59,12 +59,26 @@ Blockly.Input = function(type, name, block, connection) {
   /** @type {!Array.<!Blockly.Field>} */
   this.fieldRow = [];
 
+  /** @type {boolean?} */
+  this.isNewRow = null;
+
   /**
    * The shape that is displayed when this input is rendered but not filled.
    * @type {SVGElement}
    * @package
    */
   this.outlinePath = null;
+
+  /**
+   * If this input belongs to an extendable field, the name of said field.
+   * @type {string}
+   */
+  this.extendableName = null;
+  /**
+   * If this input belongs to an extendable field, the input's index in said field.
+   * @type {number}
+   */
+  this.extendableIndex = null;
 };
 
 /**
@@ -115,6 +129,7 @@ Blockly.Input.prototype.insertFieldAt = function(index, field, opt_name) {
   if (goog.isString(field)) {
     field = new Blockly.FieldLabel(/** @type {string} */ (field));
   }
+  field.setSourceInput(this);
   field.setSourceBlock(this.sourceBlock_);
   if (this.sourceBlock_.rendered) {
     field.init();
@@ -133,6 +148,8 @@ Blockly.Input.prototype.insertFieldAt = function(index, field, opt_name) {
     index = this.insertFieldAt(index, field.suffixField);
   }
 
+  field.insertedInto(this, this.sourceBlock_);
+
   if (this.sourceBlock_.rendered) {
     this.sourceBlock_.render();
     // Adding a field will cause the block to change shape.
@@ -149,8 +166,8 @@ Blockly.Input.prototype.insertFieldAt = function(index, field, opt_name) {
 Blockly.Input.prototype.removeField = function(name) {
   for (var i = 0, field; field = this.fieldRow[i]; i++) {
     if (field.name === name) {
-      field.dispose();
       this.fieldRow.splice(i, 1);
+      field.dispose();
       if (this.sourceBlock_.rendered) {
         this.sourceBlock_.render();
         // Removing a field will cause the block to change shape.
@@ -318,5 +335,9 @@ Blockly.Input.prototype.isClickable = function() {
 };
 
 Blockly.Input.prototype.onClick = function() {
-  Blockly.FieldCheckbox.connectBoolean(this);
+  var check = this.connection.check_ || [];
+
+  if (check.indexOf('Boolean') !== -1) {
+    Blockly.FieldCheckbox.connectBoolean(this);
+  }
 };

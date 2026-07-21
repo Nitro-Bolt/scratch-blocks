@@ -86,7 +86,18 @@ Blockly.Blocks['sensing_touchingcolor'] = {
         }
       ],
       "category": Blockly.Categories.sensing,
-      "extensions": ["colours_sensing", "output_boolean"]
+      "extensions": ["colours_sensing", "output_boolean"],
+      "switches": [
+        {
+          id: 'sensing_coloristouchingcolor',
+          createInputs: {
+            COLOR2: { shadowType: 'colour_picker', value: function() {
+              var num = Math.floor(Math.random() * 256 * 256 * 256);
+              return '#' + num.toString(16).padStart(6, '0');
+            }}
+          }
+        }
+      ]
     });
   }
 };
@@ -110,7 +121,10 @@ Blockly.Blocks['sensing_coloristouchingcolor'] = {
         }
       ],
       "category": Blockly.Categories.sensing,
-      "extensions": ["colours_sensing", "output_boolean"]
+      "extensions": ["colours_sensing", "output_boolean"],
+      "switches": [
+        { id: 'sensing_touchingcolor', splitInputs: ['COLOR2'] }
+      ]
     });
   }
 };
@@ -299,6 +313,7 @@ Blockly.Blocks['sensing_mousex'] = {
     this.jsonInit({
       "message0": Blockly.Msg.SENSING_MOUSEX,
       "category": Blockly.Categories.sensing,
+      "switches": ["sensing_mousey"],
       "checkboxInFlyout": true,
       "extensions": ["colours_sensing", "output_number"]
     });
@@ -314,6 +329,7 @@ Blockly.Blocks['sensing_mousey'] = {
     this.jsonInit({
       "message0": Blockly.Msg.SENSING_MOUSEY,
       "category": Blockly.Categories.sensing,
+      "switches": ["sensing_mousex"],
       "checkboxInFlyout": true,
       "extensions": ["colours_sensing", "output_number"]
     });
@@ -485,7 +501,9 @@ Blockly.Blocks['sensing_current'] = {
             [Blockly.Msg.SENSING_CURRENT_DAYOFWEEK, 'DAYOFWEEK'],
             [Blockly.Msg.SENSING_CURRENT_HOUR, 'HOUR'],
             [Blockly.Msg.SENSING_CURRENT_MINUTE, 'MINUTE'],
-            [Blockly.Msg.SENSING_CURRENT_SECOND, 'SECOND']
+            [Blockly.Msg.SENSING_CURRENT_SECOND, 'SECOND'],
+            [Blockly.Msg.SENSING_CURRENT_MILLISECOND, 'MILLISECOND'],
+            [Blockly.Msg.SENSING_CURRENT_TIMESTAMP, 'TIMESTAMP']
           ]
         }
       ],
@@ -538,6 +556,18 @@ Blockly.Blocks['sensing_userid'] = {
       "message0": Blockly.Msg.SENSING_USERID,
       "category": Blockly.Categories.sensing,
       "extensions": ["colours_sensing", "output_number"]
+    });
+  }
+};
+
+Blockly.Blocks['sensing_online'] = {
+  init: function() {
+    this.jsonInit({
+      // TODO: we need infrastructure to translate new blockly strings
+      "message0": "online?",
+      "category": Blockly.Categories.sensing,
+      "checkboxInFlyout": true,
+      "extensions": ["colours_sensing", "output_boolean"]
     });
   }
 };
