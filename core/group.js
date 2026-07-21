@@ -579,7 +579,8 @@ Blockly.Group.prototype.updateCollapsedBlocks_ = function() {
   this.blockIds.forEach(function(id) {
     var block = workspace.getBlockById(id);
     if (block && block.getSvgRoot()) {
-      block.getSvgRoot().style.display = this.collapsed ? 'none' : '';
+      block.getSvgRoot().style.display =
+          this.collapsed || block.intersects_ === false ? 'none' : '';
     }
   }, this);
 };

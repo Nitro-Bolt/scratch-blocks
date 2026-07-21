@@ -291,7 +291,11 @@ Blockly.BlockSvg.prototype.setIntersects = function(intersects) {
     return;
   }
   if (intersects) {
-    root.style.display = '';
+    var groups = this.workspace.getGroups ? this.workspace.getGroups() : [];
+    var hiddenByGroup = groups.some(function(group) {
+      return group.collapsed && group.blockIds.indexOf(this.id) !== -1;
+    }, this);
+    root.style.display = hiddenByGroup ? 'none' : '';
   } else {
     root.style.display = 'none';
   }
