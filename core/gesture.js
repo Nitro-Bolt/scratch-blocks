@@ -1065,6 +1065,10 @@ Blockly.Gesture.prototype.duplicateOnDrag_ = function() {
     var xy = this.targetBlock_.getRelativeToSurfaceXY();
     newBlock.moveBy(xy.x, xy.y);
     newBlock.setShadow(false);
+    if (newBlock.type === 'argument_reporter_statement') {
+      newBlock.setPreviousStatement(true, 'normal');
+      newBlock.setNextStatement(true, 'normal');
+    }
   } finally {
     Blockly.Events.enable();
   }

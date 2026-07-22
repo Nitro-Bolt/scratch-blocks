@@ -238,7 +238,7 @@ Blockly.ScratchBlocks.ProcedureUtils.updateDisplay_ = function() {
       this.setNextStatement(true, "normal");
     } else if (/*this.inputList.find(v => v.type == Blockly.NEXT_STATEMENT)*/false) {
       this.setOutput(true, null);
-      this.setOutputShape(Blockly.OUTPUT_SHAPE_SQUARE)
+      this.setOutputShape(Blockly.OUTPUT_SHAPE_SQUARE);
     } else {
       if (this.getReturn() === Blockly.PROCEDURES_CALL_TYPE_BOOLEAN) {
         this.setOutput(true, null);
@@ -346,7 +346,8 @@ Blockly.ScratchBlocks.ProcedureUtils.createAllInputs_ = function(connectionMap) 
 
       var input
       if (argumentType === 'c') {
-        input = this.appendStatementInput(id).setCheck(this.type == 'procedures_prototype' ? "argumentReporterCommand" : "normal");
+        input = this.appendStatementInput(id)
+            .setCheck(this.type == 'procedures_prototype' ? "argumentReporterCommand" : "normal");
       } else {
         input = this.appendValueInput(id);
         if (argumentType == 'b') {
@@ -524,7 +525,7 @@ Blockly.ScratchBlocks.ProcedureUtils.createArgumentReporter_ = function(
   } else if (argumentType == 'a') {
     var blockType = 'argument_reporter_array';
   } else if (argumentType == 'c') {
-    var blockType = 'argument_reporter_statement'
+    var blockType = 'argument_reporter_statement';
   }
   Blockly.Events.disable();
   try {
@@ -536,8 +537,8 @@ Blockly.ScratchBlocks.ProcedureUtils.createArgumentReporter_ = function(
       newBlock.render(false);
     }
     if (argumentType === 'c') {
-      newBlock.setPreviousStatement(true, 'argumentReporterCommand')
-      newBlock.setNextStatement(true, 'argumentReporterCommand')
+      newBlock.setPreviousStatement(true, 'argumentReporterCommand');
+      newBlock.setNextStatement(true, 'argumentReporterCommand');
     }
   } finally {
     Blockly.Events.enable();
