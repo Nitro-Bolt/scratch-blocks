@@ -1057,8 +1057,7 @@ Blockly.ScratchBlocks.ProcedureUtils.updateArgumentReporterNames_ = function(pre
         block.type === 'argument_reporter_object' ||
         block.type === 'argument_reporter_array' ||
         block.type === 'argument_reporter_statement'
-      ) &&
-        !block.isShadow()) { // Exclude arg reporters in the prototype block, which are shadows.
+    ) && !block.isShadow()) { // Exclude arg reporters in the prototype block, which are shadows.
       argReporters.push(block);
     }
   }
