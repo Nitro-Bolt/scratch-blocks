@@ -57,7 +57,7 @@ Blockly.FieldTextInputRemovable.prototype.init = function() {
   Blockly.FieldTextInputRemovable.superClass_.init.call(this);
 
   this.textElement_.classList.add('removableTextInput');
-}
+};
 
 /**
  * Show the inline free-text editor on top of the text with the remove button.
@@ -65,6 +65,16 @@ Blockly.FieldTextInputRemovable.prototype.init = function() {
  */
 Blockly.FieldTextInputRemovable.prototype.showEditor_ = function() {
   Blockly.FieldTextInputRemovable.superClass_.showEditor_.call(this);
+
+  // Remember the active procedure input so newly added inputs can be inserted
+  // immediately after it. Argument editors are children of the declaration;
+  // label editors live on the declaration itself.
+  if (this.sourceBlock_) {
+    var declaration = this.sourceBlock_.parentBlock_ || this.sourceBlock_;
+    if (declaration.type == 'procedures_declaration') {
+      declaration.selectedField_ = this;
+    }
+  }
 
   var div = Blockly.WidgetDiv.DIV;
   div.className += ' removableTextInput';
@@ -94,6 +104,54 @@ Blockly.FieldTextInputRemovable.prototype.showEditor_ = function() {
       });
     }, this);
   }
+};
+
+/**
+ * Close the editor and clear its procedure declaration selection.
+ * @return {!Function} Closure to call on destruction of the WidgetDiv.
+ * @private
+ */
+Blockly.FieldTextInputRemovable.prototype.widgetDispose_ = function() {
+  var dispose = Blockly.FieldTextInputRemovable.superClass_.widgetDispose_.
+      call(this);
+  var thisField = this;
+  return function() {
+    dispose();
+    if (!thisField.sourceBlock_) {
+      return;
+    }
+    var declaration = thisField.sourceBlock_.parentBlock_ ||
+        thisField.sourceBlock_;
+    if (declaration.type == 'procedures_declaration' &&
+        declaration.selectedField_ == thisField) {
+      declaration.selectedField_ = null;
+    }
+  };
+};
+
+/**
+ * Return the editor anchor position. A statement argument uses the statement
+ * block's horizontal bounds but the field row's vertical bounds, keeping the
+ * editor centered over the header instead of the C-shaped block body.
+ * @return {!goog.math.Coordinate} Page coordinates for the editor.
+ * @private
+ */
+Blockly.FieldTextInputRemovable.prototype.getAbsoluteXY_ = function() {
+  if (this.sourceBlock_ &&
+      this.sourceBlock_.type == 'argument_editor_statement') {
+    var fieldRect = this.getSvgRoot().getBoundingClientRect();
+    var scale = this.sourceBlock_.workspace.scale;
+    var headerWidth = (this.size_.width +
+        2 * Blockly.BlockSvg.SEP_SPACE_X) * scale;
+    return {
+      x: fieldRect.left + window.pageXOffset +
+          (fieldRect.width - headerWidth) / 2,
+      y: fieldRect.top + window.pageYOffset +
+          (fieldRect.height -
+          Blockly.BlockSvg.FIELD_HEIGHT_MAX_EDIT * scale) / 2
+    };
+  }
+  return Blockly.FieldTextInputRemovable.superClass_.getAbsoluteXY_.call(this);
 };
 
 /**
