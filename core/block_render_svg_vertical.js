@@ -939,27 +939,35 @@ Blockly.BlockSvg.prototype.renderCompute_ = function(iconWidth) {
   var shape = this.getOutputShape();
   if (this.outputConnection && (shape === Blockly.OUTPUT_SHAPE_HEXAGONAL || shape === Blockly.OUTPUT_SHAPE_OBJECT)) {
     if (inputRows.length > 1) {
-      // Calculate the height of the block
+      // Calculate the same effective height used later to draw the output
+      // edge. Statement rows gain an extra separator below the final branch
+      // and between consecutive branches. Omitting those separators here
+      // makes the field/input padding increasingly too small as branches are
+      // added, while the hexagonal/object edge continues to grow.
       var totalHeight = 0;
       for (var k = 0; k < inputRows.length; k++) {
         totalHeight += inputRows[k].height;
+        if (this.type != Blockly.PROCEDURES_DEFINITION_BLOCK_TYPE &&
+            inputRows[k].type == Blockly.NEXT_STATEMENT &&
+            (k == inputRows.length - 1 ||
+             inputRows[k + 1].type == Blockly.NEXT_STATEMENT)) {
+          totalHeight += Blockly.BlockSvg.EXTRA_STATEMENT_ROW_Y;
+        }
       }
 
       var h = totalHeight;
       var w = h / 2;
-      var currentY = 0;
-      var safetyPadding = (Blockly.BlockSvg.INPUT_SHAPE_HEIGHT / 2) + Blockly.BlockSvg.GRID_UNIT;
-      if (shape === Blockly.OUTPUT_SHAPE_OBJECT) {
-        safetyPadding = -safetyPadding / 2;
-      }
+      // renderDrawRight_ adds the reporter corner inset separately. Keep the
+      // remaining padding equal to the statement edge so first-row fields and
+      // statement sockets start on exactly the same horizontal guide.
+      var safetyPadding = Blockly.BlockSvg.STATEMENT_INPUT_EDGE_WIDTH -
+          Blockly.BlockSvg.MAX_REPORTER_CORNER_RADIUS;
 
       for (var i = 0; i < inputRows.length; i++) {
         var row = inputRows[i];
-        var rowCenterY = currentY + row.height / 2;
         var offsetFromCenter = w;
         row.paddingStart = Math.max(row.paddingStart, offsetFromCenter + safetyPadding);
         row.paddingEnd = Math.max(row.paddingEnd, offsetFromCenter + safetyPadding);
-        currentY += row.height;
       }
     }
   }
