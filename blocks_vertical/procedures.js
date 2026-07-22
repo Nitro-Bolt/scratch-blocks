@@ -58,6 +58,7 @@ Blockly.ScratchBlocks.ProcedureUtils.callerMutationToDom = function() {
   var container = document.createElement('mutation');
   container.setAttribute('proccode', this.procCode_);
   container.setAttribute('argumentids', JSON.stringify(this.argumentIds_));
+  container.setAttribute('argumentdropdowns', JSON.stringify(this.argumentDropdowns_));
   container.setAttribute('warp', JSON.stringify(this.warp_));
   container.setAttribute('colour', this.colour_);
   if (this.return_ !== Blockly.PROCEDURES_CALL_TYPE_STATEMENT) {
@@ -77,6 +78,7 @@ Blockly.ScratchBlocks.ProcedureUtils.callerDomToMutation = function(xmlElement) 
   this.generateShadows_ =
       JSON.parse(xmlElement.getAttribute('generateshadows'));
   this.argumentIds_ = JSON.parse(xmlElement.getAttribute('argumentids'));
+  this.argumentDropdowns_ = JSON.parse(xmlElement.getAttribute('argumentdropdowns'));
   this.warp_ = JSON.parse(xmlElement.getAttribute('warp'));
   if (xmlElement.getAttribute('colour')) {
     this.colours_ = Blockly.ScratchBlocks.ProcedureUtils.matchColours(
@@ -107,6 +109,7 @@ Blockly.ScratchBlocks.ProcedureUtils.definitionMutationToDom = function(
   container.setAttribute('argumentnames', JSON.stringify(this.displayNames_));
   container.setAttribute('argumentdefaults',
       JSON.stringify(this.argumentDefaults_));
+  container.setAttribute('argumentdropdowns', JSON.stringify(this.argumentDropdowns_));
   container.setAttribute('warp', JSON.stringify(this.warp_));
   container.setAttribute('colour', this.colour_);
   return container;
@@ -169,6 +172,8 @@ Blockly.ScratchBlocks.ProcedureUtils.definitionDomToMutation = function(xmlEleme
   this.displayNames_ = JSON.parse(xmlElement.getAttribute('argumentnames'));
   this.argumentDefaults_ = JSON.parse(
       xmlElement.getAttribute('argumentdefaults'));
+  this.argumentDropdowns_ = JSON.parse(
+    xmlElement.getAttribute('argumentdropdowns'));
   this.updateDisplay_();
   if (this.updateArgumentReporterNames_) {
     this.updateArgumentReporterNames_(prevArgIds, prevDisplayNames);
@@ -317,6 +322,7 @@ Blockly.ScratchBlocks.ProcedureUtils.createAllInputs_ = function(connectionMap) 
   });
   // Create arguments and labels as appropriate.
   var argumentCount = 0;
+  var dropdownCount = 0;
   var hasAnyField = false;
   for (var i = 0, component; component = procComponents[i]; i++) {
     var labelText;
@@ -344,9 +350,12 @@ Blockly.ScratchBlocks.ProcedureUtils.createAllInputs_ = function(connectionMap) 
         input.setCheck('Object');
       } else if (argumentType == 'a') {
         input.setCheck('Array');
+      } else if (argumentType == 'd' && this.argumentDropdowns_[dropdownCount]) {
+        var dropdownOptions = this.argumentDropdowns_[dropdownCount].map(o => [o, o]);
+        dropdownCount++;
       }
       this.populateArgument_(argumentType, argumentCount, connectionMap, id,
-          input);
+          input, dropdownOptions);
       hasAnyField = true;
       argumentCount++;
     } else {
@@ -433,6 +442,7 @@ Blockly.ScratchBlocks.ProcedureUtils.buildShadowDom_ = function(type) {
       break;
     case 'd':
       // ???
+      break;
     case 's':
       var shadowType = 'text';
       var fieldName = 'TEXT';
@@ -460,7 +470,7 @@ Blockly.ScratchBlocks.ProcedureUtils.buildShadowDom_ = function(type) {
  * @this Blockly.Block
  */
 Blockly.ScratchBlocks.ProcedureUtils.attachShadow_ = function(input,
-    argumentType) {
+    argumentType, dropdownOptions) {
   if (['n', 'd', 's'].includes(argumentType)) {
     var blockType = {
       'n': 'math_number',
@@ -475,7 +485,7 @@ Blockly.ScratchBlocks.ProcedureUtils.attachShadow_ = function(input,
           newBlock.setFieldValue('1', 'NUM');
           break;
         case 'd':
-          // Dropdown shadow doesn't need a value
+          // ???
           break;
         case 's':
           newBlock.setFieldValue('', 'TEXT');
@@ -536,6 +546,31 @@ Blockly.ScratchBlocks.ProcedureUtils.createArgumentReporter_ = function(
 };
 
 /**
+ * Updates the dropdown fields on procedure_call blocks.
+ * @private
+ * @this Blockly.Block
+ */
+Blockly.ScratchBlocks.ProcedureUtils.updateDropdowns_ = function() {
+  var dropdownCount = 0;
+  for (var i = 0, input; input = this.inputList[i]; i++) {
+    var target = input.connection && input.connection.targetBlock();
+    if (target && target.type == 'procedures_dropdown') {
+      var options = this.argumentDropdowns_[dropdownCount++];
+      var field = target.getField('DROPDOWN_VALUE');
+      field.menuGenerator_ = options.map(function(option) {
+        return [option, option]; 
+      });
+
+      // If the current value isn't an option, set the value to the first option.
+      var currentValue = field.getValue();
+      if (!options.some(function(o) { return o === currentValue })) {
+        field.setValue(options[0]);
+      }
+    }
+  }
+}
+
+/**
  * Populate the argument by attaching the correct child block or shadow to the
  * given input.
  * @param {string} type One of 'b' (boolean), 'o' (object), 'a' (array), 's' (string) 'n' (number) or 'd' (dropdown).
@@ -548,7 +583,7 @@ Blockly.ScratchBlocks.ProcedureUtils.createArgumentReporter_ = function(
  * @this Blockly.Block
  */
 Blockly.ScratchBlocks.ProcedureUtils.populateArgumentOnCaller_ = function(type,
-    index, connectionMap, id, input) {
+    index, connectionMap, id, input, dropdownOptions) {
   var oldBlock = null;
   var oldShadow = null;
   if (connectionMap && (id in connectionMap)) {
@@ -566,7 +601,7 @@ Blockly.ScratchBlocks.ProcedureUtils.populateArgumentOnCaller_ = function(type,
       input.connection.setShadowDom(shadowDom);
     }
   } else if (this.generateShadows_) {
-    this.attachShadow_(input, type);
+    this.attachShadow_(input, type, dropdownOptions);
   }
 };
 
@@ -624,7 +659,7 @@ Blockly.ScratchBlocks.ProcedureUtils.populateArgumentOnPrototype_ = function(
  * @this Blockly.Block
  */
 Blockly.ScratchBlocks.ProcedureUtils.populateArgumentOnDeclaration_ = function(
-    type, index, connectionMap, id, input) {
+    type, index, connectionMap, id, input, dropdownOptions) {
 
   var oldBlock = null;
   if (connectionMap && (id in connectionMap)) {
@@ -646,6 +681,12 @@ Blockly.ScratchBlocks.ProcedureUtils.populateArgumentOnDeclaration_ = function(
     connectionMap[input.name] = null;
   } else {
     var argumentEditor = this.createArgumentEditor_(type, displayName);
+  }
+
+  // Set dropdown options if this is a dropdown argument
+  if (type === 'd' && dropdownOptions) {
+    var field = argumentEditor.inputList[0].fieldRow[0];
+    field.menuGenerator_ = dropdownOptions;
   }
 
   // Attach the block.
@@ -730,6 +771,7 @@ Blockly.ScratchBlocks.ProcedureUtils.updateDeclarationProcCode_ = function() {
   this.procCode_ = '';
   this.displayNames_ = [];
   this.argumentIds_ = [];
+  this.argumentDropdowns_ = [];
   for (var i = 0; i < this.inputList.length; i++) {
     if (i != 0) {
       this.procCode_ += ' ';
@@ -750,6 +792,8 @@ Blockly.ScratchBlocks.ProcedureUtils.updateDeclarationProcCode_ = function() {
         this.procCode_ += '%a';
       } else if (target.type == 'argument_editor_dropdown') {
         this.procCode_ += '%d';
+        var options = target.inputList[0].fieldRow[0].getOptions();
+        this.argumentDropdowns_.push(options.map(o => o[0]));
       } else {
         this.procCode_ += '%s';
       }
@@ -797,7 +841,8 @@ Blockly.ScratchBlocks.ProcedureUtils.addDropdownExternal = function() {
   this.procCode_ = this.procCode_ + ' %d';
   this.displayNames_.push('dropdown');
   this.argumentIds_.push(Blockly.utils.genUid());
-  this.argumentDefaults_.push('Option 1');
+  this.argumentDefaults_.push('Option');
+  this.argumentDropdowns_.push(['Option']);
   this.updateDisplay_();
   this.focusLastEditor_();
 };
@@ -1023,6 +1068,7 @@ Blockly.Blocks['procedures_call'] = {
     });
     this.procCode_ = '';
     this.argumentIds_ = [];
+    this.argumentDropdowns_ = [];
     this.warp_ = false;
     this.return_ = Blockly.PROCEDURES_CALL_TYPE_STATEMENT;
   },
@@ -1043,7 +1089,9 @@ Blockly.Blocks['procedures_call'] = {
 
   // Only exists on the external caller.
   attachShadow_: Blockly.ScratchBlocks.ProcedureUtils.attachShadow_,
-  buildShadowDom_: Blockly.ScratchBlocks.ProcedureUtils.buildShadowDom_
+  buildShadowDom_: Blockly.ScratchBlocks.ProcedureUtils.buildShadowDom_,
+  updateDropdowns_: Blockly.ScratchBlocks.ProcedureUtils.updateDropdowns_,
+  onchange: Blockly.ScratchBlocks.ProcedureUtils.updateDropdowns_
 };
 
 Blockly.Blocks['procedures_prototype'] = {
@@ -1062,6 +1110,7 @@ Blockly.Blocks['procedures_prototype'] = {
     this.displayNames_ = [];
     this.argumentIds_ = [];
     this.argumentDefaults_ = [];
+    this.argumentDropdowns_ = [];
     this.warp_ = false;
   },
   // Shared.
@@ -1097,6 +1146,7 @@ Blockly.Blocks['procedures_declaration'] = {
     this.displayNames_ = [];
     this.argumentIds_ = [];
     this.argumentDefaults_ = [];
+    this.argumentDropdowns_ = [];
     this.warp_ = false;
   },
   // Shared.

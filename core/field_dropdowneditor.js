@@ -77,6 +77,8 @@ Blockly.FieldDropdownEditor.prototype.showDropdown_ = function() {
   var contentDiv = Blockly.DropDownDiv.getContentDiv();
   var options = this.getOptions();
   var menu = new goog.ui.Menu();
+  var menuIndex = -1;
+  var optionIndex = -1;
   var thisField = this;
 
   this.dropDownOpen_ = true;
@@ -84,7 +86,10 @@ Blockly.FieldDropdownEditor.prototype.showDropdown_ = function() {
   Blockly.DropDownDiv.hideWithoutAnimation();
   Blockly.DropDownDiv.clearContent();
 
-  function addOption(value, index) {
+  function addOption(value) {
+    menuIndex++;
+    optionIndex++;
+    var index = optionIndex;
     var container = document.createElement('div');
     container.style.display = 'flex';
     container.style.justifyContent = 'center';
@@ -119,16 +124,16 @@ Blockly.FieldDropdownEditor.prototype.showDropdown_ = function() {
       // Only set option to null to not break indexes.
       thisField.menuGenerator_[index] = null;
       menu.removeChild(menuItem, true);
+      menuIndex--;
     });
-    
-    menu.addChildAt(menuItem, index, true);
+    menu.addChildAt(menuItem, menuIndex, true);
 
     // Fix the dropdown div's right side being huge
-    menuItem.getElement().style.paddingRight = '28px';
+    menuItem.getElement().style.paddingRight = '20px';
   }
 
   for (var i = 0; i < options.length; i++) {
-    addOption(options[i][0], i);
+    addOption(options[i][0]);
   }
 
   var addItem = new goog.ui.MenuItem('Add Option');
@@ -140,7 +145,7 @@ Blockly.FieldDropdownEditor.prototype.showDropdown_ = function() {
     if (menuItem.content_ === 'Add Option') {
       thisField.menuGenerator_.push(['Option', 'Option']);
 
-      addOption('Option', menu.getChildCount() - 1);
+      addOption('Option');
     }
   }
   goog.events.listen(menu, goog.ui.Component.EventType.ACTION, callback);
