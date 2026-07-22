@@ -31,6 +31,7 @@ goog.require('Blockly.FieldTextDropdown');
 goog.require('Blockly.DropDownDiv');
 goog.require('goog.style');
 goog.require('goog.events');
+goog.require('goog.dom');
 goog.require('goog.ui.Menu');
 goog.require('goog.ui.MenuItem');
 
@@ -68,6 +69,36 @@ Blockly.FieldDropdownEditor.prototype.init = function() {
 Blockly.FieldDropdownEditor.fromJson = function(element) {
   return new Blockly.FieldDropdownEditor(element['text'], element['options']);
 };
+
+/**
+ * Function to call when remove button is called. Checks for removeFieldCallback
+ * on sourceBlock and calls it if possible.
+ * @private
+ */
+Blockly.FieldDropdownEditor.prototype.removeCallback_ = function() {
+  if (this.sourceBlock_ && this.sourceBlock_.removeFieldCallback) {
+    this.sourceBlock_.removeFieldCallback(this);
+  } else {
+    console.warn('Expected a source block with removeFieldCallback');
+  }
+};
+
+/**
+ * 
+ */
+Blockly.FieldDropdownEditor.prototype.showEditor_ = function() {
+  Blockly.FieldDropdownEditor.superClass_.showEditor_.call(this);
+
+  var div = Blockly.WidgetDiv.DIV;
+  div.className += ' removableTextInput';
+  var removeButton =
+      goog.dom.createDom(goog.dom.TagName.IMG, 'blocklyTextRemoveIcon');
+  removeButton.setAttribute('src',
+      Blockly.mainWorkspace.options.pathToMedia + 'icons/remove.svg');
+  this.removeButtonMouseWrapper_ = Blockly.bindEvent_(removeButton,
+      'mousedown', this, this.removeCallback_);
+  div.appendChild(removeButton);
+}
 
 /**
  * Create the dropdown editor menu.
