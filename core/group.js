@@ -30,6 +30,7 @@ goog.require('Blockly.ContextMenu');
 goog.require('Blockly.Events.GroupChange');
 goog.require('Blockly.Events.GroupDragOutside');
 goog.require('Blockly.Events.GroupEndDrag');
+goog.require('Blockly.SystemColourPicker');
 goog.require('Blockly.Touch');
 goog.require('goog.dom');
 goog.require('goog.math.Coordinate');
@@ -45,6 +46,7 @@ Blockly.Group = function(workspace, options) {
   this.id = options.id && !workspace.getGroupById(options.id) ?
       options.id : Blockly.utils.genUid();
   this.title = options.title || 'Group';
+  this.colour = options.colour || null;
   this.x = Number(options.x) || 0;
   this.y = Number(options.y) || 0;
   this.width = Math.max(Number(options.width) || 360, 160);
@@ -96,6 +98,11 @@ Blockly.Group.prototype.initSvg = function() {
       this.svgGroup_);
   this.delete_.setAttributeNS('http://www.w3.org/1999/xlink',
       'xlink:href', this.workspace.options.pathToMedia + 'delete-x.svg');
+  this.colourButton_ = Blockly.utils.createSvgElement('image',
+      {'class': 'scratchGroupButton', y: 6, width: 20, height: 20},
+      this.svgGroup_);
+  this.colourButton_.setAttributeNS('http://www.w3.org/1999/xlink',
+      'xlink:href', this.workspace.options.pathToMedia + 'paintbrush.svg');
   this.resizeTarget_ = Blockly.utils.createSvgElement('rect',
       {'class': 'scratchGroupResizeTarget', width: 32, height: 32},
       this.svgGroup_);
@@ -117,6 +124,10 @@ Blockly.Group.prototype.initSvg = function() {
       this.buttonMouseDown_);
   Blockly.bindEventWithChecks_(this.delete_, 'mouseup', this,
       this.deleteGroup_);
+  var group = this;
+  this.colourControl_ = Blockly.SystemColourPicker.attach(this.colourButton_,
+      function() { return group.colour; },
+      function(colour) { group.setColour_(colour); });
   Blockly.bindEventWithChecks_(this.svgGroup_, 'mousedown', this,
       this.groupMouseDown_);
   Blockly.bindEventWithChecks_(this.svgGroup_, 'contextmenu', this,
@@ -150,6 +161,12 @@ Blockly.Group.prototype.render = function() {
       'xlink:href', this.workspace.options.pathToMedia +
       (this.collapsed ? 'comment-arrow-up.svg' : 'comment-arrow-down.svg'));
   this.delete_.setAttribute('x', this.width - 32);
+  this.colourButton_.setAttribute('x', this.width - 58);
+  this.colourControl_.setAttribute('x', this.width - 58);
+  this.background_.style.fill = this.colour || '';
+  this.background_.style.stroke = this.colour || '';
+  this.header_.style.fill = this.colour || '';
+  this.header_.style.stroke = this.colour || '';
   this.resize_.style.display = this.collapsed ? 'none' : '';
   this.resizeTarget_.style.display = this.collapsed ? 'none' : '';
   this.resizeTarget_.setAttribute('x', this.width - 32);
@@ -162,7 +179,7 @@ Blockly.Group.prototype.render = function() {
  * @return {!Object} Serializable state.
  */
 Blockly.Group.prototype.toJSON = function() {
-  return {id: this.id, title: this.title, x: this.x, y: this.y,
+  return {id: this.id, title: this.title, colour: this.colour, x: this.x, y: this.y,
     width: this.width, height: this.height, expandedHeight: this.expandedHeight,
     collapsed: this.collapsed, blocks: this.blockIds.slice()};
 };
@@ -172,6 +189,7 @@ Blockly.Group.prototype.toJSON = function() {
  */
 Blockly.Group.prototype.applyState = function(state) {
   this.title = state.title;
+  this.colour = state.colour || null;
   this.x = Number(state.x);
   this.y = Number(state.y);
   this.width = Number(state.width);
@@ -191,6 +209,7 @@ Blockly.Group.prototype.toXml = function() {
   var xml = goog.dom.createDom('group');
   var state = this.toJSON();
   Object.keys(state).forEach(function(key) {
+    if (state[key] === null) return;
     xml.setAttribute(key, Array.isArray(state[key]) ? state[key].join(' ') : state[key]);
   });
   return xml;
@@ -461,6 +480,18 @@ Blockly.Group.prototype.isButtonClick_ = function(e) {
     this.buttonReleaseWrapper_ = null;
   }
   return true;
+};
+
+/** @param {string} colour Selected colour. @private */
+Blockly.Group.prototype.setColour_ = function(colour) {
+  var group = this;
+  if (colour === group.colour) return;
+  var event = new Blockly.Events.GroupChange(group);
+  event.recordOld(group);
+  group.colour = colour;
+  group.render();
+  event.recordNew(group);
+  Blockly.Events.fire(event);
 };
 
 /**
