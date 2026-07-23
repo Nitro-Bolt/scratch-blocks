@@ -407,10 +407,12 @@ Blockly.WorkspaceCommentSvg.prototype.deleteMouseUp_ = function(e) {
 };
 
 Blockly.WorkspaceCommentSvg.prototype.applyColour_ = function() {
-  if (!this.colour_) return;
-  this.svgRect_.style.fill = this.colour_;
-  this.svgRect_.style.stroke = this.colour_;
-  this.commentEditor_.firstChild.style.backgroundColor = this.colour_;
+  this.svgRect_.style.fill = this.colour_ || '';
+  this.svgRect_.style.stroke = this.colour_ || '';
+  this.commentEditor_.firstChild.style.backgroundColor = this.colour_ || '';
+  var textColour = Blockly.SystemColourPicker.isDark(this.colour_) ? '#ffffff' : '';
+  this.textarea_.style.color = textColour;
+  this.topBarLabel_.style.fill = textColour;
 };
 
 /**

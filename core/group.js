@@ -167,6 +167,8 @@ Blockly.Group.prototype.render = function() {
   this.background_.style.stroke = this.colour || '';
   this.header_.style.fill = this.colour || '';
   this.header_.style.stroke = this.colour || '';
+  this.titleText_.style.fill = Blockly.SystemColourPicker.isDark(this.colour) ?
+      '#ffffff' : '';
   this.resize_.style.display = this.collapsed ? 'none' : '';
   this.resizeTarget_.style.display = this.collapsed ? 'none' : '';
   this.resizeTarget_.setAttribute('x', this.width - 32);
