@@ -307,6 +307,7 @@ Blockly.Xml.scratchCommentToDom_ = function(block, element) {
           xy.x));
       commentElement.setAttribute('y', xy.y);
       commentElement.setAttribute('minimized', block.comment.isMinimized());
+      commentElement.setAttribute('colour', block.comment.colour_);
 
     }
     element.appendChild(commentElement);
@@ -479,7 +480,7 @@ Blockly.Xml.domToWorkspace = function(xml, workspace) {
       var name = xmlChild.nodeName.toLowerCase();
       if (name == 'group') {
         var state = {};
-        ['id', 'title', 'x', 'y', 'width', 'height', 'expandedHeight',
+        ['id', 'title', 'colour', 'x', 'y', 'width', 'height', 'expandedHeight',
           'collapsed', 'blocks'].forEach(function(key) {
           state[key] = xmlChild.getAttribute(key);
         });
@@ -747,7 +748,7 @@ Blockly.Xml.domToBlockHeadless_ = function(xmlBlock, workspace) {
         // Note bubbleX and bubbleY can be NaN, but the ScratchBlockComment
         // constructor will handle that.
         block.setCommentText(xmlChild.textContent, commentId, bubbleX, bubbleY,
-            minimized == 'true');
+            minimized == 'true', xmlChild.getAttribute('colour') || null);
 
         var visible = xmlChild.getAttribute('pinned');
         if (visible && !block.isInFlyout) {

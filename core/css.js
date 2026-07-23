@@ -720,6 +720,14 @@ Blockly.Css.CONTENT = [
     'fill-opacity: 0.1',
   '}',
 
+  '.scratchCommentButton {',
+    'cursor: pointer;',
+  '}',
+
+  '.scratchCommentButton:hover {',
+    'opacity: 0.55;',
+  '}',
+
   '.scratchGroupBackground {',
     'fill: #fff9c4;',
     'fill-opacity: 0.28;',

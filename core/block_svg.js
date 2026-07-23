@@ -948,14 +948,15 @@ Blockly.BlockSvg.prototype.getCommentText = function() {
  * @param {number=} commentX Optional x position for scratch comment in workspace coordinates
  * @param {number=} commentY Optional y position for scratch comment in workspace coordinates
  * @param {boolean=} minimized Optional minimized state for scratch comment, defaults to false
+ * @param {string=} colour Optional custom comment colour.
  */
 Blockly.BlockSvg.prototype.setCommentText = function(text, commentId,
-    commentX, commentY, minimized) {
+    commentX, commentY, minimized, colour) {
   var changedState = false;
   if (goog.isString(text)) {
     if (!this.comment) {
       this.comment = new Blockly.ScratchBlockComment(this, text, commentId,
-          commentX, commentY, minimized);
+          commentX, commentY, minimized, colour);
       changedState = true;
     } else {
       this.comment.setText(/** @type {string} */ (text));
