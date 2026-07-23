@@ -480,8 +480,19 @@ Blockly.Xml.domToWorkspace = function(xml, workspace) {
       var name = xmlChild.nodeName.toLowerCase();
       if (name == 'group') {
         var state = {};
-        ['id', 'title', 'colour', 'x', 'y', 'width', 'height', 'expandedHeight',
-          'collapsed', 'blocks'].forEach(function(key) {
+        [
+          'id',
+          'title',
+          'colour',
+          'x',
+          'y',
+          'width',
+          'height',
+          'expandedWidth',
+          'expandedHeight',
+          'collapsed',
+          'blocks'
+        ].forEach(function(key) {
           state[key] = xmlChild.getAttribute(key);
         });
         Blockly.Group.fromJSON(workspace, state, false);

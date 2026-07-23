@@ -51,11 +51,15 @@ Blockly.Group = function(workspace, options) {
   this.y = Number(options.y) || 0;
   this.width = Math.max(Number(options.width) || 360, 160);
   this.height = Math.max(Number(options.height) || 240, 96);
+  this.expandedWidth = Math.max(Number(options.expandedWidth) || this.width, 160);
   this.expandedHeight = Math.max(Number(options.expandedHeight) || this.height, 96);
   this.collapsed = options.collapsed === true || options.collapsed === 'true';
   this.blockIds = Array.isArray(options.blocks) ? options.blocks.slice() :
       (typeof options.blocks === 'string' && options.blocks ? options.blocks.split(' ') : []);
-  if (this.collapsed) this.height = 32;
+  if (this.collapsed) {
+    this.width = 200;
+    this.height = 32;
+  }
   this.svgGroup_ = null;
   this.dragState_ = null;
   this.pressedButton_ = null;
@@ -156,7 +160,7 @@ Blockly.Group.prototype.render = function() {
   this.background_.setAttribute('height', this.height);
   this.header_.setAttribute('width', this.width);
   this.header_.setAttribute('height', 32);
-  this.titleText_.textContent = this.title;
+  this.renderTitle_();
   this.collapse_.setAttributeNS('http://www.w3.org/1999/xlink',
       'xlink:href', this.workspace.options.pathToMedia +
       (this.collapsed ? 'comment-arrow-up.svg' : 'comment-arrow-down.svg'));
@@ -182,7 +186,9 @@ Blockly.Group.prototype.render = function() {
  */
 Blockly.Group.prototype.toJSON = function() {
   return {id: this.id, title: this.title, colour: this.colour, x: this.x, y: this.y,
-    width: this.width, height: this.height, expandedHeight: this.expandedHeight,
+    width: this.width, height: this.height,
+    expandedWidth: this.collapsed ? this.expandedWidth : this.width,
+    expandedHeight: this.collapsed ? this.expandedHeight : this.height,
     collapsed: this.collapsed, blocks: this.blockIds.slice()};
 };
 
@@ -196,6 +202,7 @@ Blockly.Group.prototype.applyState = function(state) {
   this.y = Number(state.y);
   this.width = Number(state.width);
   this.height = Number(state.height);
+  this.expandedWidth = Number(state.expandedWidth) || this.width;
   this.expandedHeight = Number(state.expandedHeight) || this.height;
   this.collapsed = state.collapsed === true || state.collapsed === 'true';
   this.blockIds = Array.isArray(state.blocks) ? state.blocks.slice() :
@@ -484,6 +491,30 @@ Blockly.Group.prototype.isButtonClick_ = function(e) {
   return true;
 };
 
+/** Render the title without allowing it to overlap the title-bar buttons. @private */
+Blockly.Group.prototype.renderTitle_ = function() {
+  var title = this.title;
+  var availableWidth = Math.max(0, this.width - 104);
+  this.titleText_.textContent = title;
+  if (this.titleText_.getComputedTextLength() <= availableWidth) return;
+  var low = 0;
+  var high = title.length;
+  var ellipsis = '\u2026';
+  while (low < high) {
+    var length = Math.ceil((low + high) / 2);
+    var candidate = this.workspace.RTL ? ellipsis + title.slice(0, length) :
+        title.slice(0, length) + ellipsis;
+    this.titleText_.textContent = candidate;
+    if (this.titleText_.getComputedTextLength() <= availableWidth) {
+      low = length;
+    } else {
+      high = length - 1;
+    }
+  }
+  this.titleText_.textContent = this.workspace.RTL ?
+      ellipsis + title.slice(0, low) : title.slice(0, low) + ellipsis;
+};
+
 /** @param {string} colour Selected colour. @private */
 Blockly.Group.prototype.setColour_ = function(colour) {
   var group = this;
@@ -521,6 +552,7 @@ Blockly.Group.prototype.fitBlock = function(block) {
   this.y = top;
   this.width = right - left;
   this.height = bottom - top;
+  this.expandedWidth = this.width;
   this.expandedHeight = this.height;
   if (this.blockIds.indexOf(block.id) === -1) this.blockIds.push(block.id);
   this.render();
@@ -588,6 +620,7 @@ Blockly.Group.prototype.toggleCollapsed_ = function(e) {
   event.recordOld(this);
   if (this.collapsed) {
     this.collapsed = false;
+    this.width = this.expandedWidth;
     this.height = this.expandedHeight;
   } else {
     var ids = this.blockIds.filter(function(id) {
@@ -597,8 +630,10 @@ Blockly.Group.prototype.toggleCollapsed_ = function(e) {
       if (ids.indexOf(block.id) === -1) ids.push(block.id);
     });
     this.blockIds = ids;
+    this.expandedWidth = this.width;
     this.expandedHeight = this.height;
     this.collapsed = true;
+    this.width = 200;
     this.height = 32;
   }
   this.updateCollapsedBlocks_();
@@ -635,7 +670,7 @@ Blockly.Group.prototype.restoreCollapsedBlocks_ = function() {
       var xy = block.getRelativeToSurfaceXY();
       var size = block.getHeightWidth();
       return xy.x >= group.x && xy.y >= group.y + 32 &&
-          xy.x + size.width <= group.x + group.width &&
+      xy.x + size.width <= group.x + group.expandedWidth &&
           xy.y + size.height <= group.y + group.expandedHeight;
     }).map(function(block) { return block.id; });
   }
