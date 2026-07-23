@@ -667,10 +667,11 @@ Blockly.ScratchBubble.prototype.renderArrow_ = function() {
 Blockly.ScratchBubble.prototype.setColour = function(hexColour, fillColour) {
   this.bubbleBack_.setAttribute('stroke', hexColour);
   this.bubbleArrow_.setAttribute('stroke', hexColour);
-  if (fillColour) {
-    this.bubbleBack_.style.fill = fillColour;
-    this.commentEditor_.firstChild.style.backgroundColor = fillColour;
-  }
+  this.bubbleBack_.style.fill = fillColour || '';
+  this.commentEditor_.firstChild.style.backgroundColor = fillColour || '';
+  var textColour = Blockly.SystemColourPicker.isDark(fillColour) ? '#ffffff' : '';
+  this.commentEditor_.firstChild.firstChild.style.color = textColour;
+  this.topBarLabel_.style.fill = textColour;
 };
 
 /**
