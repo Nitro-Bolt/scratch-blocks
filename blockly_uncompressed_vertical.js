@@ -85,7 +85,7 @@ goog.addDependency("../../../../core/flyout_vertical.js", ["Blockly.VerticalFlyo
 goog.addDependency("../../../../core/generator.js", ["Blockly.Generator"], ["Blockly.Block","goog.asserts"]);
 goog.addDependency("../../../../core/gesture.js", ["Blockly.Gesture"], ["Blockly.BlockAnimations","Blockly.BlockDragger","Blockly.BubbleDragger","Blockly.constants","Blockly.Events.Ui","Blockly.FlyoutDragger","Blockly.scratchBlocksUtils","Blockly.Tooltip","Blockly.Touch","Blockly.WorkspaceDragger","goog.asserts","goog.math.Coordinate"]);
 goog.addDependency("../../../../core/grid.js", ["Blockly.Grid"], ["Blockly.utils","goog.userAgent"]);
-goog.addDependency("../../../../core/group.js", ["Blockly.Group"], ["Blockly.ContextMenu","Blockly.Events.GroupChange","Blockly.Events.GroupDragOutside","Blockly.Events.GroupEndDrag","Blockly.Touch","goog.dom","goog.math.Coordinate"]);
+goog.addDependency("../../../../core/group.js", ["Blockly.Group"], ["Blockly.ContextMenu","Blockly.Events.GroupChange","Blockly.Events.GroupDragOutside","Blockly.Events.GroupEndDrag","Blockly.SystemColourPicker","Blockly.Touch","goog.dom","goog.math.Coordinate"]);
 goog.addDependency("../../../../core/group_events.js", ["Blockly.Events.GroupChange","Blockly.Events.GroupDragOutside","Blockly.Events.GroupEndDrag"], ["Blockly.Events","Blockly.Events.Abstract","Blockly.Xml"]);
 goog.addDependency("../../../../core/icon.js", ["Blockly.Icon"], ["goog.dom","goog.math.Coordinate"]);
 goog.addDependency("../../../../core/inject.js", ["Blockly.inject"], ["Blockly.BlockDragSurfaceSvg","Blockly.Css","Blockly.constants","Blockly.DropDownDiv","Blockly.Grid","Blockly.Options","Blockly.WorkspaceSvg","Blockly.WorkspaceDragSurfaceSvg","goog.dom","goog.ui.Component","goog.userAgent"]);
@@ -102,10 +102,11 @@ goog.addDependency("../../../../core/procedures_map.js", ["Blockly.ProceduresMap
 goog.addDependency("../../../../core/rendered_connection.js", ["Blockly.RenderedConnection"], ["Blockly.Connection"]);
 goog.addDependency("../../../../core/scratch_block_comment.js", ["Blockly.ScratchBlockComment"], ["Blockly.Comment","Blockly.Events.BlockChange","Blockly.Events.Ui","Blockly.Icon","Blockly.ScratchBubble","goog.math.Coordinate","goog.userAgent"]);
 goog.addDependency("../../../../core/scratch_blocks_utils.js", ["Blockly.scratchBlocksUtils"], []);
-goog.addDependency("../../../../core/scratch_bubble.js", ["Blockly.ScratchBubble"], ["Blockly.Touch","Blockly.Workspace","goog.dom","goog.math","goog.math.Coordinate","goog.userAgent"]);
+goog.addDependency("../../../../core/scratch_bubble.js", ["Blockly.ScratchBubble"], ["Blockly.SystemColourPicker","Blockly.Touch","Blockly.Workspace","goog.dom","goog.math","goog.math.Coordinate","goog.userAgent"]);
 goog.addDependency("../../../../core/scratch_events.js", ["Blockly.Events.DragBlockOutside","Blockly.Events.EndBlockDrag"], ["Blockly.Events","Blockly.Events.BlockBase","goog.array","goog.math.Coordinate"]);
 goog.addDependency("../../../../core/scratch_msgs.js", ["Blockly.ScratchMsgs"], ["Blockly.Msg"]);
 goog.addDependency("../../../../core/scrollbar.js", ["Blockly.Scrollbar","Blockly.ScrollbarPair"], ["goog.dom","goog.events"]);
+goog.addDependency("../../../../core/system_colour_picker.js", ["Blockly.SystemColourPicker"], []);
 goog.addDependency("../../../../core/toolbox.js", ["Blockly.Toolbox"], ["Blockly.Events.Ui","Blockly.HorizontalFlyout","Blockly.Touch","Blockly.VerticalFlyout","goog.dom","goog.dom.TagName","goog.events","goog.events.BrowserFeature","goog.html.SafeHtml","goog.html.SafeStyle","goog.math.Rect","goog.style","goog.ui.tree.TreeControl","goog.ui.tree.TreeNode","goog.string"]);
 goog.addDependency("../../../../core/tooltip.js", ["Blockly.Tooltip"], ["goog.dom","goog.dom.TagName"]);
 goog.addDependency("../../../../core/touch.js", ["Blockly.Touch"], ["goog.events","goog.events.BrowserFeature","goog.string"]);
@@ -122,7 +123,7 @@ goog.addDependency("../../../../core/widgetdiv.js", ["Blockly.WidgetDiv"], ["Blo
 goog.addDependency("../../../../core/workspace.js", ["Blockly.Workspace"], ["Blockly.ProceduresMap","Blockly.VariableMap","Blockly.WorkspaceComment","Blockly.Group","goog.array","goog.math"]);
 goog.addDependency("../../../../core/workspace_audio.js", ["Blockly.WorkspaceAudio"], ["goog.userAgent"]);
 goog.addDependency("../../../../core/workspace_comment.js", ["Blockly.WorkspaceComment"], ["Blockly.Events.CommentChange","Blockly.Events.CommentCreate","Blockly.Events.CommentDelete","Blockly.Events.CommentMove","goog.math.Coordinate"]);
-goog.addDependency("../../../../core/workspace_comment_render_svg.js", ["Blockly.WorkspaceCommentSvg.render"], ["Blockly.WorkspaceCommentSvg"]);
+goog.addDependency("../../../../core/workspace_comment_render_svg.js", ["Blockly.WorkspaceCommentSvg.render"], ["Blockly.WorkspaceCommentSvg","Blockly.SystemColourPicker"]);
 goog.addDependency("../../../../core/workspace_comment_svg.js", ["Blockly.WorkspaceCommentSvg"], ["Blockly.Events.CommentCreate","Blockly.Events.CommentDelete","Blockly.Events.CommentMove","Blockly.WorkspaceComment"]);
 goog.addDependency("../../../../core/workspace_drag_surface_svg.js", ["Blockly.WorkspaceDragSurfaceSvg"], ["Blockly.utils","goog.asserts","goog.math.Coordinate"]);
 goog.addDependency("../../../../core/workspace_dragger.js", ["Blockly.WorkspaceDragger"], ["goog.math.Coordinate","goog.asserts"]);
@@ -228,6 +229,7 @@ goog.require('Blockly.Events.EndBlockDrag');
 goog.require('Blockly.ScratchMsgs');
 goog.require('Blockly.Scrollbar');
 goog.require('Blockly.ScrollbarPair');
+goog.require('Blockly.SystemColourPicker');
 goog.require('Blockly.Toolbox');
 goog.require('Blockly.Tooltip');
 goog.require('Blockly.Touch');
