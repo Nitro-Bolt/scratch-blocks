@@ -253,10 +253,12 @@ Blockly.Procedures.isGlobalMutation_ = function(mutation) {
  * - global procedures conflict with any procedure layout (local/global) in any sprite.
  * @param {!Element} mutation Procedure mutation XML.
  * @param {!Blockly.Workspace} workspace Current workspace.
+ * @param {Blockly.Block=} opt_blockToIgnore Existing prototype being edited.
  * @return {boolean} True if conflict exists.
  * @private
  */
-Blockly.Procedures.hasProcedureLayoutConflict_ = function(mutation, workspace) {
+Blockly.Procedures.hasProcedureLayoutConflict_ = function(
+    mutation, workspace, opt_blockToIgnore) {
   var procCode = mutation.getAttribute('proccode');
   if (!procCode) {
     return false;
@@ -266,6 +268,9 @@ Blockly.Procedures.hasProcedureLayoutConflict_ = function(mutation, workspace) {
   var blocks = workspace.getAllBlocks(false);
   for (var i = 0; i < blocks.length; i++) {
     var block = blocks[i];
+    if (block === opt_blockToIgnore) {
+      continue;
+    }
     if (block.type !== Blockly.PROCEDURES_PROTOTYPE_BLOCK_TYPE || !block.getProcCode) {
       continue;
     }
@@ -303,6 +308,7 @@ Blockly.Procedures.hasProcedureLayoutConflict_ = function(mutation, workspace) {
     var targetBlocks = target.blocks._blocks;
     for (var blockId in targetBlocks) {
       if (!Object.prototype.hasOwnProperty.call(targetBlocks, blockId)) continue;
+      if (opt_blockToIgnore && blockId === opt_blockToIgnore.id) continue;
       var targetBlock = targetBlocks[blockId];
       if (!targetBlock || targetBlock.opcode !== 'procedures_prototype' || !targetBlock.mutation) {
         continue;
@@ -642,8 +648,16 @@ Blockly.Procedures.editProcedureCallback_ = function(block) {
 Blockly.Procedures.editProcedureCallbackFactory_ = function(block) {
   return function(mutation) {
     if (mutation) {
+      if (Blockly.Procedures.hasProcedureLayoutConflict_(
+          mutation, block.workspace, block)) {
+        alert(Blockly.Msg.PROCEDURE_ALREADY_EXISTS.replace(
+            '%1', mutation.getAttribute('proccode')));
+        return false;
+      }
+
       Blockly.Procedures.mutateCallersAndPrototype(block.getProcCode(),
           block.workspace, mutation);
+      return true;
     }
   };
 };
