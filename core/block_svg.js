@@ -291,7 +291,11 @@ Blockly.BlockSvg.prototype.setIntersects = function(intersects) {
     return;
   }
   if (intersects) {
-    root.style.display = '';
+    var groups = this.workspace.getGroups ? this.workspace.getGroups() : [];
+    var hiddenByGroup = groups.some(function(group) {
+      return group.collapsed && group.blockIds.indexOf(this.id) !== -1;
+    }, this);
+    root.style.display = hiddenByGroup ? 'none' : '';
   } else {
     root.style.display = 'none';
   }
@@ -715,6 +719,7 @@ Blockly.BlockSvg.prototype.showContextMenu_ = function(e) {
     if (this.isEditable() && this.workspace.options.comments) {
       menuOptions.push(Blockly.ContextMenu.blockCommentOption(block));
     }
+    menuOptions.push(Blockly.ContextMenu.blockGroupOption(block));
     if (this.workspace.options.collapse) {
       menuOptions.push(Blockly.ContextMenu.blockCollapseOption(block));
     }
@@ -943,14 +948,15 @@ Blockly.BlockSvg.prototype.getCommentText = function() {
  * @param {number=} commentX Optional x position for scratch comment in workspace coordinates
  * @param {number=} commentY Optional y position for scratch comment in workspace coordinates
  * @param {boolean=} minimized Optional minimized state for scratch comment, defaults to false
+ * @param {string=} colour Optional custom comment colour.
  */
 Blockly.BlockSvg.prototype.setCommentText = function(text, commentId,
-    commentX, commentY, minimized) {
+    commentX, commentY, minimized, colour) {
   var changedState = false;
   if (goog.isString(text)) {
     if (!this.comment) {
       this.comment = new Blockly.ScratchBlockComment(this, text, commentId,
-          commentX, commentY, minimized);
+          commentX, commentY, minimized, colour);
       changedState = true;
     } else {
       this.comment.setText(/** @type {string} */ (text));

@@ -98,7 +98,26 @@ Blockly.FieldDropdownEditor.prototype.showEditor_ = function() {
   this.removeButtonMouseWrapper_ = Blockly.bindEvent_(removeButton,
       'mousedown', this, this.removeCallback_);
   div.appendChild(removeButton);
-}
+
+  if (this.sourceBlock_ && this.sourceBlock_.shiftFieldCallback) {
+    this.shiftButtonMouseWrappers_ = [-1, 1].map(function(direction) {
+      var arrow = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+      arrow.setAttribute('class', 'blocklyTextShiftArrow');
+      arrow.setAttribute('viewBox', '0 0 20 40');
+      arrow.style.left = direction < 0 ?
+        'calc(50% - 40px)' : 'calc(50% + 20px)';
+      var path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+      path.setAttribute('d', direction < 0 ?
+        'M 17 11 L 8 20 L 17 29' : 'M 3 11 L 12 20 L 3 29');
+      arrow.appendChild(path);
+      div.appendChild(arrow);
+      return Blockly.bindEvent_(arrow, 'mousedown', this, function(event) {
+        event.preventDefault();
+        this.sourceBlock_.shiftFieldCallback(this, direction);
+      });
+    }, this);
+  }
+};
 
 /**
  * Create the dropdown editor menu.

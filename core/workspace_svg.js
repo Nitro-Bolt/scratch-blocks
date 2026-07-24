@@ -754,6 +754,24 @@ Blockly.WorkspaceSvg.prototype.processProcedureReturnsChanged_ = function() {
   this.procedureReturnChangeTimeout_ = null;
 
   Blockly.Events.setGroup(true);
+  for (var changedProcCode in finalTypes) {
+    if (
+      !Object.prototype.hasOwnProperty.call(initialTypes, changedProcCode) ||
+      initialTypes[changedProcCode] === finalTypes[changedProcCode]
+    ) continue;
+
+    var prototype = Blockly.Procedures.getPrototypeBlock(changedProcCode, this);
+    if (!prototype) continue;
+    var oldPrototypeMutationDom = prototype.mutationToDom();
+    var oldPrototypeMutation = Blockly.Xml.domToText(oldPrototypeMutationDom);
+    prototype.return_ = finalTypes[changedProcCode];
+    var newPrototypeMutationDom = prototype.mutationToDom();
+    var newPrototypeMutation = Blockly.Xml.domToText(newPrototypeMutationDom);
+    if (oldPrototypeMutation !== newPrototypeMutation) {
+      Blockly.Events.fire(new Blockly.Events.BlockChange(
+          prototype, 'mutation', null, oldPrototypeMutation, newPrototypeMutation));
+    }
+  }
   var topBlocks = this.getTopBlocks(false);
   for (var i = 0; i < topBlocks.length; i++) {
     var block = topBlocks[i];
@@ -1626,9 +1644,36 @@ Blockly.WorkspaceSvg.prototype.cleanUp = function(opt_blockToMakeSpaceFor) {
   var result = this.getOrderedTopBlockColumns_();
   var columns = result.cols;
 
+  // Treat each group and its scripts as one cleanup unit. Group-owned stacks
+  // must not also pass through the regular block layout below.
+  var groups = this.getGroups().sort(function(a, b) {
+    return a.x - b.x || a.y - b.y;
+  });
+  var groupedBlockIds = Object.create(null);
+  groups.forEach(function(group) {
+    group.blockIds.forEach(function(id) { groupedBlockIds[id] = true; });
+  });
+  columns.forEach(function(column) {
+    column.blocks = column.blocks.filter(function(block) {
+      return !groupedBlockIds[block.id];
+    });
+  });
+  columns = columns.filter(function(column) { return column.blocks.length; });
+
   // Position blocks in columns
   var cursorX = 48;
   var maxWidths = result.maxWidths;
+
+  if (groups.length) {
+    var groupCursorY = 64;
+    var widestGroup = 0;
+    groups.forEach(function(group) {
+      group.moveBy(cursorX - group.x, groupCursorY - group.y);
+      groupCursorY += group.height + 72;
+      widestGroup = Math.max(widestGroup, group.width);
+    });
+    cursorX += widestGroup + 96;
+  }
 
   for (var c = 0; c < columns.length; c++) {
     var column = columns[c];
@@ -1793,6 +1838,7 @@ Blockly.WorkspaceSvg.prototype.showContextMenu_ = function(e) {
   if (this.options.comments) {
     menuOptions.push(Blockly.ContextMenu.workspaceCommentOption(ws, e));
   }
+  menuOptions.push(Blockly.ContextMenu.workspaceGroupOption(ws, e));
 
   // Option to delete all blocks.
   // Count the number of blocks that are deletable.

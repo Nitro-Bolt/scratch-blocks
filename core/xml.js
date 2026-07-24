@@ -46,6 +46,9 @@ goog.require('goog.dom');
 Blockly.Xml.workspaceToDom = function(workspace, opt_noId) {
   var xml = goog.dom.createDom('xml');
   xml.appendChild(Blockly.Xml.variablesToDom(workspace.getAllVariables()));
+  workspace.getGroups().forEach(function(group) {
+    xml.appendChild(group.toXml());
+  });
   var comments = workspace.getTopComments(true).filter(function(topComment) {
     return topComment instanceof Blockly.WorkspaceComment;
   });
@@ -304,6 +307,7 @@ Blockly.Xml.scratchCommentToDom_ = function(block, element) {
           xy.x));
       commentElement.setAttribute('y', xy.y);
       commentElement.setAttribute('minimized', block.comment.isMinimized());
+      commentElement.setAttribute('colour', block.comment.colour_);
 
     }
     element.appendChild(commentElement);
@@ -474,7 +478,25 @@ Blockly.Xml.domToWorkspace = function(xml, workspace) {
     for (var i = 0; i < childCount; i++) {
       var xmlChild = xml.childNodes[i];
       var name = xmlChild.nodeName.toLowerCase();
-      if (name == 'block' ||
+      if (name == 'group') {
+        var state = {};
+        [
+          'id',
+          'title',
+          'colour',
+          'x',
+          'y',
+          'width',
+          'height',
+          'expandedWidth',
+          'expandedHeight',
+          'collapsed',
+          'blocks'
+        ].forEach(function(key) {
+          state[key] = xmlChild.getAttribute(key);
+        });
+        Blockly.Group.fromJSON(workspace, state, false);
+      } else if (name == 'block' ||
           (name == 'shadow' && !Blockly.Events.recordUndo)) {
         // Allow top-level shadow blocks if recordUndo is disabled since
         // that means an undo is in progress.  Such a block is expected
@@ -524,6 +546,11 @@ Blockly.Xml.domToWorkspace = function(xml, workspace) {
   if (workspace.setResizesEnabled) {
     workspace.setResizesEnabled(true);
   }
+  // Groups are decoded before their blocks. Reapply collapsed visibility only
+  // after every referenced block has been created and positioned.
+  workspace.getGroups().forEach(function(group) {
+    if (group.collapsed) group.restoreCollapsedBlocks_();
+  });
   return newBlockIds;
 };
 
@@ -732,7 +759,7 @@ Blockly.Xml.domToBlockHeadless_ = function(xmlBlock, workspace) {
         // Note bubbleX and bubbleY can be NaN, but the ScratchBlockComment
         // constructor will handle that.
         block.setCommentText(xmlChild.textContent, commentId, bubbleX, bubbleY,
-            minimized == 'true');
+            minimized == 'true', xmlChild.getAttribute('colour') || null);
 
         var visible = xmlChild.getAttribute('pinned');
         if (visible && !block.isInFlyout) {
