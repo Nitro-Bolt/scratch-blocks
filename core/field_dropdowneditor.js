@@ -150,10 +150,14 @@ Blockly.FieldDropdownEditor.prototype.showDropdown_ = function() {
       var opt = thisField.menuGenerator_[index];
       opt[0] = input.value;
       opt[1] = input.value;
+      
+      thisField.sourceBlock_.parentBlock_.onChangeFn();
     });
     Blockly.bindEvent_(image, 'click', null, function(e) {
       // Only set option to null to not break indexes.
       thisField.menuGenerator_[index] = null;
+      thisField.sourceBlock_.parentBlock_.onChangeFn();
+
       menu.removeChild(menuItem, true);
       menuIndex--;
     });
@@ -175,6 +179,7 @@ Blockly.FieldDropdownEditor.prototype.showDropdown_ = function() {
     var menuItem = e.target;
     if (menuItem.content_ === 'Add Option') {
       thisField.menuGenerator_.push(['Option', 'Option']);
+      thisField.sourceBlock_.parentBlock_.onChangeFn();
 
       addOption('Option');
     }

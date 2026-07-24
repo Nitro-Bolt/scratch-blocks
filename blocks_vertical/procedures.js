@@ -800,7 +800,7 @@ Blockly.ScratchBlocks.ProcedureUtils.updateDeclarationProcCode_ = function() {
       } else if (target.type == 'argument_editor_dropdown') {
         this.procCode_ += '%d';
         var options = target.inputList[0].fieldRow[0].getOptions();
-        this.argumentDropdowns_.push(options.map(o => o[0]));
+        this.argumentDropdowns_.push(options.filter(Boolean).map(o => o[0]));
       } else {
         this.procCode_ += '%s';
       }
