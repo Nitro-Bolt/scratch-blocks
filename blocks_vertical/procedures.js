@@ -557,6 +557,13 @@ Blockly.ScratchBlocks.ProcedureUtils.updateDropdowns_ = function() {
     if (target && target.type == 'procedures_dropdown') {
       var options = this.argumentDropdowns_[dropdownCount++];
       var field = target.getField('DROPDOWN_VALUE');
+
+      if (options.length === 0) {
+        field.menuGenerator_ = [['', '']];
+        field.setValue('');
+        return;
+      }
+
       field.menuGenerator_ = options.map(function(option) {
         return [option, option]; 
       });
