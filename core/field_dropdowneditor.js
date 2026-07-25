@@ -89,6 +89,15 @@ Blockly.FieldDropdownEditor.prototype.removeCallback_ = function() {
 Blockly.FieldDropdownEditor.prototype.showEditor_ = function() {
   Blockly.FieldDropdownEditor.superClass_.showEditor_.call(this);
 
+  // Remember the active procedure input so newly added inputs can be inserted
+  // immediately after it.
+  if (this.sourceBlock_) {
+    var declaration = this.sourceBlock_.parentBlock_ || this.sourceBlock_;
+    if (declaration.type == 'procedures_declaration') {
+      declaration.selectedField_ = this;
+    }
+  }
+
   var div = Blockly.WidgetDiv.DIV;
   div.className += ' removableTextInput';
   var removeButton =
@@ -117,6 +126,29 @@ Blockly.FieldDropdownEditor.prototype.showEditor_ = function() {
       });
     }, this);
   }
+};
+
+/**
+ * Close the editor and clear its procedure declaration selection.
+ * @return {!Function} Closure to call on destruction of the WidgetDiv.
+ * @private
+ */
+Blockly.FieldDropdownEditor.prototype.widgetDispose_ = function() {
+  var dispose = Blockly.FieldDropdownEditor.superClass_.widgetDispose_.
+      call(this);
+  var thisField = this;
+  return function() {
+    dispose();
+    if (!thisField.sourceBlock_) {
+      return;
+    }
+    var declaration = thisField.sourceBlock_.parentBlock_ ||
+        thisField.sourceBlock_;
+    if (declaration.type == 'procedures_declaration' &&
+        declaration.selectedField_ == thisField) {
+      declaration.selectedField_ = null;
+    }
+  };
 };
 
 /**

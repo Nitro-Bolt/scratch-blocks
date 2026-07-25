@@ -189,6 +189,7 @@ Blockly.Css.CONTENT = [
     'left: 50%;',
     'margin-left: -12px;',
     'cursor: pointer;',
+    'filter: drop-shadow(0px 2px 2px rgba(0, 0, 0, 0.5));',
   '}',
 
   '.blocklyTextShiftArrow {',
@@ -203,6 +204,7 @@ Blockly.Css.CONTENT = [
     'fill: none;',
     'stroke: #ff661a;',
     'stroke-width: 2;',
+    'filter: drop-shadow(0px 2px 2px rgba(0, 0, 0, 0.5));',
   '}',
 
   '.blocklyNonSelectable {',
@@ -499,6 +501,10 @@ Blockly.Css.CONTENT = [
     'font-family: "Helvetica Neue", Helvetica, sans-serif;',
     'font-size: 12pt;',
     'font-weight: 500;',
+  '}',
+
+  '.blocklyText.removableTextInput {',
+    'fill: #fff;',
   '}',
 
   '.blocklyCheckbox {',
