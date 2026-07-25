@@ -345,8 +345,16 @@ Blockly.BlockSvg.prototype.setParent = function(newParent) {
     this.moveConnections_(newXY.x - oldXY.x, newXY.y - oldXY.y);
     // If we are a shadow block, inherit tertiary colour.
     if (this.isShadow()) {
-      this.setColour(this.getColour(), this.getColourSecondary(),
-          newParent.getColourTertiary(), this.getColourQuaternary());
+      if (this.type == 'procedures_dropdown') {
+        // Procedure dropdown shadows are part of the custom block's visual
+        // palette. XML loading creates and connects them after the caller's
+        // mutation has rendered, so inherit every colour at connection time.
+        this.setColour(newParent.getColour(), newParent.getColourSecondary(),
+            newParent.getColourTertiary(), newParent.getColourQuaternary());
+      } else {
+        this.setColour(this.getColour(), this.getColourSecondary(),
+            newParent.getColourTertiary(), this.getColourQuaternary());
+      }
     }
   }
   // If we are losing a parent, we want to move our DOM element to the
