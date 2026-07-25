@@ -148,7 +148,7 @@ Blockly.FieldTextInput.prototype.init = function() {
           'y': 0,
           'width': this.size_.width,
           'height': this.size_.height,
-          'fill': this.sourceBlock_.getColourTertiary()
+          'fill': this.sourceBlock_.getColourSecondary()
         }
     );
     this.fieldGroup_.insertBefore(this.box_, this.textElement_);
@@ -498,7 +498,12 @@ Blockly.FieldTextInput.prototype.resizeEditor_ = function() {
 
   var initialWidth;
   if (this.sourceBlock_.isShadow()) {
-    initialWidth = this.sourceBlock_.getHeightWidth().width * scale;
+    if (this.sourceBlock_.type == 'argument_editor_statement') {
+      initialWidth = (this.size_.width +
+          2 * Blockly.BlockSvg.SEP_SPACE_X) * scale;
+    } else {
+      initialWidth = this.sourceBlock_.getHeightWidth().width * scale;
+    }
   } else {
     initialWidth = this.size_.width * scale;
   }
