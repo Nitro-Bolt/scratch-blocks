@@ -1589,10 +1589,6 @@ Blockly.Blocks['argument_editor_dropdown'] = {
           ]
         }
       ],
-      "colour": Blockly.Colours.textField,
-      "colourSecondary": Blockly.Colours.textField,
-      "colourTertiary": Blockly.Colours.textField,
-      "colourQuaternary": Blockly.Colours.textField,
       "extensions": ["colours_more", "output_number", "output_string"]
     });
   },
