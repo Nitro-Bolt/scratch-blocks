@@ -536,6 +536,7 @@ Blockly.Procedures.newProcedureMutation = function() {
       ' argumentids="[]"' +
       ' argumentnames="[]"' +
       ' argumentdefaults="[]"' +
+      ' argumentdropdowns="[]"' +
       ' warp="false"' +
       ' global="false">' +
       '</mutation>' +
