@@ -976,6 +976,60 @@ Blockly.ScratchBlocks.ProcedureUtils.finishAddingInput_ = function(
 };
 
 /**
+ * Return an unused display name for a new procedure argument.
+ * Numbering starts at 2, for example "boolean", "boolean2", "boolean3".
+ * @param {string} baseName The default name for this argument type.
+ * @return {string} An unused argument name.
+ * @private
+ */
+Blockly.ScratchBlocks.ProcedureUtils.getUniqueArgumentName_ = function(
+    baseName) {
+  var usedNames = Object.create(null);
+  for (var i = 0; i < this.inputList.length; i++) {
+    var input = this.inputList[i];
+    var target = input.connection && input.connection.targetBlock();
+    var field = target && target.getField('TEXT');
+    if (field) {
+      usedNames[field.getValue()] = true;
+    }
+  }
+
+  var name = baseName;
+  var suffix = 2;
+  while (usedNames[name]) {
+    name = baseName + suffix;
+    suffix++;
+  }
+  return name;
+};
+
+/**
+ * Reject a procedure argument name already used by another argument.
+ * @param {string} proposedName The name entered by the user.
+ * @return {?string} The name, or null when another argument already uses it.
+ * @this Blockly.Field
+ * @private
+ */
+Blockly.ScratchBlocks.ProcedureUtils.argumentNameValidator_ = function(
+    proposedName) {
+  var argumentBlock = this.sourceBlock_;
+  var declaration = argumentBlock && argumentBlock.parentBlock_;
+  if (!declaration || declaration.type != 'procedures_declaration') {
+    return proposedName;
+  }
+
+  for (var i = 0; i < declaration.inputList.length; i++) {
+    var input = declaration.inputList[i];
+    var target = input.connection && input.connection.targetBlock();
+    var field = target && target.getField('TEXT');
+    if (field && field !== this && field.getValue() === proposedName) {
+      return null;
+    }
+  }
+  return proposedName;
+};
+
+/**
  * Externally-visible function to add a label to the procedure declaration.
  * @public
  */
@@ -995,7 +1049,7 @@ Blockly.ScratchBlocks.ProcedureUtils.addDropdownExternal = function() {
   var selectedIndex = this.getSelectedInputIndex_();
   Blockly.WidgetDiv.hide(true);
   this.procCode_ = this.procCode_ + ' %d';
-  this.displayNames_.push('dropdown');
+  this.displayNames_.push(this.getUniqueArgumentName_('dropdown'));
   this.argumentIds_.push(Blockly.utils.genUid());
   this.argumentDefaults_.push('Option');
   this.argumentDropdowns_.push(['Option']);
@@ -1012,7 +1066,7 @@ Blockly.ScratchBlocks.ProcedureUtils.addBooleanExternal = function() {
   var selectedIndex = this.getSelectedInputIndex_();
   Blockly.WidgetDiv.hide(true);
   this.procCode_ = this.procCode_ + ' %b';
-  this.displayNames_.push('boolean');
+  this.displayNames_.push(this.getUniqueArgumentName_('boolean'));
   this.argumentIds_.push(Blockly.utils.genUid());
   this.argumentDefaults_.push('false');
   this.updateDisplay_();
@@ -1028,7 +1082,7 @@ Blockly.ScratchBlocks.ProcedureUtils.addObjectExternal = function() {
   var selectedIndex = this.getSelectedInputIndex_();
   Blockly.WidgetDiv.hide(true);
   this.procCode_ = this.procCode_ + ' %o';
-  this.displayNames_.push('object');
+  this.displayNames_.push(this.getUniqueArgumentName_('object'));
   this.argumentIds_.push(Blockly.utils.genUid());
   this.argumentDefaults_.push(new Object());
   this.updateDisplay_();
@@ -1044,7 +1098,7 @@ Blockly.ScratchBlocks.ProcedureUtils.addArrayExternal = function() {
   var selectedIndex = this.getSelectedInputIndex_();
   Blockly.WidgetDiv.hide(true);
   this.procCode_ = this.procCode_ + ' %a';
-  this.displayNames_.push('array');
+  this.displayNames_.push(this.getUniqueArgumentName_('array'));
   this.argumentIds_.push(Blockly.utils.genUid());
   this.argumentDefaults_.push(new Array());
   this.updateDisplay_();
@@ -1060,7 +1114,7 @@ Blockly.ScratchBlocks.ProcedureUtils.addStatementExternal = function() {
   var selectedIndex = this.getSelectedInputIndex_();
   Blockly.WidgetDiv.hide(true);
   this.procCode_ = this.procCode_ + ' %c';
-  this.displayNames_.push('statement');
+  this.displayNames_.push(this.getUniqueArgumentName_('statement'));
   this.argumentIds_.push('SUBSTACK' + Blockly.utils.genUid());
   this.argumentDefaults_.push('');
   this.updateDisplay_();
@@ -1076,7 +1130,7 @@ Blockly.ScratchBlocks.ProcedureUtils.addStringNumberExternal = function() {
   var selectedIndex = this.getSelectedInputIndex_();
   Blockly.WidgetDiv.hide(true);
   this.procCode_ = this.procCode_ + ' %s';
-  this.displayNames_.push('number or text');
+  this.displayNames_.push(this.getUniqueArgumentName_('number or text'));
   this.argumentIds_.push(Blockly.utils.genUid());
   this.argumentDefaults_.push('');
   this.updateDisplay_();
@@ -1373,6 +1427,7 @@ Blockly.Blocks['procedures_declaration'] = {
   focusLastEditor_: Blockly.ScratchBlocks.ProcedureUtils.focusLastEditor_,
   getSelectedInputIndex_: Blockly.ScratchBlocks.ProcedureUtils.getSelectedInputIndex_,
   finishAddingInput_: Blockly.ScratchBlocks.ProcedureUtils.finishAddingInput_,
+  getUniqueArgumentName_: Blockly.ScratchBlocks.ProcedureUtils.getUniqueArgumentName_,
   getWarp: Blockly.ScratchBlocks.ProcedureUtils.getWarp,
   setWarp: Blockly.ScratchBlocks.ProcedureUtils.setWarp,
   getGlobal: Blockly.ScratchBlocks.ProcedureUtils.getGlobal,
@@ -1499,6 +1554,8 @@ Blockly.Blocks['argument_editor_boolean'] = {
       ],
       "extensions": ["colours_more", "output_boolean"]
     });
+    this.getField('TEXT').setValidator(
+        Blockly.ScratchBlocks.ProcedureUtils.argumentNameValidator_);
   },
   // Exist on declaration and arguments editors, with different implementations.
   removeFieldCallback: Blockly.ScratchBlocks.ProcedureUtils.removeArgumentCallback_,
@@ -1517,6 +1574,8 @@ Blockly.Blocks['argument_editor_object'] = {
       ],
       "extensions": ["colours_more", "output_object"]
     });
+    this.getField('TEXT').setValidator(
+        Blockly.ScratchBlocks.ProcedureUtils.argumentNameValidator_);
   },
   // Exist on declaration and arguments editors, with different implementations.
   removeFieldCallback: Blockly.ScratchBlocks.ProcedureUtils.removeArgumentCallback_,
@@ -1535,6 +1594,8 @@ Blockly.Blocks['argument_editor_array'] = {
       ],
       "extensions": ["colours_more", "output_array"]
     });
+    this.getField('TEXT').setValidator(
+        Blockly.ScratchBlocks.ProcedureUtils.argumentNameValidator_);
   },
   // Exist on declaration and arguments editors, with different implementations.
   removeFieldCallback: Blockly.ScratchBlocks.ProcedureUtils.removeArgumentCallback_,
@@ -1553,6 +1614,8 @@ Blockly.Blocks['argument_editor_statement'] = {
       ],
       "extensions": ["colours_more", "shape_statement"]
     });
+    this.getField('TEXT').setValidator(
+        Blockly.ScratchBlocks.ProcedureUtils.argumentNameValidator_);
   },
   // Exist on declaration and arguments editors, with different implementations.
   removeFieldCallback: Blockly.ScratchBlocks.ProcedureUtils.removeArgumentCallback_,
@@ -1571,6 +1634,8 @@ Blockly.Blocks['argument_editor_string_number'] = {
       ],
       "extensions": ["colours_more", "output_number", "output_string"]
     });
+    this.getField('TEXT').setValidator(
+        Blockly.ScratchBlocks.ProcedureUtils.argumentNameValidator_);
   },
   // Exist on declaration and arguments editors, with different implementations.
   removeFieldCallback: Blockly.ScratchBlocks.ProcedureUtils.removeArgumentCallback_,
@@ -1591,6 +1656,8 @@ Blockly.Blocks['argument_editor_dropdown'] = {
       ],
       "extensions": ["colours_more", "output_number", "output_string"]
     });
+    this.getField('TEXT').setValidator(
+        Blockly.ScratchBlocks.ProcedureUtils.argumentNameValidator_);
   },
   // Exist on declaration and arguments editors, with different implementations.
   removeFieldCallback: Blockly.ScratchBlocks.ProcedureUtils.removeArgumentCallback_,
