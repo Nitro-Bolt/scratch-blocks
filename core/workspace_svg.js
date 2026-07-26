@@ -1594,30 +1594,53 @@ Blockly.WorkspaceSvg.prototype.getBlocksBoundingBox = function() {
   var topBlocks = this.getTopBlocks(false);
   var topComments = this.getTopComments(false);
   var topElements = topBlocks.concat(topComments);
-  // There are no blocks, return empty rectangle.
-  if (!topElements.length) {
+  var groups = this.getGroups();
+  // There are no blocks, comments, or groups, return empty rectangle.
+  if (!topElements.length && !groups.length) {
     return {x: 0, y: 0, width: 0, height: 0};
   }
 
-  // Initialize boundary using the first block.
-  var boundary = topElements[0].getBoundingRectangle();
+  var boundary;
+  if (topElements.length) {
+    // Initialize boundary using the first block.
+    boundary = topElements[0].getBoundingRectangle();
 
-  // Start at 1 since the 0th block was used for initialization
-  for (var i = 1; i < topElements.length; i++) {
-    var blockBoundary = topElements[i].getBoundingRectangle();
-    if (blockBoundary.topLeft.x < boundary.topLeft.x) {
-      boundary.topLeft.x = blockBoundary.topLeft.x;
+    // Start at 1 since the 0th block was used for initialization
+    for (var i = 1; i < topElements.length; i++) {
+      var blockBoundary = topElements[i].getBoundingRectangle();
+      if (blockBoundary.topLeft.x < boundary.topLeft.x) {
+        boundary.topLeft.x = blockBoundary.topLeft.x;
+      }
+      if (blockBoundary.bottomRight.x > boundary.bottomRight.x) {
+        boundary.bottomRight.x = blockBoundary.bottomRight.x;
+      }
+      if (blockBoundary.topLeft.y < boundary.topLeft.y) {
+        boundary.topLeft.y = blockBoundary.topLeft.y;
+      }
+      if (blockBoundary.bottomRight.y > boundary.bottomRight.y) {
+        boundary.bottomRight.y = blockBoundary.bottomRight.y;
+      }
     }
-    if (blockBoundary.bottomRight.x > boundary.bottomRight.x) {
-      boundary.bottomRight.x = blockBoundary.bottomRight.x;
-    }
-    if (blockBoundary.topLeft.y < boundary.topLeft.y) {
-      boundary.topLeft.y = blockBoundary.topLeft.y;
-    }
-    if (blockBoundary.bottomRight.y > boundary.bottomRight.y) {
-      boundary.bottomRight.y = blockBoundary.bottomRight.y;
-    }
+  } else {
+    // Initialize boundary using the first group.
+    var g = groups[0];
+    boundary = {topLeft: {x: g.x, y: g.y},
+      bottomRight: {x: g.x + g.width, y: g.y + g.height}};
   }
+
+  // Expand to include groups.
+  for (var i = 0; i < groups.length; i++) {
+    var group = groups[i];
+    var left = group.x;
+    var top = group.y;
+    var right = left + group.width;
+    var bottom = top + group.height;
+    if (left < boundary.topLeft.x) boundary.topLeft.x = left;
+    if (top < boundary.topLeft.y) boundary.topLeft.y = top;
+    if (right > boundary.bottomRight.x) boundary.bottomRight.x = right;
+    if (bottom > boundary.bottomRight.y) boundary.bottomRight.y = bottom;
+  }
+
   return {
     x: boundary.topLeft.x,
     y: boundary.topLeft.y,

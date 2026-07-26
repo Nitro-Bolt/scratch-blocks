@@ -209,6 +209,7 @@ Blockly.Group.prototype.applyState = function(state) {
       (typeof state.blocks === 'string' && state.blocks ? state.blocks.split(' ') : []);
   this.render();
   this.updateCollapsedBlocks_();
+  this.workspace.resizeContents();
 };
 
 /**
@@ -446,6 +447,7 @@ Blockly.Group.prototype.finishPointer_ = function(e) {
   Blockly.Events.fire(state.event);
   Blockly.Events.setGroup(false);
   this.dragState_ = null;
+  this.workspace.resizeContents();
   if (isOutside) {
     var workspace = this.workspace;
     var groupId = this.id;
@@ -558,6 +560,7 @@ Blockly.Group.prototype.fitBlock = function(block) {
   this.render();
   event.recordNew(this);
   Blockly.Events.fire(event);
+  this.workspace.resizeContents();
 };
 
 /**
@@ -599,6 +602,7 @@ Blockly.Group.prototype.moveBy = function(dx, dy) {
   this.render();
   event.recordNew(this);
   Blockly.Events.fire(event);
+  this.workspace.resizeContents();
 };
 
 Blockly.Group.prototype.rename_ = function(e) {
@@ -640,6 +644,7 @@ Blockly.Group.prototype.toggleCollapsed_ = function(e) {
   this.render();
   event.recordNew(this);
   Blockly.Events.fire(event);
+  this.workspace.resizeContents();
 };
 
 Blockly.Group.prototype.updateCollapsedBlocks_ = function() {
