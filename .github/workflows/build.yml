@@ -51,7 +51,7 @@ jobs:
           git config --local user.email "action@github.com"
 
           mkdir ../build-output
-          cp -r dist/ media/ \
+          cp -r dist/ media/ msg/ \
             blockly_compressed_vertical.js \
             blocks_compressed_vertical.js \
             blocks_compressed.js \
