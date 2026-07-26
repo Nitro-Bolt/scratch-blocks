@@ -109,9 +109,9 @@ Blockly.Msg.DATA_ROW = 'row';
 Blockly.Msg.JSON_NEW_OBJECT = 'new object';
 Blockly.Msg.JSON_OBJECT = 'new object %1';
 Blockly.Msg.JSON_GET_PROPERTIES = '%1 of %2';
-Blockly.Msg.JSON_GET_PROPERTIES_KEYS = "keys";
-Blockly.Msg.JSON_GET_PROPERTIES_VALUES = "values";
-Blockly.Msg.JSON_GET_PROPERTIES_ENTRIES = "entries";
+Blockly.Msg.JSON_GET_PROPERTIES_KEYS = 'keys';
+Blockly.Msg.JSON_GET_PROPERTIES_VALUES = 'values';
+Blockly.Msg.JSON_GET_PROPERTIES_ENTRIES = 'entries';
 Blockly.Msg.JSON_VALUE_OF_KEY = 'value of %1 in %2';
 Blockly.Msg.JSON_SET_KEY = 'set %1 in %2 to %3';
 Blockly.Msg.JSON_DELETE_KEY = 'delete %1 in %2';
@@ -394,7 +394,7 @@ Blockly.Msg.CATEGORY_CONTROL = 'Control';
 Blockly.Msg.CATEGORY_SENSING = 'Sensing';
 Blockly.Msg.CATEGORY_OPERATORS = 'Operators';
 Blockly.Msg.CATEGORY_VARIABLES = 'Variables';
-Blockly.Msg.CATEGORY_JSON = "JSON";
+Blockly.Msg.CATEGORY_JSON = 'JSON';
 Blockly.Msg.CATEGORY_MYBLOCKS = 'My Blocks';
 
 // Context menus
