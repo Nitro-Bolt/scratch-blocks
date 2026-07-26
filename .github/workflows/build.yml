@@ -40,7 +40,7 @@ jobs:
         run: npm ci
 
       - name: Run Prepublish
-      - run: npm run prepublish
+        run: npm run prepublish
 
       - name: Commit and Push Build
         run: |
