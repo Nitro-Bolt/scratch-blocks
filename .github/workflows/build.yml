@@ -48,7 +48,12 @@ jobs:
           git config --local user.email "action@github.com"
 
           mkdir ../build-output
-          cp -r dist/ media/ *.js ../build-output/
+          cp -r dist/ media/ \
+            blockly_compressed_vertical.js \
+            blocks_compressed_vertical.js \
+            blocks_compressed.js \
+            blockly_uncompressed_vertical.js \
+            ../build-output/
 
           git fetch origin develop-builds
           git checkout develop-builds
