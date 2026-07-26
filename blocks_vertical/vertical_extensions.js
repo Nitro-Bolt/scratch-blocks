@@ -52,10 +52,10 @@ Blockly.ScratchBlocks.VerticalExtensions.colourHelper = function(category) {
    * the given category.
    * @this {Blockly.Block}
    */
-  return (function() {
+  return function() {
     this.setColourFromRawValues_(colours.primary, colours.secondary,
         colours.tertiary, colours.quaternary);
-  });
+  };
 };
 
 /**
@@ -76,8 +76,8 @@ Blockly.ScratchBlocks.VerticalExtensions.COLOUR_TEXTFIELD = function() {
  */
 Blockly.ScratchBlocks.VerticalExtensions.SHAPE_STATEMENT = function() {
   this.setInputsInline(true);
-  this.setPreviousStatement(true, null);
-  this.setNextStatement(true, null);
+  this.setPreviousStatement(true, "normal");
+  this.setNextStatement(true, "normal");
 };
 
 /**
@@ -89,7 +89,7 @@ Blockly.ScratchBlocks.VerticalExtensions.SHAPE_STATEMENT = function() {
  */
 Blockly.ScratchBlocks.VerticalExtensions.SHAPE_HAT = function() {
   this.setInputsInline(true);
-  this.setNextStatement(true, null);
+  this.setNextStatement(true, "normal");
 };
 
 /**
@@ -101,7 +101,7 @@ Blockly.ScratchBlocks.VerticalExtensions.SHAPE_HAT = function() {
  */
 Blockly.ScratchBlocks.VerticalExtensions.SHAPE_END = function() {
   this.setInputsInline(true);
-  this.setPreviousStatement(true, null);
+  this.setPreviousStatement(true, "normal");
 };
 
 /**
@@ -263,8 +263,8 @@ Blockly.ScratchBlocks.VerticalExtensions.SCRATCH_EXTENSION = function() {
  */
 Blockly.ScratchBlocks.VerticalExtensions.registerAll = function() {
   var categoryNames =
-      ['control', 'data', 'data_lists', 'json', 'sounds', 'motion', 'looks', 'event',
-        'sensing', 'pen', 'operators', 'more', 'comments'];
+      ['control', 'data', 'data_lists', 'data_tables', 'json', 'assets', 'sounds', 'motion', 'looks', 'event',
+        'sensing', 'pen', 'operators', 'more'];
   // Register functions for all category colours.
   for (var i = 0; i < categoryNames.length; i++) {
     var name = categoryNames[i];

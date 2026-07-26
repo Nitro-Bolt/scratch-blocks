@@ -64,10 +64,38 @@ Blockly.scratchBlocksUtils.changeObscuredShadowIds = function(block) {
       if (connection) {
         var shadowDom = connection.getShadowDom();
         if (shadowDom) {
-          shadowDom.setAttribute('id', Blockly.utils.genUid());
+          var newId = Blockly.utils.genUid();
+          var oldId = shadowDom.getAttribute('id');
+          shadowDom.setAttribute('id', newId);
           connection.setShadowDom(shadowDom);
+          // Update the ID to match VM
+          var targetBlock = connection.targetBlock();
+          if (targetBlock && targetBlock.isShadow()) {
+            if (targetBlock.workspace) {
+              delete targetBlock.workspace.blockDB_[oldId];
+              targetBlock.workspace.blockDB_[newId] = targetBlock;
+            }
+            targetBlock.id = newId;
+          }
         }
       }
+    }
+  }
+};
+
+/**
+ * Recursively assign fresh IDs to blocks, in-place.
+ * @param {Element} xmlBlock The root XML
+ */
+Blockly.scratchBlocksUtils.changeCopiedBlockIds = function(xmlBlock) {
+  var tagName = xmlBlock.tagName && xmlBlock.tagName.toLowerCase();
+  if (tagName === 'block' || tagName === 'shadow') {
+    xmlBlock.setAttribute('id', Blockly.utils.genUid());
+  }
+  for (var i = 0; i < xmlBlock.childNodes.length; i++) {
+    var child = xmlBlock.childNodes[i];
+    if (child.nodeType === 1) {
+      Blockly.scratchBlocksUtils.changeCopiedBlockIds(child);
     }
   }
 };
@@ -83,11 +111,7 @@ Blockly.scratchBlocksUtils.changeObscuredShadowIds = function(block) {
  * @package
  */
 Blockly.scratchBlocksUtils.isShadowArgumentReporter = function(block) {
-  return (block.isShadow() && (block.type == 'argument_reporter_boolean' ||
-      block.type == 'argument_reporter_object' ||
-      block.type == 'argument_reporter_array' ||
-      block.type == 'argument_reporter_string_number'
-    ));
+  return (block.isShadow() && block.type.startsWith("argument_reporter_"));
 };
 
 /**

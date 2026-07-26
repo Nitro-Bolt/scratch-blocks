@@ -19,7 +19,7 @@
 
 /**
  * @fileoverview Fix up some polyfill's and stuff :)
- * @author meow@miyo.lol (Miyo Sho)
+ * @author Miyo Sho
  */
 'use strict';
 
