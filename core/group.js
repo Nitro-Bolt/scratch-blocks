@@ -649,6 +649,9 @@ Blockly.Group.prototype.updateCollapsedBlocks_ = function() {
     if (block && block.getSvgRoot()) {
       block.getSvgRoot().style.display =
           this.collapsed || block.intersects_ === false ? 'none' : '';
+      // Hide connections of blocks inside collapsed groups so other blocks
+      // cannot connect to them.
+      block.setConnectionsHidden(this.collapsed);
     }
   }, this);
 };
