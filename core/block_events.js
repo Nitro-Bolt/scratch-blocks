@@ -410,6 +410,9 @@ Blockly.Events.Move.prototype.type = Blockly.Events.MOVE;
  */
 Blockly.Events.Move.prototype.toJson = function() {
   var json = Blockly.Events.Move.superClass_.toJson.call(this);
+  if (this.reason) {
+    json['reason'] = this.reason;
+  }
   if (this.newParentId) {
     json['newParentId'] = this.newParentId;
   }
@@ -435,6 +438,7 @@ Blockly.Events.Move.prototype.toJson = function() {
  */
 Blockly.Events.Move.prototype.fromJson = function(json) {
   Blockly.Events.Move.superClass_.fromJson.call(this, json);
+  this.reason = json['reason'] || null;
   this.newParentId = json['newParentId'];
   this.newInputName = json['newInputName'];
   if (json['oldParentId']) {
@@ -449,6 +453,12 @@ Blockly.Events.Move.prototype.fromJson = function(json) {
         new goog.math.Coordinate(parseFloat(xy[0]), parseFloat(xy[1]));
   }
 };
+
+/**
+ * Reason used for block moves committed as part of moving a group.
+ * @const {string}
+ */
+Blockly.Events.Move.GROUP_MOVE_REASON = 'group_move';
 
 /**
  * Record the block's new location.  Called after the move.

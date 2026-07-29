@@ -28,6 +28,7 @@ goog.provide('Blockly.ScratchBlockComment');
 
 goog.require('Blockly.Comment');
 goog.require('Blockly.Events.BlockChange');
+goog.require('Blockly.Events.CommentMove');
 goog.require('Blockly.Events.Ui');
 goog.require('Blockly.Icon');
 goog.require('Blockly.ScratchBubble');
@@ -519,6 +520,71 @@ Blockly.ScratchBlockComment.prototype.moveTo = function(x, y) {
   this.y_ = y;
   event.recordNew();
   Blockly.Events.fire(event);
+};
+
+/**
+ * Capture attached comment positions before a block stack moves.
+ * @param {!Blockly.Block} block Root block of the moving stack.
+ * @return {!Array.<{comment: !Blockly.ScratchBlockComment,
+ *     oldCoordinate: !goog.math.Coordinate}>} Captured comment positions.
+ * @package
+ */
+Blockly.ScratchBlockComment.captureBlockMoveData = function(block) {
+  var moveData = [];
+  var descendants = block.getDescendants(false);
+  for (var i = 0, descendant; descendant = descendants[i]; i++) {
+    var comment = descendant.comment;
+    if (comment instanceof Blockly.ScratchBlockComment) {
+      moveData.push({
+        comment: comment,
+        oldCoordinate: comment.getXY()
+      });
+    }
+  }
+  return moveData;
+};
+
+/**
+ * Update attached comment model positions after their block stack moves and,
+ * when events are enabled, emit one final derived move per comment.
+ *
+ * The derived event is not added to the undo stack: undoing the corresponding
+ * block move already moves its attached comments. It is still delivered to
+ * workspace listeners so model and collaboration consumers can persist the
+ * final absolute comment position.
+ * @param {!Array.<{comment: !Blockly.ScratchBlockComment,
+ *     oldCoordinate: !goog.math.Coordinate}>} moveData Captured positions.
+ * @param {number} dx Horizontal block movement in workspace units.
+ * @param {number} dy Vertical block movement in workspace units.
+ * @package
+ */
+Blockly.ScratchBlockComment.finishBlockMove = function(moveData, dx, dy) {
+  var eventsEnabled = Blockly.Events.isEnabled();
+  for (var i = 0, data; data = moveData[i]; i++) {
+    var comment = data.comment;
+    if (!comment.workspace) continue;
+
+    var newCoordinate = comment.isVisible() ? comment.getXY() :
+        new goog.math.Coordinate(
+            data.oldCoordinate.x + dx, data.oldCoordinate.y + dy);
+    var event = eventsEnabled ?
+        new Blockly.Events.CommentMove(
+            comment, Blockly.Events.CommentMove.BLOCK_MOVE_REASON) : null;
+    if (event) {
+      event.setOldCoordinate(data.oldCoordinate);
+      event.recordUndo = false;
+    }
+
+    // Scratch block comments store absolute coordinates even while hidden.
+    // Keep that model state aligned with the bubble's derived visual movement.
+    comment.x_ = newCoordinate.x;
+    comment.y_ = newCoordinate.y;
+
+    if (event) {
+      event.recordNew();
+      Blockly.Events.fire(event);
+    }
+  }
 };
 
 /**

@@ -417,14 +417,23 @@ Blockly.Events.CommentDelete.prototype.run = function(forward) {
  * Class for a comment move event.  Created before the move.
  * @param {Blockly.WorkspaceComment | Blockly.ScratchBlockComment} comment
  *     The comment that is being moved. Null for a blank event.
+ * @param {string=} opt_reason Optional reason for the move. Direct comment
+ *     moves omit this; moves derived from an attached block use
+ *     Blockly.Events.CommentMove.BLOCK_MOVE_REASON.
  * @extends {Blockly.Events.CommentBase}
  * @constructor
  */
-Blockly.Events.CommentMove = function(comment) {
+Blockly.Events.CommentMove = function(comment, opt_reason) {
   if (!comment) {
     return;  // Blank event to be populated by fromJson.
   }
   Blockly.Events.CommentMove.superClass_.constructor.call(this, comment);
+
+  /**
+   * Why the comment moved, or null for a direct comment move.
+   * @type {?string}
+   */
+  this.reason = opt_reason || null;
 
   /**
    * The comment that is being moved.  Will be cleared after recording the new
@@ -447,6 +456,12 @@ Blockly.Events.CommentMove = function(comment) {
   this.newCoordinate_ = null;
 };
 goog.inherits(Blockly.Events.CommentMove, Blockly.Events.CommentBase);
+
+/**
+ * Reason used for a comment move which is derived from moving its block.
+ * @const {string}
+ */
+Blockly.Events.CommentMove.BLOCK_MOVE_REASON = 'block_move';
 
 /**
  * Calculate the current, language agnostic location of the comment.
@@ -496,8 +511,14 @@ Blockly.Events.CommentMove.prototype.type = Blockly.Events.COMMENT_MOVE;
  *     coordinates.
  */
 Blockly.Events.CommentMove.prototype.setOldCoordinate = function(xy) {
-  this.oldCoordinate_ = new goog.math.Coordinate(this.comment_.workspace.RTL ?
-      this.workspaceWidth_ - xy.x : xy.x, xy.y);
+  var x = xy.x;
+  if (this.comment_.workspace.RTL) {
+    x = this.workspaceWidth_ - x;
+    if (this.comment_ instanceof Blockly.ScratchBlockComment) {
+      x -= this.comment_.getBubbleSize().width;
+    }
+  }
+  this.oldCoordinate_ = new goog.math.Coordinate(x, xy.y);
 };
 
 /**
@@ -508,6 +529,9 @@ Blockly.Events.CommentMove.prototype.setOldCoordinate = function(xy) {
  */
 Blockly.Events.CommentMove.prototype.toJson = function() {
   var json = Blockly.Events.CommentMove.superClass_.toJson.call(this);
+  if (this.reason) {
+    json['reason'] = this.reason;
+  }
   if (this.newCoordinate_) {
     json['newCoordinate'] = Math.round(this.newCoordinate_.x) + ',' +
         Math.round(this.newCoordinate_.y);
@@ -521,6 +545,7 @@ Blockly.Events.CommentMove.prototype.toJson = function() {
  */
 Blockly.Events.CommentMove.prototype.fromJson = function(json) {
   Blockly.Events.CommentMove.superClass_.fromJson.call(this, json);
+  this.reason = json['reason'] || null;
 
   if (json['newCoordinate']) {
     var xy = json['newCoordinate'].split(',');
@@ -552,7 +577,9 @@ Blockly.Events.CommentMove.prototype.run = function(forward) {
 
   if (comment instanceof Blockly.ScratchBlockComment) {
     if (comment.workspace.RTL) {
-      comment.moveTo(this.workspaceWidth_ - target.x, target.y);
+      var workspaceWidth = comment.workspace.getWidth();
+      var commentWidth = comment.getBubbleSize().width;
+      comment.moveTo(workspaceWidth - target.x - commentWidth, target.y);
     } else {
       comment.moveTo(target.x, target.y);
     }

@@ -54,6 +54,8 @@ Blockly.Group = function(workspace, options) {
   this.expandedWidth = Math.max(Number(options.expandedWidth) || this.width, 160);
   this.expandedHeight = Math.max(Number(options.expandedHeight) || this.height, 96);
   this.collapsed = options.collapsed === true || options.collapsed === 'true';
+  this.hasExplicitBlockIds_ = Array.isArray(options.blocks) ||
+      typeof options.blocks === 'string';
   this.blockIds = Array.isArray(options.blocks) ? options.blocks.slice() :
       (typeof options.blocks === 'string' && options.blocks ? options.blocks.split(' ') : []);
   if (this.collapsed) {
@@ -65,6 +67,7 @@ Blockly.Group = function(workspace, options) {
   this.pressedButton_ = null;
   this.buttonReleaseWrapper_ = null;
   this.fitTimer_ = null;
+  this.membershipTimer_ = null;
   this.workspaceChangeListener_ = this.onWorkspaceChange_.bind(this);
   workspace.addChangeListener(this.workspaceChangeListener_);
   workspace.addGroup(this);
@@ -196,6 +199,14 @@ Blockly.Group.prototype.toJSON = function() {
  * @param {!Object} state New state.
  */
 Blockly.Group.prototype.applyState = function(state) {
+  if (this.fitTimer_) {
+    clearTimeout(this.fitTimer_);
+    this.fitTimer_ = null;
+  }
+  if (this.membershipTimer_) {
+    clearTimeout(this.membershipTimer_);
+    this.membershipTimer_ = null;
+  }
   this.title = state.title;
   this.colour = state.colour || null;
   this.x = Number(state.x);
@@ -205,6 +216,8 @@ Blockly.Group.prototype.applyState = function(state) {
   this.expandedWidth = Number(state.expandedWidth) || this.width;
   this.expandedHeight = Number(state.expandedHeight) || this.height;
   this.collapsed = state.collapsed === true || state.collapsed === 'true';
+  this.hasExplicitBlockIds_ = Array.isArray(state.blocks) ||
+      typeof state.blocks === 'string';
   this.blockIds = Array.isArray(state.blocks) ? state.blocks.slice() :
       (typeof state.blocks === 'string' && state.blocks ? state.blocks.split(' ') : []);
   this.render();
@@ -431,7 +444,7 @@ Blockly.Group.prototype.finishPointer_ = function(e) {
       // Restore the recorded position before committing so moveBy measures from
       // the real origin instead of applying the drag delta a second time.
       block.translate(state.blockXY[index].x, state.blockXY[index].y);
-      block.moveBy(dx, dy);
+      block.moveBy(dx, dy, Blockly.Events.BlockMove.GROUP_MOVE_REASON);
     });
   } else {
     Blockly.Events.setGroup(true);
@@ -561,22 +574,87 @@ Blockly.Group.prototype.fitBlock = function(block) {
 };
 
 /**
+ * Stop owning a stack. Group geometry is intentionally left unchanged.
+ * @param {string} blockId ID of the top-level stack to release.
+ */
+Blockly.Group.prototype.removeBlock = function(blockId) {
+  var index = this.blockIds.indexOf(blockId);
+  if (index === -1) return;
+  var event = new Blockly.Events.GroupChange(this);
+  event.recordOld(this);
+  this.blockIds.splice(index, 1);
+  event.recordNew(this);
+  Blockly.Events.fire(event);
+};
+
+/**
+ * Expand once to contain all currently owned stacks without changing
+ * membership.
+ * @private
+ */
+Blockly.Group.prototype.fitOwnedBlocks_ = function() {
+  var blocks = this.getOwnedTopBlocks_();
+  if (!blocks.length) return;
+  var padding = 16;
+  var left = this.x;
+  var top = this.y;
+  var right = this.x + this.width;
+  var bottom = this.y + this.height;
+  blocks.forEach(function(block) {
+    var bounds = block.getBoundingRectangle();
+    left = Math.min(left, bounds.topLeft.x - padding);
+    top = Math.min(top, bounds.topLeft.y - 32 - padding);
+    right = Math.max(right, bounds.bottomRight.x + padding);
+    bottom = Math.max(bottom, bounds.bottomRight.y + padding);
+  });
+  if (left === this.x && top === this.y &&
+      right === this.x + this.width && bottom === this.y + this.height) {
+    return;
+  }
+  var event = new Blockly.Events.GroupChange(this);
+  event.recordOld(this);
+  this.x = left;
+  this.y = top;
+  this.width = right - left;
+  this.height = bottom - top;
+  this.expandedWidth = this.width;
+  this.expandedHeight = this.height;
+  this.render();
+  event.recordNew(this);
+  Blockly.Events.fire(event);
+};
+
+/**
  * Remeasure owned stacks after block edits and mutations finish rendering.
  * @param {Blockly.Events.Abstract=} event Workspace event.
  */
 Blockly.Group.prototype.onWorkspaceChange_ = function(event) {
-  if (event && ['dragOutside', 'endDrag', 'group_drag_outside',
-    'group_end_drag'].indexOf(event.type) !== -1) return;
-  if (this.collapsed || this.dragState_) return;
+  if (this.collapsed || this.dragState_ ||
+      (this.workspace.isDragging && this.workspace.isDragging())) return;
+  if (event) {
+    var ignoredTypes = [
+      Blockly.Events.UI,
+      Blockly.Events.COMMENT_CREATE,
+      Blockly.Events.COMMENT_CHANGE,
+      Blockly.Events.COMMENT_MOVE,
+      Blockly.Events.COMMENT_DELETE,
+      Blockly.Events.DRAG_OUTSIDE,
+      Blockly.Events.END_DRAG,
+      Blockly.Events.GROUP_CHANGE,
+      Blockly.Events.GROUP_DRAG_OUTSIDE,
+      Blockly.Events.GROUP_END_DRAG
+    ];
+    if (ignoredTypes.indexOf(event.type) !== -1 || !event.blockId) return;
+    var changedBlock = this.workspace.getBlockById(event.blockId);
+    var changedRoot = changedBlock && changedBlock.getRootBlock();
+    if (!changedRoot || this.blockIds.indexOf(changedRoot.id) === -1) return;
+  }
   if (this.fitTimer_) clearTimeout(this.fitTimer_);
   var group = this;
   this.fitTimer_ = setTimeout(function() {
     group.fitTimer_ = null;
     if (!group.workspace || group.collapsed) return;
-    group.blockIds.slice().forEach(function(id) {
-      var block = group.workspace.getBlockById(id);
-      if (block && !block.getParent()) group.fitBlock(block);
-    });
+    group.fitOwnedBlocks_();
   }, 0);
 };
 
@@ -750,6 +828,7 @@ Blockly.Group.prototype.showContextMenu_ = function(e) {
 Blockly.Group.prototype.dispose = function(fireEvent) {
   if (!this.workspace) return;
   clearTimeout(this.fitTimer_);
+  clearTimeout(this.membershipTimer_);
   if (this.buttonReleaseWrapper_) {
     Blockly.unbindEvent_(this.buttonReleaseWrapper_);
     this.buttonReleaseWrapper_ = null;
@@ -779,12 +858,22 @@ Blockly.Group.prototype.dispose = function(fireEvent) {
 Blockly.Group.fromJSON = function(workspace, state, fireEvent) {
   var group = new Blockly.Group(workspace, state);
   group.initSvg();
-  setTimeout(function() {
+  group.membershipTimer_ = setTimeout(function() {
+    group.membershipTimer_ = null;
     if (!group.workspace) return;
-    if (!group.blockIds.length && !group.collapsed) {
-      group.blockIds = group.getContainedBlocks().map(function(block) {
+    if (!group.hasExplicitBlockIds_ && !group.collapsed) {
+      var blockIds = group.getContainedBlocks().map(function(block) {
         return block.id;
       });
+      if (blockIds.join(' ') !== group.blockIds.join(' ')) {
+        var membershipEvent = new Blockly.Events.GroupChange(group);
+        membershipEvent.recordOld(group);
+        group.blockIds = blockIds;
+        group.hasExplicitBlockIds_ = true;
+        membershipEvent.recordNew(group);
+        membershipEvent.recordUndo = false;
+        Blockly.Events.fire(membershipEvent);
+      }
     }
     if (group.collapsed) group.updateCollapsedBlocks_();
   }, 0);

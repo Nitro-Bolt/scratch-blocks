@@ -33,6 +33,7 @@ goog.require('Blockly.Events.Ui');
 goog.require('Blockly.Events.BlockMove');
 goog.require('Blockly.Grid');
 goog.require('Blockly.RenderedConnection');
+goog.require('Blockly.ScratchBlockComment');
 goog.require('Blockly.scratchBlocksUtils');
 goog.require('Blockly.Tooltip');
 goog.require('Blockly.Touch');
@@ -410,12 +411,16 @@ Blockly.BlockSvg.prototype.getRelativeToSurfaceXY = function() {
  * Move a block by a relative offset.
  * @param {number} dx Horizontal offset in workspace units.
  * @param {number} dy Vertical offset in workspace units.
+ * @param {string=} opt_reason Optional semantic reason for the move.
  */
-Blockly.BlockSvg.prototype.moveBy = function(dx, dy) {
+Blockly.BlockSvg.prototype.moveBy = function(dx, dy, opt_reason) {
   goog.asserts.assert(!this.parentBlock_, 'Block has parent.');
   var eventsEnabled = Blockly.Events.isEnabled();
+  var commentMoveData =
+      Blockly.ScratchBlockComment.captureBlockMoveData(this);
   if (eventsEnabled) {
     var event = new Blockly.Events.BlockMove(this);
+    event.reason = opt_reason || null;
   }
   var xy = this.getRelativeToSurfaceXY();
   this.translate(xy.x + dx, xy.y + dy);
@@ -424,6 +429,7 @@ Blockly.BlockSvg.prototype.moveBy = function(dx, dy) {
     event.recordNew();
     Blockly.Events.fire(event);
   }
+  Blockly.ScratchBlockComment.finishBlockMove(commentMoveData, dx, dy);
   this.workspace.resizeContents();
 };
 

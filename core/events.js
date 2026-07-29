@@ -109,6 +109,24 @@ Blockly.Events.DRAG_OUTSIDE = 'dragOutside';
 Blockly.Events.END_DRAG = 'endDrag';
 
 /**
+ * Name of an event that changes a group.
+ * @const
+ */
+Blockly.Events.GROUP_CHANGE = 'group_change';
+
+/**
+ * Name of an event that drags a group outside of the blocks workspace.
+ * @const
+ */
+Blockly.Events.GROUP_DRAG_OUTSIDE = 'group_drag_outside';
+
+/**
+ * Name of an event that ends a group drag.
+ * @const
+ */
+Blockly.Events.GROUP_END_DRAG = 'group_end_drag';
+
+/**
  * Name of event that moves a block.
  * @const
  */
@@ -388,6 +406,15 @@ Blockly.Events.fromJson = function(json, workspace) {
       break;
     case Blockly.Events.END_DRAG:
       event = new Blockly.Events.EndBlockDrag(null, false);
+      break;
+    case Blockly.Events.GROUP_CHANGE:
+      event = new Blockly.Events.GroupChange(null);
+      break;
+    case Blockly.Events.GROUP_DRAG_OUTSIDE:
+      event = new Blockly.Events.GroupDragOutside(null, false);
+      break;
+    case Blockly.Events.GROUP_END_DRAG:
+      event = new Blockly.Events.GroupEndDrag(null, false);
       break;
     default:
       throw 'Unknown event type.';

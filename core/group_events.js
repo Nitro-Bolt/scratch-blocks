@@ -46,7 +46,27 @@ Blockly.Events.GroupDragOutside = function(group, isOutside) {
   this.recordUndo = false;
 };
 goog.inherits(Blockly.Events.GroupDragOutside, Blockly.Events.Abstract);
-Blockly.Events.GroupDragOutside.prototype.type = 'group_drag_outside';
+Blockly.Events.GroupDragOutside.prototype.type =
+    Blockly.Events.GROUP_DRAG_OUTSIDE;
+
+/**
+ * @override
+ */
+Blockly.Events.GroupDragOutside.prototype.toJson = function() {
+  var json = Blockly.Events.GroupDragOutside.superClass_.toJson.call(this);
+  json['groupId'] = this['groupId'];
+  json['isOutside'] = this['isOutside'];
+  return json;
+};
+
+/**
+ * @override
+ */
+Blockly.Events.GroupDragOutside.prototype.fromJson = function(json) {
+  Blockly.Events.GroupDragOutside.superClass_.fromJson.call(this, json);
+  this['groupId'] = json['groupId'];
+  this['isOutside'] = !!json['isOutside'];
+};
 
 /**
  * @param {Blockly.Group=} group Group whose drag ended.
@@ -66,7 +86,30 @@ Blockly.Events.GroupEndDrag = function(group, isOutside) {
   this.recordUndo = false;
 };
 goog.inherits(Blockly.Events.GroupEndDrag, Blockly.Events.Abstract);
-Blockly.Events.GroupEndDrag.prototype.type = 'group_end_drag';
+Blockly.Events.GroupEndDrag.prototype.type = Blockly.Events.GROUP_END_DRAG;
+
+/**
+ * @override
+ */
+Blockly.Events.GroupEndDrag.prototype.toJson = function() {
+  var json = Blockly.Events.GroupEndDrag.superClass_.toJson.call(this);
+  json['groupId'] = this['groupId'];
+  json['isOutside'] = this['isOutside'];
+  json['groupState'] = this['groupState'];
+  json['xmls'] = this['xmls'];
+  return json;
+};
+
+/**
+ * @override
+ */
+Blockly.Events.GroupEndDrag.prototype.fromJson = function(json) {
+  Blockly.Events.GroupEndDrag.superClass_.fromJson.call(this, json);
+  this['groupId'] = json['groupId'];
+  this['isOutside'] = !!json['isOutside'];
+  this['groupState'] = json['groupState'];
+  this['xmls'] = json['xmls'] || [];
+};
 
 /**
  * @param {Blockly.Group=} group Group affected by this event.
@@ -82,7 +125,7 @@ Blockly.Events.GroupChange = function(group) {
 };
 goog.inherits(Blockly.Events.GroupChange, Blockly.Events.Abstract);
 
-Blockly.Events.GroupChange.prototype.type = 'group_change';
+Blockly.Events.GroupChange.prototype.type = Blockly.Events.GROUP_CHANGE;
 
 /**
  * @override

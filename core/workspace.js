@@ -273,23 +273,17 @@ Blockly.Workspace.prototype.getGroupById = function(id) {
  */
 Blockly.Workspace.prototype.getGroupForBlock = function(blockId, opt_exclude) {
   var groups = this.getGroups();
-  var block = this.getBlockById(blockId);
   for (var i = 0; i < groups.length; i++) {
     var group = groups[i];
     if (group === opt_exclude || group.blockIds.indexOf(blockId) === -1) continue;
-    if (!block || group.collapsed || group.containsBlock(block)) return group;
-
-    // Expanded groups release blocks which have been dragged out. Remove the
-    // stale ID immediately so another group can adopt and serialize the block.
-    group.blockIds.splice(group.blockIds.indexOf(blockId), 1);
+    return group;
   }
   return null;
 };
 
 /**
  * Remeasure the group which owns a block after a live field edit.
- * This deliberately checks the saved ownership directly: using
- * getGroupForBlock here could release a stack while its group is growing.
+ * This deliberately checks the saved ownership directly.
  * @param {!Blockly.Block} block Block whose rendered size changed.
  */
 Blockly.Workspace.prototype.scheduleGroupFit = function(block) {

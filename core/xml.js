@@ -431,15 +431,22 @@ Blockly.Xml.textToDom = function(text) {
  * @return {Array.<string>} An array containing new block ids.
  */
 Blockly.Xml.clearWorkspaceAndLoadFromXml = function(xml, workspace) {
-  var wasEventsEnabled = Blockly.Events.isEnabled();
+  var wereResizesEnabled = workspace.resizesEnabled_;
+  var wasToolboxRefreshEnabled = workspace.toolboxRefreshEnabled_;
   Blockly.Events.disable();
   workspace.setResizesEnabled(false);
   workspace.setToolboxRefreshEnabled(false);
-  workspace.clear();
-  var blockIds = Blockly.Xml.domToWorkspace(xml, workspace);
-  if (wasEventsEnabled) Blockly.Events.enable();
-  workspace.setResizesEnabled(true);
-  workspace.setToolboxRefreshEnabled(true);
+  var blockIds;
+  try {
+    workspace.clear();
+    blockIds = Blockly.Xml.domToWorkspace(xml, workspace);
+  } finally {
+    // Balance this function's disable even if an outer caller already disabled
+    // events, then restore the workspace's prior batching state.
+    Blockly.Events.enable();
+    workspace.setResizesEnabled(wereResizesEnabled);
+    workspace.setToolboxRefreshEnabled(wasToolboxRefreshEnabled);
+  }
   return blockIds;
 };
 
@@ -511,10 +518,16 @@ Blockly.Xml.domToWorkspace = function(xml, workspace) {
         var blockY = xmlChild.hasAttribute('y') ?
             parseInt(xmlChild.getAttribute('y'), 10) : 10;
         if (!isNaN(blockX) && !isNaN(blockY)) {
+          // Comment coordinates in project XML are already absolute. Preserve
+          // them while positioning the newly-created block: moveBy normally
+          // advances attached comments so ordinary block moves stay in sync.
+          var commentXY = block.comment &&
+              typeof block.comment === 'object' ?
+              block.comment.getXY() : null;
+          var commentWidth = commentXY ?
+              block.comment.getBubbleSize().width : 0;
           block.moveBy(workspace.RTL ? width - blockX : blockX, blockY);
-          if (block.comment && typeof block.comment === 'object') {
-            var commentXY = block.comment.getXY();
-            var commentWidth = block.comment.getBubbleSize().width;
+          if (commentXY) {
             block.comment.moveTo(block.workspace.RTL ? width - commentXY.x - commentWidth : commentXY.x, commentXY.y);
           }
         }

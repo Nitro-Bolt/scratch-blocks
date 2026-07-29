@@ -32,6 +32,7 @@ goog.require('Blockly.Events.DragBlockOutside');
 goog.require('Blockly.Events.EndBlockDrag');
 goog.require('Blockly.Group');
 goog.require('Blockly.InsertionMarkerManager');
+goog.require('Blockly.ScratchBlockComment');
 
 goog.require('goog.math.Coordinate');
 goog.require('goog.asserts');
@@ -107,6 +108,15 @@ Blockly.BlockDragger = function(block, workspace) {
    * @private
    */
   this.dragIconData_ = Blockly.BlockDragger.initIconData_(block);
+
+  /**
+   * Original positions of comments attached to this stack. These are used to
+   * emit one final derived comment move after the block drag settles.
+   * @type {!Array.<!Object>}
+   * @private
+   */
+  this.commentMoveData_ =
+      Blockly.ScratchBlockComment.captureBlockMoveData(block);
 };
 
 /**
@@ -118,6 +128,7 @@ Blockly.BlockDragger.prototype.dispose = function() {
   this.workspace_ = null;
   this.startWorkspace_ = null;
   this.dragIconData_.length = 0;
+  this.commentMoveData_.length = 0;
 
   if (this.draggedConnectionManager_) {
     this.draggedConnectionManager_.dispose();
@@ -256,9 +267,12 @@ Blockly.BlockDragger.prototype.endBlockDrag = function(e, currentDragDeltaXY) {
     } else {
       this.draggingBlock_.render();
     }
+    Blockly.ScratchBlockComment.finishBlockMove(
+        this.commentMoveData_, delta.x, delta.y);
     this.fitGroupAroundBlock_();
     this.draggingBlock_.scheduleSnapAndBump();
   }
+  this.commentMoveData_ = [];
   this.workspace_.setResizesEnabled(true);
 
   var toolbox = this.workspace_.getToolbox();
@@ -309,6 +323,7 @@ Blockly.BlockDragger.prototype.endBlockDrag = function(e, currentDragDeltaXY) {
 Blockly.BlockDragger.prototype.fitGroupAroundBlock_ = function() {
   var block = this.draggingBlock_.getRootBlock();
   if (block !== this.draggingBlock_) return;
+  var owner = this.workspace_.getGroupForBlock(block.id);
   var bounds = block.getBoundingRectangle();
   var x = bounds.topLeft.x;
   var y = bounds.topLeft.y;
@@ -322,14 +337,10 @@ Blockly.BlockDragger.prototype.fitGroupAroundBlock_ = function() {
       break;
     }
   }
-  if (!destination) {
-    // This lookup removes stale ownership when a stack was dragged out of its
-    // previous expanded group and dropped onto empty workspace.
-    this.workspace_.getGroupForBlock(block.id);
-    return;
+  if (owner && owner !== destination) {
+    owner.removeBlock(block.id);
   }
-  var owner = this.workspace_.getGroupForBlock(block.id, destination);
-  if (!owner) destination.fitBlock(block);
+  if (destination) destination.fitBlock(block);
 };
 
 /**
