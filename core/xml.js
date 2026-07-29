@@ -783,7 +783,15 @@ Blockly.Xml.domToBlockHeadless_ = function(xmlBlock, workspace) {
           // before positioning the comment bubble.
           setTimeout(function() {
             if (block.comment && block.comment.setVisible) {
-              block.comment.setVisible(visible == 'true');
+              // The enclosing block creation already serializes this comment.
+              // Restoring its deferred presentation state must not emit a
+              // second CommentCreate after event replay suppression ends.
+              Blockly.Events.disable();
+              try {
+                block.comment.setVisible(visible == 'true');
+              } finally {
+                Blockly.Events.enable();
+              }
             }
           }, 1);
         }

@@ -607,6 +607,10 @@ Blockly.Workspace.prototype.undo = function(redo) {
   }
   events = Blockly.Events.filter(events, redo);
   Blockly.Events.recordUndo = false;
+  var previousGroup = Blockly.Events.getGroup();
+  if (!previousGroup) {
+    Blockly.Events.setGroup(events[0].group || true);
+  }
   if (Blockly.selected) {
     Blockly.Events.disable();
     try {
@@ -620,6 +624,9 @@ Blockly.Workspace.prototype.undo = function(redo) {
       event.run(redo);
     }
   } finally {
+    if (!previousGroup) {
+      Blockly.Events.setGroup(false);
+    }
     Blockly.Events.recordUndo = true;
   }
 };

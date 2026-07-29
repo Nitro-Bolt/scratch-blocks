@@ -169,6 +169,7 @@ Blockly.Events.GroupChange.prototype.run = function(forward) {
   var workspace = this.getEventWorkspace_();
   var state = forward ? this['newState'] : this['oldState'];
   var group = workspace.getGroupById(this['groupId']);
+  var previousState = group ? group.toJSON() : null;
   Blockly.Events.disable();
   try {
     if (!state) {
@@ -188,8 +189,9 @@ Blockly.Events.GroupChange.prototype.run = function(forward) {
   var syncEvent = new Blockly.Events.GroupChange();
   syncEvent.workspaceId = this.workspaceId;
   syncEvent['groupId'] = this['groupId'];
-  syncEvent['oldState'] = state;
+  syncEvent['oldState'] = previousState;
   syncEvent['newState'] = state;
+  syncEvent.group = Blockly.Events.getGroup() || this.group;
   syncEvent.recordUndo = false;
   Blockly.Events.fire(syncEvent);
 };

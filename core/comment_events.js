@@ -282,6 +282,7 @@ Blockly.Events.CommentCreate.prototype.toJson = function() {
   if (this.xy) json['xy'] = Math.round(this.xy.x) + ',' + Math.round(this.xy.y);
   json['width'] = this.width;
   json['height'] = this.height;
+  json['colour'] = this.colour;
   return json;
 };
 
@@ -305,6 +306,7 @@ Blockly.Events.CommentCreate.prototype.fromJson = function(json) {
   }
   this.width = json['width'];
   this.height = json['height'];
+  this.colour = json['colour'] || null;
 };
 
 /**
@@ -317,8 +319,11 @@ Blockly.Events.CommentCreate.prototype.run = function(forward) {
     if (this.blockId) {
       var block = workspace.getBlockById(this.blockId);
       if (block) {
-        block.setCommentText('', this.commentId, this.xy.x, this.xy.y,
+        block.setCommentText(this.text, this.commentId, this.xy.x, this.xy.y,
             this.minimized, this.colour);
+        if (block.comment) {
+          block.comment.setSize(this.width, this.height);
+        }
       }
     } else {
       var xml = goog.dom.createDom('xml');

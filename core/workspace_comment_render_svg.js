@@ -421,22 +421,39 @@ Blockly.WorkspaceCommentSvg.prototype.applyColour_ = function() {
  * @private
  */
 Blockly.WorkspaceCommentSvg.prototype.resizeMouseDown_ = function(e) {
-  this.resizeStartSize_ = {width: this.width_, height: this.height_};
-  this.unbindDragEvents_();
-  this.workspace.setResizesEnabled(false);
   if (Blockly.utils.isRightButton(e)) {
     // No right-click.
+    Blockly.Touch.clearTouchIdentifier();
     e.stopPropagation();
     return;
   }
-  // Left-click (or middle click)
-  this.workspace.startDrag(e, new goog.math.Coordinate(
-    this.workspace.RTL ? -this.width_ : this.width_, this.height_));
 
-  this.onMouseUpWrapper_ = Blockly.bindEventWithChecks_(
-      document, 'mouseup', this, this.resizeMouseUp_);
-  this.onMouseMoveWrapper_ = Blockly.bindEventWithChecks_(
-      document, 'mousemove', this, this.resizeMouseMove_);
+  // A missed mouse-up from a previous resize must not leak its listeners or
+  // disabled workspace-resize state into the next interaction.
+  this.cancelResize_(true);
+  this.resizeStartSize_ = {width: this.width_, height: this.height_};
+  this.resizeWorkspaceResizesEnabled_ = this.workspace.resizesEnabled_;
+  this.workspace.setResizesEnabled(false);
+
+  // Left-click (or middle click)
+  try {
+    this.workspace.startDrag(e, new goog.math.Coordinate(
+      this.workspace.RTL ? -this.width_ : this.width_, this.height_));
+
+    this.onMouseUpWrapper_ = Blockly.bindEventWithChecks_(
+        document, 'mouseup', this, this.resizeMouseUp_);
+    this.onMouseMoveWrapper_ = Blockly.bindEventWithChecks_(
+        document, 'mousemove', this, this.resizeMouseMove_);
+    this.onWindowBlurWrapper_ = Blockly.bindEvent_(
+        window, 'blur', this, this.cancelResize_);
+    this.onVisibilityChangeWrapper_ = Blockly.bindEvent_(
+        document, 'visibilitychange', this, this.resizeVisibilityChange_);
+    this.onPointerCancelWrapper_ = Blockly.bindEvent_(
+        document, 'pointercancel', this, this.cancelResize_);
+  } catch (error) {
+    this.cancelResize_();
+    throw error;
+  }
   Blockly.hideChaff();
   // This event has been handled.  No need to bubble up to the document.
   e.stopPropagation();
@@ -499,6 +516,67 @@ Blockly.WorkspaceCommentSvg.prototype.unbindDragEvents_ = function() {
     Blockly.unbindEvent_(this.onMouseMoveWrapper_);
     this.onMouseMoveWrapper_ = null;
   }
+  if (this.onWindowBlurWrapper_) {
+    Blockly.unbindEvent_(this.onWindowBlurWrapper_);
+    this.onWindowBlurWrapper_ = null;
+  }
+  if (this.onVisibilityChangeWrapper_) {
+    Blockly.unbindEvent_(this.onVisibilityChangeWrapper_);
+    this.onVisibilityChangeWrapper_ = null;
+  }
+  if (this.onPointerCancelWrapper_) {
+    Blockly.unbindEvent_(this.onPointerCancelWrapper_);
+    this.onPointerCancelWrapper_ = null;
+  }
+};
+
+/**
+ * Cancel an active resize without committing its temporary dimensions.
+ * @param {boolean=} opt_preserveTouchIdentifier Whether a new pointer stream
+ *     is already replacing the resize being cancelled.
+ * @private
+ */
+Blockly.WorkspaceCommentSvg.prototype.cancelResize_ = function(
+    opt_preserveTouchIdentifier) {
+  if (opt_preserveTouchIdentifier !== true) {
+    Blockly.Touch.clearTouchIdentifier();
+  }
+  this.unbindDragEvents_();
+
+  var oldHW = this.resizeStartSize_;
+  var restoreWorkspaceResizes = this.resizeWorkspaceResizesEnabled_;
+  this.resizeStartSize_ = null;
+  this.resizeWorkspaceResizesEnabled_ = null;
+
+  if (oldHW && this.svgGroup_) {
+    var eventsWereEnabled = Blockly.Events.isEnabled();
+    if (eventsWereEnabled) {
+      Blockly.Events.disable();
+    }
+    try {
+      this.setSize(oldHW.width, oldHW.height);
+    } finally {
+      if (eventsWereEnabled) {
+        Blockly.Events.enable();
+      }
+    }
+  }
+
+  if (this.workspace && restoreWorkspaceResizes !== null) {
+    this.workspace.setResizesEnabled(restoreWorkspaceResizes);
+  }
+};
+
+/**
+ * Cancel an active resize when its document is moved into the background.
+ * @param {!Event} e Visibility change event.
+ * @private
+ */
+Blockly.WorkspaceCommentSvg.prototype.resizeVisibilityChange_ = function(e) {
+  var source = e.target || document;
+  if (source.hidden || source.visibilityState == 'hidden') {
+    this.cancelResize_();
+  }
 };
 
 /*
@@ -506,21 +584,34 @@ Blockly.WorkspaceCommentSvg.prototype.unbindDragEvents_ = function() {
  * @param {!Event} e Mouse up event.
  * @private
  */
-Blockly.WorkspaceCommentSvg.prototype.resizeMouseUp_ = function(/*e*/) {
+Blockly.WorkspaceCommentSvg.prototype.resizeMouseUp_ = function(e) {
+  if (e && (e.type == 'touchcancel' || e.type == 'pointercancel')) {
+    this.cancelResize_();
+    return;
+  }
+
   Blockly.Touch.clearTouchIdentifier();
   this.unbindDragEvents_();
   var oldHW = this.resizeStartSize_;
+  var restoreWorkspaceResizes = this.resizeWorkspaceResizesEnabled_;
   this.resizeStartSize_ = null;
-  if (this.width_ == oldHW.width && this.height_ == oldHW.height) {
+  this.resizeWorkspaceResizesEnabled_ = null;
+  if (!oldHW) {
     return;
   }
-  // Fire a change event for the new width/height after
-  // resize mouse up
-  Blockly.Events.fire(new Blockly.Events.CommentChange(
-      this, {width: oldHW.width , height: oldHW.height},
-      {width: this.width_, height: this.height_}));
 
-  this.workspace.setResizesEnabled(true);
+  try {
+    if (this.width_ != oldHW.width || this.height_ != oldHW.height) {
+      // Fire a change event for the new width/height after resize mouse up.
+      Blockly.Events.fire(new Blockly.Events.CommentChange(
+          this, {width: oldHW.width, height: oldHW.height},
+          {width: this.width_, height: this.height_}));
+    }
+  } finally {
+    if (this.workspace && restoreWorkspaceResizes !== null) {
+      this.workspace.setResizesEnabled(restoreWorkspaceResizes);
+    }
+  }
 };
 
 /**
@@ -690,6 +781,7 @@ Blockly.WorkspaceComment.prototype.setMinimized = function(minimize) {
  * @private
  */
 Blockly.WorkspaceCommentSvg.prototype.disposeInternal_ = function() {
+  this.cancelResize_();
   this.textarea_ = null;
   this.foreignObject_ = null;
   this.svgRect_ = null;

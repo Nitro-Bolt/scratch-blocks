@@ -66,6 +66,11 @@ Blockly.Group = function(workspace, options) {
   this.dragState_ = null;
   this.pressedButton_ = null;
   this.buttonReleaseWrapper_ = null;
+  this.pointerMoveListener_ = null;
+  this.pointerUpListener_ = null;
+  this.pointerCancelListener_ = null;
+  this.pointerBlurListener_ = null;
+  this.visibilityChangeListener_ = null;
   this.fitTimer_ = null;
   this.membershipTimer_ = null;
   this.workspaceChangeListener_ = this.onWorkspaceChange_.bind(this);
@@ -199,6 +204,7 @@ Blockly.Group.prototype.toJSON = function() {
  * @param {!Object} state New state.
  */
 Blockly.Group.prototype.applyState = function(state) {
+  this.cancelPointer_();
   if (this.fitTimer_) {
     clearTimeout(this.fitTimer_);
     this.fitTimer_ = null;
@@ -284,12 +290,14 @@ Blockly.Group.prototype.containsBlock = function(block) {
 
 Blockly.Group.prototype.startDrag_ = function(e) {
   if (e.button !== 0) return;
+  this.cancelPointer_();
   Blockly.ContextMenu.hide();
   e.stopPropagation();
   Blockly.utils.addClass(this.svgGroup_, 'blocklyDragging');
+  var previousBlockIds = this.blockIds.slice();
   var blocks = this.getContainedBlocks();
   this.blockIds = blocks.map(function(block) { return block.id; });
-  this.startPointer_(e, false, blocks);
+  this.startPointer_(e, false, blocks, previousBlockIds);
 };
 
 Blockly.Group.prototype.startResize_ = function(e) {
@@ -299,7 +307,9 @@ Blockly.Group.prototype.startResize_ = function(e) {
   this.startPointer_(e, true, []);
 };
 
-Blockly.Group.prototype.startPointer_ = function(e, resizing, blocks) {
+Blockly.Group.prototype.startPointer_ = function(
+    e, resizing, blocks, opt_previousBlockIds) {
+  this.cancelPointer_();
   this.bringToFront_();
   var group = this;
   var event = new Blockly.Events.GroupChange(this);
@@ -308,16 +318,105 @@ Blockly.Group.prototype.startPointer_ = function(e, resizing, blocks) {
     x: this.x, y: this.y, width: this.width, height: this.height,
     resizing: resizing, blocks: blocks,
     blockXY: blocks.map(function(block) { return block.getRelativeToSurfaceXY(); }),
+    previousBlockIds: opt_previousBlockIds || this.blockIds.slice(),
     event: event, isOutside: false};
   if (!resizing) this.moveToDragSurface_();
-  var move = function(moveEvent) { group.pointerMove_(moveEvent); };
-  var up = function(upEvent) {
-    document.removeEventListener('mousemove', move);
-    document.removeEventListener('mouseup', up);
+  this.pointerMoveListener_ = function(moveEvent) {
+    group.pointerMove_(moveEvent);
+  };
+  this.pointerUpListener_ = function(upEvent) {
+    group.unbindPointerEvents_();
     group.finishPointer_(upEvent);
   };
-  document.addEventListener('mousemove', move);
-  document.addEventListener('mouseup', up);
+  this.pointerCancelListener_ = function() {
+    group.cancelPointer_();
+  };
+  this.pointerBlurListener_ = function() {
+    group.cancelPointer_();
+  };
+  this.visibilityChangeListener_ = function() {
+    if (document.hidden || document.visibilityState == 'hidden') {
+      group.cancelPointer_();
+    }
+  };
+  document.addEventListener('mousemove', this.pointerMoveListener_);
+  document.addEventListener('mouseup', this.pointerUpListener_);
+  document.addEventListener('pointercancel', this.pointerCancelListener_);
+  document.addEventListener('touchcancel', this.pointerCancelListener_);
+  window.addEventListener('blur', this.pointerBlurListener_);
+  document.addEventListener(
+      'visibilitychange', this.visibilityChangeListener_);
+};
+
+/**
+ * Remove the document listeners for a group drag or resize.
+ * @private
+ */
+Blockly.Group.prototype.unbindPointerEvents_ = function() {
+  if (this.pointerMoveListener_) {
+    document.removeEventListener('mousemove', this.pointerMoveListener_);
+    this.pointerMoveListener_ = null;
+  }
+  if (this.pointerUpListener_) {
+    document.removeEventListener('mouseup', this.pointerUpListener_);
+    this.pointerUpListener_ = null;
+  }
+  if (this.pointerCancelListener_) {
+    document.removeEventListener(
+        'pointercancel', this.pointerCancelListener_);
+    document.removeEventListener('touchcancel', this.pointerCancelListener_);
+    this.pointerCancelListener_ = null;
+  }
+  if (this.pointerBlurListener_) {
+    window.removeEventListener('blur', this.pointerBlurListener_);
+    this.pointerBlurListener_ = null;
+  }
+  if (this.visibilityChangeListener_) {
+    document.removeEventListener(
+        'visibilitychange', this.visibilityChangeListener_);
+    this.visibilityChangeListener_ = null;
+  }
+};
+
+/**
+ * Abandon a group drag or resize without committing its changed geometry.
+ * This is used when focus is lost or the group is disposed while a snapshot
+ * replaces the workspace.
+ * @param {boolean=} opt_suppressUi Whether to skip drag-target cleanup events.
+ * @private
+ */
+Blockly.Group.prototype.cancelPointer_ = function(opt_suppressUi) {
+  this.unbindPointerEvents_();
+  var state = this.dragState_;
+  if (!state) return;
+
+  this.x = state.x;
+  this.y = state.y;
+  this.width = state.width;
+  this.height = state.height;
+  this.blockIds = state.previousBlockIds.slice();
+
+  if (state.dragSurface && this.workspace) {
+    this.moveOffDragSurface_();
+  } else {
+    state.blocks.forEach(function(block, index) {
+      if (block.workspace) {
+        block.translate(state.blockXY[index].x, state.blockXY[index].y);
+      }
+    });
+    this.render();
+  }
+  if (this.svgGroup_) {
+    Blockly.utils.removeClass(this.svgGroup_, 'blocklyDragging');
+  }
+  this.dragState_ = null;
+
+  // Clear any GUI drag target which was shown before focus was lost. These
+  // events do not mutate the workspace and are excluded from collaboration.
+  if (!opt_suppressUi && this.workspace && Blockly.Events.isEnabled()) {
+    Blockly.Events.fire(new Blockly.Events.GroupDragOutside(this, false));
+    Blockly.Events.fire(new Blockly.Events.GroupEndDrag(this, false));
+  }
 };
 
 // Move the group and its blocks to Blockly's elevated drag surface.
@@ -351,6 +450,7 @@ Blockly.Group.prototype.moveOffDragSurface_ = function() {
 
 Blockly.Group.prototype.pointerMove_ = function(e) {
   var state = this.dragState_;
+  if (!state || !this.workspace) return;
   var dx = (e.clientX - state.clientX) / this.workspace.scale;
   var dy = (e.clientY - state.clientY) / this.workspace.scale;
   if (state.resizing) {
@@ -381,6 +481,7 @@ Blockly.Group.prototype.pointerMove_ = function(e) {
  * @param {Event=} e Mouse-up event.
  */
 Blockly.Group.prototype.finishPointer_ = function(e) {
+  this.unbindPointerEvents_();
   var state = this.dragState_;
   if (!state) return;
   this.moveOffDragSurface_();
@@ -629,6 +730,22 @@ Blockly.Group.prototype.fitOwnedBlocks_ = function() {
  * @param {Blockly.Events.Abstract=} event Workspace event.
  */
 Blockly.Group.prototype.onWorkspaceChange_ = function(event) {
+  if (event && event.type == Blockly.Events.DELETE) {
+    var deletedIds = Array.isArray(event.ids) ? event.ids :
+        (event.blockId ? [event.blockId] : []);
+    var remainingIds = this.blockIds.filter(function(id) {
+      return deletedIds.indexOf(id) === -1;
+    });
+    if (remainingIds.length !== this.blockIds.length) {
+      var membershipEvent = new Blockly.Events.GroupChange(this);
+      membershipEvent.recordOld(this);
+      this.blockIds = remainingIds;
+      membershipEvent.recordNew(this);
+      membershipEvent.group = event.group;
+      Blockly.Events.fire(membershipEvent);
+    }
+    return;
+  }
   if (this.collapsed || this.dragState_ ||
       (this.workspace.isDragging && this.workspace.isDragging())) return;
   if (event) {
@@ -827,6 +944,7 @@ Blockly.Group.prototype.showContextMenu_ = function(e) {
 
 Blockly.Group.prototype.dispose = function(fireEvent) {
   if (!this.workspace) return;
+  this.cancelPointer_(true);
   clearTimeout(this.fitTimer_);
   clearTimeout(this.membershipTimer_);
   if (this.buttonReleaseWrapper_) {

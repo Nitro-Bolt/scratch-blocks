@@ -195,6 +195,16 @@ Blockly.Events.fire = function(event) {
   if (!Blockly.Events.isEnabled()) {
     return;
   }
+  // Blockly dispatches its event queue on a later task. Preserve the VM target
+  // represented by this workspace now, before the editor can switch sprites.
+  // This value is intentionally not part of toJson(); collaboration uses its
+  // canonical target reference around the Blockly event instead.
+  if (!event.targetId && event.workspaceId) {
+    var workspace = Blockly.Workspace.getById(event.workspaceId);
+    if (workspace && workspace.vmTargetId) {
+      event.targetId = workspace.vmTargetId;
+    }
+  }
   if (!Blockly.Events.FIRE_QUEUE_.length) {
     // First event added; schedule a firing of the event queue.
     setTimeout(Blockly.Events.fireNow_, 0);

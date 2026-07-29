@@ -84,6 +84,32 @@ Blockly.WorkspaceCommentSvg = function(workspace, content, height, width, minimi
   this.useDragSurface_ =
       Blockly.utils.is3dSupported() && !!workspace.blockDragSurface_;
 
+  /**
+   * Size of the comment before an in-progress resize, or null when idle.
+   * @type {?{width: number, height: number}}
+   * @private
+   */
+  this.resizeStartSize_ = null;
+
+  /**
+   * Whether workspace resizes were enabled before an in-progress comment
+   * resize.
+   * @type {?boolean}
+   * @private
+   */
+  this.resizeWorkspaceResizesEnabled_ = null;
+
+  /**
+   * Document and window event wrappers installed for an in-progress resize.
+   * @type {!Array.<!Array>}
+   * @private
+   */
+  this.onMouseUpWrapper_ = null;
+  this.onMouseMoveWrapper_ = null;
+  this.onWindowBlurWrapper_ = null;
+  this.onVisibilityChangeWrapper_ = null;
+  this.onPointerCancelWrapper_ = null;
+
   Blockly.WorkspaceCommentSvg.superClass_.constructor.call(this,
       workspace, content, height, width, minimized, opt_id, opt_colour);
 
@@ -486,6 +512,7 @@ Blockly.WorkspaceCommentSvg.prototype.setMovable = function(movable) {
  * @package
  */
 Blockly.WorkspaceCommentSvg.prototype.setDragging = function(adding) {
+  if (!this.svgGroup_) return;
   if (adding) {
     var group = this.getSvgRoot();
     group.translate_ = '';
@@ -535,6 +562,7 @@ Blockly.WorkspaceCommentSvg.prototype.setText = function(text) {
  * @package
  */
 Blockly.WorkspaceCommentSvg.prototype.setDeleteStyle = function(enable) {
+  if (!this.svgGroup_) return;
   if (enable) {
     Blockly.utils.addClass(
         /** @type {!Element} */ (this.svgGroup_), 'blocklyDraggingDelete');

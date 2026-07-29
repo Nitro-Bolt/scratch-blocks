@@ -2527,9 +2527,24 @@ Blockly.WorkspaceSvg.prototype.setToolboxRefreshEnabled = function(enabled) {
  * Dispose of all blocks in workspace, with an optimization to prevent resizes.
  */
 Blockly.WorkspaceSvg.prototype.clear = function() {
+  // A collaboration snapshot may replace the workspace while the local user
+  // is still dragging.  End that gesture while its block/comment still has a
+  // live SVG node so the document-level listeners cannot act on disposed
+  // objects.  Clearing is not a user move, so suppress the drag's final event.
+  if (this.currentGesture_) {
+    Blockly.Events.disable();
+    try {
+      this.cancelCurrentGesture();
+    } finally {
+      Blockly.Events.enable();
+    }
+  }
   this.setResizesEnabled(false);
-  Blockly.WorkspaceSvg.superClass_.clear.call(this);
-  this.setResizesEnabled(true);
+  try {
+    Blockly.WorkspaceSvg.superClass_.clear.call(this);
+  } finally {
+    this.setResizesEnabled(true);
+  }
 };
 
 /**

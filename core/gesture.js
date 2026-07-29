@@ -46,9 +46,6 @@ goog.require('goog.math.Coordinate');
  * Note: In this file "start" refers to touchstart, mousedown, and pointerstart
  * events.  "End" refers to touchend, mouseup, and pointerend events.
  */
-// TODO: Consider touchcancel/pointercancel.
-
-
 /**
  * Class for one gesture.
  * @param {!Event} e The event that kicked off this gesture.
@@ -188,6 +185,29 @@ Blockly.Gesture = function(e, creatorWorkspace) {
   this.onUpWrapper_ = null;
 
   /**
+   * A handle to use to unbind a window blur listener at the end of a drag.
+   * @type {Array.<!Array>}
+   * @private
+   */
+  this.onWindowBlurWrapper_ = null;
+
+  /**
+   * A handle to use to unbind a document visibility listener at the end of a
+   * drag.
+   * @type {Array.<!Array>}
+   * @private
+   */
+  this.onVisibilityChangeWrapper_ = null;
+
+  /**
+   * A handle to use to unbind a pointer cancellation listener at the end of a
+   * drag.
+   * @type {Array.<!Array>}
+   * @private
+   */
+  this.onPointerCancelWrapper_ = null;
+
+  /**
    * The object tracking a bubble drag, or null if none is in progress.
    * @type {Blockly.BubbleDragger}
    * @private
@@ -258,9 +278,23 @@ Blockly.Gesture.prototype.dispose = function() {
 
   if (this.onMoveWrapper_) {
     Blockly.unbindEvent_(this.onMoveWrapper_);
+    this.onMoveWrapper_ = null;
   }
   if (this.onUpWrapper_) {
     Blockly.unbindEvent_(this.onUpWrapper_);
+    this.onUpWrapper_ = null;
+  }
+  if (this.onWindowBlurWrapper_) {
+    Blockly.unbindEvent_(this.onWindowBlurWrapper_);
+    this.onWindowBlurWrapper_ = null;
+  }
+  if (this.onVisibilityChangeWrapper_) {
+    Blockly.unbindEvent_(this.onVisibilityChangeWrapper_);
+    this.onVisibilityChangeWrapper_ = null;
+  }
+  if (this.onPointerCancelWrapper_) {
+    Blockly.unbindEvent_(this.onPointerCancelWrapper_);
+    this.onPointerCancelWrapper_ = null;
   }
 
 
@@ -539,6 +573,12 @@ Blockly.Gesture.prototype.bindMouseEvents = function(e) {
       document, 'mousemove', null, this.handleMove.bind(this));
   this.onUpWrapper_ = Blockly.bindEventWithChecks_(
       document, 'mouseup', null, this.handleUp.bind(this));
+  this.onWindowBlurWrapper_ = Blockly.bindEvent_(
+      window, 'blur', this, this.cancelAndFlush_);
+  this.onVisibilityChangeWrapper_ = Blockly.bindEvent_(
+      document, 'visibilitychange', this, this.handleVisibilityChange_);
+  this.onPointerCancelWrapper_ = Blockly.bindEvent_(
+      document, 'pointercancel', this, this.cancelAndFlush_);
 
   e.preventDefault();
   e.stopPropagation();
@@ -576,6 +616,13 @@ Blockly.Gesture.prototype.handleMove = function(e) {
  * @package
  */
 Blockly.Gesture.prototype.handleUp = function(e) {
+  if (e.type == 'touchcancel' || e.type == 'pointercancel') {
+    this.cancelAndFlush_();
+    e.preventDefault();
+    e.stopPropagation();
+    return;
+  }
+
   this.updateFromEvent_(e);
   Blockly.longStop_();
 
@@ -611,6 +658,33 @@ Blockly.Gesture.prototype.handleUp = function(e) {
   e.stopPropagation();
 
   this.dispose();
+};
+
+/**
+ * Finish a gesture at its last valid pointer position and synchronously
+ * deliver the resulting events. Background tabs can defer timers and lose the
+ * corresponding mouseup, so leaving the gesture alive would allow a stale
+ * release to commit much later.
+ * @private
+ */
+Blockly.Gesture.prototype.cancelAndFlush_ = function() {
+  if (this.isEnding_) {
+    return;
+  }
+  this.cancel();
+  if (Blockly.Events.isEnabled() && Blockly.Events.FIRE_QUEUE_.length) {
+    Blockly.Events.fireNow_();
+  }
+};
+
+/**
+ * Finish an active gesture when its document becomes hidden.
+ * @private
+ */
+Blockly.Gesture.prototype.handleVisibilityChange_ = function() {
+  if (document.hidden || document.visibilityState == 'hidden') {
+    this.cancelAndFlush_();
+  }
 };
 
 /**
@@ -757,9 +831,11 @@ Blockly.Gesture.prototype.doInputClick_ = function() {
  * @private
  */
 Blockly.Gesture.prototype.doBlockClick_ = function() {
-  // For jumping to custom block definition if middle mouse button is used or if shift is held
+  // For jumping to custom block definition if middle mouse button is used or
+  // if shift is held.
   // Below code is a slight modification of:
-  // https://github.com/TurboWarp/scratch-gui/blob/552dc5584164989d9752e847c23833bf057430f4/src/addons/addons/jump-to-def/userscript.js#L14
+  // https://github.com/TurboWarp/scratch-gui/blob/552dc5584164989d9752e847c23833bf057430f4/
+  // src/addons/addons/jump-to-def/userscript.js#L14
   if (this.mostRecentEvent_.button === 1 || this.mostRecentEvent_.shiftKey) {
     var block = this.startBlock_;
     for (; block; block = block.getSurroundParent()) {
