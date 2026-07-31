@@ -387,6 +387,26 @@ Blockly.ContextMenu.blockMakeSpaceOption = function(block) {
 };
 
 /**
+ * Make a context menu option for inspecting the current block.
+ * @param {!Blockly.BlockSvg} block The block where the right-click originated.
+ * @return {!Object} A menu option, containing text, enabled, and a callback.
+ * @package
+ */
+Blockly.ContextMenu.blockInspectOption = function(block) {
+  var inspectOption = {
+    text: Blockly.Msg.INSPECT_BLOCK,
+    enabled: true,
+    callback: function() {
+      if (Blockly.inspectBlockCallback) {
+        Blockly.inspectBlockCallback(block);
+      }
+    },
+    separator: true
+  };
+  return inspectOption;
+};
+
+/**
  * Make a context-menu option which fits a new group around this block stack.
  * @param {!Blockly.BlockSvg} block Block where the menu originated.
  * @return {!Object} Context-menu option.

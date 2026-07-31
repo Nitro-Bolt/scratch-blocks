@@ -417,6 +417,15 @@ Blockly.statusButtonCallback = function(id) {
 };
 
 /**
+ * A callback for inspecting a block. The window.alert is here for testing and
+ * should be overridden.
+ * @param {!Blockly.BlockSvg} block The block to inspect.
+ */
+Blockly.inspectBlockCallback = function(block) {
+  window.alert('block was inspected for ' + block.type);
+};
+
+/**
  * Refresh the visual state of a status button in all extension category headers.
  * @param {Blockly.Workspace} workspace A workspace.
  */
