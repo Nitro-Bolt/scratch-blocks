@@ -743,7 +743,7 @@ Blockly.BlockSvg.prototype.showContextMenu_ = function(e) {
     menuOptions.push.apply(menuOptions, switchOptions);
   }
 
-  if (!block.isInFlyout) {
+  if (!block.isInFlyout && !this.workspace.options.disableInspectBlock) {
     menuOptions.push(Blockly.ContextMenu.blockInspectOption(this));
   }
 
