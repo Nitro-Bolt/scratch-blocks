@@ -362,6 +362,7 @@ Blockly.Msg["EXPAND_X_BLOCKS"] = "Expand %1 Blocks";
 Blockly.Msg["SWITCH_BLOCK"] = "Switch to %1";
 Blockly.Msg["CLEAN_UP"] = "Clean up Blocks";
 Blockly.Msg["MAKE_SPACE"] = "Make Space";
+Blockly.Msg["INSPECT_BLOCK"] = "Inspect Block";
 Blockly.Msg["HELP"] = "Help";
 Blockly.Msg["UNDO"] = "Undo";
 Blockly.Msg["REDO"] = "Redo";
