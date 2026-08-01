@@ -1012,6 +1012,10 @@ Blockly.ScratchBlocks.ProcedureUtils.getUniqueArgumentName_ = function(
  */
 Blockly.ScratchBlocks.ProcedureUtils.argumentNameValidator_ = function(
     proposedName) {
+  if (!proposedName || !proposedName.trim()) {
+    return null;
+  }
+
   var argumentBlock = this.sourceBlock_;
   var declaration = argumentBlock && argumentBlock.parentBlock_;
   if (!declaration || declaration.type != 'procedures_declaration') {

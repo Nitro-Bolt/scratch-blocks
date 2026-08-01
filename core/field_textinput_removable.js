@@ -60,6 +60,21 @@ Blockly.FieldTextInputRemovable.prototype.init = function() {
 };
 
 /**
+ * Reject empty removable text fields. Procedure labels and argument names use
+ * this field, and an empty value causes the declaration rebuild to remove them.
+ * @param {string} text The proposed field text.
+ * @return {?string} The text, or null when it is empty or whitespace-only.
+ */
+Blockly.FieldTextInputRemovable.prototype.classValidator = function(text) {
+  var validated = Blockly.FieldTextInputRemovable.superClass_.classValidator.
+      call(this, text);
+  if (validated === null || !validated || !validated.trim()) {
+    return null;
+  }
+  return validated;
+};
+
+/**
  * Show the inline free-text editor on top of the text with the remove button.
  * @private
  */
