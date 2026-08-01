@@ -42,9 +42,6 @@ jobs:
       - name: Update Translations
         run: npm run translate
 
-      - name: Run Prepublish
-        run: npm run prepublish
-
       - name: Commit and Push Build
         run: |
           git config --local user.name "GitHub Action"
