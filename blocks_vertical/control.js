@@ -568,8 +568,14 @@ Blockly.Blocks['control_all_at_once'] = {
    */
   init: function() {
     this.jsonInit({
-      "message0": Blockly.Msg.CONTROL_ALLATONCE,
-      "message1": "%1", // Statement
+      "message0": "run without screen refresh %1",
+      "message1": "%1",
+      "args0": [
+        {
+          "type": "field_checkbox",
+          "name": "CHECKBOX"
+        }
+      ],
       "args1": [
         {
           "type": "input_statement",
