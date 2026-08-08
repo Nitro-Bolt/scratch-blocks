@@ -1298,8 +1298,8 @@ Blockly.Block.prototype.appendValueInput = function(name, opt_position) {
  */
 Blockly.Block.prototype.appendStatementInput = function(name, opt_position) {
   let output = this.appendInput_(Blockly.NEXT_STATEMENT, name, opt_position);
-  output.setCheck("normal")
-  return output
+  output.setCheck("normal");
+  return output;
 };
 
 /**
@@ -1539,7 +1539,7 @@ Blockly.Block.prototype.appendArgsList = function(
   var opt_namePrefix = options.namePrefix;
   var opt_populate = options.populate;
   var opt_isExtendable = options.isExtendable;
-  
+
   // Add last dummy input if needed.
   var dummyInput;
   if (elements.length && (typeof elements[elements.length - 1] == 'string' ||
@@ -1841,8 +1841,12 @@ Blockly.Block.prototype.removeNumberedInput = function(inputIndex, opt_quiet) {
     input.connection.setShadowDom(null);
     var block = input.connection.targetBlock();
     if (block.isShadow()) {
-      // Destroy any attached shadow block.
-      block.dispose();
+      Blockly.Events.disable();
+      try {
+        block.dispose();
+      } finally {
+        Blockly.Events.enable();
+      }
     } else {
       // Disconnect any attached normal block.
       block.unplug();
