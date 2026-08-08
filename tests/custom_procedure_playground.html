@@ -49,6 +49,7 @@
         <button id="boolean" onclick="addBoolean()">Add boolean input</button>
         <button id="object" onclick="addObject()">Add object input</button>
         <button id="array" onclick="addArray()">Add array input</button>
+        <button id="color" onclick="addColor()">Add color input</button>
         <button id="statement" onclick="addStatement()">Add statement input</button>
         <button id="label" onclick="addLabel()">Add label</button>
         <button id="cancelButton" onclick="cancel()">cancel</button>
@@ -219,6 +220,10 @@
       mutationRoot.addArrayExternal();
     }
 
+    function addColor() {
+      mutationRoot.addColorExternal();
+    }
+
     function addStatement() {
       mutationRoot.addStatementExternal();
     }
@@ -235,7 +240,7 @@
     }
 
     function addRandomInput() {
-      var rnd = Math.floor(Math.random() * 5);
+      var rnd = Math.floor(Math.random() * 6);
       switch (rnd) {
         case 0:
           addTextNumber();
@@ -251,6 +256,9 @@
           break;
         case 4:
           addArray();
+          break;
+        case 5:
+          addColor();
           break;
       }
     }

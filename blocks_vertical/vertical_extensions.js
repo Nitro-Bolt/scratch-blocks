@@ -170,6 +170,19 @@ Blockly.ScratchBlocks.VerticalExtensions.OUTPUT_ARRAY = function() {
 };
 
 /**
+ * Extension to make represent a colour reporter in Scratch-Blocks.
+ * That means the block has inline inputs, a round output shape, and a 'Colour'
+ * output type.
+ * @this {Blockly.Block}
+ * @readonly
+ */
+Blockly.ScratchBlocks.VerticalExtensions.OUTPUT_COLOUR = function() {
+  this.setInputsInline(true);
+  this.setOutputShape(Blockly.OUTPUT_SHAPE_ROUND);
+  this.setOutput(true, 'Colour');
+};
+
+/**
  * Mixin to add a context menu for a procedure definition block.
  * It adds the "edit" option and removes the "duplicate" option.
  * @mixin
@@ -295,6 +308,8 @@ Blockly.ScratchBlocks.VerticalExtensions.registerAll = function() {
       Blockly.ScratchBlocks.VerticalExtensions.OUTPUT_OBJECT);
   Blockly.Extensions.register('output_array',
       Blockly.ScratchBlocks.VerticalExtensions.OUTPUT_ARRAY);
+  Blockly.Extensions.register('output_colour',
+      Blockly.ScratchBlocks.VerticalExtensions.OUTPUT_COLOUR);
 
   // Custom procedures have interesting context menus.
   Blockly.Extensions.registerMixin('procedure_def_contextmenu',
