@@ -407,7 +407,12 @@ Blockly.ScratchBlocks.ProcedureUtils.deleteShadows_ = function(connectionMap) {
       if (saveInfo) {
         var block = saveInfo['block'];
         if (block && block.isShadow()) {
-          block.dispose();
+          Blockly.Events.disable();
+          try {
+            block.dispose();
+          } finally {
+            Blockly.Events.enable();
+          }
           connectionMap[id] = null;
           // At this point we know which shadow DOMs are about to be orphaned in
           // the VM.  What do we do with that information?
