@@ -27,7 +27,10 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '21'
-          cache: npm
+          cache: pnpm
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
 
       - name: Set up Java
         uses: actions/setup-java@v4
@@ -37,10 +40,13 @@ jobs:
           java-package: 'jre'
 
       - name: Install Dependencies
-        run: npm ci
+        run: pnpm install --frozen-lockfile
+
+      - name: Build
+        run: pnpm run prepublish
 
       - name: Update Translations
-        run: npm run translate
+        run: pnpm run translate
 
       - name: Commit and Push Build
         run: |
@@ -54,7 +60,7 @@ jobs:
             blocks_compressed.js \
             blockly_uncompressed_vertical.js \
             package.json \
-            package-lock.json \
+            pnpm-lock.yaml \
             ../build-output/
 
           git fetch origin develop-builds
