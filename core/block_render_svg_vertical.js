@@ -1458,7 +1458,13 @@ Blockly.BlockSvg.prototype.renderDrawRight_ = function(steps,
       // Subtract CORNER_RADIUS * 2 to account for the top right corner
       // and also the bottom right corner. Only move vertically the non-corner length.
       if (!this.edgeShape_ || hasStatementInputs) {
-        steps.push('v', row.height - Blockly.BlockSvg.CORNER_RADIUS * 2);
+        if (y == inputRows.length - 1) {
+          // Consecutive rows share their corners, which leaves the right edge
+          // short by CORNER_RADIUS per extra row.
+          steps.push('V', cursorY + row.height - Blockly.BlockSvg.CORNER_RADIUS);
+        } else {
+          steps.push('v', row.height - Blockly.BlockSvg.CORNER_RADIUS * 2);
+        }
       }
       prevRowWidth = cursorX;
     } else if (row.type == Blockly.NEXT_STATEMENT) {
@@ -1553,7 +1559,14 @@ Blockly.BlockSvg.prototype.renderDrawRight_ = function(steps,
       // Subtract CORNER_RADIUS * 2 to account for the top right corner
       // and also the bottom right corner. Only move vertically the non-corner length.
       if (!this.edgeShape_ || hasStatementInputs) {
-        steps.push('v', row.height - Blockly.BlockSvg.CORNER_RADIUS * 2);
+        if (y == inputRows.length - 1) {
+          // Consecutive rows share their corners, which leaves the right edge
+          // short by CORNER_RADIUS per extra row. Stretch the last row to the
+          // block's full height so the bottom edge lines up with cursorY.
+          steps.push('V', cursorY + row.height - Blockly.BlockSvg.CORNER_RADIUS);
+        } else {
+          steps.push('v', row.height - Blockly.BlockSvg.CORNER_RADIUS * 2);
+        }
       }
       prevRowWidth = cursorX;
     }

@@ -181,6 +181,46 @@ Blockly.Blocks['extension_nested_extendable_inputs_test'] = {
   }
 };
 
+Blockly.Blocks['extension_nested_extendable_newlines_test'] = {
+  /**
+   * @this Blockly.Block
+   */
+  init: function() {
+    this.jsonInit({
+      "message0": "newlines nested extendable test:\n%1 asd",
+      "args0": [
+        {
+          "type": "extendable",
+          "name": "EXTENDABLE",
+          "args": [
+            {
+              "type": "extendable",
+              "name": "EXTENDABLE",
+              "args": [
+                {
+                  "type": "field_image",
+                  "src": Blockly.mainWorkspace.options.pathToMedia + "extensions/pen-block-icon.svg",
+                  "width": 40,
+                  "height": 40
+                },
+              ],
+              "separator": [""],
+              "minInputs": 0,
+              "maxInputs": 100,
+            },
+          ],
+          "separator": ["\n"],
+          "collapser": "EMPTY",
+          "minInputs": 0,
+          "maxInputs": 100,
+        },
+      ],
+      "category": Blockly.Categories.more,
+      "extensions": ["colours_more", "output_array"]
+    });
+  }
+};
+
 Blockly.Blocks['extension_recursive_extendable_test'] = {
   /**
    * @this Blockly.Block
