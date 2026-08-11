@@ -1,6 +1,7 @@
 {
   "name": "scratch-blocks",
   "version": "0.1.0",
+  "packageManager": "pnpm@10.33.0",
   "description": "Scratch Blocks is a library for building creative computing interfaces.",
   "author": "Massachusetts Institute of Technology",
   "license": "GPL-3.0",
@@ -16,13 +17,13 @@
     "prepublish": "node build && webpack",
     "test:unit": "node tests/jsunit/test_runner.js",
     "test:lint": "eslint .",
-    "test:messages": "npm run translate && node i18n/test_scratch_msgs.js",
-    "test": "npm run test:messages && npm run test:unit",
+    "test:messages": "pnpm run translate && node i18n/test_scratch_msgs.js",
+    "test": "pnpm run test:messages && pnpm run test:unit",
     "version": "json -f package.json -I -e \"this.repository.sha = '$(git log -n1 --pretty=format:%H)'\"",
     "translate": "node i18n/js_to_json.js && node i18n/json_to_js.js",
     "translate:sync:src": "tx-push-src scratch-editor blocks msg/json/en.json",
     "translate:sync:translations": "node i18n/sync_tx_translations.js",
-    "translate:update": "npm run translate:sync:src && npm run translate:sync:translations"
+    "translate:update": "pnpm run translate:sync:src && pnpm run translate:sync:translations"
   },
   "dependencies": {
     "exports-loader": "0.7.0",
@@ -48,5 +49,11 @@
     "webpack": "4.47.0",
     "webpack-cli": "3.3.12",
     "which": "^4.0.0"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "chromedriver",
+      "core-js"
+    ]
   }
 }
