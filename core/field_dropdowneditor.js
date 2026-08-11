@@ -50,13 +50,13 @@ goog.inherits(Blockly.FieldDropdownEditor, Blockly.FieldTextDropdown);
 
 Blockly.FieldDropdownEditor.prototype.init = function() {
   Blockly.FieldDropdownEditor.superClass_.init.call(this);
-  
+
   this.arrow_.setAttributeNS('http://www.w3.org/1999/xlink',
-    'xlink:href',
-    Blockly.mainWorkspace.options.pathToMedia + 'dropdown-arrow.svg');
+      'xlink:href',
+      Blockly.mainWorkspace.options.pathToMedia + 'dropdown-arrow.svg');
 
   this.textElement_.classList.add('blocklyEditableLabel');
-}
+};
 
 /**
  * Construct a FieldDropdownEditor from a JSON arg object,
@@ -84,9 +84,12 @@ Blockly.FieldDropdownEditor.prototype.removeCallback_ = function() {
 };
 
 /**
- * 
+ *
  */
 Blockly.FieldDropdownEditor.prototype.showEditor_ = function() {
+  if (this.dropDownOpen_) {
+    return;
+  }
   Blockly.FieldDropdownEditor.superClass_.showEditor_.call(this);
 
   // Remember the active procedure input so newly added inputs can be inserted
@@ -197,14 +200,14 @@ Blockly.FieldDropdownEditor.prototype.showDropdown_ = function() {
     Blockly.bindEvent_(input, 'mousedown', null, function(e) {
       e.stopPropagation();
     });
-    Blockly.bindEvent_(input, 'input', null, function(e) {
+    Blockly.bindEvent_(input, 'input', null, function() {
       var opt = thisField.menuGenerator_[index];
       opt[0] = input.value;
       opt[1] = input.value;
-      
+
       thisField.sourceBlock_.parentBlock_.onChangeFn();
     });
-    Blockly.bindEvent_(image, 'click', null, function(e) {
+    Blockly.bindEvent_(image, 'click', null, function() {
       // Only set option to null to not break indexes.
       thisField.menuGenerator_[index] = null;
       thisField.sourceBlock_.parentBlock_.onChangeFn();
@@ -264,9 +267,6 @@ Blockly.FieldDropdownEditor.prototype.showDropdown_ = function() {
   Blockly.DropDownDiv.setBoundsElement(this.sourceBlock_.workspace.getParentSvg().parentNode);
   Blockly.DropDownDiv.show(
       this, primaryX, primaryY, secondaryX, secondaryY, this.onHide.bind(this));
-
-  menu.setAllowAutoFocus(true);
-  menuDom.focus();
 };
 
 /**
@@ -276,6 +276,6 @@ Blockly.FieldDropdownEditor.prototype.onHide = function() {
   this.dropDownOpen_ = false;
   // Clear out any deleted options
   this.menuGenerator_ = this.menuGenerator_.filter(Boolean);
-}
+};
 
 Blockly.Field.register('field_dropdowneditor', Blockly.FieldDropdownEditor);
