@@ -188,7 +188,9 @@ Blockly.FieldTextDropdown.prototype.isOptionListDynamic = Blockly.FieldDropdown.
  * @param {number} x X position the arrow is being rendered at, in px.
  * @return {number} Amount of space the arrow is taking up, in px.
  */
-Blockly.FieldTextDropdown.prototype.positionArrow = Blockly.FieldDropdown.prototype.positionArrow;
+Blockly.FieldTextDropdown.prototype.positionArrow = function(x) {
+  return Blockly.FieldDropdown.prototype.positionArrow.call(this, x);
+};
 
 /**
  * Create the dropdown menu.
