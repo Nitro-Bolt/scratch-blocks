@@ -531,10 +531,6 @@ Blockly.Css.CONTENT = [
     'fill: $colour_textFieldText;',
   '}',
 
-  '.blocklyEditableText>.blocklyEditableLabel {',
-    'fill: #fff;',
-  '}',
-
   '.blocklyDropdownText {',
     'fill: $colour_text !important;',
   '}',

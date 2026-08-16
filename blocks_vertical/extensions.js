@@ -315,8 +315,29 @@ Blockly.Blocks['extension_extendable_reporter_test'] = {
   }
 };
 
-
-
+Blockly.Blocks['extension_text_dropdown'] = {
+  /**
+   * @this Blockly.Block
+   */
+  init: function() {
+    this.jsonInit({
+      "message0": "text dropdown %1",
+      "args0": [
+        {
+          "type": "field_textdropdown",
+          "name": "MENU",
+          "options": [
+            ["option 1", "option 1"],
+            ["option 2", "option 2"],
+            ["option 3", "option 3"]
+          ]
+        },
+      ],
+      "category": Blockly.Categories.more,
+      "extensions": ["colours_more", "shape_statement"]
+    });
+  }
+};
 
 Blockly.Blocks['extension_pen_down'] = {
   /**
