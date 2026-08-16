@@ -81,10 +81,11 @@ Blockly.FieldTextDropdown.prototype.init = function() {
     return;
   }
   Blockly.FieldTextDropdown.superClass_.init.call(this);
-  // Text dropdowns should look like a text field: a white background with
-  // rounded corners so it matches the editor that appears when typing.
+  // Text dropdowns should look like a text field.
   if (this.box_) {
     this.box_.setAttribute('fill', Blockly.Colours.textField);
+    this.box_.setAttribute('stroke', this.sourceBlock_.getColourSecondary());
+    this.box_.setAttribute('stroke-width', 1);
     this.box_.setAttribute('rx', Blockly.BlockSvg.TEXT_FIELD_CORNER_RADIUS);
     this.box_.setAttribute('ry', Blockly.BlockSvg.TEXT_FIELD_CORNER_RADIUS);
   }
