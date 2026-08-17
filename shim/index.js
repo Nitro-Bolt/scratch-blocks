@@ -1,7 +1,7 @@
 /**
- * Webpack shim module
+ * Rspack shim module
  *
- * Uses webpack imports-loader and exports-loader to provide the horizontal and
+ * Uses imports-loader and exports-loader to provide the horizontal and
  * vertical flavors of Blockly.  All of the other files in this directory shim
  * Blockly and goog between blockly_compressed_* and blocks_compressed*.
  *

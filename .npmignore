@@ -7,7 +7,7 @@
 /.github
 /.tx
 /tests
-/webpack.config.js
+/rspack.config.js
 
 # Localization / I18N
 common.pyc
