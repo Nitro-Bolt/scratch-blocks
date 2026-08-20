@@ -44,6 +44,7 @@ goog.require('Blockly.FieldColourSlider');
 //goog.require('Blockly.FieldDate');
 goog.require('Blockly.FieldDropdown');
 goog.require('Blockly.FieldDropdownEditor');
+goog.require('Blockly.FieldDependentDropdown');
 goog.require('Blockly.FieldExtendable');
 goog.require('Blockly.FieldIconMenu');
 goog.require('Blockly.FieldImage');
