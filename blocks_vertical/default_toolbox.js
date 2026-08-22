@@ -246,7 +246,7 @@ Blockly.Blocks.defaultToolbox = '<xml id="toolbox-categories" style="display: no
     '</block>' +
     '<block type="sound_setvolumeto" id="sound_setvolumeto">' +
       '<value name="VOLUME">' +
-        '<shadow type="math_number">' +
+        '<shadow type="math_slider">' +
           '<field name="NUM">100</field>' +
         '</shadow>' +
       '</value>' +

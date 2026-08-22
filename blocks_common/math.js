@@ -157,3 +157,31 @@ Blockly.Blocks['math_angle'] = {
     });
   }
 };
+
+Blockly.Blocks['math_slider'] = {
+  /**
+   * Number value block with a slider picker.
+   * @this Blockly.Block
+   */
+  init: function() {
+    this.jsonInit({
+      "message0": "%1",
+      "args0": [
+        {
+          "type": "field_slider",
+          "name": "NUM",
+          "value": 50,
+          "min": 0,
+          "max": 100,
+          "precision": 1
+        }
+      ],
+      "output": "Number",
+      "outputShape": Blockly.OUTPUT_SHAPE_ROUND,
+      "colour": Blockly.Colours.textField,
+      "colourSecondary": Blockly.Colours.textField,
+      "colourTertiary": Blockly.Colours.textField,
+      "colourQuaternary": Blockly.Colours.textField
+    });
+  }
+};

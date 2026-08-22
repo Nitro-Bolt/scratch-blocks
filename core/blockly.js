@@ -49,6 +49,7 @@ goog.require('Blockly.FieldExtendable');
 goog.require('Blockly.FieldIconMenu');
 goog.require('Blockly.FieldImage');
 goog.require('Blockly.FieldNote');
+goog.require('Blockly.FieldSlider');
 goog.require('Blockly.FieldTextInput');
 goog.require('Blockly.FieldTextInputRemovable');
 goog.require('Blockly.FieldTextDropdown');
