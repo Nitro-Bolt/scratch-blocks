@@ -695,3 +695,66 @@ Blockly.Blocks['json_foreach_index'] = {
     });
   }
 };
+
+Blockly.Blocks['json_map'] = {
+  /**
+   * Block to map each item and index in array.
+   * @this Blockly.Block
+   */
+  init: function() {
+    this.jsonInit({
+      "message0": Blockly.Msg.JSON_MAP,
+      "args0": [
+        {
+          "type": "input_value",
+          "name": "ARRAY",
+          "check": "Array"
+        },
+        {
+          "type": "input_value",
+          "name": "VALUE"
+        },
+        {
+          "type": "input_value",
+          "name": "INDEX"
+        },
+        {
+          "type": "input_value",
+          "name": "METHOD"
+        },
+      ],
+      "category": Blockly.Categories.json,
+      "extensions": ["colours_json", "output_array"],
+    });
+  }
+};
+
+Blockly.Blocks['json_map_value'] = {
+  /**
+   * @this Blockly.Block
+   */
+  init: function() {
+    this.jsonInit({
+      "message0": Blockly.Msg.JSON_FOREACH_VALUE,
+      "output": null,
+      "outputShape": Blockly.OUTPUT_SHAPE_ROUND,
+      "category": Blockly.Categories.json,
+      "duplicateOnDrag": true,
+      "extensions": ["colours_json"],
+    });
+  }
+};
+
+Blockly.Blocks['json_map_index'] = {
+  /**
+   * @this Blockly.Block
+   */
+  init: function() {
+    this.jsonInit({
+      "message0": Blockly.Msg.JSON_FOREACH_INDEX,
+      "category": Blockly.Categories.json,
+      "duplicateOnDrag": true,
+      "extensions": ["colours_json", "output_number"]
+    });
+  }
+};
