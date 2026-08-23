@@ -185,10 +185,13 @@ Blockly.FieldTextDropdown.prototype.setText = function(text) {
 };
 
 /**
+ * Border radius for drawing this field, called when rendering the owning shadow block.
  * @return {Number} Border radius in px.
- * @override
- */
-Blockly.FieldTextDropdown.prototype.getBorderRadius = function() {
+*/
+Blockly.FieldTextInput.prototype.getBorderRadius = function() {
+  if (this.sourceBlock_.getOutputShape() == Blockly.OUTPUT_SHAPE_ROUND) {
+    return Blockly.BlockSvg.NUMBER_FIELD_CORNER_RADIUS;
+  }
   return Blockly.BlockSvg.TEXT_FIELD_CORNER_RADIUS;
 };
 
