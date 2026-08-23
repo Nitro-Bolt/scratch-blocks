@@ -74,7 +74,7 @@ jobs:
           if git diff --staged --quiet; then
             echo "No changes to commit."
           else
-            git commit -m "Build: $(git rev-parse --short HEAD)"
+            git commit -m "Build: ${GITHUB_SHA::7}"
             git push origin develop-builds
           fi
 
