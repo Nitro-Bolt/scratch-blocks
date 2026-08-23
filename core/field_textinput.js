@@ -142,20 +142,23 @@ Blockly.FieldTextInput.prototype.init = function() {
 
   // If not in a shadow block, draw a box.
   if (notInShadow) {
+    var inProcedure = this.sourceBlock_.type === "procedures_declaration";
     this.box_ = Blockly.utils.createSvgElement('rect',
         {
           'x': 0,
           'y': 0,
           'width': this.size_.width,
           'height': this.size_.height,
-          'fill': Blockly.Colours.textField,
-          'color': Blockly.Colours.textFieldText,
-          'stroke': this.sourceBlock_.getColourSecondary(),
-          'stroke-width': 1,
+          'fill': this.sourceBlock_.getColourSecondary(),
           'rx': Blockly.BlockSvg.TEXT_FIELD_CORNER_RADIUS,
           'ry': Blockly.BlockSvg.TEXT_FIELD_CORNER_RADIUS,
         }
     );
+    if (!inProcedure) {
+      this.box_.setAttribute('fill', Blockly.Colours.textField);
+      this.box_.setAttribute('stroke', this.sourceBlock_.getColourSecondary());
+      this.box_.setAttribute('stroke-width', 1);
+    }
     this.fieldGroup_.insertBefore(this.box_, this.textElement_);
   }
 };
