@@ -339,6 +339,25 @@ Blockly.Blocks['extension_text_dropdown'] = {
   }
 };
 
+Blockly.Blocks['extension_text_input'] = {
+  /**
+   * @this Blockly.Block
+   */
+  init: function() {
+    this.jsonInit({
+      "message0": "text input %1",
+      "args0": [
+        {
+          "type": "field_input",
+          "name": "INPUT"
+        },
+      ],
+      "category": Blockly.Categories.more,
+      "extensions": ["colours_more", "shape_statement"]
+    });
+  }
+};
+
 Blockly.Blocks['extension_pen_down'] = {
   /**
    * @this Blockly.Block

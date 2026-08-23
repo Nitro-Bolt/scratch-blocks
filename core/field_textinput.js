@@ -148,7 +148,12 @@ Blockly.FieldTextInput.prototype.init = function() {
           'y': 0,
           'width': this.size_.width,
           'height': this.size_.height,
-          'fill': this.sourceBlock_.getColourSecondary()
+          'fill': Blockly.Colours.textField,
+          'color': Blockly.Colours.textFieldText,
+          'stroke': this.sourceBlock_.getColourSecondary(),
+          'stroke-width': 1,
+          'rx': Blockly.BlockSvg.TEXT_FIELD_CORNER_RADIUS,
+          'ry': Blockly.BlockSvg.TEXT_FIELD_CORNER_RADIUS,
         }
     );
     this.fieldGroup_.insertBefore(this.box_, this.textElement_);
