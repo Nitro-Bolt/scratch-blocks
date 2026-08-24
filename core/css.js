@@ -1424,10 +1424,15 @@ Blockly.Css.CONTENT = [
    * @author attila@google.com (Attila Bodis)
    */
 
-  '.blocklyWidgetDiv .goog-menuseparator, ',
-  '.blocklyDropDownDiv .goog-menuseparator {',
-    'border-top: 1px solid var(--ui-black-transparent);',
+  '.blocklyWidgetDiv .goog-menuseparator {',
+    'border-top: 1px solid var(--ui-black-transparent, rgba(0, 0, 0, 0.18));',
     'margin: 2px 0;',
+    'padding: 0;',
+  '}',
+
+  '.blocklyDropDownDiv .goog-menuseparator {',
+    'border-top: 1px solid var(--blockly-dropdown-border-colour);',
+    'margin: 4px 5px;',
     'padding: 0;',
   '}',
 

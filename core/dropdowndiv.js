@@ -162,6 +162,8 @@ Blockly.DropDownDiv.clearContent = function() {
 Blockly.DropDownDiv.setColour = function(backgroundColour, borderColour) {
   Blockly.DropDownDiv.DIV_.style.backgroundColor = backgroundColour;
   Blockly.DropDownDiv.DIV_.style.borderColor = borderColour;
+  Blockly.DropDownDiv.DIV_.style.setProperty(
+      '--blockly-dropdown-border-colour', borderColour);
 };
 
 /**

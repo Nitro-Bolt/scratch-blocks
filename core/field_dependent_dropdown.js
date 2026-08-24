@@ -66,7 +66,14 @@ Blockly.FieldDependentDropdown = function(parentName, optionMapping,
       }
     }
   }
-  if (!this.options_.length) {
+  var hasSelectableOption = false;
+  for (var i = 0; i < this.options_.length; i++) {
+    if (this.options_[i] != Blockly.FieldDropdown.SEPARATOR) {
+      hasSelectableOption = true;
+      break;
+    }
+  }
+  if (!hasSelectableOption) {
     // FieldDropdown historically assumes that a menu has at least one item.
     // Keep construction safe even when a block is configured with an empty
     // mapping; callers can replace the mapping before using the field.
@@ -130,16 +137,27 @@ Blockly.FieldDependentDropdown.prototype.updateOptions_ = function(
 
   var currentValue = this.getValue();
   var currentValueIsValid = false;
+  var firstOption = null;
   for (var i = 0; i < options.length; i++) {
+    if (options[i] == Blockly.FieldDropdown.SEPARATOR) {
+      continue;
+    }
+    if (!firstOption) {
+      firstOption = options[i];
+    }
     if (options[i][1] == currentValue) {
       currentValueIsValid = true;
       break;
     }
   }
+  if (!firstOption) {
+    firstOption = ['', ''];
+    this.options_ = [firstOption];
+  }
   if (!currentValueIsValid) {
     // Use this field's setter so any dependent dropdowns chained after this
     // field are refreshed too. The setter wrapper uses the new options list.
-    this.setValue(options[0][1]);
+    this.setValue(firstOption[1]);
   }
 };
 
