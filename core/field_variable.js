@@ -328,12 +328,33 @@ Blockly.FieldVariable.dropdownCreate = function() {
       }
     }
   }
-  variableModelList.sort(Blockly.VariableModel.compareByName);
+  var localVariableModels = [];
+  var globalVariableModels = [];
+  for (var i = 0; i < variableModelList.length; i++) {
+    var variableForScope = variableModelList[i];
+    if (workspace && workspace.isFlyout && workspace.targetWorkspace) {
+      variableForScope = workspace.targetWorkspace.getVariableById(
+          variableModelList[i].getId()) || variableForScope;
+    }
+    if (variableForScope.isLocal) {
+      localVariableModels.push(variableModelList[i]);
+    } else {
+      globalVariableModels.push(variableModelList[i]);
+    }
+  }
+  localVariableModels.sort(Blockly.VariableModel.compareByName);
+  globalVariableModels.sort(Blockly.VariableModel.compareByName);
 
   var options = [];
-  for (var i = 0; i < variableModelList.length; i++) {
+  for (var i = 0; i < localVariableModels.length; i++) {
     // Set the uuid as the internal representation of the variable.
-    options[i] = [variableModelList[i].name, variableModelList[i].getId()];
+    options.push([localVariableModels[i].name, localVariableModels[i].getId()]);
+  }
+  if (localVariableModels.length && globalVariableModels.length) {
+    options.push(Blockly.FieldDropdown.SEPARATOR);
+  }
+  for (var i = 0; i < globalVariableModels.length; i++) {
+    options.push([globalVariableModels[i].name, globalVariableModels[i].getId()]);
   }
   if (this.defaultType_ == Blockly.BROADCAST_MESSAGE_VARIABLE_TYPE) {
     options.unshift(
