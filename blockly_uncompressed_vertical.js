@@ -61,7 +61,7 @@ goog.addDependency("../../../../core/field_colour.js", ["Blockly.FieldColour"], 
 goog.addDependency("../../../../core/field_colour_slider.js", ["Blockly.FieldColourSlider"], ["Blockly.Field","Blockly.DropDownDiv","goog.dom","goog.events","goog.style","goog.color","goog.ui.Slider"]);
 goog.addDependency("../../../../core/field_date.js", ["Blockly.FieldDate"], ["Blockly.Field","Blockly.utils","goog.date","goog.date.DateTime","goog.dom","goog.events","goog.i18n.DateTimeSymbols","goog.i18n.DateTimeSymbols_he","goog.style","goog.ui.DatePicker"]);
 goog.addDependency("../../../../core/field_dependent_dropdown.js", ["Blockly.FieldDependentDropdown"], ["Blockly.FieldDropdown"]);
-goog.addDependency("../../../../core/field_dropdown.js", ["Blockly.FieldDropdown"], ["Blockly.Field","Blockly.DropDownDiv","goog.dom","goog.events","goog.style","goog.ui.Menu","goog.ui.MenuItem","goog.userAgent"]);
+goog.addDependency("../../../../core/field_dropdown.js", ["Blockly.FieldDropdown"], ["Blockly.Field","Blockly.DropDownDiv","goog.dom","goog.events","goog.style","goog.ui.Menu","goog.ui.MenuItem","goog.ui.MenuSeparator","goog.userAgent"]);
 goog.addDependency("../../../../core/field_dropdowneditor.js", ["Blockly.FieldDropdownEditor"], ["Blockly.FieldTextDropdown","Blockly.DropDownDiv","goog.style","goog.events","goog.dom","goog.ui.Menu","goog.ui.MenuItem"]);
 goog.addDependency("../../../../core/field_extendable.js", ["Blockly.FieldExtendable"], ["Blockly.Field"]);
 goog.addDependency("../../../../core/field_iconmenu.js", ["Blockly.FieldIconMenu"], ["Blockly.DropDownDiv"]);
