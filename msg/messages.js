@@ -497,3 +497,7 @@ Blockly.Msg.NEW_BROADCAST_MESSAGE = 'New message';
 Blockly.Msg.NEW_BROADCAST_MESSAGE_TITLE = 'New message name:';
 Blockly.Msg.BROADCAST_MODAL_TITLE = 'New Message';
 Blockly.Msg.DEFAULT_BROADCAST_MESSAGE_NAME = 'message1';
+Blockly.Msg.RENAME_BROADCAST = 'Rename broadcast';
+Blockly.Msg.RENAME_BROADCAST_TITLE = 'Rename all "%1" broadcasts to:';
+Blockly.Msg.RENAME_BROADCAST_MODAL_TITLE = 'Rename Broadcast';
+Blockly.Msg.DELETE_BROADCAST = 'Delete the "%1" broadcast';
