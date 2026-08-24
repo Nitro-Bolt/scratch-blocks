@@ -56,6 +56,7 @@ Blockly.FieldDropdownEditor.prototype.init = function() {
       Blockly.mainWorkspace.options.pathToMedia + 'dropdown-arrow.svg');
 
   this.textElement_.classList.add('blocklyEditableLabel');
+  this.textElement_.classList.add('blocklyEditableDropdown');
 };
 
 /**
