@@ -714,6 +714,9 @@ Blockly.Connection.prototype.setCheck = function (check) {
  * @return {number} Enum representing shape.
  */
 Blockly.Connection.prototype.getOutputShape = function () {
+  if (this.outputShapeOverride_ !== undefined) {
+    return this.outputShapeOverride_;
+  }
   if (!this.check_) return Blockly.OUTPUT_SHAPE_ROUND;
   if (this.check_.indexOf('Boolean') !== -1) {
     return Blockly.OUTPUT_SHAPE_HEXAGONAL;
@@ -731,6 +734,14 @@ Blockly.Connection.prototype.getOutputShape = function () {
     return Blockly.OUTPUT_SHAPE_SQUARE;
   }
   return Blockly.OUTPUT_SHAPE_ROUND;
+};
+
+/**
+ * Override the visual shape used to draw this connection when unoccupied.
+ * @param {number} shape Enum representing shape (Blockly.OUTPUT_SHAPE_*).
+ */
+Blockly.Connection.prototype.setOutputShape = function (shape) {
+  this.outputShapeOverride_ = shape;
 };
 
 /**
