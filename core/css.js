@@ -503,6 +503,7 @@ Blockly.Css.CONTENT = [
     'font-weight: 500;',
   '}',
 
+  '.blocklyText.blocklyEditableLabel,',
   '.blocklyText.removableTextInput {',
     'fill: #fff;',
   '}',
@@ -1208,7 +1209,6 @@ Blockly.Css.CONTENT = [
     'font: normal 13px "Helvetica Neue", Helvetica, sans-serif;',
     'margin: 0;',
     'outline: none;',
-    'padding: 4px 0;',
     'position: absolute;',
     'overflow-y: auto;',
     'overflow-x: hidden;',
