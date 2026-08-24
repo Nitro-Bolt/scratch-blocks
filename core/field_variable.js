@@ -360,6 +360,16 @@ Blockly.FieldVariable.dropdownCreate = function() {
     options.push(Blockly.FieldDropdown.SEPARATOR);
     options.push(
         [Blockly.Msg.NEW_BROADCAST_MESSAGE, Blockly.NEW_BROADCAST_MESSAGE_ID]);
+    if (!this.variable_) {
+      return options;
+    }
+
+    options.push([Blockly.Msg.RENAME_BROADCAST, Blockly.RENAME_BROADCAST_ID]);
+    options.push(
+        [
+          Blockly.Msg.DELETE_BROADCAST.replace('%1', name),
+          Blockly.DELETE_BROADCAST_ID
+        ]);
     return options;
   }
 
@@ -415,7 +425,7 @@ Blockly.FieldVariable.dropdownCreate = function() {
 /**
  * Handle the selection of an item in the variable dropdown menu.
  * Special case the 'Rename variable...', 'Delete variable...',
- * and 'New message...' options.
+ * 'New message...', 'Rename broadcast...', and 'Delete broadcast...' options.
  * In the rename case, prompt the user for a new name.
  * @param {!goog.ui.Menu} menu The Menu component clicked.
  * @param {!goog.ui.MenuItem} menuItem The MenuItem selected within menu.
@@ -430,6 +440,14 @@ Blockly.FieldVariable.prototype.onItemSelected = function(menu, menuItem) {
       return;
     } else if (id == Blockly.DELETE_VARIABLE_ID) {
       // Delete variable.
+      workspace.deleteVariableById(this.variable_.getId());
+      return;
+    } else if (id == Blockly.RENAME_BROADCAST_ID) {
+      // Rename broadcast.
+      Blockly.Variables.renameVariable(workspace, this.variable_);
+      return;
+    } else if (id == Blockly.DELETE_BROADCAST_ID) {
+      // Delete broadcast.
       workspace.deleteVariableById(this.variable_.getId());
       return;
     } else if (id == Blockly.NEW_BROADCAST_MESSAGE_ID) {
