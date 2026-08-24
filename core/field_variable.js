@@ -357,7 +357,8 @@ Blockly.FieldVariable.dropdownCreate = function() {
     options.push([globalVariableModels[i].name, globalVariableModels[i].getId()]);
   }
   if (this.defaultType_ == Blockly.BROADCAST_MESSAGE_VARIABLE_TYPE) {
-    options.unshift(
+    options.push(Blockly.FieldDropdown.SEPARATOR);
+    options.push(
         [Blockly.Msg.NEW_BROADCAST_MESSAGE, Blockly.NEW_BROADCAST_MESSAGE_ID]);
     return options;
   }
@@ -374,7 +375,8 @@ Blockly.FieldVariable.dropdownCreate = function() {
     createNewText = Blockly.Msg.NEW_VARIABLE_OPTION;
     createNewType = '';
   }
-  options.unshift([createNewText, newVariableOptionId]);
+  options.push(Blockly.FieldDropdown.SEPARATOR);
+  options.push([createNewText, newVariableOptionId]);
 
   // When there is no selected variable yet, still offer creation action.
   if (!this.variable_) {
