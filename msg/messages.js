@@ -434,6 +434,10 @@ Blockly.Msg.COLOUR_HUE_LABEL = 'Color';
 Blockly.Msg.COLOUR_SATURATION_LABEL = 'Saturation';
 Blockly.Msg.COLOUR_BRIGHTNESS_LABEL = 'Brightness';
 
+// Organization
+Blockly.Msg.FOR_ALL_SPRITES = 'For all sprites:';
+Blockly.Msg.FOR_THIS_SPRITE_ONLY = 'For this sprite only:';
+
 // Variables
 // @todo Remove these once fully managed by Scratch VM / Scratch GUI
 Blockly.Msg.CHANGE_VALUE_TITLE = 'Change value:';
