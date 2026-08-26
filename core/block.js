@@ -1710,6 +1710,9 @@ Blockly.Block.prototype.appendArgsList = function(
         if (element['check']) {
           input.setCheck(element['check']);
         }
+        if (element['outputShape'] !== undefined) {
+          input.connection.setOutputShape(element['outputShape']);
+        }
         if (element['align']) {
           input.setAlign(alignmentLookup[element['align']]);
         }
