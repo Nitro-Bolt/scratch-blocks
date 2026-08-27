@@ -1329,8 +1329,8 @@ Blockly.Css.CONTENT = [
     'border-color: $colour_contextMenuActiveBackground;',
     'border-style: dotted;',
     'border-width: 1px 0;',
-    'padding-bottom: 5px;',
-    'padding-top: 5px;',
+    'padding-bottom: 4px;',
+    'padding-top: 4px;',
   '}',
 
   '.blocklyDropDownDiv .goog-menuitem-highlight,',
