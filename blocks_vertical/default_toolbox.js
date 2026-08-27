@@ -667,6 +667,21 @@ Blockly.Blocks.defaultToolbox = '<xml id="toolbox-categories" style="display: no
         '<shadow type="json_map_index">' +
         '</shadow>' +
       '</value>' +
+      '<value name="METHOD">' +
+        '<shadow type="text">' +
+          '<field name="TEXT">baz</field>' +
+        '</shadow>' +
+      '</value>' +
+    '</block>' +
+    '<block type="json_filter" id="json_filter">' +
+      '<value name="VALUE">' +
+        '<shadow type="json_filter_value">' +
+        '</shadow>' +
+      '</value>' +
+      '<value name="INDEX">' +
+        '<shadow type="json_filter_index">' +
+        '</shadow>' +
+      '</value>' +
     '</block>' +
     '<block type="json_foreach" id="json_foreach">' +
       '<value name="VALUE">' +

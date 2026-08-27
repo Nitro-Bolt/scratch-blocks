@@ -133,6 +133,7 @@ Blockly.Msg.JSON_FOREACH_VALUE = 'value';
 Blockly.Msg.JSON_FOREACH_INDEX = 'index';
 Blockly.Msg.JSON_FOREACH = 'for each %1 %2 in %3';
 Blockly.Msg.JSON_MAP = 'map %1 by %2 %3 %4 %5';
+Blockly.Msg.JSON_FILTER = 'filter %1 by %2 %3 %4 %5';
 Blockly.Msg.JSON_KEY = 'key';
 Blockly.Msg.JSON_BAR = 'bar';
 Blockly.Msg.JSON_BAZ = 'baz';
