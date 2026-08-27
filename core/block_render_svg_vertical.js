@@ -912,7 +912,14 @@ Blockly.BlockSvg.prototype.renderCompute_ = function(iconWidth) {
       if (!isSecondInputOnProcedure) {
         input.fieldWidth += field.renderWidth + field.renderSep;
       }
-      row.height = Math.max(row.height, fieldSize.height);
+      var fieldHeight = fieldSize.height;
+      // Direct multiline fields draw their own white input box. Give that box
+      // the same vertical breathing room that connected value inputs receive.
+      // Shadow text blocks already get padding from their input connection.
+      if (!this.isShadow() && field.isMultiline && field.isMultiline()) {
+        fieldHeight += 2 * Blockly.BlockSvg.INLINE_PADDING_Y;
+      }
+      row.height = Math.max(row.height, fieldHeight);
       previousFieldEditable = field.EDITABLE;
     }
 
