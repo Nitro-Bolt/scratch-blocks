@@ -683,6 +683,21 @@ Blockly.Blocks.defaultToolbox = '<xml id="toolbox-categories" style="display: no
         '</shadow>' +
       '</value>' +
     '</block>' +
+    '<block type="json_sort" id="json_sort">' +
+      '<value name="A">' +
+        '<shadow type="json_sort_a">' +
+        '</shadow>' +
+      '</value>' +
+      '<value name="B">' +
+        '<shadow type="json_sort_b">' +
+        '</shadow>' +
+      '</value>' +
+      '<value name="METHOD">' +
+        '<shadow type="math_whole_number">' +
+          '<field name="NUM">1</field>' +
+        '</shadow>' +
+      '</value>' +
+    '</block>' +
     '<block type="json_foreach" id="json_foreach">' +
       '<value name="VALUE">' +
         '<shadow type="json_foreach_value">' +
