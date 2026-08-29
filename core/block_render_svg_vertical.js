@@ -1254,6 +1254,10 @@ Blockly.BlockSvg.prototype.renderDraw_ = function(iconWidth, inputRows) {
             Blockly.BlockSvg.MAX_REPORTER_CORNER_RADIUS
         );
       }
+      if (shape === Blockly.OUTPUT_SHAPE_ROUND) {
+        this.edgeShapeWidth_ = Math.min(this.edgeShapeWidth_,
+            inputRows.rightEdge / 2);
+      }
 
       this.edgeShape_ = shape;
       this.squareTopLeftCorner_ = true;
