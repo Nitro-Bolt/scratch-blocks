@@ -900,9 +900,11 @@ Blockly.Blocks['json_sort_b'] = {
   init: function() {
     this.jsonInit({
       "message0": Blockly.Msg.JSON_SORT_B,
+      "output": null,
+      "outputShape": Blockly.OUTPUT_SHAPE_ROUND,
       "category": Blockly.Categories.json,
       "duplicateOnDrag": true,
-      "extensions": ["colours_json", "output_number"]
+      "extensions": ["colours_json"]
     });
   }
 };
