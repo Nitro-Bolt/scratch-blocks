@@ -193,6 +193,12 @@ Blockly.Xml.allFieldsToDom_ = function(block, element) {
 Blockly.Xml.blockToDom = function(block, opt_noId) {
   var element = goog.dom.createDom(block.isShadow() ? 'shadow' : 'block');
   element.setAttribute('type', block.type);
+  // Carry the preferred monitor presentation with block creation events. This lets
+  // the VM treat core and extension blocks uniformly without maintaining opcode lists.
+  var outputChecks = block.outputConnection && block.outputConnection.check_;
+  var monitorMode = outputChecks && outputChecks.indexOf('Array') !== -1 ?
+    'list' : 'default';
+  element.setAttribute('monitor_mode', monitorMode);
   if (!opt_noId) {
     element.setAttribute('id', block.id);
   }
