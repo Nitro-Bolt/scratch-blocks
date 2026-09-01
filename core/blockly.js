@@ -33,6 +33,7 @@ goog.provide('Blockly');
 goog.require('Polypatch');
 goog.require('Blockly.ColourMutation');
 goog.require('Blockly.BlockSvg.render');
+goog.require('Blockly.BlockShapes');
 goog.require('Blockly.DropDownDiv');
 goog.require('Blockly.Events');
 goog.require('Blockly.FieldAngle');
@@ -633,3 +634,4 @@ if (!goog.global['Blockly']) {
 goog.global['Blockly']['getMainWorkspace'] = Blockly.getMainWorkspace;
 goog.global['Blockly']['goog'] = goog;
 Blockly.goog = goog;
+goog.global['Blockly']['BlockShapes'] = Blockly.BlockShapes;
