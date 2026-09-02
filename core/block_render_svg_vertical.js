@@ -27,6 +27,8 @@
 goog.provide('Blockly.BlockSvg.render');
 
 goog.require('Blockly.BlockSvg');
+goog.require('Blockly.FieldLabel');
+goog.require('Blockly.SystemColourPicker');
 goog.require('Blockly.scratchBlocksUtils');
 goog.require('Blockly.utils');
 
@@ -585,9 +587,20 @@ Blockly.BlockSvg.prototype.updateColour = function() {
     icons[i].updateColour();
   }
 
+  // Use dark label text when the block is bright enough that white
+  // text would be hard to read.
+  var darkText = !Blockly.SystemColourPicker.isDark(fillColour, 200);
+
   // Bump every dropdown to change its colour.
   for (var x = 0, input; input = this.inputList[x]; x++) {
     for (var y = 0, field; field = input.fieldRow[y]; y++) {
+      if (field instanceof Blockly.FieldLabel && field.getSvgRoot()) {
+        if (darkText) {
+          Blockly.utils.addClass(field.getSvgRoot(), 'blocklyTextDark');
+        } else {
+          Blockly.utils.removeClass(field.getSvgRoot(), 'blocklyTextDark');
+        }
+      }
       field.setText(null);
     }
   }

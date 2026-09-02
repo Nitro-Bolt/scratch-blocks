@@ -503,6 +503,10 @@ Blockly.Css.CONTENT = [
     'font-weight: 500;',
   '}',
 
+  '.blocklyText.blocklyTextDark {',
+    'fill: $colour_blackText;',
+  '}',
+
   '.blocklyText.blocklyEditableLabel:not(.blocklyEditableDropdown),',
   '.blocklyText.removableTextInput {',
     'fill: #fff;',
