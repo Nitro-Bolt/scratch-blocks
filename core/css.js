@@ -507,6 +507,10 @@ Blockly.Css.CONTENT = [
     'fill: $colour_blackText;',
   '}',
 
+  '.blocklyText.removableTextInput {',
+    'color: #fff;',
+  '}',
+
   '.blocklyCheckbox {',
     'fill: $colour_textFieldText;',
   '}',
