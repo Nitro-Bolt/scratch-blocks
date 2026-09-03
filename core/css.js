@@ -507,11 +507,6 @@ Blockly.Css.CONTENT = [
     'fill: $colour_blackText;',
   '}',
 
-  '.blocklyText.blocklyEditableLabel:not(.blocklyEditableDropdown),',
-  '.blocklyText.removableTextInput {',
-    'fill: #fff;',
-  '}',
-
   '.blocklyCheckbox {',
     'fill: $colour_textFieldText;',
   '}',

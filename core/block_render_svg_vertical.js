@@ -606,14 +606,14 @@ Blockly.BlockSvg.prototype.updateColour = function() {
       if (field.textElement_) {
         if (darkText) {
           Blockly.utils.addClass(field.textElement_, 'blocklyTextDark');
+          if (field.arrow_) {
+            field.arrow_.setAttributeNS('http://www.w3.org/1999/xlink',
+                'xlink:href',
+                Blockly.mainWorkspace.options.pathToMedia + 'dropdown-arrow-dark.svg'
+            );
+          }
         } else {
           Blockly.utils.removeClass(field.textElement_, 'blocklyTextDark');
-        }
-        if (field.arrow_) {
-          field.arrow_.setAttributeNS('http://www.w3.org/1999/xlink',
-              'xlink:href',
-              Blockly.mainWorkspace.options.pathToMedia +
-              (darkText ? 'dropdown-arrow-dark.svg' : 'dropdown-arrow.svg'));
         }
       }
       field.setText(null);
