@@ -639,6 +639,8 @@ Blockly.Blocks['json_foreach'] = {
     this.jsonInit({
       "message0": Blockly.Msg.JSON_FOREACH,
       "message1": "%1", // Statement
+      "message2": "%1",
+      "lastDummyAlign2": "RIGHT",
       "args0": [
         {
           "type": "input_value",
@@ -658,6 +660,16 @@ Blockly.Blocks['json_foreach'] = {
         {
           "type": "input_statement",
           "name": "SUBSTACK"
+        }
+      ],
+      "args2": [
+        {
+          "type": "field_image",
+          "src": Blockly.mainWorkspace.options.pathToMedia + "repeat.svg",
+          "width": 24,
+          "height": 24,
+          "alt": "*",
+          "flip_rtl": true
         }
       ],
       "category": Blockly.Categories.json,
