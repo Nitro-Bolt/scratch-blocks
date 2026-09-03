@@ -589,7 +589,7 @@ Blockly.BlockSvg.prototype.updateColour = function() {
 
   // Use dark label text when the block is bright enough that white
   // text would be hard to read.
-  var darkText = !Blockly.SystemColourPicker.isDark(fillColour, 180);
+  var darkText = !Blockly.SystemColourPicker.isDark(fillColour, 190);
 
   // Bump every dropdown to change its colour.
   for (var x = 0, input; input = this.inputList[x]; x++) {
