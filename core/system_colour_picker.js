@@ -3,6 +3,13 @@
 goog.provide('Blockly.SystemColourPicker');
 
 /**
+ * Global brightness threshold used to decide whether a bright block
+ * colour should use dark label text instead of white.
+ * @type {number}
+ */
+Blockly.LABEL_CONTRAST_THRESHOLD = 190;
+
+/**
  * Place a native colour input over an SVG paintbrush icon.
  * @param {!Element} anchor Paintbrush icon.
  * @param {!Function} getColour Returns the current colour.

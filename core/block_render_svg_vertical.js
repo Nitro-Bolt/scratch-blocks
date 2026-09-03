@@ -589,7 +589,7 @@ Blockly.BlockSvg.prototype.updateColour = function() {
 
   // Use dark label text when the block is bright enough that white
   // text would be hard to read.
-  var labelContrastThreshold = this.workspace.options.labelContrastThreshold;
+  var labelContrastThreshold = Blockly.LABEL_CONTRAST_THRESHOLD;
   if (labelContrastThreshold === null || labelContrastThreshold === (void 0)) {
     labelContrastThreshold = 190;
   }
