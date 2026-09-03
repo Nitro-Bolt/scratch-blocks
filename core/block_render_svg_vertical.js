@@ -589,7 +589,7 @@ Blockly.BlockSvg.prototype.updateColour = function() {
 
   // Use dark label text when the block is bright enough that white
   // text would be hard to read.
-  var darkText = !Blockly.SystemColourPicker.isDark(fillColour, 200);
+  var darkText = !Blockly.SystemColourPicker.isDark(fillColour, 180);
 
   // Bump every dropdown to change its colour.
   for (var x = 0, input; input = this.inputList[x]; x++) {
@@ -599,6 +599,21 @@ Blockly.BlockSvg.prototype.updateColour = function() {
           Blockly.utils.addClass(field.getSvgRoot(), 'blocklyTextDark');
         } else {
           Blockly.utils.removeClass(field.getSvgRoot(), 'blocklyTextDark');
+        }
+      }
+      // We can't do instance of Blockly.FieldDropdown because it
+      // causes a compilation error, so let's just do this for now.
+      if (field.textElement_) {
+        if (darkText) {
+          Blockly.utils.addClass(field.textElement_, 'blocklyTextDark');
+        } else {
+          Blockly.utils.removeClass(field.textElement_, 'blocklyTextDark');
+        }
+        if (field.arrow_) {
+          field.arrow_.setAttributeNS('http://www.w3.org/1999/xlink',
+              'xlink:href',
+              Blockly.mainWorkspace.options.pathToMedia +
+              (darkText ? 'dropdown-arrow-dark.svg' : 'dropdown-arrow.svg'));
         }
       }
       field.setText(null);

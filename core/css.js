@@ -540,6 +540,10 @@ Blockly.Css.CONTENT = [
     'fill: $colour_text !important;',
   '}',
 
+  '.blocklyDropdownText.blocklyTextDark {',
+    'fill: $colour_blackText !important;',
+  '}',
+
   '.blocklyBubbleText {',
     'fill: $colour_textFieldText;',
   '}',
