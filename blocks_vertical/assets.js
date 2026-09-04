@@ -47,11 +47,8 @@ Blockly.Blocks['assets_menu'] = {
           ]
         }
       ],
-      "colour": Blockly.Colours.assets.secondary,
-      "colourSecondary": Blockly.Colours.assets.secondary,
-      "colourTertiary": Blockly.Colours.assets.tertiary,
-      "colourQuaternary": Blockly.Colours.assets.quaternary,
-      "extensions": ["output_string"]
+      "category": Blockly.Categories.assets,
+      "extensions": ["colours_assets", "output_string"]
     });
   }
 };
@@ -71,6 +68,7 @@ Blockly.Blocks['assets_sprite_menu'] = {
           "options": []
         }
       ],
+      "category": Blockly.Categories.assets,
       "extensions": ["colours_assets", "output_string"]
     });
   }
