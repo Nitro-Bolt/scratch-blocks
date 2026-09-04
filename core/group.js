@@ -441,6 +441,7 @@ Blockly.Group.prototype.finishPointer_ = function(e) {
     this.blockIds = this.getContainedBlocks().map(function(block) {
       return block.id;
     });
+    if (!state.resizing) this.bringToFront_();
   }
   state.event.recordNew(this);
   state.event.group = Blockly.Events.getGroup();
