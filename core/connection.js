@@ -773,7 +773,7 @@ Blockly.Connection.prototype.setShadowDom = function (shadow) {
  * @param {Object} ctx Load context the description belongs to.
  * @package
  */
-Blockly.Connection.prototype.setShadowDesc = function (desc, ctx) {
+Blockly.Connection.prototype.setShadowDesc = function(desc, ctx) {
   this.shadowDom_ = null;
   this.shadowDesc_ = desc ? {desc: desc, ctx: ctx} : null;
 };
