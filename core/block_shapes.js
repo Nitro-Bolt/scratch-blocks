@@ -43,6 +43,14 @@ Blockly.BlockShapes.register = function (name, definition) {
 };
 
 /**
+ * Remove a previously registered shape definition.
+ * @param {(number|string)} name The shape ID or built-in enum.
+ */
+Blockly.BlockShapes.unregister = function (name) {
+  delete Blockly.BlockShapes.shapes_[name];
+};
+
+/**
  * Look up a shape definition by name or numeric enum.
  * @param {(number|string)} name The shape ID or built-in enum.
  * @return {?Object} The shape definition, or null if unknown.
