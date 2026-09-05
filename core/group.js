@@ -41,6 +41,9 @@ goog.require('goog.math.Coordinate');
  * @constructor
  */
 Blockly.Group = function(workspace, options) {
+  if (workspace.materializeAllScripts) {
+    workspace.materializeAllScripts();
+  }
   options = options || {};
   this.workspace = workspace;
   this.id = options.id && !workspace.getGroupById(options.id) ?
