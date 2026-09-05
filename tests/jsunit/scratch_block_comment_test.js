@@ -23,7 +23,7 @@ goog.require('goog.testing');
 
 var block;
 var workspace;
-var originalCreateIcon = Blockly.ScratchBlockComment.prototype.createIcon;
+var originalCreateIcon = Blockly.ScratchBlockComment.createIcon;
 
 function scratchBlockCommentTest_setUp() {
   workspace = new Blockly.Workspace();
