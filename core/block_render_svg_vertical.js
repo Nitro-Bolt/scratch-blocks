@@ -344,6 +344,12 @@ Blockly.BlockSvg.INPUT_SHAPE_ROUND =
 Blockly.BlockSvg.INPUT_SHAPE_ROUND_WIDTH = 12 * Blockly.BlockSvg.GRID_UNIT;
 
 /**
+ * Reserved width of an auto-generated custom input shape.
+ * @const
+ */
+Blockly.BlockSvg.INPUT_SHAPE_CUSTOM_WIDTH = 12 * Blockly.BlockSvg.GRID_UNIT;
+
+/**
  * Height of empty input shape.
  * @const
  */
@@ -1014,6 +1020,10 @@ Blockly.BlockSvg.prototype.computeInputWidth_ = function(input) {
       if (custom && typeof custom.width === 'number') {
         return custom.width;
       }
+    }
+    if (shapeDef) {
+      var autoShape = Blockly.BlockSvg.getCustomInputShapeInfo_(shapeDef);
+      if (autoShape) return autoShape.width;
     }
     switch (inputShape) {
       case Blockly.OUTPUT_SHAPE_SQUARE:
@@ -1965,6 +1975,49 @@ Blockly.BlockSvg.prototype.renderDefineBlock_ = function(steps, inputRows,
 };
 
 /**
+ * Build the closed input-hole geometry for a custom shape definition from its
+ * leftEdge andrightEdge functions.
+ * @param {!Object} shapeDef The custom shape definition.
+ * @return {?Object} An object with `path`, `argType`, `width` and `height`, or
+ *     null when the definition can't be auto-generated.
+ * @private
+ */
+Blockly.BlockSvg.getCustomInputShapeInfo_ = function(shapeDef) {
+  if (!shapeDef ||
+      typeof shapeDef.leftEdge !== 'function' ||
+      typeof shapeDef.rightEdge !== 'function') {
+    return null;
+  }
+
+  var height = Blockly.BlockSvg.INPUT_SHAPE_HEIGHT;
+  var w = (typeof shapeDef.edgeWidth === 'function') ?
+      shapeDef.edgeWidth(height) : height / 2;
+  if (typeof w !== 'number' || !isFinite(w)) {
+    w = height / 2;
+  }
+  w = Math.max(0, Math.min(w, height / 2));
+  var halfStraight = Math.max(0, (height - 2 * w) / 2);
+
+  var width = Blockly.BlockSvg.INPUT_SHAPE_CUSTOM_WIDTH;
+  var straight = Math.max(0, width - 2 * w);
+
+  var steps = [];
+  steps.push('M ' + w + ',0');
+  steps.push('H', straight + w);
+  shapeDef.rightEdge(steps, w, halfStraight);
+  steps.push('H', w);
+  shapeDef.leftEdge(steps, w, halfStraight);
+  steps.push('z');
+
+  return {
+    path: steps.join(' '),
+    argType: (shapeDef && shapeDef.argType) || 'round',
+    width: width,
+    height: height
+  };
+};
+
+/**
  * Get some information about the input shape to draw, based on the type of the
  * connection.
  * @param {number} shape An enum representing the shape of the connection we're
@@ -1986,6 +2039,10 @@ Blockly.BlockSvg.getInputShapeInfo_ = function(shape) {
         height: custom.height || Blockly.BlockSvg.INPUT_SHAPE_HEIGHT
       };
     }
+  }
+  if (shapeDef) {
+    var autoShape = Blockly.BlockSvg.getCustomInputShapeInfo_(shapeDef);
+    if (autoShape) return autoShape;
   }
 
   var inputShapePath = null;
