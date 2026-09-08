@@ -98,6 +98,8 @@
     "JSON_SORT": "sort %1 by %2 %3 %4 %5",
     "JSON_SORT_A": "a",
     "JSON_SORT_B": "b",
+    "JSON_SPLIT_SPLIT": "split",
+    "JSON_SPLIT_DELIMITER": "with delimiter",
     "JSON_KEY": "key",
     "JSON_BAR": "bar",
     "JSON_BAZ": "baz",
