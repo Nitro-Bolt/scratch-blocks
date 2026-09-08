@@ -651,6 +651,18 @@ Blockly.Blocks.defaultToolbox = '<xml id="toolbox-categories" style="display: no
     '</block>' +
     '<block type="json_reverse_array" id="json_reverse_array">' +
     '</block>' +
+    '<block type="json_split" id="json_split">' +
+      '<value name="INPUT">' +
+        '<shadow type="text">' +
+          '<field name="TEXT">a,b,c</field>' +
+        '</shadow>' +
+      '</value>' +
+      '<value name="DELIMITER">' +
+        '<shadow type="text">' +
+          '<field name="TEXT">,</field>' +
+        '</shadow>' +
+      '</value>' +
+    '</block>' +
     '<block type="json_has_item" id="json_has_item">' +
       '<value name="ITEM">' +
         '<shadow type="text">' +

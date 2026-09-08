@@ -920,3 +920,89 @@ Blockly.Blocks['json_sort_b'] = {
     });
   }
 };
+
+Blockly.Blocks["json_split"] = {
+  /**
+   * @this Blockly.Block
+   */
+  init: function() {
+    Blockly.Extensions.apply("colours_json", this, false);
+    Blockly.Extensions.apply("output_array", this, false);
+    const dropdown = new Blockly.FieldDropdown([
+      [Blockly.Msg.JSON_SPLIT_SPLIT, "SPLIT"],
+      [Blockly.Msg.JSON_SPLIT_JOIN, "JOIN"],
+    ]);
+    dropdown.setValidator((newMode) => {
+      this.updateType_(newMode);
+    });
+    this.appendValueInput("INPUT")
+        .setCheck(null)
+        .appendField(dropdown, "MODE");
+    this.appendValueInput("DELIMITER")
+        .setCheck(null)
+        .appendField(Blockly.Msg.JSON_SPLIT_DELIMITER);
+  },
+  updateType_: function(newMode) {
+    const mode = this.getFieldValue("MODE");
+    if (mode !== newMode) {
+      const input = this.getInput("INPUT");
+      if (input) {
+        const inputConnection = input.connection;
+        if (inputConnection) {
+          const inputBlock = inputConnection.targetBlock();
+          if (inputBlock) {
+            if (inputBlock.isShadow()) {
+              const savedShadowDom = Blockly.Xml.blockToDom(inputBlock);
+              savedShadowDom.removeAttribute('id');
+              this.savedInputShadowDom_ = savedShadowDom;
+            } else {
+              this.savedInputShadowDom_ = null;
+            }
+            inputConnection.setShadowDom(null);
+            inputConnection.disconnect();
+            if (inputBlock.isShadow()) {
+              inputBlock.dispose(false);
+            } else {
+              this.bumpNeighbours_();
+            }
+          } else {
+            inputConnection.setShadowDom(null);
+          }
+        }
+      }
+    }
+    if (newMode === "JOIN") {
+      this.setOutputShape(Blockly.OUTPUT_SHAPE_ROUND);
+      this.setOutput(true, null);
+      this.getInput("INPUT").setCheck(["Array", "String"]);
+    } else {
+      this.setOutputShape(Blockly.OUTPUT_SHAPE_SQUARE);
+      this.setOutput(true, 'Array');
+      this.getInput("INPUT").setCheck(null);
+      const inputConnection = this.getInput("INPUT").connection;
+      if (inputConnection && !inputConnection.targetBlock() &&
+          this.savedInputShadowDom_) {
+        const shadowDom = this.savedInputShadowDom_;
+        inputConnection.setShadowDom(shadowDom);
+        const shadowBlock = Blockly.Xml.domToBlock(shadowDom, this.workspace);
+        if (shadowBlock.outputConnection) {
+          inputConnection.connect(shadowBlock.outputConnection);
+        }
+      }
+    }
+  },
+  mutationToDom: function() {
+    const container = document.createElement("mutation");
+    container.setAttribute("mode", this.getFieldValue("MODE"));
+    return container;
+  },
+  domToMutation: function(xmlElement) {
+    this.updateType_(xmlElement.getAttribute("mode"));
+  },
+  saveExtraState: function() {
+    return { mode: this.getFieldValue("MODE") };
+  },
+  loadExtraState: function(state) {
+    this.updateType_(state["mode"]);
+  },
+};
