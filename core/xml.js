@@ -1818,6 +1818,19 @@ Blockly.Xml.blockDescToDom = function(desc, ctx) {
   if (desc.mutation) {
     element.appendChild(Blockly.Xml.mutationDescToDom_(desc.mutation));
   }
+  for (var fieldName in desc.fields) {
+    var fieldDesc = desc.fields[fieldName];
+    var field = goog.dom.createDom('field', null,
+        Blockly.Xml.descFieldValue_(fieldDesc));
+    field.setAttribute('name', fieldDesc.name);
+    if (fieldDesc.id) {
+      field.setAttribute('id', fieldDesc.id);
+    }
+    if (typeof fieldDesc.variableType === 'string') {
+      field.setAttribute('variabletype', fieldDesc.variableType);
+    }
+    element.appendChild(field);
+  }
   for (var inputName in desc.inputs) {
     var inputDesc = desc.inputs[inputName];
     if (!inputDesc.block && !inputDesc.shadow) {
@@ -1835,19 +1848,6 @@ Blockly.Xml.blockDescToDom = function(desc, ctx) {
           Blockly.Xml.blockDescToDom(ctx.blocks[inputDesc.shadow], ctx));
     }
     element.appendChild(value);
-  }
-  for (var fieldName in desc.fields) {
-    var fieldDesc = desc.fields[fieldName];
-    var field = goog.dom.createDom('field', null,
-        Blockly.Xml.descFieldValue_(fieldDesc));
-    field.setAttribute('name', fieldDesc.name);
-    if (fieldDesc.id) {
-      field.setAttribute('id', fieldDesc.id);
-    }
-    if (typeof fieldDesc.variableType === 'string') {
-      field.setAttribute('variabletype', fieldDesc.variableType);
-    }
-    element.appendChild(field);
   }
   if (desc.next && ctx.blocks[desc.next]) {
     var next = goog.dom.createDom('next');
@@ -1892,6 +1892,36 @@ Blockly.Xml.descToField_ = function(block, fieldDesc) {
 };
 
 /**
+ * Restore fields which must be deserialized before mutations and inputs.
+ * FieldExtendable uses this to create its dynamic inputs before their child
+ * blocks are connected. Repeat the scan so nested extendable fields created by
+ * an earlier field can be restored in the same order as XML deserialization.
+ * @param {!Blockly.Block} block The block being deserialized.
+ * @param {!Object} fields Field descriptions keyed by name.
+ * @return {!Array.<string>} Names of fields restored early.
+ * @private
+ */
+Blockly.Xml.restoreReverseFields_ = function(block, fields) {
+  var restored = [];
+  var changed;
+  do {
+    changed = false;
+    for (var fieldName in fields) {
+      if (restored.indexOf(fieldName) !== -1) {
+        continue;
+      }
+      var field = block.getField(fields[fieldName].name);
+      if (field && field.REVERSE_SERIALIZE) {
+        Blockly.Xml.descToField_(block, fields[fieldName]);
+        restored.push(fieldName);
+        changed = true;
+      }
+    }
+  } while (changed);
+  return restored;
+};
+
+/**
  * Create a block and its children from a block description.
  * @param {!Object} desc Block description.
  * @param {!Object} ctx Load context: {blocks, comments}.
@@ -1902,12 +1932,18 @@ Blockly.Xml.descToField_ = function(block, fieldDesc) {
 Blockly.Xml.descToBlockHeadless_ = function(desc, ctx, workspace) {
   goog.asserts.assert(desc.opcode, 'Block type unspecified: %s', desc.id);
   var block = workspace.newBlock(desc.opcode, desc.id);
+  var reverseFields = Blockly.Xml.restoreReverseFields_(block, desc.fields);
 
   // Must come before inputs: a mutation can create them.
   if (desc.mutation && block.domToMutation) {
     block.domToMutation(Blockly.Xml.mutationDescToDom_(desc.mutation));
     if (block.initSvg) {
       block.initSvg();
+    }
+  }
+  for (var fieldName in desc.fields) {
+    if (reverseFields.indexOf(fieldName) === -1) {
+      Blockly.Xml.descToField_(block, desc.fields[fieldName]);
     }
   }
   if (desc.comment && ctx.comments) {
@@ -1956,9 +1992,6 @@ Blockly.Xml.descToBlockHeadless_ = function(desc, ctx, workspace) {
       goog.asserts.fail(
           'Child block does not have output or previous statement.');
     }
-  }
-  for (var fieldName in desc.fields) {
-    Blockly.Xml.descToField_(block, desc.fields[fieldName]);
   }
   if (desc.next && ctx.blocks[desc.next]) {
     var nextBlock =
