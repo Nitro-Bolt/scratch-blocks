@@ -44,9 +44,7 @@ goog.require('goog.dom');
  * @return {!Element} XML document.
  */
 Blockly.Xml.workspaceToDom = function(workspace, opt_noId) {
-  if (workspace.materializeAllScripts) {
-    workspace.materializeAllScripts();
-  }
+  workspace.materializeAllScripts();
   var xml = goog.dom.createDom('xml');
   xml.appendChild(Blockly.Xml.variablesToDom(workspace.getAllVariables()));
   workspace.getGroups().forEach(function(group) {
@@ -476,23 +474,22 @@ Blockly.Xml.VIRTUAL_UNLOAD_DELAY_MS = 20000;
 Blockly.Xml.VIRTUAL_SWEEP_INTERVAL_MS = 2000;
 
 /**
- * @param {!Element} xml Workspace XML. When opt_descs is given this carries
- *     only the variables, groups and workspace comments; the blocks come from
- *     the descriptions.
+ * @param {!Element} xml Variables, groups and workspace comments.
+ * @param {!Object} descs Blocks as scratch-vm descriptions:
+ *     {blocks, scripts, comments}.
  * @param {!Blockly.Workspace} workspace The workspace.
  * @param {Object=} opt_callbacks onProgress and onDone.
- * @param {Object=} opt_descs Blocks as scratch-vm descriptions:
- *     {blocks, scripts, comments}. Skips the XML round trip entirely.
  * @return {!Object} Handle with a cancel() method.
  */
-Blockly.Xml.clearWorkspaceAndLoadFromXmlDeferred = function(xml, workspace,
-    opt_callbacks, opt_descs) {
+Blockly.Xml.clearWorkspaceAndLoadFromDescsDeferred = function(xml, descs,
+    workspace, opt_callbacks) {
   workspace.setResizesEnabled(false);
   workspace.setToolboxRefreshEnabled(false);
   Blockly.Events.disable();
   try {
     workspace.clear();
-    return Blockly.Xml.domToWorkspaceDeferred(xml, workspace, opt_callbacks, opt_descs);
+    return Blockly.Xml.domAndDescsToWorkspaceDeferred_(xml, descs, workspace,
+        opt_callbacks);
   } finally {
     Blockly.Events.enable();
     workspace.setResizesEnabled(true);
@@ -500,26 +497,18 @@ Blockly.Xml.clearWorkspaceAndLoadFromXmlDeferred = function(xml, workspace,
   }
 };
 
-Blockly.Xml.domToWorkspaceDeferred = function(xml, workspace, opt_callbacks,
-    opt_descs) {
+Blockly.Xml.domAndDescsToWorkspaceDeferred_ = function(xml, descs, workspace,
+    opt_callbacks) {
   var callbacks = opt_callbacks || {};
-  if (workspace.cancelDeferredRender) {
-    workspace.cancelDeferredRender();
-  }
+  workspace.cancelDeferredRender();
   // Groups keep references to their member blocks and discard missing IDs.
   // Keep grouped workspaces fully loaded until groups support deferred members.
   if (!workspace.rendered || xml.getElementsByTagName('group').length) {
-    var blockIds;
-    if (opt_descs) {
-      Blockly.Xml.domAndDescsToWorkspace_(xml, opt_descs, workspace);
-      blockIds = opt_descs.scripts.slice();
-    } else {
-      blockIds = Blockly.Xml.domToWorkspace(xml, workspace);
-    }
+    Blockly.Xml.domAndDescsToWorkspace_(xml, descs, workspace);
     if (callbacks.onDone) {
       callbacks.onDone();
     }
-    return {blockIds: blockIds, cancel: function() {}};
+    return {blockIds: descs.scripts.slice(), cancel: function() {}};
   }
   var width;
   if (workspace.RTL) {
@@ -559,35 +548,6 @@ Blockly.Xml.domToWorkspaceDeferred = function(xml, workspace, opt_callbacks,
           state[key] = xmlChild.getAttribute(key);
         });
         Blockly.Group.fromJSON(workspace, state, false);
-      } else if (name == 'block' ||
-          (name == 'shadow' && !Blockly.Events.recordUndo)) {
-        var blockX = xmlChild.hasAttribute('x') ?
-            parseInt(xmlChild.getAttribute('x'), 10) : 10;
-        var blockY = xmlChild.hasAttribute('y') ?
-            parseInt(xmlChild.getAttribute('y'), 10) : 10;
-        var hasPosition = !isNaN(blockX) && !isNaN(blockY);
-        scripts.push({
-          xmlNode: xmlChild,
-          hasPosition: hasPosition,
-          x: hasPosition ? (workspace.RTL ? width - blockX : blockX) : 0,
-          y: hasPosition ? blockY : 0,
-          estimate: xmlChild.getElementsByTagName('block').length +
-              xmlChild.getElementsByTagName('shadow').length + 1,
-          visible: xmlChild.getElementsByTagName('block').length + 1,
-          rows: xmlChild.getElementsByTagName('next').length +
-              xmlChild.getElementsByTagName('statement').length + 1,
-          phase: -1,
-          topBlock: null,
-          blocks: null,
-          blockIndex: -1,
-          placeholder: null,
-          loaded: false,
-          lastNear: 0
-        });
-        variablesFirst = false;
-      } else if (name == 'shadow') {
-        goog.asserts.fail('Shadow block cannot be a top-level block.');
-        variablesFirst = false;
       } else if (name == 'comment') {
         if (workspace.rendered) {
           Blockly.WorkspaceCommentSvg.fromXml(xmlChild, workspace, width);
@@ -605,35 +565,32 @@ Blockly.Xml.domToWorkspaceDeferred = function(xml, workspace, opt_callbacks,
         variablesFirst = false;
       }
     }
-    if (opt_descs) {
-      var ctx = {blocks: opt_descs.blocks, comments: opt_descs.comments};
-      for (var s = 0; s < opt_descs.scripts.length; s++) {
-        var desc = ctx.blocks[opt_descs.scripts[s]];
-        if (!desc) {
-          continue;
-        }
-        var descX = typeof desc.x === 'number' ? desc.x : 10;
-        var descY = typeof desc.y === 'number' ? desc.y : 10;
-        var size = Blockly.Xml.measureDesc_(desc, ctx);
-        scripts.push({
-          desc: desc,
-          ctx: ctx,
-          xmlNode: null,
-          hasPosition: true,
-          x: workspace.RTL ? width - descX : descX,
-          y: descY,
-          estimate: size.count,
-          visible: size.visible,
-          rows: size.rows,
-          phase: -1,
-          topBlock: null,
-          blocks: null,
-          blockIndex: -1,
-          placeholder: null,
-          loaded: false,
-          lastNear: 0
-        });
+    var ctx = {blocks: descs.blocks, comments: descs.comments};
+    for (var s = 0; s < descs.scripts.length; s++) {
+      var desc = ctx.blocks[descs.scripts[s]];
+      if (!desc) {
+        continue;
       }
+      var descX = typeof desc.x === 'number' ? desc.x : 10;
+      var descY = typeof desc.y === 'number' ? desc.y : 10;
+      var size = Blockly.Xml.measureDesc_(desc, ctx);
+      scripts.push({
+        desc: desc,
+        ctx: ctx,
+        hasPosition: true,
+        x: workspace.RTL ? width - descX : descX,
+        y: descY,
+        estimate: size.count,
+        visible: size.visible,
+        rows: size.rows,
+        phase: -1,
+        topBlock: null,
+        blocks: null,
+        blockIndex: -1,
+        placeholder: null,
+        loaded: false,
+        lastNear: 0
+      });
     }
   } catch (e) {
     caughtError = e;
@@ -650,9 +607,6 @@ Blockly.Xml.domToWorkspaceDeferred = function(xml, workspace, opt_callbacks,
 };
 
 Blockly.Xml.startDeferredRender_ = function(workspace, scripts, callbacks) {
-  if (workspace.cancelDeferredRender) {
-    workspace.cancelDeferredRender();
-  }
   workspace.deferredRenderActive = true;
   var canvas = workspace.getCanvas();
   var phWidth = Blockly.Xml.DEFERRED_SCRIPT_WIDTH_ESTIMATE;
@@ -734,9 +688,6 @@ Blockly.Xml.startDeferredRender_ = function(workspace, scripts, callbacks) {
   };
   // Does the VM still have this script, as a top level block?
   var isStillOurs = function(script) {
-    if (!script.desc || !script.ctx) {
-      return true;
-    }
     var current = script.ctx.blocks[script.desc.id];
     if (current) {
       script.desc = current;
@@ -748,9 +699,8 @@ Blockly.Xml.startDeferredRender_ = function(workspace, scripts, callbacks) {
     addPlaceholder(script);
     Blockly.Events.disable();
     try {
-      var topBlock = script.desc ?
-          Blockly.Xml.descToBlockHeadless_(script.desc, script.ctx, workspace) :
-          Blockly.Xml.domToBlockHeadless_(script.xmlNode, workspace);
+      var topBlock = Blockly.Xml.descToBlockHeadless_(script.desc,
+          script.ctx, workspace);
       script.topBlock = topBlock;
       script.blocks = topBlock.getDescendants(false);
       topBlock.setConnectionsHidden(true);
@@ -798,22 +748,18 @@ Blockly.Xml.startDeferredRender_ = function(workspace, scripts, callbacks) {
       }
     }
     // The user may have dragged it somewhere since it was loaded.
-    if (script.desc) {
-      if (typeof script.desc.x === 'number') {
-        script.x = workspace.RTL ?
-            workspace.getWidth() - script.desc.x : script.desc.x;
-      }
-      if (typeof script.desc.y === 'number') {
-        script.y = script.desc.y;
-      }
+    if (typeof script.desc.x === 'number') {
+      script.x = workspace.RTL ?
+          workspace.getWidth() - script.desc.x : script.desc.x;
+    }
+    if (typeof script.desc.y === 'number') {
+      script.y = script.desc.y;
     }
     boundsDirty = true;
   };
 
   var canUnload = function(script) {
-    // Only VM-backed scripts. An XML script is a snapshot taken at load, so
-    // rebuilding one would undo every edit made to it since.
-    if (!script.loaded || !script.desc || !script.topBlock) {
+    if (!script.loaded || !script.topBlock) {
       return false;
     }
     if (!script.topBlock.workspace || script.topBlock.getParent()) {
@@ -1116,13 +1062,12 @@ Blockly.Xml.startDeferredRender_ = function(workspace, scripts, callbacks) {
       var s = scripts[i];
       if (!s.loaded && s.phase === -1) {
         out.push({
-          id: s.desc ? s.desc.id : s.xmlNode.getAttribute('id'),
-          type: s.desc ? s.desc.opcode : s.xmlNode.getAttribute('type'),
+          id: s.desc.id,
+          type: s.desc.opcode,
           x: s.x,
           y: s.y,
-          xmlNode: s.xmlNode,
-          desc: s.desc || null,
-          ctx: s.ctx || null
+          desc: s.desc,
+          ctx: s.ctx
         });
       }
     }
@@ -1134,26 +1079,14 @@ Blockly.Xml.startDeferredRender_ = function(workspace, scripts, callbacks) {
       if (s.loaded || s.phase !== -1) {
         continue;
       }
-      if (s.desc) {
-        var found = false;
-        Blockly.Xml.forEachDescBlock(s.desc, s.ctx, function(d) {
-          if (d.id === id) {
-            found = true;
-          }
-        });
-        if (found) {
-          return {x: s.x, y: s.y};
+      var found = false;
+      Blockly.Xml.forEachDescBlock(s.desc, s.ctx, function(d) {
+        if (d.id === id) {
+          found = true;
         }
-        continue;
-      }
-      if (s.xmlNode.getAttribute('id') === id) {
+      });
+      if (found) {
         return {x: s.x, y: s.y};
-      }
-      var els = s.xmlNode.getElementsByTagName('block');
-      for (var j = 0; j < els.length; j++) {
-        if (els[j].getAttribute('id') === id) {
-          return {x: s.x, y: s.y};
-        }
       }
     }
     return null;
@@ -1205,14 +1138,7 @@ Blockly.Xml.startDeferredRender_ = function(workspace, scripts, callbacks) {
       for (var i = scripts.length - 1; i >= 0; i--) {
         var script = scripts[i];
         if (rootIds) {
-          var matches = script.desc ? !!rootIds[script.desc.id] :
-              !!rootIds[script.xmlNode.getAttribute('id')];
-          if (!matches && script.xmlNode) {
-            var nodes = script.xmlNode.getElementsByTagName('*');
-            for (var n = 0; n < nodes.length && !matches; n++) {
-              matches = !!rootIds[nodes[n].getAttribute('id')];
-            }
-          }
+          var matches = !!rootIds[script.desc.id];
           if (!matches) continue;
         }
         if (script.loaded) {
@@ -1263,12 +1189,12 @@ Blockly.Xml.startDeferredRender_ = function(workspace, scripts, callbacks) {
     workspace.deferredRenderActive = false;
     workspace.deferredContentBounds_ = null;
     workspace.deferredRenderHandle_ = null;
-    workspace.getDeferredScripts = null;
-    workspace.findDeferredScriptByBlockId = null;
-    workspace.getUnloadedBlockCount = null;
-    workspace.materializeAllScripts = null;
-    workspace.materializeScriptsForBlockIds = null;
-    workspace.wakeVirtualScripts_ = null;
+    delete workspace.getDeferredScripts;
+    delete workspace.findDeferredScriptByBlockId;
+    delete workspace.getUnloadedBlockCount;
+    delete workspace.materializeAllScripts;
+    delete workspace.materializeScriptsForBlockIds;
+    delete workspace.wakeVirtualScripts_;
     for (var i = 0; i < scripts.length; i++) {
       removePlaceholder(scripts[i]);
     }
@@ -2270,9 +2196,7 @@ goog.global['Blockly']['Xml']['textToDom'] = Blockly.Xml.textToDom;
 goog.global['Blockly']['Xml']['workspaceToDom'] = Blockly.Xml.workspaceToDom;
 goog.global['Blockly']['Xml']['clearWorkspaceAndLoadFromXml'] =
   Blockly.Xml.clearWorkspaceAndLoadFromXml;
-goog.global['Blockly']['Xml']['domToWorkspaceDeferred'] =
-  Blockly.Xml.domToWorkspaceDeferred;
-goog.global['Blockly']['Xml']['clearWorkspaceAndLoadFromXmlDeferred'] =
-  Blockly.Xml.clearWorkspaceAndLoadFromXmlDeferred;
+goog.global['Blockly']['Xml']['clearWorkspaceAndLoadFromDescsDeferred'] =
+  Blockly.Xml.clearWorkspaceAndLoadFromDescsDeferred;
 goog.global['Blockly']['Xml']['clearWorkspaceAndLoadFromDescs'] =
   Blockly.Xml.clearWorkspaceAndLoadFromDescs;

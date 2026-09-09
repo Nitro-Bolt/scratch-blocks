@@ -746,15 +746,6 @@ Blockly.WorkspaceSvg.prototype.queueIntersectionCheck = function() {
 };
 
 /**
- * Render every script that is currently only a placeholder. Anything that acts
- * on the whole workspace at once has to call this first: the workspace only
- * renders the scripts you are looking at.
- */
-Blockly.WorkspaceSvg.prototype.materializeAllScripts = function() {
-  // Replaced by the virtual script loader while it has scripts in hand.
-};
-
-/**
  * The number of blocks the workspace holds, including the ones in scripts that
  * are not currently rendered. Shadow blocks are not counted.
  * @return {number} Block count.
@@ -767,9 +758,7 @@ Blockly.WorkspaceSvg.prototype.getTotalBlockCount = function() {
       count++;
     }
   }
-  if (this.getUnloadedBlockCount) {
-    count += this.getUnloadedBlockCount();
-  }
+  count += this.getUnloadedBlockCount();
   return count;
 };
 
@@ -1760,9 +1749,7 @@ Blockly.WorkspaceSvg.prototype.getBlocksBoundingBox = function() {
 Blockly.WorkspaceSvg.prototype.cleanUp = function(opt_blockToMakeSpaceFor) {
   // Tidying only the scripts that happen to be rendered would pile them on top
   // of the ones that are not.
-  if (this.materializeAllScripts) {
-    this.materializeAllScripts();
-  }
+  this.materializeAllScripts();
   // Only treat as a block if it's actually a block object (context menu passes true)
   var makeSpaceForBlock = opt_blockToMakeSpaceFor && typeof opt_blockToMakeSpaceFor.getRootBlock === 'function'
       ? opt_blockToMakeSpaceFor.getRootBlock() : null;
@@ -1981,9 +1968,7 @@ Blockly.WorkspaceSvg.prototype.showContextMenu_ = function(e) {
       deleteCount++;
     }
   }
-  if (ws.getUnloadedBlockCount) {
-    deleteCount += ws.getUnloadedBlockCount();
-  }
+  deleteCount += ws.getUnloadedBlockCount();
 
   var DELAY = 9;
   function deleteNext() {
@@ -2002,9 +1987,7 @@ Blockly.WorkspaceSvg.prototype.showContextMenu_ = function(e) {
   // Deleting means deleting all of it, so the unrendered scripts have to exist
   // as blocks before the delete list is built.
   function deleteAll() {
-    if (ws.materializeAllScripts) {
-      ws.materializeAllScripts();
-    }
+    ws.materializeAllScripts();
     deleteList = Blockly.WorkspaceSvg.buildDeleteList_(ws.getTopBlocks(true));
     deleteNext();
   }

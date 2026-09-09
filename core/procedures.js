@@ -132,38 +132,17 @@ Blockly.Procedures.allProcedureMutations = function(root) {
  */
 Blockly.Procedures.deferredProcedureMutations_ = function(root) {
   var mutations = [];
-  if (!root.getDeferredScripts) {
-    return mutations;
-  }
   var scripts = root.getDeferredScripts();
   for (var i = 0; i < scripts.length; i++) {
     var prototypeMutation = null;
     var hasReturn = false;
-    if (scripts[i].desc) {
-      Blockly.Xml.forEachDescBlock(scripts[i].desc, scripts[i].ctx, function(d) {
-        if (d.opcode == Blockly.PROCEDURES_PROTOTYPE_BLOCK_TYPE && d.mutation) {
-          prototypeMutation = Blockly.Xml.mutationDescToDom_(d.mutation);
-        } else if (d.opcode == Blockly.PROCEDURES_RETURN_BLOCK_TYPE) {
-          hasReturn = true;
-        }
-      });
-    } else {
-      var xmlBlocks = scripts[i].xmlNode.getElementsByTagName('*');
-      for (var j = 0; j < xmlBlocks.length; j++) {
-        var type = xmlBlocks[j].getAttribute('type');
-        if (type == Blockly.PROCEDURES_PROTOTYPE_BLOCK_TYPE) {
-          var children = xmlBlocks[j].childNodes;
-          for (var k = 0; k < children.length; k++) {
-            if (children[k].nodeName.toLowerCase() == 'mutation') {
-              prototypeMutation = children[k];
-              break;
-            }
-          }
-        } else if (type == Blockly.PROCEDURES_RETURN_BLOCK_TYPE) {
-          hasReturn = true;
-        }
+    Blockly.Xml.forEachDescBlock(scripts[i].desc, scripts[i].ctx, function(d) {
+      if (d.opcode == Blockly.PROCEDURES_PROTOTYPE_BLOCK_TYPE && d.mutation) {
+        prototypeMutation = Blockly.Xml.mutationDescToDom_(d.mutation);
+      } else if (d.opcode == Blockly.PROCEDURES_RETURN_BLOCK_TYPE) {
+        hasReturn = true;
       }
-    }
+    });
     if (!prototypeMutation) {
       continue;
     }
@@ -258,9 +237,7 @@ Blockly.Procedures.isLegalName_ = function(name, workspace, opt_exclude) {
  * @return {boolean} True if the name is used, otherwise return false.
  */
 Blockly.Procedures.isNameUsed = function(name, workspace, opt_exclude) {
-  if (workspace.materializeAllScripts) {
-    workspace.materializeAllScripts();
-  }
+  workspace.materializeAllScripts();
   var blocks = workspace.getAllBlocks();
   // Iterate through every block and check the name.
   for (var i = 0; i < blocks.length; i++) {
@@ -523,9 +500,7 @@ Blockly.Procedures.getCallers = function(name, ws, definitionRoot,
   var allBlocks = [];
   // Callers in scripts that are not rendered still have to be found: this is
   // what renaming a procedure updates, and what refuses to delete a used one.
-  if (ws.materializeAllScripts) {
-    ws.materializeAllScripts();
-  }
+  ws.materializeAllScripts();
   var topBlocks = ws.getTopBlocks();
 
   // Start by deciding which stacks to investigate.
