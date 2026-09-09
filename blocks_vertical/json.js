@@ -941,6 +941,7 @@ Blockly.Blocks["json_split"] = {
     this.appendValueInput("DELIMITER")
         .setCheck(null)
         .appendField(Blockly.Msg.JSON_SPLIT_DELIMITER);
+    this.updateType_(this.getFieldValue("MODE"));
   },
   updateType_: function(newMode) {
     const mode = this.getFieldValue("MODE");
