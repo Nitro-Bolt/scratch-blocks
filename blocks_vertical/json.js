@@ -946,12 +946,21 @@ Blockly.Blocks["json_split"] = {
   updateType_: function(newMode) {
     const mode = this.getFieldValue("MODE");
     if (mode !== newMode) {
+      const newCheck = newMode === "JOIN" ? ["Array", "String"] : null;
       const input = this.getInput("INPUT");
       if (input) {
         const inputConnection = input.connection;
         if (inputConnection) {
           const inputBlock = inputConnection.targetBlock();
           if (inputBlock) {
+            if (newCheck === null || inputBlock.outputConnection &&
+                inputBlock.outputConnection.check_ &&
+                newCheck.some(function(c) {
+                  return inputBlock.outputConnection.check_.indexOf(c) !== -1;
+                })) {
+              this.savedInputShadowDom_ = null;
+              return;
+            }
             if (inputBlock.isShadow()) {
               const savedShadowDom = Blockly.Xml.blockToDom(inputBlock);
               savedShadowDom.removeAttribute('id');
