@@ -159,6 +159,46 @@ Blockly.Workspace.prototype.refreshToolboxSelection_ = function() {
 };
 
 /**
+ * Render all scripts managed by a deferred workspace load.
+ */
+Blockly.Workspace.prototype.materializeAllScripts = function() {
+  // Replaced by the deferred loader while it has scripts in hand.
+};
+
+/**
+ * Render deferred scripts containing any of the supplied block IDs.
+ * @param {!Array.<string>} _ids Block IDs to materialize.
+ */
+Blockly.Workspace.prototype.materializeScriptsForBlockIds = function(_ids) {
+  // Replaced by the deferred loader while it has scripts in hand.
+};
+
+/**
+ * Return descriptions for scripts which have not been materialized.
+ * @return {!Array.<!Object>} Deferred script descriptions.
+ */
+Blockly.Workspace.prototype.getDeferredScripts = function() {
+  return [];
+};
+
+/**
+ * Find the deferred script containing a block.
+ * @param {string} _id Block ID.
+ * @return {?Object} The script position, or null.
+ */
+Blockly.Workspace.prototype.findDeferredScriptByBlockId = function(_id) {
+  return null;
+};
+
+/**
+ * Count blocks in scripts which have not been materialized.
+ * @return {number} Block count.
+ */
+Blockly.Workspace.prototype.getUnloadedBlockCount = function() {
+  return 0;
+};
+
+/**
  * Dispose of this workspace.
  * Unlink from all DOM elements to prevent memory leaks.
  */
@@ -612,6 +652,12 @@ Blockly.Workspace.prototype.undo = function(redo) {
     outputStack.push(event);
   }
   events = Blockly.Events.filter(events, redo);
+  var ids = [];
+  events.forEach(function(event) {
+    ids.push(event.blockId, event.oldParentId, event.newParentId);
+    if (event.ids) ids = ids.concat(event.ids);
+  });
+  this.materializeScriptsForBlockIds(ids);
   Blockly.Events.recordUndo = false;
   if (Blockly.selected) {
     Blockly.Events.disable();

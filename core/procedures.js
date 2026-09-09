@@ -114,6 +114,48 @@ Blockly.Procedures.allProcedureMutations = function(root) {
       mutations.push(globalMutation);
     }
   }
+  var pending = Blockly.Procedures.deferredProcedureMutations_(root);
+  for (var k = 0; k < pending.length; k++) {
+    if (!localByProcCode[pending[k].getAttribute('proccode')]) {
+      mutations.push(pending[k]);
+    }
+  }
+  return mutations;
+};
+
+/**
+ * Find procedure definition mutations in scripts that a deferred workspace load
+ * has not materialized into blocks yet.
+ * @param {!Blockly.Workspace} root Root workspace.
+ * @return {!Array.<Element>} Array of mutation xml elements.
+ * @private
+ */
+Blockly.Procedures.deferredProcedureMutations_ = function(root) {
+  var mutations = [];
+  var scripts = root.getDeferredScripts();
+  for (var i = 0; i < scripts.length; i++) {
+    var prototypeMutation = null;
+    var hasReturn = false;
+    Blockly.Xml.forEachDescBlock(scripts[i].desc, scripts[i].ctx, function(d) {
+      if (d.opcode == Blockly.PROCEDURES_PROTOTYPE_BLOCK_TYPE && d.mutation) {
+        prototypeMutation = Blockly.Xml.mutationDescToDom_(d.mutation);
+      } else if (d.opcode == Blockly.PROCEDURES_RETURN_BLOCK_TYPE) {
+        hasReturn = true;
+      }
+    });
+    if (!prototypeMutation) {
+      continue;
+    }
+    var mutation = prototypeMutation.cloneNode(false);
+    mutation.setAttribute('generateshadows', true);
+    if (hasReturn) {
+      // ponytail: boolean-returning definitions show as round reporters until the
+      // script renders and the toolbox refreshes; the XML alone doesn't carry the
+      // output shape. Harmless while Blockly.Procedures.ENFORCE_TYPES is false.
+      mutation.setAttribute('return', Blockly.PROCEDURES_CALL_TYPE_REPORTER);
+    }
+    mutations.push(mutation);
+  }
   return mutations;
 };
 
@@ -195,6 +237,7 @@ Blockly.Procedures.isLegalName_ = function(name, workspace, opt_exclude) {
  * @return {boolean} True if the name is used, otherwise return false.
  */
 Blockly.Procedures.isNameUsed = function(name, workspace, opt_exclude) {
+  workspace.materializeAllScripts();
   var blocks = workspace.getAllBlocks();
   // Iterate through every block and check the name.
   for (var i = 0; i < blocks.length; i++) {
@@ -455,6 +498,9 @@ Blockly.Procedures.addCreateButton_ = function(workspace, xmlList) {
 Blockly.Procedures.getCallers = function(name, ws, definitionRoot,
     allowRecursive) {
   var allBlocks = [];
+  // Callers in scripts that are not rendered still have to be found: this is
+  // what renaming a procedure updates, and what refuses to delete a used one.
+  ws.materializeAllScripts();
   var topBlocks = ws.getTopBlocks();
 
   // Start by deciding which stacks to investigate.
