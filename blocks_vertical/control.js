@@ -215,9 +215,6 @@ Blockly.Blocks['control_stop'] = {
     var ALL_SCRIPTS = 'all';
     var THIS_SCRIPT = 'this script';
     var OTHER_SCRIPTS = 'other scripts in sprite';
-    var transformStopOption = function(block, option) {
-      block.setNextStatement(option == OTHER_SCRIPTS);
-    };
     var stopDropdown = new Blockly.FieldMutatorDropdown(function() {
       if (this.sourceBlock_ &&
           this.sourceBlock_.nextConnection &&
@@ -231,9 +228,9 @@ Blockly.Blocks['control_stop'] = {
         [Blockly.Msg.CONTROL_STOP_OTHER, OTHER_SCRIPTS]
       ];
     }, {
-      'all': transformStopOption,
-      'this script': transformStopOption,
-      'other scripts in sprite': transformStopOption
+      'all': {'nextStatement': false},
+      'this script': {'nextStatement': false},
+      'other scripts in sprite': {'nextStatement': true}
     });
     this.appendDummyInput()
         .appendField(Blockly.Msg.CONTROL_STOP)

@@ -930,6 +930,10 @@ Blockly.Blocks["json_split"] = {
     Blockly.Extensions.apply("output_array", this, false);
     const modeTransformations = {
       "SPLIT": {
+        "outputShape": Blockly.OUTPUT_SHAPE_SQUARE,
+        "outputCheck": "Array",
+        "disconnectInputs": ["INPUT"],
+        "inputChecks": {"INPUT": null},
         "inputShadows": {
           "INPUT": {
             "opcode": "text",
@@ -938,58 +942,22 @@ Blockly.Blocks["json_split"] = {
         }
       },
       "JOIN": {
+        "outputShape": Blockly.OUTPUT_SHAPE_ROUND,
+        "outputCheck": null,
+        "disconnectInputs": ["INPUT"],
+        "inputChecks": {"INPUT": ["Array", "String"]},
         "inputShadows": {"INPUT": null}
       }
-    };
-    const transformMode = function(block, newMode, oldMode) {
-      block.updateType_(newMode, oldMode);
-      Blockly.FieldMutatorDropdown.applyTransformationToBlock(
-          block, modeTransformations[newMode]);
     };
     const dropdown = new Blockly.FieldMutatorDropdown([
       [Blockly.Msg.JSON_SPLIT_SPLIT, "SPLIT"],
       [Blockly.Msg.JSON_SPLIT_JOIN, "JOIN"],
-    ], {
-      "SPLIT": transformMode,
-      "JOIN": transformMode
-    });
+    ], modeTransformations);
     this.appendValueInput("INPUT")
         .setCheck(null)
         .appendField(dropdown, "MODE");
     this.appendValueInput("DELIMITER")
         .setCheck(null)
         .appendField(Blockly.Msg.JSON_SPLIT_DELIMITER);
-    this.updateType_(this.getFieldValue("MODE"));
-  },
-  updateType_: function(newMode, opt_oldMode) {
-    const mode = opt_oldMode === undefined ?
-      this.getFieldValue("MODE") : opt_oldMode;
-    if (mode !== newMode) {
-      const input = this.getInput("INPUT");
-      if (input) {
-        const inputConnection = input.connection;
-        if (inputConnection) {
-          const inputBlock = inputConnection.targetBlock();
-          if (inputBlock) {
-            inputConnection.setShadowDom(null);
-            inputConnection.disconnect();
-            if (inputBlock.isShadow()) {
-              inputBlock.dispose(false);
-            }
-          } else {
-            inputConnection.setShadowDom(null);
-          }
-        }
-      }
-    }
-    if (newMode === "JOIN") {
-      this.setOutputShape(Blockly.OUTPUT_SHAPE_ROUND);
-      this.setOutput(true, null);
-      this.getInput("INPUT").setCheck(["Array", "String"]);
-    } else {
-      this.setOutputShape(Blockly.OUTPUT_SHAPE_SQUARE);
-      this.setOutput(true, 'Array');
-      this.getInput("INPUT").setCheck(null);
-    }
   }
 };

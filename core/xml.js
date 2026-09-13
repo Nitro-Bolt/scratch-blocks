@@ -812,6 +812,12 @@ Blockly.Xml.domToBlockHeadless_ = function(xmlBlock, workspace) {
           blockChild = Blockly.Xml.domToBlockHeadless_(childBlockElement,
               workspace);
           if (blockChild.outputConnection) {
+            if (childBlockElement == childShadowElement &&
+                !input.connection.checkType_(blockChild.outputConnection)) {
+              input.connection.setShadowDom(null);
+              blockChild.dispose(false);
+              break;
+            }
             input.connection.connect(blockChild.outputConnection);
           } else if (blockChild.previousConnection) {
             input.connection.connect(blockChild.previousConnection);

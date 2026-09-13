@@ -70,15 +70,17 @@ Blockly.FieldMutatorDropdown.fromJson = function(element) {
  * Apply a declarative transformation to a block.
  *
  * Supported properties are outputShape, outputCheck, previousStatement,
- * nextStatement, inputsInline, inputChecks, and inputShadows. inputChecks is
- * keyed by input name. inputShadows values are null to remove a shadow, or an
- * object with an opcode and optional fields object to create a default shadow.
+ * nextStatement, inputsInline, disconnectInputs, inputChecks, and inputShadows.
+ * inputChecks is keyed by input name. inputShadows values are null to remove a
+ * shadow, or an object with an opcode and optional fields object to create a
+ * default shadow.
  *
  * @param {!Blockly.Block} block The block to transform.
  * @param {!Object} transformation The declarative transformation.
+ * @param {boolean=} opt_isValueChange Whether the selected value just changed.
  */
 Blockly.FieldMutatorDropdown.applyTransformationToBlock = function(
-    block, transformation) {
+    block, transformation, opt_isValueChange) {
   if (Object.prototype.hasOwnProperty.call(transformation, 'outputShape')) {
     block.setOutputShape(transformation['outputShape']);
   }
@@ -94,6 +96,25 @@ Blockly.FieldMutatorDropdown.applyTransformationToBlock = function(
   }
   if (Object.prototype.hasOwnProperty.call(transformation, 'inputsInline')) {
     block.setInputsInline(!!transformation['inputsInline']);
+  }
+
+  if (opt_isValueChange && transformation['disconnectInputs']) {
+    var disconnectInputs = transformation['disconnectInputs'];
+    for (var i = 0; i < disconnectInputs.length; i++) {
+      var disconnectInput = block.getInput(disconnectInputs[i]);
+      var disconnectConnection = disconnectInput && disconnectInput.connection;
+      var disconnectBlock = disconnectConnection &&
+          disconnectConnection.targetBlock();
+      if (disconnectConnection) {
+        disconnectConnection.setShadowDom(null);
+      }
+      if (disconnectBlock) {
+        disconnectConnection.disconnect();
+        if (disconnectBlock.isShadow()) {
+          disconnectBlock.dispose(false);
+        }
+      }
+    }
   }
 
   var inputChecks = transformation['inputChecks'];
@@ -179,7 +200,7 @@ Blockly.FieldMutatorDropdown.prototype.applyTransformation = function(
     transformation(this.sourceBlock_, newValue, opt_oldValue, this);
   } else if (transformation) {
     Blockly.FieldMutatorDropdown.applyTransformationToBlock(
-        this.sourceBlock_, transformation);
+        this.sourceBlock_, transformation, newValue !== opt_oldValue);
   }
   if (this.sourceBlock_.rendered) {
     this.sourceBlock_.render();
