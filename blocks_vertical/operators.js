@@ -561,7 +561,7 @@ Blockly.Blocks['operator_cast'] = {
           "name": "VALUE"
         },
         {
-          "type": "field_dropdown",
+          "type": "field_mutator_dropdown",
           "name": "TYPE",
           "options": [
             [Blockly.Msg.OPERATORS_CAST_STRING, "string"],
@@ -569,10 +569,32 @@ Blockly.Blocks['operator_cast'] = {
             [Blockly.Msg.OPERATORS_CAST_BOOLEAN, "boolean"],
             [Blockly.Msg.OPERATORS_CAST_OBJECT, "object"],
             [Blockly.Msg.OPERATORS_CAST_ARRAY, "array"]
-          ]
+          ],
+          "transformations": {
+            "string": {
+              "outputShape": Blockly.OUTPUT_SHAPE_ROUND,
+              "outputCheck": "String"
+            },
+            "number": {
+              "outputShape": Blockly.OUTPUT_SHAPE_ROUND,
+              "outputCheck": "Number"
+            },
+            "boolean": {
+              "outputShape": Blockly.OUTPUT_SHAPE_HEXAGONAL,
+              "outputCheck": "Boolean"
+            },
+            "object": {
+              "outputShape": Blockly.OUTPUT_SHAPE_OBJECT,
+              "outputCheck": "Object"
+            },
+            "array": {
+              "outputShape": Blockly.OUTPUT_SHAPE_SQUARE,
+              "outputCheck": "Array"
+            }
+          }
         }
       ],
-      "output": null,
+      "output": "String",
       "outputShape": Blockly.OUTPUT_SHAPE_ROUND,
       "category": Blockly.Categories.operators,
       "extensions": ["colours_operators"],

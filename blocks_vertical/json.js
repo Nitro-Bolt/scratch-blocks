@@ -928,12 +928,30 @@ Blockly.Blocks["json_split"] = {
   init: function() {
     Blockly.Extensions.apply("colours_json", this, false);
     Blockly.Extensions.apply("output_array", this, false);
-    const dropdown = new Blockly.FieldDropdown([
+    const modeTransformations = {
+      "SPLIT": {
+        "inputShadows": {
+          "INPUT": {
+            "opcode": "text",
+            "fields": {"TEXT": "a,b,c"}
+          }
+        }
+      },
+      "JOIN": {
+        "inputShadows": {"INPUT": null}
+      }
+    };
+    const transformMode = function(block, newMode, oldMode) {
+      block.updateType_(newMode, oldMode);
+      Blockly.FieldMutatorDropdown.applyTransformationToBlock(
+          block, modeTransformations[newMode]);
+    };
+    const dropdown = new Blockly.FieldMutatorDropdown([
       [Blockly.Msg.JSON_SPLIT_SPLIT, "SPLIT"],
       [Blockly.Msg.JSON_SPLIT_JOIN, "JOIN"],
-    ]);
-    dropdown.setValidator((newMode) => {
-      this.updateType_(newMode);
+    ], {
+      "SPLIT": transformMode,
+      "JOIN": transformMode
     });
     this.appendValueInput("INPUT")
         .setCheck(null)
@@ -943,37 +961,20 @@ Blockly.Blocks["json_split"] = {
         .appendField(Blockly.Msg.JSON_SPLIT_DELIMITER);
     this.updateType_(this.getFieldValue("MODE"));
   },
-  updateType_: function(newMode) {
-    const mode = this.getFieldValue("MODE");
+  updateType_: function(newMode, opt_oldMode) {
+    const mode = opt_oldMode === undefined ?
+      this.getFieldValue("MODE") : opt_oldMode;
     if (mode !== newMode) {
-      const newCheck = newMode === "JOIN" ? ["Array", "String"] : null;
       const input = this.getInput("INPUT");
       if (input) {
         const inputConnection = input.connection;
         if (inputConnection) {
           const inputBlock = inputConnection.targetBlock();
           if (inputBlock) {
-            if (newCheck === null || inputBlock.outputConnection &&
-                inputBlock.outputConnection.check_ &&
-                newCheck.some(function(c) {
-                  return inputBlock.outputConnection.check_.indexOf(c) !== -1;
-                })) {
-              this.savedInputShadowDom_ = null;
-              return;
-            }
-            if (inputBlock.isShadow()) {
-              const savedShadowDom = Blockly.Xml.blockToDom(inputBlock);
-              savedShadowDom.removeAttribute('id');
-              this.savedInputShadowDom_ = savedShadowDom;
-            } else {
-              this.savedInputShadowDom_ = null;
-            }
             inputConnection.setShadowDom(null);
             inputConnection.disconnect();
             if (inputBlock.isShadow()) {
               inputBlock.dispose(false);
-            } else {
-              this.bumpNeighbours_();
             }
           } else {
             inputConnection.setShadowDom(null);
@@ -989,30 +990,6 @@ Blockly.Blocks["json_split"] = {
       this.setOutputShape(Blockly.OUTPUT_SHAPE_SQUARE);
       this.setOutput(true, 'Array');
       this.getInput("INPUT").setCheck(null);
-      const inputConnection = this.getInput("INPUT").connection;
-      if (inputConnection && !inputConnection.targetBlock() &&
-          this.savedInputShadowDom_) {
-        const shadowDom = this.savedInputShadowDom_;
-        inputConnection.setShadowDom(shadowDom);
-        const shadowBlock = Blockly.Xml.domToBlock(shadowDom, this.workspace);
-        if (shadowBlock.outputConnection) {
-          inputConnection.connect(shadowBlock.outputConnection);
-        }
-      }
     }
-  },
-  mutationToDom: function() {
-    const container = document.createElement("mutation");
-    container.setAttribute("mode", this.getFieldValue("MODE"));
-    return container;
-  },
-  domToMutation: function(xmlElement) {
-    this.updateType_(xmlElement.getAttribute("mode"));
-  },
-  saveExtraState: function() {
-    return { mode: this.getFieldValue("MODE") };
-  },
-  loadExtraState: function(state) {
-    this.updateType_(state["mode"]);
-  },
+  }
 };

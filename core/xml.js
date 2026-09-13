@@ -877,6 +877,14 @@ Blockly.Xml.domToBlockHeadless_ = function(xmlBlock, workspace) {
     }
     block.setShadow(true);
   }
+  for (var inputIndex = 0; inputIndex < block.inputList.length; inputIndex++) {
+    var fields = block.inputList[inputIndex].fieldRow;
+    for (var fieldIndex = 0; fieldIndex < fields.length; fieldIndex++) {
+      if (typeof fields[fieldIndex].reapplyTransformation === 'function') {
+        fields[fieldIndex].reapplyTransformation();
+      }
+    }
+  }
   return block;
 };
 
