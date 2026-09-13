@@ -35,7 +35,7 @@ goog.addDependency("../../../../core/block_dragger.js", ["Blockly.BlockDragger"]
 goog.addDependency("../../../../core/block_events.js", ["Blockly.Events.BlockBase","Blockly.Events.BlockChange","Blockly.Events.BlockCreate","Blockly.Events.BlockDelete","Blockly.Events.BlockMove","Blockly.Events.Change","Blockly.Events.Create","Blockly.Events.Delete","Blockly.Events.Move"], ["Blockly.Events","Blockly.Events.Abstract","goog.array","goog.math.Coordinate"]);
 goog.addDependency("../../../../core/block_render_svg_vertical.js", ["Blockly.BlockSvg.render"], ["Blockly.BlockSvg","Blockly.FieldLabel","Blockly.SystemColourPicker","Blockly.scratchBlocksUtils","Blockly.utils"]);
 goog.addDependency("../../../../core/block_svg.js", ["Blockly.BlockSvg"], ["Blockly.Block","Blockly.BlockAnimations","Blockly.ContextMenu","Blockly.Events.Ui","Blockly.Events.BlockMove","Blockly.Grid","Blockly.RenderedConnection","Blockly.scratchBlocksUtils","Blockly.Tooltip","Blockly.Touch","Blockly.utils","goog.Timer","goog.asserts","goog.dom","goog.math.Coordinate"]);
-goog.addDependency("../../../../core/blockly.js", ["Blockly"], ["Polypatch","Blockly.ColourMutation","Blockly.BlockSvg.render","Blockly.DropDownDiv","Blockly.Events","Blockly.FieldAngle","Blockly.FieldCheckbox","Blockly.FieldColour","Blockly.FieldColourSlider","Blockly.FieldDropdown","Blockly.FieldDropdownEditor","Blockly.FieldDependentDropdown","Blockly.FieldExtendable","Blockly.FieldIconMenu","Blockly.FieldImage","Blockly.FieldNote","Blockly.FieldSlider","Blockly.FieldTextInput","Blockly.FieldTextInputRemovable","Blockly.FieldTextDropdown","Blockly.FieldNumber","Blockly.FieldNumberDropdown","Blockly.FieldMatrix","Blockly.FieldVariable","Blockly.FieldVerticalSeparator","Blockly.Generator","Blockly.Msg","Blockly.Procedures","Blockly.ScratchMsgs","Blockly.Toolbox","Blockly.Touch","Blockly.WidgetDiv","Blockly.WorkspaceSvg","Blockly.constants","Blockly.inject","Blockly.utils","goog.color"]);
+goog.addDependency("../../../../core/blockly.js", ["Blockly"], ["Polypatch","Blockly.ColourMutation","Blockly.BlockSvg.render","Blockly.DropDownDiv","Blockly.Events","Blockly.FieldAngle","Blockly.FieldCheckbox","Blockly.FieldColour","Blockly.FieldColourSlider","Blockly.FieldDropdown","Blockly.FieldDropdownEditor","Blockly.FieldDependentDropdown","Blockly.FieldMutatorDropdown","Blockly.FieldExtendable","Blockly.FieldIconMenu","Blockly.FieldImage","Blockly.FieldNote","Blockly.FieldSlider","Blockly.FieldTextInput","Blockly.FieldTextInputRemovable","Blockly.FieldTextDropdown","Blockly.FieldNumber","Blockly.FieldNumberDropdown","Blockly.FieldMatrix","Blockly.FieldVariable","Blockly.FieldVerticalSeparator","Blockly.Generator","Blockly.Msg","Blockly.Procedures","Blockly.ScratchMsgs","Blockly.Toolbox","Blockly.Touch","Blockly.WidgetDiv","Blockly.WorkspaceSvg","Blockly.constants","Blockly.inject","Blockly.utils","goog.color"]);
 goog.addDependency("../../../../core/blocks.js", ["Blockly.Blocks"], []);
 goog.addDependency("../../../../core/bubble.js", ["Blockly.Bubble"], ["Blockly.Touch","Blockly.Workspace","goog.dom","goog.math.Coordinate","goog.userAgent"]);
 goog.addDependency("../../../../core/bubble_dragger.js", ["Blockly.BubbleDragger"], ["Blockly.Bubble","Blockly.Events.CommentMove","Blockly.WorkspaceCommentSvg","goog.math.Coordinate","goog.asserts"]);
@@ -69,6 +69,7 @@ goog.addDependency("../../../../core/field_image.js", ["Blockly.FieldImage"], ["
 goog.addDependency("../../../../core/field_label.js", ["Blockly.FieldLabel"], ["Blockly.Field","Blockly.Tooltip","goog.dom","goog.math.Size","goog.userAgent"]);
 goog.addDependency("../../../../core/field_label_serializable.js", ["Blockly.FieldLabelSerializable"], ["Blockly.FieldLabel"]);
 goog.addDependency("../../../../core/field_matrix.js", ["Blockly.FieldMatrix"], ["Blockly.DropDownDiv"]);
+goog.addDependency("../../../../core/field_mutator_dropdown.js", ["Blockly.FieldMutatorDropdown"], ["Blockly.Events","Blockly.Events.BlockCreate","Blockly.FieldDropdown","Blockly.Xml"]);
 goog.addDependency("../../../../core/field_note.js", ["Blockly.FieldNote"], ["Blockly.DropDownDiv","Blockly.FieldTextInput","goog.math","goog.userAgent"]);
 goog.addDependency("../../../../core/field_number.js", ["Blockly.FieldNumber"], ["Blockly.FieldTextInput","Blockly.Touch","goog.math","goog.userAgent"]);
 goog.addDependency("../../../../core/field_numberdropdown.js", ["Blockly.FieldNumberDropdown"], ["Blockly.FieldTextDropdown","goog.userAgent"]);
@@ -188,6 +189,7 @@ goog.require('Blockly.FieldImage');
 goog.require('Blockly.FieldLabel');
 goog.require('Blockly.FieldLabelSerializable');
 goog.require('Blockly.FieldMatrix');
+goog.require('Blockly.FieldMutatorDropdown');
 goog.require('Blockly.FieldNote');
 goog.require('Blockly.FieldNumber');
 goog.require('Blockly.FieldNumberDropdown');
