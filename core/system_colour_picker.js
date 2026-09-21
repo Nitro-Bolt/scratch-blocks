@@ -3,6 +3,13 @@
 goog.provide('Blockly.SystemColourPicker');
 
 /**
+ * Global brightness threshold used to decide whether a bright block
+ * colour should use dark label text instead of white.
+ * @type {number}
+ */
+Blockly.LABEL_CONTRAST_THRESHOLD = 190;
+
+/**
  * Place a native colour input over an SVG paintbrush icon.
  * @param {!Element} anchor Paintbrush icon.
  * @param {!Function} getColour Returns the current colour.
@@ -43,12 +50,14 @@ Blockly.SystemColourPicker.attach = function(anchor, getColour, callback) {
 /**
  * Check whether a hex colour needs light foreground text.
  * @param {?string} colour Background colour in #rrggbb format.
+ * @param {?number} limit Brightness limit.
  * @return {boolean} Whether white text should be used.
  */
-Blockly.SystemColourPicker.isDark = function(colour) {
+Blockly.SystemColourPicker.isDark = function(colour, limit) {
+  if (limit === null || limit === (void 0)) limit = 128;
   var match = /^#([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})$/i.exec(colour || '');
   if (!match) return false;
   var brightness = (299 * parseInt(match[1], 16) +
       587 * parseInt(match[2], 16) + 114 * parseInt(match[3], 16)) / 1000;
-  return brightness < 128;
+  return brightness < limit;
 };

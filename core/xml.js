@@ -193,6 +193,12 @@ Blockly.Xml.allFieldsToDom_ = function(block, element) {
 Blockly.Xml.blockToDom = function(block, opt_noId) {
   var element = goog.dom.createDom(block.isShadow() ? 'shadow' : 'block');
   element.setAttribute('type', block.type);
+  // Carry the preferred monitor presentation with block creation events. This lets
+  // the VM treat core and extension blocks uniformly without maintaining opcode lists.
+  var outputChecks = block.outputConnection && block.outputConnection.check_;
+  var monitorMode = outputChecks && outputChecks.indexOf('Array') !== -1 ?
+    'list' : 'default';
+  element.setAttribute('monitor_mode', monitorMode);
   if (!opt_noId) {
     element.setAttribute('id', block.id);
   }
@@ -806,6 +812,12 @@ Blockly.Xml.domToBlockHeadless_ = function(xmlBlock, workspace) {
           blockChild = Blockly.Xml.domToBlockHeadless_(childBlockElement,
               workspace);
           if (blockChild.outputConnection) {
+            if (childBlockElement == childShadowElement &&
+                !input.connection.checkType_(blockChild.outputConnection)) {
+              input.connection.setShadowDom(null);
+              blockChild.dispose(false);
+              break;
+            }
             input.connection.connect(blockChild.outputConnection);
           } else if (blockChild.previousConnection) {
             input.connection.connect(blockChild.previousConnection);
@@ -870,6 +882,14 @@ Blockly.Xml.domToBlockHeadless_ = function(xmlBlock, workspace) {
           child.isShadow(), 'Shadow block not allowed non-shadow child.');
     }
     block.setShadow(true);
+  }
+  for (var inputIndex = 0; inputIndex < block.inputList.length; inputIndex++) {
+    var fields = block.inputList[inputIndex].fieldRow;
+    for (var fieldIndex = 0; fieldIndex < fields.length; fieldIndex++) {
+      if (typeof fields[fieldIndex].reapplyTransformation === 'function') {
+        fields[fieldIndex].reapplyTransformation();
+      }
+    }
   }
   return block;
 };

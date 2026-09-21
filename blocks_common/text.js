@@ -55,3 +55,28 @@ Blockly.Blocks['text'] = {
     });
   }
 };
+
+Blockly.Blocks['text_multiline'] = {
+  /**
+   * Multiline text value shadow.
+   * @this Blockly.Block
+   */
+  init: function() {
+    this.jsonInit({
+      "message0": "%1",
+      "args0": [
+        {
+          "type": "field_input",
+          "name": "TEXT",
+          "multiline": true
+        }
+      ],
+      "output": "String",
+      "outputShape": Blockly.OUTPUT_SHAPE_ROUND,
+      "colour": Blockly.Colours.textField,
+      "colourSecondary": Blockly.Colours.textField,
+      "colourTertiary": Blockly.Colours.textField,
+      "colourQuaternary": Blockly.Colours.textField
+    });
+  }
+};

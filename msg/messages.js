@@ -132,6 +132,14 @@ Blockly.Msg.JSON_REVERSE_ARRAY = 'reverse %1';
 Blockly.Msg.JSON_FOREACH_VALUE = 'value';
 Blockly.Msg.JSON_FOREACH_INDEX = 'index';
 Blockly.Msg.JSON_FOREACH = 'for each %1 %2 in %3';
+Blockly.Msg.JSON_MAP = 'map %1 by %2 %3 %4 %5';
+Blockly.Msg.JSON_FILTER = 'filter %1 by %2 %3 %4 %5';
+Blockly.Msg.JSON_SORT = 'sort %1 by %2 %3 %4 %5';
+Blockly.Msg.JSON_SORT_A = 'a';
+Blockly.Msg.JSON_SORT_B = 'b';
+Blockly.Msg.JSON_SPLIT_SPLIT = 'split';
+Blockly.Msg.JSON_SPLIT_JOIN = 'join'
+Blockly.Msg.JSON_SPLIT_DELIMITER = 'with delimiter';
 Blockly.Msg.JSON_KEY = 'key';
 Blockly.Msg.JSON_BAR = 'bar';
 Blockly.Msg.JSON_BAZ = 'baz';
@@ -383,6 +391,13 @@ Blockly.Msg.ASSETS_ALL = 'all assets in %1';
 Blockly.Msg.ASSETS_METADATA = '%1 of %2';
 Blockly.Msg.ASSETS_SET = 'set %1 of %2 to %3';
 Blockly.Msg.ASSETS_WRITE = 'write %1 as %2 to %3';
+Blockly.Msg.ASSETS_FILE_AS_TYPE_TEXT = 'text';
+Blockly.Msg.ASSETS_FILE_AS_TYPE_DATA_URI = 'data: URI';
+Blockly.Msg.ASSETS_METADATA_NAME = 'name';
+Blockly.Msg.ASSETS_METADATA_EXTENSION = 'extension';
+Blockly.Msg.ASSETS_METADATA_CONTENT_TYPE = 'content type';
+Blockly.Msg.ASSETS_METADATA_LAST_MODIFIED = 'last modified';
+Blockly.Msg.ASSETS_METADATA_MD5 = 'md5';
 
 // Category labels
 Blockly.Msg.CATEGORY_MOTION = 'Motion';
@@ -433,6 +448,10 @@ Blockly.Msg.WORKSPACE_COMMENT_DEFAULT_TEXT = 'Say something...';
 Blockly.Msg.COLOUR_HUE_LABEL = 'Color';
 Blockly.Msg.COLOUR_SATURATION_LABEL = 'Saturation';
 Blockly.Msg.COLOUR_BRIGHTNESS_LABEL = 'Brightness';
+
+// Organization
+Blockly.Msg.FOR_ALL_SPRITES = 'For all sprites:';
+Blockly.Msg.FOR_THIS_SPRITE_ONLY = 'For this sprite only:';
 
 // Variables
 // @todo Remove these once fully managed by Scratch VM / Scratch GUI
@@ -497,3 +516,7 @@ Blockly.Msg.NEW_BROADCAST_MESSAGE = 'New message';
 Blockly.Msg.NEW_BROADCAST_MESSAGE_TITLE = 'New message name:';
 Blockly.Msg.BROADCAST_MODAL_TITLE = 'New Message';
 Blockly.Msg.DEFAULT_BROADCAST_MESSAGE_NAME = 'message1';
+Blockly.Msg.RENAME_BROADCAST = 'Rename broadcast';
+Blockly.Msg.RENAME_BROADCAST_TITLE = 'Rename all "%1" broadcasts to:';
+Blockly.Msg.RENAME_BROADCAST_MODAL_TITLE = 'Rename Broadcast';
+Blockly.Msg.DELETE_BROADCAST = 'Delete the "%1" broadcast';

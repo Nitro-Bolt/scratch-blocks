@@ -1058,7 +1058,7 @@ Blockly.Gesture.prototype.duplicateOnDrag_ = function() {
     // need to update shadow block IDs to avoid problems in the VM.
     // Resizes will be reenabled at the end of the drag.
     this.startWorkspace_.setResizesEnabled(false);
-    var xmlBlock = Blockly.Xml.blockToDom(this.targetBlock_);
+    var xmlBlock = Blockly.Xml.blockToDom(this.targetBlock_, true);
     newBlock = Blockly.Xml.domToBlock(xmlBlock, this.startWorkspace_);
 
     // Move the duplicate to original position.

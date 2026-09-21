@@ -479,11 +479,9 @@ Blockly.Variables.renameVariable = function(workspace, variable,
   var promptMsg, modalTitle;
   var varType = variable.type;
   if (varType == Blockly.BROADCAST_MESSAGE_VARIABLE_TYPE) {
-    console.warn('Unexpected attempt to rename a broadcast message with ' +
-        'id: ' + variable.getId() + ' and name: ' + variable.name);
-    return;
-  }
-  if (varType == Blockly.TABLE_VARIABLE_TYPE) {
+    promptMsg = Blockly.Msg.RENAME_BROADCAST_TITLE;
+    modalTitle = Blockly.Msg.RENAME_BROADCAST_MODAL_TITLE;
+  } else if (varType == Blockly.TABLE_VARIABLE_TYPE) {
     promptMsg = Blockly.Msg.RENAME_TABLE_TITLE;
     modalTitle = Blockly.Msg.RENAME_TABLE_MODAL_TITLE;
   } else if (varType == Blockly.LIST_VARIABLE_TYPE) {

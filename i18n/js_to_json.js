@@ -34,7 +34,7 @@ const extract = function (str) {
 // Stream input and push each match to the storage object
 const stream = fs.createReadStream(PATH_INPUT);
 stream
-    .pipe(es.split('\n'))
+    .pipe(es.split())
     .pipe(es.mapSync(function (str) {
         if (!match(str)) return;
         const result = extract(str);

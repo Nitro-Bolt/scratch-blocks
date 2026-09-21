@@ -639,6 +639,8 @@ Blockly.Blocks['json_foreach'] = {
     this.jsonInit({
       "message0": Blockly.Msg.JSON_FOREACH,
       "message1": "%1", // Statement
+      "message2": "%1",
+      "lastDummyAlign2": "RIGHT",
       "args0": [
         {
           "type": "input_value",
@@ -658,6 +660,16 @@ Blockly.Blocks['json_foreach'] = {
         {
           "type": "input_statement",
           "name": "SUBSTACK"
+        }
+      ],
+      "args2": [
+        {
+          "type": "field_image",
+          "src": Blockly.mainWorkspace.options.pathToMedia + "repeat.svg",
+          "width": 24,
+          "height": 24,
+          "alt": "*",
+          "flip_rtl": true
         }
       ],
       "category": Blockly.Categories.json,
@@ -693,5 +705,259 @@ Blockly.Blocks['json_foreach_index'] = {
       "duplicateOnDrag": true,
       "extensions": ["colours_json", "output_number"]
     });
+  }
+};
+
+Blockly.Blocks['json_map'] = {
+  /**
+   * Block to map each item and index in array.
+   * @this Blockly.Block
+   */
+  init: function() {
+    this.jsonInit({
+      "message0": Blockly.Msg.JSON_MAP,
+      "args0": [
+        {
+          "type": "input_value",
+          "name": "ARRAY",
+          "check": "Array"
+        },
+        {
+          "type": "input_value",
+          "name": "VALUE"
+        },
+        {
+          "type": "input_value",
+          "name": "INDEX"
+        },
+        {
+          "type": "field_image",
+          "src": Blockly.mainWorkspace.options.pathToMedia + "icons/json_right_arrow.svg",
+          "width": 24,
+          "height": 24,
+          "alt": "=>"
+        },
+        {
+          "type": "input_value",
+          "name": "METHOD"
+        },
+      ],
+      "category": Blockly.Categories.json,
+      "extensions": ["colours_json", "output_array"],
+    });
+  }
+};
+
+Blockly.Blocks['json_map_value'] = {
+  /**
+   * @this Blockly.Block
+   */
+  init: function() {
+    this.jsonInit({
+      "message0": Blockly.Msg.JSON_FOREACH_VALUE,
+      "output": null,
+      "outputShape": Blockly.OUTPUT_SHAPE_ROUND,
+      "category": Blockly.Categories.json,
+      "duplicateOnDrag": true,
+      "extensions": ["colours_json"],
+    });
+  }
+};
+
+Blockly.Blocks['json_map_index'] = {
+  /**
+   * @this Blockly.Block
+   */
+  init: function() {
+    this.jsonInit({
+      "message0": Blockly.Msg.JSON_FOREACH_INDEX,
+      "category": Blockly.Categories.json,
+      "duplicateOnDrag": true,
+      "extensions": ["colours_json", "output_number"]
+    });
+  }
+};
+
+Blockly.Blocks['json_filter'] = {
+  /**
+   * Block to filter each item and index in array.
+   * @this Blockly.Block
+   */
+  init: function() {
+    this.jsonInit({
+      "message0": Blockly.Msg.JSON_FILTER,
+      "args0": [
+        {
+          "type": "input_value",
+          "name": "ARRAY",
+          "check": "Array"
+        },
+        {
+          "type": "input_value",
+          "name": "VALUE"
+        },
+        {
+          "type": "input_value",
+          "name": "INDEX"
+        },
+        {
+          "type": "field_image",
+          "src": Blockly.mainWorkspace.options.pathToMedia + "icons/json_right_arrow.svg",
+          "width": 24,
+          "height": 24,
+          "alt": "=>"
+        },
+        {
+          "type": "input_value",
+          "name": "METHOD",
+          "check": "Boolean"
+        },
+      ],
+      "category": Blockly.Categories.json,
+      "extensions": ["colours_json", "output_array"],
+    });
+  }
+};
+
+Blockly.Blocks['json_filter_value'] = {
+  /**
+   * @this Blockly.Block
+   */
+  init: function() {
+    this.jsonInit({
+      "message0": Blockly.Msg.JSON_FOREACH_VALUE,
+      "output": null,
+      "outputShape": Blockly.OUTPUT_SHAPE_ROUND,
+      "category": Blockly.Categories.json,
+      "duplicateOnDrag": true,
+      "extensions": ["colours_json"],
+    });
+  }
+};
+
+Blockly.Blocks['json_filter_index'] = {
+  /**
+   * @this Blockly.Block
+   */
+  init: function() {
+    this.jsonInit({
+      "message0": Blockly.Msg.JSON_FOREACH_INDEX,
+      "category": Blockly.Categories.json,
+      "duplicateOnDrag": true,
+      "extensions": ["colours_json", "output_number"]
+    });
+  }
+};
+
+Blockly.Blocks['json_sort'] = {
+  /**
+   * Block to sort each item and index in array.
+   * @this Blockly.Block
+   */
+  init: function() {
+    this.jsonInit({
+      "message0": Blockly.Msg.JSON_SORT,
+      "args0": [
+        {
+          "type": "input_value",
+          "name": "ARRAY",
+          "check": "Array"
+        },
+        {
+          "type": "input_value",
+          "name": "A"
+        },
+        {
+          "type": "input_value",
+          "name": "B"
+        },
+        {
+          "type": "field_image",
+          "src": Blockly.mainWorkspace.options.pathToMedia + "icons/json_right_arrow.svg",
+          "width": 24,
+          "height": 24,
+          "alt": "=>"
+        },
+        {
+          "type": "input_value",
+          "name": "METHOD"
+        },
+      ],
+      "category": Blockly.Categories.json,
+      "extensions": ["colours_json", "output_array"],
+    });
+  }
+};
+
+Blockly.Blocks['json_sort_a'] = {
+  /**
+   * @this Blockly.Block
+   */
+  init: function() {
+    this.jsonInit({
+      "message0": Blockly.Msg.JSON_SORT_A,
+      "output": null,
+      "outputShape": Blockly.OUTPUT_SHAPE_ROUND,
+      "category": Blockly.Categories.json,
+      "duplicateOnDrag": true,
+      "extensions": ["colours_json"],
+    });
+  }
+};
+
+Blockly.Blocks['json_sort_b'] = {
+  /**
+   * @this Blockly.Block
+   */
+  init: function() {
+    this.jsonInit({
+      "message0": Blockly.Msg.JSON_SORT_B,
+      "output": null,
+      "outputShape": Blockly.OUTPUT_SHAPE_ROUND,
+      "category": Blockly.Categories.json,
+      "duplicateOnDrag": true,
+      "extensions": ["colours_json"]
+    });
+  }
+};
+
+Blockly.Blocks["json_split"] = {
+  /**
+   * @this Blockly.Block
+   */
+  init: function() {
+    Blockly.Extensions.apply("colours_json", this, false);
+    Blockly.Extensions.apply("output_array", this, false);
+    const modeTransformations = {
+      "SPLIT": {
+        "outputShape": Blockly.OUTPUT_SHAPE_SQUARE,
+        "outputCheck": "Array",
+        "disconnectInputs": ["INPUT"],
+        "inputChecks": {"INPUT": null},
+        "inputShadows": {
+          "INPUT": {
+            "opcode": "text",
+            "fields": {"TEXT": "a,b,c"}
+          }
+        }
+      },
+      "JOIN": {
+        "outputShape": Blockly.OUTPUT_SHAPE_ROUND,
+        "outputCheck": null,
+        "disconnectInputs": ["INPUT"],
+        "inputChecks": {"INPUT": ["Array", "String"]},
+        "inputShadows": {"INPUT": null}
+      }
+    };
+    const dropdown = new Blockly.FieldMutatorDropdown([
+      [Blockly.Msg.JSON_SPLIT_SPLIT, "SPLIT"],
+      [Blockly.Msg.JSON_SPLIT_JOIN, "JOIN"],
+    ], modeTransformations);
+    this.appendValueInput("INPUT")
+        .setCheck(null)
+        .appendField(dropdown, "MODE");
+    this.appendValueInput("DELIMITER")
+        .setCheck(null)
+        .appendField(Blockly.Msg.JSON_SPLIT_DELIMITER);
   }
 };

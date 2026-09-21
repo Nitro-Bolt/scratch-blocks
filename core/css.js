@@ -503,8 +503,8 @@ Blockly.Css.CONTENT = [
     'font-weight: 500;',
   '}',
 
-  '.blocklyText.removableTextInput {',
-    'fill: #fff;',
+  '.blocklyText.blocklyTextDark {',
+    'fill: $colour_blackText;',
   '}',
 
   '.blocklyCheckbox {',
@@ -526,13 +526,13 @@ Blockly.Css.CONTENT = [
   '.blocklyNonEditableText>text {',
     'pointer-events: none;',
   '}',
-  '.blocklyNonEditableText>text,',
-  '.blocklyEditableText>text {',
-    'fill: $colour_textFieldText;',
-  '}',
 
   '.blocklyDropdownText {',
     'fill: $colour_text !important;',
+  '}',
+
+  '.blocklyDropdownText.blocklyTextDark {',
+    'fill: $colour_blackText !important;',
   '}',
 
   '.blocklyBubbleText {',
@@ -829,6 +829,20 @@ Blockly.Css.CONTENT = [
     'background-color: $colour_textField;',
     'font-weight: 500;',
     'color-scheme: light;',
+  '}',
+
+  '.blocklyHtmlTextAreaInput {',
+    'resize: none;',
+    'overflow: hidden;',
+    'text-align: left;',
+    'white-space: pre-wrap;',
+    'padding: 8px;',
+    'line-height: 16px;',
+  '}',
+
+  '.blocklyText.blocklyMultilineText,',
+  '.blocklyText.blocklyEditableLabel.blocklyMultilineText {',
+    'fill: $colour_textFieldText;',
   '}',
 
   '.blocklyMainBackground {',
@@ -1208,7 +1222,7 @@ Blockly.Css.CONTENT = [
     'font: normal 13px "Helvetica Neue", Helvetica, sans-serif;',
     'margin: 0;',
     'outline: none;',
-    'padding: 4px 0;',
+    'padding: 0;',
     'position: absolute;',
     'overflow-y: auto;',
     'overflow-x: hidden;',
@@ -1256,7 +1270,7 @@ Blockly.Css.CONTENT = [
     'list-style: none;',
     'margin: 0;',
      /* 28px on the left for icon or checkbox; 7em on the right for shortcut. */
-    'padding: 4px 7em 4px 28px;',
+    'padding: 5px 7em 5px 28px;',
     'white-space: nowrap;',
   '}',
 
@@ -1328,8 +1342,8 @@ Blockly.Css.CONTENT = [
     'border-color: $colour_contextMenuActiveBackground;',
     'border-style: dotted;',
     'border-width: 1px 0;',
-    'padding-bottom: 3px;',
-    'padding-top: 3px;',
+    'padding-bottom: 4px;',
+    'padding-top: 4px;',
   '}',
 
   '.blocklyDropDownDiv .goog-menuitem-highlight,',
@@ -1428,6 +1442,12 @@ Blockly.Css.CONTENT = [
   '.blocklyDropDownDiv .goog-menuseparator {',
     'border-top: 1px solid var(--ui-black-transparent);',
     'margin: 2px 0;',
+    'padding: 0;',
+  '}',
+
+  '.blocklyDropDownDiv .goog-menuseparator {',
+    'border-top: 1px solid var(--blockly-dropdown-border-colour);',
+    'margin: 4px 5px;',
     'padding: 0;',
   '}',
 

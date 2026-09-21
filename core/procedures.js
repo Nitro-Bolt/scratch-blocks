@@ -373,6 +373,36 @@ Blockly.Procedures.flyoutCategory = function(workspace) {
   // Create call blocks for each procedure defined in the workspace
   var mutations = Blockly.Procedures.allProcedureMutations(workspace);
   mutations = Blockly.Procedures.sortProcedureMutations_(mutations);
+  var globalMutations = mutations.filter(
+      Blockly.Procedures.isGlobalMutation_);
+  var localMutations = mutations.filter(function(mutation) {
+    return !Blockly.Procedures.isGlobalMutation_(mutation);
+  });
+
+  Blockly.Procedures.addProcedureGroup_(workspace, xmlList,
+      Blockly.Msg.FOR_ALL_SPRITES, globalMutations);
+  Blockly.Procedures.addProcedureGroup_(workspace, xmlList,
+      Blockly.Msg.FOR_THIS_SPRITE_ONLY, localMutations);
+
+  return xmlList;
+};
+
+/**
+ * Add a labeled group of procedure call blocks to the flyout.
+ * @param {!Blockly.Workspace} workspace The workspace containing procedures.
+ * @param {!Array.<!Element>} xmlList Array of XML flyout elements.
+ * @param {string} labelText Text for the scope label.
+ * @param {!Array.<!Element>} mutations Procedure mutations to add.
+ * @private
+ */
+Blockly.Procedures.addProcedureGroup_ = function(workspace, xmlList,
+    labelText, mutations) {
+  if (!mutations.length) return;
+
+  var label = goog.dom.createDom('label');
+  label.setAttribute('text', labelText);
+  xmlList.push(label);
+
   for (var i = 0; i < mutations.length; i++) {
     var mutation = mutations[i].cloneNode(false);
     var procCode = mutation.getAttribute('proccode');
@@ -385,12 +415,10 @@ Blockly.Procedures.flyoutCategory = function(workspace) {
     // </block>
     var block = goog.dom.createDom('block');
     block.setAttribute('type', 'procedures_call');
-    block.setAttribute('gap', 12);
+    block.setAttribute('gap', i === mutations.length - 1 ? 24 : 8);
     block.appendChild(mutation);
     xmlList.push(block);
   }
-
-  return xmlList;
 };
 
 /**

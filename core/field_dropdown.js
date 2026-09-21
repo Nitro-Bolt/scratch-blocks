@@ -35,6 +35,7 @@ goog.require('goog.events');
 goog.require('goog.style');
 goog.require('goog.ui.Menu');
 goog.require('goog.ui.MenuItem');
+goog.require('goog.ui.MenuSeparator');
 goog.require('goog.userAgent');
 
 
@@ -53,7 +54,17 @@ goog.require('goog.userAgent');
 Blockly.FieldDropdown = function(menuGenerator, opt_validator) {
   this.menuGenerator_ = menuGenerator;
   this.trimOptions_();
-  var firstTuple = this.getOptions()[0];
+  var options = this.getOptions();
+  var firstTuple = null;
+  for (var i = 0; i < options.length; i++) {
+    if (options[i] != Blockly.FieldDropdown.SEPARATOR) {
+      firstTuple = options[i];
+      break;
+    }
+  }
+  if (!firstTuple) {
+    throw new Error('FieldDropdown options must contain at least one option.');
+  }
 
   // Call parent's constructor.
   Blockly.FieldDropdown.superClass_.constructor.call(this, firstTuple[1],
@@ -77,6 +88,12 @@ Blockly.FieldDropdown.fromJson = function(element) {
  * Horizontal distance that a checkmark overhangs the dropdown.
  */
 Blockly.FieldDropdown.CHECKMARK_OVERHANG = 25;
+
+/**
+ * Magic value used to insert a separator into a dropdown menu.
+ * @const {string}
+ */
+Blockly.FieldDropdown.SEPARATOR = 'separator';
 
 /**
  * Mouse cursor style when over the hotspot that initiates the editor.
@@ -201,6 +218,10 @@ Blockly.FieldDropdown.prototype.showEditor_ = function() {
   var menu = new goog.ui.Menu();
   menu.setRightToLeft(this.sourceBlock_.RTL);
   for (var i = 0; i < options.length; i++) {
+    if (options[i] == Blockly.FieldDropdown.SEPARATOR) {
+      menu.addChild(new goog.ui.MenuSeparator(), true);
+      continue;
+    }
     var content = options[i][0]; // Human-readable text or image.
     var value = options[i][1];   // Language-neutral value.
     if (typeof content == 'object') {
@@ -323,6 +344,9 @@ Blockly.FieldDropdown.prototype.trimOptions_ = function() {
 
   // Localize label text and image alt text.
   for (var i = 0; i < options.length; i++) {
+    if (options[i] == Blockly.FieldDropdown.SEPARATOR) {
+      continue;
+    }
     var label = options[i][0];
     if (typeof label == 'string') {
       options[i][0] = Blockly.utils.replaceMessageReferences(label);
@@ -383,6 +407,9 @@ Blockly.FieldDropdown.prototype.setValue = function(newValue) {
   // Look up and display the human-readable text.
   var options = this.getOptions();
   for (var i = 0; i < options.length; i++) {
+    if (options[i] == Blockly.FieldDropdown.SEPARATOR) {
+      continue;
+    }
     // Options are tuples of human-readable text and language-neutral values.
     if (options[i][1] == newValue) {
       var content = options[i][0];

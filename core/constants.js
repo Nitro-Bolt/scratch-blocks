@@ -352,6 +352,26 @@ Blockly.NEW_BROADCAST_MESSAGE_ID = 'NEW_BROADCAST_MESSAGE_ID';
 Blockly.NEW_VARIABLE_OPTION_ID = 'NEW_VARIABLE_OPTION_ID';
 
 /**
+ * String for use in the dropdown created in field_variable,
+ * specifically for broadcast messages.
+ * This string indicates that this option in the dropdown is 'Rename
+ * broadcast...' and if selected, should trigger the prompt to rename a
+ * broadcast message.
+ * @const {string}
+ */
+Blockly.RENAME_BROADCAST_ID = 'RENAME_BROADCAST_ID';
+
+/**
+ * String for use in the dropdown created in field_variable,
+ * specifically for broadcast messages.
+ * This string indicates that this option in the dropdown is 'Delete the "%1"
+ * broadcast' and if selected, should trigger the prompt to delete a broadcast
+ * message.
+ * @const {string}
+ */
+Blockly.DELETE_BROADCAST_ID = 'DELETE_BROADCAST_ID';
+
+/**
  * String representing the variable type of broadcast message blocks.
  * This string, for use in differentiating between types of variables,
  * indicates that the current variable is a broadcast message.

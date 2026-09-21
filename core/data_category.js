@@ -46,10 +46,8 @@ Blockly.DataCategory = function(workspace) {
   var xmlList = [];
 
   Blockly.DataCategory.addCreateButton(xmlList, workspace, 'VARIABLE');
-
-  for (var i = 0; i < variableModelList.length; i++) {
-    Blockly.DataCategory.addDataVariable(xmlList, variableModelList[i]);
-  }
+  Blockly.DataCategory.addScopedVariableReporters(xmlList, variableModelList,
+      Blockly.DataCategory.addDataVariable);
 
   if (variableModelList.length > 0) {
     xmlList[xmlList.length - 1].setAttribute('gap', 28);
@@ -65,9 +63,8 @@ Blockly.DataCategory = function(workspace) {
   Blockly.DataCategory.addCreateButton(xmlList, workspace, 'LIST');
   variableModelList = workspace.getVariablesOfType(Blockly.LIST_VARIABLE_TYPE);
   variableModelList.sort(Blockly.VariableModel.compareByName);
-  for (var i = 0; i < variableModelList.length; i++) {
-    Blockly.DataCategory.addDataList(xmlList, variableModelList[i]);
-  }
+  Blockly.DataCategory.addScopedVariableReporters(xmlList, variableModelList,
+      Blockly.DataCategory.addDataList);
 
   if (variableModelList.length > 0) {
     xmlList[xmlList.length - 1].setAttribute('gap', 28);
@@ -96,9 +93,8 @@ Blockly.DataCategory = function(workspace) {
   Blockly.DataCategory.addCreateButton(xmlList, workspace, 'TABLE');
   variableModelList = workspace.getVariablesOfType(Blockly.TABLE_VARIABLE_TYPE);
   variableModelList.sort(Blockly.VariableModel.compareByName);
-  for (var i = 0; i < variableModelList.length; i++) {
-    Blockly.DataCategory.addDataTable(xmlList, variableModelList[i]);
-  }
+  Blockly.DataCategory.addScopedVariableReporters(xmlList, variableModelList,
+      Blockly.DataCategory.addDataTable);
 
   if (variableModelList.length > 0) {
     xmlList[xmlList.length - 1].setAttribute('gap', 28);
@@ -707,6 +703,47 @@ Blockly.DataCategory.addHideTable = function(xmlList, variable) {
   //   <field name="TABLE" variabletype="table" id="">variablename</field>
   // </block>
   Blockly.DataCategory.addBlock(xmlList, variable, 'data_hidetable', 'TABLE');
+};
+
+/**
+ * Add variable reporters grouped by global and sprite-local scope.
+ * @param {!Array.<!Element>} xmlList Array of XML flyout elements.
+ * @param {!Array.<!Blockly.VariableModel>} variables Variables to add.
+ * @param {!function(!Array.<!Element>, !Blockly.VariableModel)} addReporter
+ *     Function that adds the reporter for a variable.
+ */
+Blockly.DataCategory.addScopedVariableReporters = function(xmlList, variables,
+    addReporter) {
+  var globalVariables = variables.filter(function(variable) {
+    return !variable.isLocal;
+  });
+  var localVariables = variables.filter(function(variable) {
+    return variable.isLocal;
+  });
+
+  var addGroup = function(label, group) {
+    if (!group.length) return;
+    Blockly.DataCategory.addLabel(xmlList, label);
+    for (var i = 0; i < group.length; i++) {
+      addReporter(xmlList, group[i]);
+      xmlList[xmlList.length - 1].setAttribute(
+          'gap', i === group.length - 1 ? 24 : 8);
+    }
+  };
+
+  addGroup(Blockly.Msg.FOR_ALL_SPRITES, globalVariables);
+  addGroup(Blockly.Msg.FOR_THIS_SPRITE_ONLY, localVariables);
+};
+
+/**
+ * Construct a flyout label.
+ * @param {!Array.<!Element>} xmlList Array of XML flyout elements.
+ * @param {string} text Label text.
+ */
+Blockly.DataCategory.addLabel = function(xmlList, text) {
+  var label = document.createElement('label');
+  label.setAttribute('text', text);
+  xmlList.push(label);
 };
 
 /**

@@ -1133,7 +1133,6 @@ Blockly.Constants.Data.CUSTOM_CONTEXT_MENU_GET_LIST_MIXIN = {
                 variablesList[i].getId(), fieldName);
         options.push(option);
       }
-      options.push({separator: true});
       options.push({
         text: Blockly.Msg.REPLACE_LIST,
         enabled: true,

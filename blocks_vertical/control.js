@@ -215,7 +215,7 @@ Blockly.Blocks['control_stop'] = {
     var ALL_SCRIPTS = 'all';
     var THIS_SCRIPT = 'this script';
     var OTHER_SCRIPTS = 'other scripts in sprite';
-    var stopDropdown = new Blockly.FieldDropdown(function() {
+    var stopDropdown = new Blockly.FieldMutatorDropdown(function() {
       if (this.sourceBlock_ &&
           this.sourceBlock_.nextConnection &&
           this.sourceBlock_.nextConnection.isConnected()) {
@@ -227,18 +227,10 @@ Blockly.Blocks['control_stop'] = {
         [Blockly.Msg.CONTROL_STOP_THIS, THIS_SCRIPT],
         [Blockly.Msg.CONTROL_STOP_OTHER, OTHER_SCRIPTS]
       ];
-    }, function(option) {
-      // Create an event group to keep field value and mutator in sync
-      // Return null at the end because setValue is called here already.
-      Blockly.Events.setGroup(true);
-      var oldMutation = Blockly.Xml.domToText(this.sourceBlock_.mutationToDom());
-      this.sourceBlock_.setNextStatement(option == OTHER_SCRIPTS);
-      var newMutation = Blockly.Xml.domToText(this.sourceBlock_.mutationToDom());
-      Blockly.Events.fire(new Blockly.Events.BlockChange(this.sourceBlock_,
-          'mutation', null, oldMutation, newMutation));
-      this.setValue(option);
-      Blockly.Events.setGroup(false);
-      return null;
+    }, {
+      'all': {'nextStatement': false},
+      'this script': {'nextStatement': false},
+      'other scripts in sprite': {'nextStatement': true}
     });
     this.appendDummyInput()
         .appendField(Blockly.Msg.CONTROL_STOP)
@@ -250,15 +242,6 @@ Blockly.Blocks['control_stop'] = {
         Blockly.Colours.control.quaternary
     );
     this.setPreviousStatement(true);
-  },
-  mutationToDom: function() {
-    var container = document.createElement('mutation');
-    container.setAttribute('hasnext', this.nextConnection != null);
-    return container;
-  },
-  domToMutation: function(xmlElement) {
-    var hasNext = (xmlElement.getAttribute('hasnext') == 'true');
-    this.setNextStatement(hasNext);
   }
 };
 
@@ -591,6 +574,8 @@ Blockly.Blocks['control_foreach_in_range'] = {
     this.jsonInit({
       "message0": Blockly.Msg.CONTROL_FOREACHINRANGE,
       "message1": "%1", // Statement
+      "message2": "%1",
+      "lastDummyAlign2": "RIGHT",
       "args0": [
         {
           "type": "input_value",
@@ -609,6 +594,16 @@ Blockly.Blocks['control_foreach_in_range'] = {
         {
           "type": "input_statement",
           "name": "SUBSTACK"
+        }
+      ],
+      "args2": [
+        {
+          "type": "field_image",
+          "src": Blockly.mainWorkspace.options.pathToMedia + "repeat.svg",
+          "width": 24,
+          "height": 24,
+          "alt": "*",
+          "flip_rtl": true
         }
       ],
       "category": Blockly.Categories.json,

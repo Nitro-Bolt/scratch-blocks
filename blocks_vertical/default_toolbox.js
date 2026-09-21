@@ -651,10 +651,62 @@ Blockly.Blocks.defaultToolbox = '<xml id="toolbox-categories" style="display: no
     '</block>' +
     '<block type="json_reverse_array" id="json_reverse_array">' +
     '</block>' +
+    '<block type="json_split" id="json_split">' +
+      '<value name="INPUT">' +
+        '<shadow type="text">' +
+          '<field name="TEXT">a,b,c</field>' +
+        '</shadow>' +
+      '</value>' +
+      '<value name="DELIMITER">' +
+        '<shadow type="text">' +
+          '<field name="TEXT">,</field>' +
+        '</shadow>' +
+      '</value>' +
+    '</block>' +
     '<block type="json_has_item" id="json_has_item">' +
       '<value name="ITEM">' +
         '<shadow type="text">' +
           '<field name="TEXT">bar</field>' +
+        '</shadow>' +
+      '</value>' +
+    '</block>' +
+    '<block type="json_map" id="json_map">' +
+      '<value name="VALUE">' +
+        '<shadow type="json_map_value">' +
+        '</shadow>' +
+      '</value>' +
+      '<value name="INDEX">' +
+        '<shadow type="json_map_index">' +
+        '</shadow>' +
+      '</value>' +
+      '<value name="METHOD">' +
+        '<shadow type="text">' +
+          '<field name="TEXT">baz</field>' +
+        '</shadow>' +
+      '</value>' +
+    '</block>' +
+    '<block type="json_filter" id="json_filter">' +
+      '<value name="VALUE">' +
+        '<shadow type="json_filter_value">' +
+        '</shadow>' +
+      '</value>' +
+      '<value name="INDEX">' +
+        '<shadow type="json_filter_index">' +
+        '</shadow>' +
+      '</value>' +
+    '</block>' +
+    '<block type="json_sort" id="json_sort">' +
+      '<value name="A">' +
+        '<shadow type="json_sort_a">' +
+        '</shadow>' +
+      '</value>' +
+      '<value name="B">' +
+        '<shadow type="json_sort_b">' +
+        '</shadow>' +
+      '</value>' +
+      '<value name="METHOD">' +
+        '<shadow type="math_whole_number">' +
+          '<field name="NUM">1</field>' +
         '</shadow>' +
       '</value>' +
     '</block>' +

@@ -27,6 +27,8 @@
 goog.provide('Blockly.BlockSvg.render');
 
 goog.require('Blockly.BlockSvg');
+goog.require('Blockly.FieldLabel');
+goog.require('Blockly.SystemColourPicker');
 goog.require('Blockly.scratchBlocksUtils');
 goog.require('Blockly.utils');
 
@@ -591,9 +593,39 @@ Blockly.BlockSvg.prototype.updateColour = function() {
     icons[i].updateColour();
   }
 
+  // Use dark label text when the block is bright enough that white
+  // text would be hard to read.
+  var labelContrastThreshold = Blockly.LABEL_CONTRAST_THRESHOLD;
+  if (labelContrastThreshold === null || labelContrastThreshold === (void 0)) {
+    labelContrastThreshold = 190;
+  }
+  var darkText = !Blockly.SystemColourPicker.isDark(fillColour, labelContrastThreshold);
+
   // Bump every dropdown to change its colour.
   for (var x = 0, input; input = this.inputList[x]; x++) {
     for (var y = 0, field; field = input.fieldRow[y]; y++) {
+      if (field instanceof Blockly.FieldLabel && field.getSvgRoot()) {
+        if (darkText) {
+          Blockly.utils.addClass(field.getSvgRoot(), 'blocklyTextDark');
+        } else {
+          Blockly.utils.removeClass(field.getSvgRoot(), 'blocklyTextDark');
+        }
+      }
+      // We can't do instance of Blockly.FieldDropdown because it
+      // causes a compilation error, so let's just do this for now.
+      if (field.textElement_) {
+        if (darkText) {
+          Blockly.utils.addClass(field.textElement_, 'blocklyTextDark');
+          if (field.arrow_) {
+            field.arrow_.setAttributeNS('http://www.w3.org/1999/xlink',
+                'xlink:href',
+                Blockly.mainWorkspace.options.pathToMedia + 'dropdown-arrow-dark.svg'
+            );
+          }
+        } else {
+          Blockly.utils.removeClass(field.textElement_, 'blocklyTextDark');
+        }
+      }
       field.setText(null);
     }
   }
@@ -918,7 +950,14 @@ Blockly.BlockSvg.prototype.renderCompute_ = function(iconWidth) {
       if (!isSecondInputOnProcedure) {
         input.fieldWidth += field.renderWidth + field.renderSep;
       }
-      row.height = Math.max(row.height, fieldSize.height);
+      var fieldHeight = fieldSize.height;
+      // Direct multiline fields draw their own white input box. Give that box
+      // the same vertical breathing room that connected value inputs receive.
+      // Shadow text blocks already get padding from their input connection.
+      if (!this.isShadow() && field.isMultiline && field.isMultiline()) {
+        fieldHeight += 2 * Blockly.BlockSvg.INLINE_PADDING_Y;
+      }
+      row.height = Math.max(row.height, fieldHeight);
       previousFieldEditable = field.EDITABLE;
     }
 
@@ -1301,6 +1340,10 @@ Blockly.BlockSvg.prototype.renderDraw_ = function(iconWidth, inputRows) {
             estimatedHeight / 2,
             Blockly.BlockSvg.MAX_REPORTER_CORNER_RADIUS
         );
+      }
+      if (shape === Blockly.OUTPUT_SHAPE_ROUND) {
+        this.edgeShapeWidth_ = Math.min(this.edgeShapeWidth_,
+            inputRows.rightEdge / 2);
       }
 
       this.edgeShape_ = shape;
