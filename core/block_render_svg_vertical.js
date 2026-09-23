@@ -1178,13 +1178,18 @@ Blockly.BlockSvg.prototype.computeRightEdge_ = function(curEdge, hasStatement) {
  * Determine the amount of nesting padding for custom block shapes.
  * @param {*} outer The outer shape value.
  * @param {*} inner The inner shape value.
+ * @param {string} side 'left' or 'right'.
  * @return {number} The padding in px.
  * @private
  */
-Blockly.BlockSvg.getShapeInShapePadding_ = function(outer, inner) {
+Blockly.BlockSvg.getShapeInShapePadding_ = function(outer, inner, side) {
   var outerDef = Blockly.BlockShapes.resolve(outer);
   if (outerDef && typeof outerDef.padding === 'function') {
-    return outerDef.padding(inner);
+    var padding = outerDef.padding(inner);
+    if (padding && typeof padding === 'object') {
+      return typeof padding[side] === 'number' ? padding[side] : 0;
+    }
+    return padding;
   }
   if (typeof outer !== 'number') {
     return Blockly.BlockSvg.SHAPE_IN_SHAPE_PADDING[
@@ -1252,7 +1257,7 @@ Blockly.BlockSvg.prototype.computeOutputPadding_ = function(inputRows) {
       row.paddingStart += deltaHeight / 2;
     }
   }
-  row.paddingStart += Blockly.BlockSvg.getShapeInShapePadding_(shape, otherShape);
+  row.paddingStart += Blockly.BlockSvg.getShapeInShapePadding_(shape, otherShape, 'left');
   // End row padding: based on last input or last field.
   var lastInput = row[row.length - 1];
   // In checking the right/end side, any value input takes precedence over any field.
@@ -1281,7 +1286,7 @@ Blockly.BlockSvg.prototype.computeOutputPadding_ = function(inputRows) {
     // No input in this row - mark as field.
     otherShape = 0;
   }
-  row.paddingEnd += Blockly.BlockSvg.getShapeInShapePadding_(shape, otherShape);
+  row.paddingEnd += Blockly.BlockSvg.getShapeInShapePadding_(shape, otherShape, 'right');
 };
 
 /**
@@ -1682,6 +1687,21 @@ Blockly.BlockSvg.prototype.renderDrawRight_ = function(steps,
 };
 
 /**
+ * Negate every numeric token in a set of relative SVG path step strings.
+ * @param {!Array.<string>} steps Path step strings to mirror.
+ * @return {!Array.<string>} A new array of mirrored path step strings.
+ * @private
+ */
+Blockly.BlockSvg.mirrorEdgeSteps_ = function(steps) {
+  return steps.map(function(step) {
+    return String(step).replace(/-?\d+(?:\.\d+)?/g, function(token) {
+      var negated = -parseFloat(token);
+      return String(negated === 0 ? 0 : negated);
+    });
+  });
+};
+
+/**
  * Render the input shapes.
  * If there's a connected block, hide the input shape.
  * Otherwise, draw and set the position of the input shape.
@@ -1795,8 +1815,11 @@ Blockly.BlockSvg.prototype.renderDrawLeft_ = function(steps) {
     // Draw the left-side edge shape.
     var w = this.edgeShapeWidth_;
     if (this.edgeShapeDef_) {
-      // Custom shape definitions own their edge path.
-      this.edgeShapeDef_.leftEdge(steps, w, halfStraight);
+      // Custom shape definitions own their edge path. Only `leftEdge` is
+      // required; `rightEdge` is mirrored from it automatically when the
+      // definition doesn't provide its own (see drawCustomShapeEdge_).
+      Blockly.BlockSvg.drawCustomShapeEdge_(
+          this.edgeShapeDef_, 'leftEdge', steps, w, halfStraight);
     } else if (this.edgeShape_ === Blockly.OUTPUT_SHAPE_ROUND) {
       // Draw a rounded arc.
       var k = 0.5523;
@@ -1847,7 +1870,8 @@ Blockly.BlockSvg.prototype.drawEdgeShapeRight_ = function(steps, cursorY) {
     var w = this.edgeShapeWidth_;
     if (this.edgeShapeDef_) {
       // Custom shape definitions own their edge path.
-      this.edgeShapeDef_.rightEdge(steps, w, halfStraight);
+      Blockly.BlockSvg.drawCustomShapeEdge_(
+          this.edgeShapeDef_, 'rightEdge', steps, w, halfStraight);
     } else if (this.edgeShape_ === Blockly.OUTPUT_SHAPE_ROUND) {
       // Draw a rounded arc.
       var k = 0.5523;
@@ -2018,17 +2042,36 @@ Blockly.BlockSvg.prototype.renderDefineBlock_ = function(steps, inputRows,
 };
 
 /**
+ * Draw the given side of a custom shape's edge.
+ * @param {!Object} shapeDef The custom shape definition.
+ * @param {string} side 'leftEdge' or 'rightEdge'.
+ * @param {!Array.<string>} steps Path of block outline to push onto.
+ * @param {number} w Horizontal size of the edge shape.
+ * @param {number} halfStraight Half of the straight run between the two
+ *     segments of the edge.
+ * @private
+ */
+Blockly.BlockSvg.drawCustomShapeEdge_ = function(shapeDef, side, steps, w, halfStraight) {
+  if (typeof shapeDef[side] === 'function') {
+    shapeDef[side](steps, w, halfStraight);
+    return;
+  }
+  var otherSide = side === 'leftEdge' ? 'rightEdge' : 'leftEdge';
+  var otherSteps = [];
+  shapeDef[otherSide](otherSteps, w, halfStraight);
+  steps.push.apply(steps, Blockly.BlockSvg.mirrorEdgeSteps_(otherSteps));
+};
+
+/**
  * Build the closed input-hole geometry for a custom shape definition from its
- * leftEdge andrightEdge functions.
+ * leftEdge and optional rightEdge functions.
  * @param {!Object} shapeDef The custom shape definition.
  * @return {?Object} An object with `path`, `argType`, `width` and `height`, or
  *     null when the definition can't be auto-generated.
  * @private
  */
 Blockly.BlockSvg.getCustomInputShapeInfo_ = function(shapeDef) {
-  if (!shapeDef ||
-      typeof shapeDef.leftEdge !== 'function' ||
-      typeof shapeDef.rightEdge !== 'function') {
+  if (!shapeDef || typeof shapeDef.leftEdge !== 'function') {
     return null;
   }
 
@@ -2047,9 +2090,9 @@ Blockly.BlockSvg.getCustomInputShapeInfo_ = function(shapeDef) {
   var steps = [];
   steps.push('M ' + w + ',0');
   steps.push('H', straight + w);
-  shapeDef.rightEdge(steps, w, halfStraight);
+  Blockly.BlockSvg.drawCustomShapeEdge_(shapeDef, 'rightEdge', steps, w, halfStraight);
   steps.push('H', w);
-  shapeDef.leftEdge(steps, w, halfStraight);
+  Blockly.BlockSvg.drawCustomShapeEdge_(shapeDef, 'leftEdge', steps, w, halfStraight);
   steps.push('z');
 
   return {
