@@ -61,7 +61,7 @@ Blockly.ScratchBlocks.ProcedureUtils.callerMutationToDom = function() {
   container.setAttribute('argumentdropdowns', JSON.stringify(this.argumentDropdowns_));
   container.setAttribute('warp', JSON.stringify(this.warp_));
   container.setAttribute('global', JSON.stringify(this.global_));
-  container.setAttribute('colour', this.colour_);
+  container.setAttribute('colour', this.procedureColour_ || this.colour_);
   if (this.return_ !== Blockly.PROCEDURES_CALL_TYPE_STATEMENT) {
     container.setAttribute('return', this.return_);
   }
@@ -83,8 +83,9 @@ Blockly.ScratchBlocks.ProcedureUtils.callerDomToMutation = function(xmlElement) 
   this.warp_ = JSON.parse(xmlElement.getAttribute('warp'));
   this.global_ = JSON.parse(xmlElement.getAttribute('global'));
   if (xmlElement.getAttribute('colour')) {
+    this.procedureColour_ = xmlElement.getAttribute('colour');
     this.colours_ = Blockly.ScratchBlocks.ProcedureUtils.matchColours(
-      xmlElement.getAttribute('colour')
+        this.procedureColour_
     );
   }
   this.return_ = Blockly.ScratchBlocks.ProcedureUtils.parseReturnMutation(xmlElement);
@@ -114,7 +115,7 @@ Blockly.ScratchBlocks.ProcedureUtils.definitionMutationToDom = function(
   container.setAttribute('argumentdropdowns', JSON.stringify(this.argumentDropdowns_));
   container.setAttribute('warp', JSON.stringify(this.warp_));
   container.setAttribute('global', JSON.stringify(this.global_));
-  container.setAttribute('colour', this.colour_);
+  container.setAttribute('colour', this.procedureColour_ || this.colour_);
   if (this.return_ !== Blockly.PROCEDURES_CALL_TYPE_STATEMENT) {
     container.setAttribute('return', this.return_);
   }
@@ -135,12 +136,17 @@ Blockly.ScratchBlocks.ProcedureUtils.matchColours = function(colour1, ld) {
   var maybeColours = Object.entries(Blockly.Colours).find(v => (
     categorys.includes(v[0]) && (v[1].primary.toLowerCase() === colour1)
   ));
-  if (maybeColours && maybeColours[1]) return [
-    maybeColours[1].primary,
-    maybeColours[1].secondary,
-    maybeColours[1].tertiary,
-    maybeColours[1].quaternary || maybeColours[1].tertiary
-  ];
+  if (maybeColours && maybeColours[1]) {
+    return [
+      maybeColours[1].primary,
+      maybeColours[1].secondary,
+      maybeColours[1].tertiary,
+      maybeColours[1].quaternary || maybeColours[1].tertiary
+    ];
+  }
+  if (Blockly.CustomProcedureColourTransform) {
+    return Blockly.CustomProcedureColourTransform(colour1);
+  }
   var c = parseInt(colour1.slice(1, 7), 16);
   var rgb = [(c >> 16), ((c >> 8) & 0x00ff), (c & 0x0000ff)];
   rgb[0] = Math.floor(rgb[0] * ld) % 256;
@@ -156,6 +162,26 @@ Blockly.ScratchBlocks.ProcedureUtils.matchColours = function(colour1, ld) {
 };
 
 /**
+ * Store a procedure's source colour and apply its current themed palette.
+ * @param {string} colour The source colour selected by the user.
+ * @this Blockly.Block
+ */
+Blockly.ScratchBlocks.ProcedureUtils.setProcedureColour = function(colour) {
+  this.procedureColour_ = colour;
+  this.setColour.apply(this,
+      Blockly.ScratchBlocks.ProcedureUtils.matchColours(colour));
+};
+
+/**
+ * Return the source colour selected for a procedure.
+ * @return {string} The unthemed source colour.
+ * @this Blockly.Block
+ */
+Blockly.ScratchBlocks.ProcedureUtils.getProcedureColour = function() {
+  return this.procedureColour_ || this.colour_;
+};
+
+/**
  * Parse XML to restore the (non-editable) name and arguments of a
  * procedures_prototype block or a procedures_declaration block.
  * @param {!Element} xmlElement XML storage element.
@@ -168,8 +194,9 @@ Blockly.ScratchBlocks.ProcedureUtils.definitionDomToMutation = function(xmlEleme
   this.return_ = Blockly.ScratchBlocks.ProcedureUtils.parseReturnMutation(xmlElement);
 
   if (xmlElement.getAttribute('colour')) {
+    this.procedureColour_ = xmlElement.getAttribute('colour');
     this.colours_ = Blockly.ScratchBlocks.ProcedureUtils.matchColours(
-      xmlElement.getAttribute('colour')
+        this.procedureColour_
     );
   }
 
@@ -1371,6 +1398,8 @@ Blockly.Blocks['procedures_call'] = {
   },
   // Shared.
   getProcCode: Blockly.ScratchBlocks.ProcedureUtils.getProcCode,
+  getProcedureColour: Blockly.ScratchBlocks.ProcedureUtils.getProcedureColour,
+  setProcedureColour: Blockly.ScratchBlocks.ProcedureUtils.setProcedureColour,
   removeAllInputs_: Blockly.ScratchBlocks.ProcedureUtils.removeAllInputs_,
   disconnectOldBlocks_: Blockly.ScratchBlocks.ProcedureUtils.disconnectOldBlocks_,
   deleteShadows_: Blockly.ScratchBlocks.ProcedureUtils.deleteShadows_,
@@ -1414,6 +1443,8 @@ Blockly.Blocks['procedures_prototype'] = {
   },
   // Shared.
   getProcCode: Blockly.ScratchBlocks.ProcedureUtils.getProcCode,
+  getProcedureColour: Blockly.ScratchBlocks.ProcedureUtils.getProcedureColour,
+  setProcedureColour: Blockly.ScratchBlocks.ProcedureUtils.setProcedureColour,
   removeAllInputs_: Blockly.ScratchBlocks.ProcedureUtils.removeAllInputs_,
   disconnectOldBlocks_: Blockly.ScratchBlocks.ProcedureUtils.disconnectOldBlocks_,
   deleteShadows_: Blockly.ScratchBlocks.ProcedureUtils.deleteShadows_,
@@ -1452,6 +1483,8 @@ Blockly.Blocks['procedures_declaration'] = {
   },
   // Shared.
   getProcCode: Blockly.ScratchBlocks.ProcedureUtils.getProcCode,
+  getProcedureColour: Blockly.ScratchBlocks.ProcedureUtils.getProcedureColour,
+  setProcedureColour: Blockly.ScratchBlocks.ProcedureUtils.setProcedureColour,
   removeAllInputs_: Blockly.ScratchBlocks.ProcedureUtils.removeAllInputs_,
   disconnectOldBlocks_: Blockly.ScratchBlocks.ProcedureUtils.disconnectOldBlocks_,
   deleteShadows_: Blockly.ScratchBlocks.ProcedureUtils.deleteShadows_,
