@@ -91,6 +91,28 @@ Blockly.FieldExtendable.ARROW_LEFT_PATH = 'icons/extendable_arrow_left.svg';
 Blockly.FieldExtendable.ARROW_RIGHT_PATH = 'icons/extendable_arrow_right.svg';
 
 /**
+ * Should the arrows be placed before the extendable inputs?
+ */
+Blockly.FieldExtendable.ARROWS_LEFT = false;
+
+/**
+ * Get the input index at which new extendable inputs should be inserted.
+ * @return {number} The index to insert at.
+ * @private
+ */
+Blockly.FieldExtendable.prototype.getInsertIndex_ = function() {
+  var inputList = this.sourceBlock_.inputList;
+  var index = inputList.indexOf(this.sourceInput_);
+  if (!Blockly.FieldExtendable.ARROWS_LEFT) return index;
+  // Arrowz on the left
+  var last = index;
+  for (var i = index + 1; i < inputList.length; i++) {
+    if (inputList[i].extendableName == this.name) last = i;
+  }
+  return last + 1;
+};
+
+/**
  * Install this field on a block.
  */
 Blockly.FieldExtendable.prototype.init = function() {
@@ -229,7 +251,7 @@ Blockly.FieldExtendable.prototype.setValue = function(newValue, opt_force, opt_n
         }
       }
       // If we increased the number of inputs, add some
-      var thisIndex = this.sourceBlock_.inputList.indexOf(this.sourceInput_);
+      var thisIndex = this.getInsertIndex_();
       for (var i = this.inputs; i < newInputs; i++) {
         // Add separator for inputs after the first
         if (i > 0 && this.separator.length) {
@@ -274,7 +296,7 @@ Blockly.FieldExtendable.prototype.setValue = function(newValue, opt_force, opt_n
   } else if (this.sourceBlock_) {
     if (newInputs === 0 && this.firstTimeAddingInputs) {
       // Add collapser on first block creation
-      var thisIndex = this.sourceBlock_.inputList.indexOf(this.sourceInput_);
+      var thisIndex = this.getInsertIndex_();
       thisIndex = this.appendArgsList(
           this.collapser, "", thisIndex, "COLLAPSER", shouldPopulate
       );
