@@ -5,11 +5,9 @@
 /node_modules
 npm-*
 
-# Localization / I18N
-common.pyc
+# Project metadata
 .settings
 .project
-*.pyc
 *.komodoproject
 /nbproject/private/
 
