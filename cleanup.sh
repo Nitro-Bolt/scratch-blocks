@@ -11,7 +11,6 @@ indent() { sed 's/^/  /'; }
 indent_more() { sed 's/^/\t/'; }
 empty_lines() { printf '\n\n'; }
 
-
 empty_lines
 echo Cleaning up a merge from Blockly to Scratch-Blocks...
 
@@ -87,14 +86,12 @@ msg/messages.js \
 msg/js/en.js \
 msg/json/en.json"
 
-
 for filename in $keep_ours
 do
   git checkout --ours $filename && git add $filename | indent_more
 done
 
-# Scratch-blocks has separate vertical and horizontal playgrounds and block
-# rendering.
+# Scratch-blocks has a separate vertical playground and block rendering.
 git rm -f tests/playground.html core/block_render_svg.js | indent_more
 
 empty_lines

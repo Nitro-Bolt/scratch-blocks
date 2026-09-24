@@ -22,15 +22,14 @@
  * @fileoverview Events fired as a result of UI actions in Blockly's editor.
  * @author fraser@google.com (Neil Fraser)
  */
-'use strict';
+"use strict";
 
-goog.provide('Blockly.Events.Ui');
+goog.provide("Blockly.Events.Ui");
 
-goog.require('Blockly.Events');
-goog.require('Blockly.Events.Abstract');
+goog.require("Blockly.Events");
+goog.require("Blockly.Events.Abstract");
 
-goog.require('goog.array');
-goog.require('goog.math.Coordinate');
+goog.require("goog.math.Coordinate");
 
 /**
  * Class for a UI event.
@@ -45,7 +44,7 @@ goog.require('goog.math.Coordinate');
  * @extends {Blockly.Events.Abstract}
  * @constructor
  */
-Blockly.Events.Ui = function(block, element, oldValue, newValue) {
+Blockly.Events.Ui = function (block, element, oldValue, newValue) {
   Blockly.Events.Ui.superClass_.constructor.call(this);
   this.blockId = block ? block.id : null;
   this.workspaceId = block ? block.workspace.id : null;
@@ -67,14 +66,14 @@ Blockly.Events.Ui.prototype.type = Blockly.Events.UI;
  * Encode the event as JSON.
  * @return {!Object} JSON representation.
  */
-Blockly.Events.Ui.prototype.toJson = function() {
-  var json = Blockly.Events.Ui.superClass_.toJson.call(this);
-  json['element'] = this.element;
+Blockly.Events.Ui.prototype.toJson = function () {
+  const json = Blockly.Events.Ui.superClass_.toJson.call(this);
+  json["element"] = this.element;
   if (this.newValue !== undefined) {
-    json['newValue'] = this.newValue;
+    json["newValue"] = this.newValue;
   }
   if (this.blockId) {
-    json['blockId'] = this.blockId;
+    json["blockId"] = this.blockId;
   }
   return json;
 };
@@ -83,9 +82,9 @@ Blockly.Events.Ui.prototype.toJson = function() {
  * Decode the JSON event.
  * @param {!Object} json JSON representation.
  */
-Blockly.Events.Ui.prototype.fromJson = function(json) {
+Blockly.Events.Ui.prototype.fromJson = function (json) {
   Blockly.Events.Ui.superClass_.fromJson.call(this, json);
-  this.element = json['element'];
-  this.newValue = json['newValue'];
-  this.blockId = json['blockId'];
+  this.element = json["element"];
+  this.newValue = json["newValue"];
+  this.blockId = json["blockId"];
 };

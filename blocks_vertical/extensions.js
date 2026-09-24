@@ -18,608 +18,632 @@
  * limitations under the License.
  */
 
-'use strict';
+"use strict";
 
-goog.provide('Blockly.Blocks.extensions');
+goog.provide("Blockly.Blocks.extensions");
 
-goog.require('Blockly.Blocks');
-goog.require('Blockly.Colours');
-goog.require('Blockly.constants');
-goog.require('Blockly.ScratchBlocks.VerticalExtensions');
+goog.require("Blockly.Blocks");
+goog.require("Blockly.Colours");
+goog.require("Blockly.constants");
+goog.require("Blockly.ScratchBlocks.VerticalExtensions");
 
-Blockly.Blocks['extension_extendable_test'] = {
+Blockly.Blocks["extension_extendable_test"] = {
   /**
    * @this Blockly.Block
    */
-  init: function() {
+  init: function () {
     this.jsonInit({
-      "message0": "extendable test %1 more text",
-      "args0": [
+      message0: "extendable test %1 more text",
+      args0: [
         {
-          "type": "extendable",
-          "name": "EXTENDABLE",
-          "args": [
+          type: "extendable",
+          name: "EXTENDABLE",
+          args: [
             {
-              "type": "field_image",
-              "src": Blockly.mainWorkspace.options.pathToMedia + "extensions/pen-block-icon.svg",
-              "width": 40,
-              "height": 40
+              type: "field_image",
+              src:
+                Blockly.mainWorkspace.options.pathToMedia +
+                "extensions/pen-block-icon.svg",
+              width: 40,
+              height: 40,
             },
             {
-              "type": "input_value",
-              "name": "INPUT",
-              "shadowOpcode": "text",
-              "shadowFieldName": "TEXT",
-              "shadowFieldValue": "apple"
+              type: "input_value",
+              name: "INPUT",
+              shadowOpcode: "text",
+              shadowFieldName: "TEXT",
+              shadowFieldValue: "apple",
             },
           ],
-          "separator": ["sep text"],
-          "minInputs": 0,
-          "maxInputs": 10,
+          separator: ["sep text"],
+          minInputs: 0,
+          maxInputs: 10,
         },
       ],
-      "category": Blockly.Categories.more,
-      "extensions": ["colours_more", "shape_statement"]
+      category: Blockly.Categories.more,
+      extensions: ["colours_more", "shape_statement"],
     });
-  }
+  },
 };
 
-Blockly.Blocks['extension_extendable_broken_test'] = {
+Blockly.Blocks["extension_extendable_broken_test"] = {
   /**
    * @this Blockly.Block
    */
-  init: function() {
+  init: function () {
     this.jsonInit({
-      "message0": "extendable broken test %1",
-      "args0": [
+      message0: "extendable broken test %1",
+      args0: [
         {
-          "type": "extendable",
-          "name": "CASES",
-          "args": [
+          type: "extendable",
+          name: "CASES",
+          args: [
             {
-              "type": "extendable",
-              "name": "CASE_VALUES",
-              "args": [
+              type: "extendable",
+              name: "CASE_VALUES",
+              args: [
                 {
-                  "type": "input_value",
-                  "name": "CONDITION",
-                  "shadowOpcode": "text",
-                  "shadowFieldName": "TEXT",
-                  "shadowFieldValue": "should be before statement"
+                  type: "input_value",
+                  name: "CONDITION",
+                  shadowOpcode: "text",
+                  shadowFieldName: "TEXT",
+                  shadowFieldValue: "should be before statement",
                 },
               ],
-              "minInputs": 1,
-              "defaultInputs": 1
+              minInputs: 1,
+              defaultInputs: 1,
             },
             {
-              "type": "input_statement",
-              "name": "SUBSTACK",
+              type: "input_statement",
+              name: "SUBSTACK",
             },
           ],
         },
       ],
-      "category": Blockly.Categories.more,
-      "extensions": ["colours_more", "shape_statement"]
+      category: Blockly.Categories.more,
+      extensions: ["colours_more", "shape_statement"],
     });
-  }
+  },
 };
 
-Blockly.Blocks['extension_nested_extendable_test'] = {
+Blockly.Blocks["extension_nested_extendable_test"] = {
   /**
    * @this Blockly.Block
    */
-  init: function() {
+  init: function () {
     this.jsonInit({
-      "message0": "nested extendable test: %1 asd",
-      "args0": [
+      message0: "nested extendable test: %1 asd",
+      args0: [
         {
-          "type": "extendable",
-          "name": "EXTENDABLE",
-          "args": [
+          type: "extendable",
+          name: "EXTENDABLE",
+          args: [
             {
-              "type": "extendable",
-              "name": "EXTENDABLE",
-              "args": [
+              type: "extendable",
+              name: "EXTENDABLE",
+              args: [
                 {
-                  "type": "field_image",
-                  "src": Blockly.mainWorkspace.options.pathToMedia + "extensions/pen-block-icon.svg",
-                  "width": 40,
-                  "height": 40
+                  type: "field_image",
+                  src:
+                    Blockly.mainWorkspace.options.pathToMedia +
+                    "extensions/pen-block-icon.svg",
+                  width: 40,
+                  height: 40,
                 },
               ],
-              "separator": [""],
-              "minInputs": 0,
-              "maxInputs": 100,
+              separator: [""],
+              minInputs: 0,
+              maxInputs: 100,
             },
           ],
-          "separator": ["|"],
-          "collapser": "EMPTY",
-          "minInputs": 0,
-          "maxInputs": 100,
+          separator: ["|"],
+          collapser: "EMPTY",
+          minInputs: 0,
+          maxInputs: 100,
         },
       ],
-      "category": Blockly.Categories.more,
-      "extensions": ["colours_more", "shape_statement"]
+      category: Blockly.Categories.more,
+      extensions: ["colours_more", "shape_statement"],
     });
-  }
+  },
 };
 
-Blockly.Blocks['extension_nested_extendable_inputs_test'] = {
+Blockly.Blocks["extension_nested_extendable_inputs_test"] = {
   /**
    * @this Blockly.Block
    */
-  init: function() {
+  init: function () {
     this.jsonInit({
-      "message0": "nested extendable with inputs %1 asd",
-      "args0": [
+      message0: "nested extendable with inputs %1 asd",
+      args0: [
         {
-          "type": "extendable",
-          "name": "EXTENDABLE",
-          "args": [
+          type: "extendable",
+          name: "EXTENDABLE",
+          args: [
             {
-              "type": "extendable",
-              "name": "EXTENDABLE",
-              "args": [
+              type: "extendable",
+              name: "EXTENDABLE",
+              args: [
                 {
-                  "type": "input_value",
-                  "name": "INPUT",
+                  type: "input_value",
+                  name: "INPUT",
                 },
               ],
-              "separator": [""],
-              "minInputs": 0,
-              "maxInputs": 100,
+              separator: [""],
+              minInputs: 0,
+              maxInputs: 100,
             },
           ],
-          "separator": ["|"],
-          "minInputs": 0,
-          "maxInputs": 100,
+          separator: ["|"],
+          minInputs: 0,
+          maxInputs: 100,
         },
       ],
-      "category": Blockly.Categories.more,
-      "extensions": ["colours_more", "shape_statement"]
+      category: Blockly.Categories.more,
+      extensions: ["colours_more", "shape_statement"],
     });
-  }
+  },
 };
 
-Blockly.Blocks['extension_nested_extendable_newlines_test'] = {
+Blockly.Blocks["extension_nested_extendable_newlines_test"] = {
   /**
    * @this Blockly.Block
    */
-  init: function() {
+  init: function () {
     this.jsonInit({
-      "message0": "newlines nested extendable test:\n%1 asd",
-      "args0": [
+      message0: "newlines nested extendable test:\n%1 asd",
+      args0: [
         {
-          "type": "extendable",
-          "name": "EXTENDABLE",
-          "args": [
+          type: "extendable",
+          name: "EXTENDABLE",
+          args: [
             {
-              "type": "extendable",
-              "name": "EXTENDABLE",
-              "args": [
+              type: "extendable",
+              name: "EXTENDABLE",
+              args: [
                 {
-                  "type": "field_image",
-                  "src": Blockly.mainWorkspace.options.pathToMedia + "extensions/pen-block-icon.svg",
-                  "width": 40,
-                  "height": 40
+                  type: "field_image",
+                  src:
+                    Blockly.mainWorkspace.options.pathToMedia +
+                    "extensions/pen-block-icon.svg",
+                  width: 40,
+                  height: 40,
                 },
               ],
-              "separator": [""],
-              "minInputs": 0,
-              "maxInputs": 100,
+              separator: [""],
+              minInputs: 0,
+              maxInputs: 100,
             },
           ],
-          "separator": ["\n"],
-          "collapser": "EMPTY",
-          "minInputs": 0,
-          "maxInputs": 100,
+          separator: ["\n"],
+          collapser: "EMPTY",
+          minInputs: 0,
+          maxInputs: 100,
         },
       ],
-      "category": Blockly.Categories.more,
-      "extensions": ["colours_more", "output_array"]
+      category: Blockly.Categories.more,
+      extensions: ["colours_more", "output_array"],
     });
-  }
+  },
 };
 
-Blockly.Blocks['extension_recursive_extendable_test'] = {
+Blockly.Blocks["extension_recursive_extendable_test"] = {
   /**
    * @this Blockly.Block
    */
-  init: function() {
-    var extendable = {
-      "type": "extendable",
-      "name": "EXTENDABLE",
-      "args": [],
-      "separator": ["|"],
+  init: function () {
+    const extendable = {
+      type: "extendable",
+      name: "EXTENDABLE",
+      args: [],
+      separator: ["|"],
     };
     extendable.args = [extendable];
     this.jsonInit({
-      "message0": "recursive extendable!? %1",
-      "args0": [
-        extendable
-      ],
-      "category": Blockly.Categories.more,
-      "extensions": ["colours_more", "shape_statement"]
+      message0: "recursive extendable!? %1",
+      args0: [extendable],
+      category: Blockly.Categories.more,
+      extensions: ["colours_more", "shape_statement"],
     });
-  }
+  },
 };
 
-Blockly.Blocks['extension_extendable_if_test'] = {
+Blockly.Blocks["extension_extendable_if_test"] = {
   /**
    * @this Blockly.Block
    */
-  init: function() {
+  init: function () {
     this.jsonInit({
-      "message0": "%1",
-      "args0": [
+      message0: "%1",
+      args0: [
         {
-          "type": "extendable",
-          "name": "ABCSUBSTACKS",
-          "args": [
+          type: "extendable",
+          name: "ABCSUBSTACKS",
+          args: [
             "if",
             {
-              "type": "input_value",
-              "name": "CONDITION",
-              "check": "Boolean"
+              type: "input_value",
+              name: "CONDITION",
+              check: "Boolean",
             },
             "then",
             {
-              "type": "input_statement",
-              "name": "ABCSUBSTACK",
+              type: "input_statement",
+              name: "ABCSUBSTACK",
             },
           ],
-          "separator": "else",
-          "minInputs": 1,
-        }
-      ],
-      "category": Blockly.Categories.more,
-      "extensions": ["colours_more", "shape_statement"]
-    });
-  }
-};
-
-Blockly.Blocks['extension_extendable_reporter_test'] = {
-  /**
-   * @this Blockly.Block
-   */
-  init: function() {
-    this.jsonInit({
-      "message0": "hot dog %1",
-      "args0": [
-        {
-          "type": "extendable",
-          "name": "EXTENDABLE",
-          "args": [
-            {
-              "type": "field_image",
-              "src": Blockly.mainWorkspace.options.pathToMedia + "extensions/pen-block-icon.svg",
-              "width": 40,
-              "height": 40
-            },
-            {
-              "type": "input_value",
-              "name": "INPUT",
-              "shadowOpcode": "text",
-              "shadowFieldName": "TEXT",
-              "shadowFieldValue": "apple"
-            },
-          ],
-          "separator": ["sep text"],
-          "minInputs": 0,
-          "maxInputs": 10,
+          separator: "else",
+          minInputs: 1,
         },
       ],
-      "category": Blockly.Categories.more,
-      "extensions": ["colours_more", "output_string"]
+      category: Blockly.Categories.more,
+      extensions: ["colours_more", "shape_statement"],
     });
-  }
+  },
 };
 
-Blockly.Blocks['extension_text_dropdown'] = {
+Blockly.Blocks["extension_extendable_reporter_test"] = {
   /**
    * @this Blockly.Block
    */
-  init: function() {
+  init: function () {
     this.jsonInit({
-      "message0": "text dropdown %1",
-      "args0": [
+      message0: "hot dog %1",
+      args0: [
         {
-          "type": "field_textdropdown",
-          "name": "MENU",
-          "options": [
+          type: "extendable",
+          name: "EXTENDABLE",
+          args: [
+            {
+              type: "field_image",
+              src:
+                Blockly.mainWorkspace.options.pathToMedia +
+                "extensions/pen-block-icon.svg",
+              width: 40,
+              height: 40,
+            },
+            {
+              type: "input_value",
+              name: "INPUT",
+              shadowOpcode: "text",
+              shadowFieldName: "TEXT",
+              shadowFieldValue: "apple",
+            },
+          ],
+          separator: ["sep text"],
+          minInputs: 0,
+          maxInputs: 10,
+        },
+      ],
+      category: Blockly.Categories.more,
+      extensions: ["colours_more", "output_string"],
+    });
+  },
+};
+
+Blockly.Blocks["extension_text_dropdown"] = {
+  /**
+   * @this Blockly.Block
+   */
+  init: function () {
+    this.jsonInit({
+      message0: "text dropdown %1",
+      args0: [
+        {
+          type: "field_textdropdown",
+          name: "MENU",
+          options: [
             ["option 1", "option 1"],
             ["option 2", "option 2"],
-            ["option 3", "option 3"]
-          ]
+            ["option 3", "option 3"],
+          ],
         },
       ],
-      "category": Blockly.Categories.more,
-      "extensions": ["colours_more", "shape_statement"]
+      category: Blockly.Categories.more,
+      extensions: ["colours_more", "shape_statement"],
     });
-  }
+  },
 };
 
-Blockly.Blocks['extension_text_input'] = {
+Blockly.Blocks["extension_text_input"] = {
   /**
    * @this Blockly.Block
    */
-  init: function() {
+  init: function () {
     this.jsonInit({
-      "message0": "text input %1",
-      "args0": [
+      message0: "text input %1",
+      args0: [
         {
-          "type": "field_input",
-          "name": "INPUT"
+          type: "field_input",
+          name: "INPUT",
         },
       ],
-      "category": Blockly.Categories.more,
-      "extensions": ["colours_more", "shape_statement"]
+      category: Blockly.Categories.more,
+      extensions: ["colours_more", "shape_statement"],
     });
-  }
+  },
 };
 
-Blockly.Blocks['extension_pen_down'] = {
+Blockly.Blocks["extension_pen_down"] = {
   /**
    * @this Blockly.Block
    */
-  init: function() {
+  init: function () {
     this.jsonInit({
-      "message0": "%1 %2 pen down",
-      "args0": [
+      message0: "%1 %2 pen down",
+      args0: [
         {
-          "type": "field_image",
-          "src": Blockly.mainWorkspace.options.pathToMedia + "extensions/pen-block-icon.svg",
-          "width": 40,
-          "height": 40
+          type: "field_image",
+          src:
+            Blockly.mainWorkspace.options.pathToMedia +
+            "extensions/pen-block-icon.svg",
+          width: 40,
+          height: 40,
         },
         {
-          "type": "field_vertical_separator"
-        }
+          type: "field_vertical_separator",
+        },
       ],
-      "category": Blockly.Categories.more,
-      "extensions": ["colours_more", "shape_statement", "scratch_extension"]
+      category: Blockly.Categories.more,
+      extensions: ["colours_more", "shape_statement", "scratch_extension"],
     });
-  }
+  },
 };
 
-Blockly.Blocks['extension_music_drum'] = {
+Blockly.Blocks["extension_music_drum"] = {
   /**
    * @this Blockly.Block
    */
-  init: function() {
+  init: function () {
     this.jsonInit({
-      "message0": "%1 %2 play drum %3",
-      "args0": [
+      message0: "%1 %2 play drum %3",
+      args0: [
         {
-          "type": "field_image",
-          "src": Blockly.mainWorkspace.options.pathToMedia + "extensions/music-block-icon.svg",
-          "width": 40,
-          "height": 40
+          type: "field_image",
+          src:
+            Blockly.mainWorkspace.options.pathToMedia +
+            "extensions/music-block-icon.svg",
+          width: 40,
+          height: 40,
         },
         {
-          "type": "field_vertical_separator"
+          type: "field_vertical_separator",
         },
         {
-          "type": "input_value",
-          "name": "NUMBER"
-        }
+          type: "input_value",
+          name: "NUMBER",
+        },
       ],
-      "category": Blockly.Categories.more,
-      "extensions": ["colours_more", "shape_statement", "scratch_extension"]
+      category: Blockly.Categories.more,
+      extensions: ["colours_more", "shape_statement", "scratch_extension"],
     });
-  }
+  },
 };
 
-Blockly.Blocks['extension_wedo_motor'] = {
+Blockly.Blocks["extension_wedo_motor"] = {
   /**
    * @this Blockly.Block
    */
-  init: function() {
+  init: function () {
     this.jsonInit({
-      "message0": "%1 %2 turn a motor %3",
-      "args0": [
+      message0: "%1 %2 turn a motor %3",
+      args0: [
         {
-          "type": "field_image",
-          "src": Blockly.mainWorkspace.options.pathToMedia + "extensions/wedo2-block-icon.svg",
-          "width": 40,
-          "height": 40
+          type: "field_image",
+          src:
+            Blockly.mainWorkspace.options.pathToMedia +
+            "extensions/wedo2-block-icon.svg",
+          width: 40,
+          height: 40,
         },
         {
-          "type": "field_vertical_separator"
+          type: "field_vertical_separator",
         },
         {
-          "type": "field_image",
-          "src": Blockly.mainWorkspace.options.pathToMedia + "rotate-right.svg",
-          "width": 24,
-          "height": 24
-        }
+          type: "field_image",
+          src: Blockly.mainWorkspace.options.pathToMedia + "rotate-right.svg",
+          width: 24,
+          height: 24,
+        },
       ],
-      "category": Blockly.Categories.more,
-      "extensions": ["colours_more", "shape_statement", "scratch_extension"]
+      category: Blockly.Categories.more,
+      extensions: ["colours_more", "shape_statement", "scratch_extension"],
     });
-  }
+  },
 };
 
-Blockly.Blocks['extension_wedo_hat'] = {
+Blockly.Blocks["extension_wedo_hat"] = {
   /**
    * @this Blockly.Block
    */
-  init: function() {
+  init: function () {
     this.jsonInit({
-      "message0": "%1 %2 when I am wearing a hat",
-      "args0": [
+      message0: "%1 %2 when I am wearing a hat",
+      args0: [
         {
-          "type": "field_image",
-          "src": Blockly.mainWorkspace.options.pathToMedia + "extensions/wedo2-block-icon.svg",
-          "width": 40,
-          "height": 40
+          type: "field_image",
+          src:
+            Blockly.mainWorkspace.options.pathToMedia +
+            "extensions/wedo2-block-icon.svg",
+          width: 40,
+          height: 40,
         },
         {
-          "type": "field_vertical_separator"
-        }
+          type: "field_vertical_separator",
+        },
       ],
-      "category": Blockly.Categories.more,
-      "extensions": ["colours_more", "shape_hat", "scratch_extension"]
+      category: Blockly.Categories.more,
+      extensions: ["colours_more", "shape_hat", "scratch_extension"],
     });
-  }
+  },
 };
 
-Blockly.Blocks['extension_wedo_boolean'] = {
+Blockly.Blocks["extension_wedo_boolean"] = {
   /**
    * @this Blockly.Block
    */
-  init: function() {
+  init: function () {
     this.jsonInit({
-      "message0": "%1 %2 O RLY?",
-      "args0": [
+      message0: "%1 %2 O RLY?",
+      args0: [
         {
-          "type": "field_image",
-          "src": Blockly.mainWorkspace.options.pathToMedia + "extensions/wedo2-block-icon.svg",
-          "width": 40,
-          "height": 40
+          type: "field_image",
+          src:
+            Blockly.mainWorkspace.options.pathToMedia +
+            "extensions/wedo2-block-icon.svg",
+          width: 40,
+          height: 40,
         },
         {
-          "type": "field_vertical_separator"
-        }
+          type: "field_vertical_separator",
+        },
       ],
-      "category": Blockly.Categories.more,
-      "extensions": ["colours_more", "output_boolean", "scratch_extension"]
+      category: Blockly.Categories.more,
+      extensions: ["colours_more", "output_boolean", "scratch_extension"],
     });
-  }
+  },
 };
 
-Blockly.Blocks['extension_wedo_tilt_reporter'] = {
+Blockly.Blocks["extension_wedo_tilt_reporter"] = {
   /**
    * @this Blockly.Block
    */
-  init: function() {
+  init: function () {
     this.jsonInit({
-      "message0": "%1 %2 tilt angle %3",
-      "args0": [
+      message0: "%1 %2 tilt angle %3",
+      args0: [
         {
-          "type": "field_image",
-          "src": Blockly.mainWorkspace.options.pathToMedia + "extensions/wedo2-block-icon.svg",
-          "width": 40,
-          "height": 40
+          type: "field_image",
+          src:
+            Blockly.mainWorkspace.options.pathToMedia +
+            "extensions/wedo2-block-icon.svg",
+          width: 40,
+          height: 40,
         },
         {
-          "type": "field_vertical_separator"
+          type: "field_vertical_separator",
         },
         {
-          "type": "input_value",
-          "name": "TILT"
-        }
+          type: "input_value",
+          name: "TILT",
+        },
       ],
-      "category": Blockly.Categories.more,
-      "extensions": ["colours_more", "output_number", "scratch_extension"]
+      category: Blockly.Categories.more,
+      extensions: ["colours_more", "output_number", "scratch_extension"],
     });
-  }
+  },
 };
 
-Blockly.Blocks['extension_wedo_tilt_menu'] = {
+Blockly.Blocks["extension_wedo_tilt_menu"] = {
   /**
    * @this Blockly.Block
    */
-  init: function() {
+  init: function () {
     this.jsonInit({
-      "message0": "%1",
-      "args0": [
+      message0: "%1",
+      args0: [
         {
-          "type": "field_dropdown",
-          "name": "TILT",
-          "options": [
-            ['Any', 'Any'],
-            ['Whirl', 'Whirl'],
-            ['South', 'South'],
-            ['Back in time', 'Back in time']
-          ]
-        }
+          type: "field_dropdown",
+          name: "TILT",
+          options: [
+            ["Any", "Any"],
+            ["Whirl", "Whirl"],
+            ["South", "South"],
+            ["Back in time", "Back in time"],
+          ],
+        },
       ],
-      "extensions": ["colours_more", "output_string"]
+      extensions: ["colours_more", "output_string"],
     });
-  }
+  },
 };
 
-Blockly.Blocks['extension_music_reporter'] = {
+Blockly.Blocks["extension_music_reporter"] = {
   /**
    * @this Blockly.Block
    */
-  init: function() {
+  init: function () {
     this.jsonInit({
-      "message0": "%1 %2 hey now, you're an all-star",
-      "args0": [
+      message0: "%1 %2 hey now, you're an all-star",
+      args0: [
         {
-          "type": "field_image",
-          "src": Blockly.mainWorkspace.options.pathToMedia + "extensions/music-block-icon.svg",
-          "width": 40,
-          "height": 40
+          type: "field_image",
+          src:
+            Blockly.mainWorkspace.options.pathToMedia +
+            "extensions/music-block-icon.svg",
+          width: 40,
+          height: 40,
         },
         {
-          "type": "field_vertical_separator"
-        }
+          type: "field_vertical_separator",
+        },
       ],
-      "category": Blockly.Categories.more,
-      "extensions": ["colours_more", "output_number", "scratch_extension"]
+      category: Blockly.Categories.more,
+      extensions: ["colours_more", "output_number", "scratch_extension"],
     });
-  }
+  },
 };
 
-Blockly.Blocks['extension_microbit_display'] = {
+Blockly.Blocks["extension_microbit_display"] = {
   /**
    * @this Blockly.Block
    */
-  init: function() {
+  init: function () {
     this.jsonInit({
-      "message0": "%1 %2 display %3",
-      "args0": [
+      message0: "%1 %2 display %3",
+      args0: [
         {
-          "type": "field_image",
-          "src": Blockly.mainWorkspace.options.pathToMedia + "extensions/microbit-block-icon.svg",
-          "width": 40,
-          "height": 40
+          type: "field_image",
+          src:
+            Blockly.mainWorkspace.options.pathToMedia +
+            "extensions/microbit-block-icon.svg",
+          width: 40,
+          height: 40,
         },
         {
-          "type": "field_vertical_separator"
+          type: "field_vertical_separator",
         },
         {
-          "type": "input_value",
-          "name": "MATRIX"
+          type: "input_value",
+          name: "MATRIX",
         },
       ],
-      "category": Blockly.Categories.pen,
-      "extensions": ["colours_pen", "shape_statement", "scratch_extension"]
+      category: Blockly.Categories.pen,
+      extensions: ["colours_pen", "shape_statement", "scratch_extension"],
     });
-  }
+  },
 };
 
-Blockly.Blocks['extension_music_play_note'] = {
+Blockly.Blocks["extension_music_play_note"] = {
   /**
    * @this Blockly.Block
    */
-  init: function() {
+  init: function () {
     this.jsonInit({
-      "message0": "%1 %2 play note %3 for %4 beats",
-      "args0": [
+      message0: "%1 %2 play note %3 for %4 beats",
+      args0: [
         {
-          "type": "field_image",
-          "src": Blockly.mainWorkspace.options.pathToMedia + "extensions/music-block-icon.svg",
-          "width": 40,
-          "height": 40
+          type: "field_image",
+          src:
+            Blockly.mainWorkspace.options.pathToMedia +
+            "extensions/music-block-icon.svg",
+          width: 40,
+          height: 40,
         },
         {
-          "type": "field_vertical_separator"
+          type: "field_vertical_separator",
         },
         {
-          "type": "input_value",
-          "name": "NOTE"
+          type: "input_value",
+          name: "NOTE",
         },
         {
-          "type": "input_value",
-          "name": "BEATS"
-        }
+          type: "input_value",
+          name: "BEATS",
+        },
       ],
-      "category": Blockly.Categories.pen,
-      "extensions": ["colours_pen", "shape_statement", "scratch_extension"]
+      category: Blockly.Categories.pen,
+      extensions: ["colours_pen", "shape_statement", "scratch_extension"],
     });
-  }
+  },
 };

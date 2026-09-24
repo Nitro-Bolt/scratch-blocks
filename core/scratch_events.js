@@ -23,16 +23,15 @@
  * editor that are not fired in Blockly.
  * @author fenichel@google.com (Rachel Fenichel)
  */
-'use strict';
+"use strict";
 
-goog.provide('Blockly.Events.DragBlockOutside');
-goog.provide('Blockly.Events.EndBlockDrag');
+goog.provide("Blockly.Events.DragBlockOutside");
+goog.provide("Blockly.Events.EndBlockDrag");
 
-goog.require('Blockly.Events');
-goog.require('Blockly.Events.BlockBase');
+goog.require("Blockly.Events");
+goog.require("Blockly.Events.BlockBase");
 
-goog.require('goog.array');
-goog.require('goog.math.Coordinate');
+goog.require("goog.math.Coordinate");
 
 /**
  * Class for a block drag event. Fired when block dragged into or out of
@@ -41,9 +40,9 @@ goog.require('goog.math.Coordinate');
  * @extends {Blockly.Events.BlockBase}
  * @constructor
  */
-Blockly.Events.DragBlockOutside = function(block) {
+Blockly.Events.DragBlockOutside = function (block) {
   if (!block) {
-    return;  // Blank event to be populated by fromJson.
+    return; // Blank event to be populated by fromJson.
   }
   Blockly.Events.DragBlockOutside.superClass_.constructor.call(this, block);
   this.recordUndo = false;
@@ -60,10 +59,10 @@ Blockly.Events.DragBlockOutside.prototype.type = Blockly.Events.DRAG_OUTSIDE;
  * Encode the event as JSON.
  * @return {!Object} JSON representation.
  */
-Blockly.Events.DragBlockOutside.prototype.toJson = function() {
-  var json = Blockly.Events.DragBlockOutside.superClass_.toJson.call(this);
+Blockly.Events.DragBlockOutside.prototype.toJson = function () {
+  const json = Blockly.Events.DragBlockOutside.superClass_.toJson.call(this);
   if (this.isOutside) {
-    json['isOutside'] = this.isOutside;
+    json["isOutside"] = this.isOutside;
   }
   return json;
 };
@@ -72,9 +71,9 @@ Blockly.Events.DragBlockOutside.prototype.toJson = function() {
  * Decode the JSON event.
  * @param {!Object} json JSON representation.
  */
-Blockly.Events.DragBlockOutside.prototype.fromJson = function(json) {
+Blockly.Events.DragBlockOutside.prototype.fromJson = function (json) {
   Blockly.Events.DragBlockOutside.superClass_.fromJson.call(this, json);
-  this.isOutside = json['isOutside'];
+  this.isOutside = json["isOutside"];
 };
 
 /**
@@ -85,9 +84,9 @@ Blockly.Events.DragBlockOutside.prototype.fromJson = function(json) {
  * @extends {Blockly.Events.BlockBase}
  * @constructor
  */
-Blockly.Events.EndBlockDrag = function(block, isOutside) {
+Blockly.Events.EndBlockDrag = function (block, isOutside) {
   if (!block) {
-    return;  // Blank event to be populated by fromJson.
+    return; // Blank event to be populated by fromJson.
   }
   Blockly.Events.EndBlockDrag.superClass_.constructor.call(this, block);
   this.isOutside = isOutside;
@@ -109,13 +108,13 @@ Blockly.Events.EndBlockDrag.prototype.type = Blockly.Events.END_DRAG;
  * Encode the event as JSON.
  * @return {!Object} JSON representation.
  */
-Blockly.Events.EndBlockDrag.prototype.toJson = function() {
-  var json = Blockly.Events.EndBlockDrag.superClass_.toJson.call(this);
+Blockly.Events.EndBlockDrag.prototype.toJson = function () {
+  const json = Blockly.Events.EndBlockDrag.superClass_.toJson.call(this);
   if (this.isOutside) {
-    json['isOutside'] = this.isOutside;
+    json["isOutside"] = this.isOutside;
   }
   if (this.xml) {
-    json['xml'] = this.xml;
+    json["xml"] = this.xml;
   }
   return json;
 };
@@ -124,8 +123,8 @@ Blockly.Events.EndBlockDrag.prototype.toJson = function() {
  * Decode the JSON event.
  * @param {!Object} json JSON representation.
  */
-Blockly.Events.EndBlockDrag.prototype.fromJson = function(json) {
+Blockly.Events.EndBlockDrag.prototype.fromJson = function (json) {
   Blockly.Events.EndBlockDrag.superClass_.fromJson.call(this, json);
-  this.isOutside = json['isOutside'];
-  this.xml = json['xml'];
+  this.isOutside = json["isOutside"];
+  this.xml = json["xml"];
 };

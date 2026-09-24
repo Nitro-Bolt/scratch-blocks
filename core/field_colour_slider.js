@@ -22,17 +22,16 @@
  * @fileoverview Colour input field.
  * @author fraser@google.com (Neil Fraser)
  */
-'use strict';
+"use strict";
 
-goog.provide('Blockly.FieldColourSlider');
+goog.provide("Blockly.FieldColourSlider");
 
-goog.require('Blockly.Field');
-goog.require('Blockly.DropDownDiv');
-goog.require('goog.dom');
-goog.require('goog.events');
-goog.require('goog.style');
-goog.require('goog.color');
-goog.require('goog.ui.Slider');
+goog.require("Blockly.Field");
+goog.require("Blockly.DropDownDiv");
+goog.require("goog.events");
+goog.require("goog.style");
+goog.require("goog.color");
+goog.require("goog.ui.Slider");
 
 /**
  * Class for a slider-based colour input field.
@@ -45,9 +44,13 @@ goog.require('goog.ui.Slider');
  * @extends {Blockly.Field}
  * @constructor
  */
-Blockly.FieldColourSlider = function(colour, opt_validator) {
-  Blockly.FieldColourSlider.superClass_.constructor.call(this, colour, opt_validator);
-  this.addArgType('colour');
+Blockly.FieldColourSlider = function (colour, opt_validator) {
+  Blockly.FieldColourSlider.superClass_.constructor.call(
+    this,
+    colour,
+    opt_validator
+  );
+  this.addArgType("colour");
 
   // Flag to track whether or not the slider callbacks should execute
   this.sliderCallbacksEnabled_ = false;
@@ -61,8 +64,8 @@ goog.inherits(Blockly.FieldColourSlider, Blockly.Field);
  * @package
  * @nocollapse
  */
-Blockly.FieldColourSlider.fromJson = function(options) {
-  return new Blockly.FieldColourSlider(options['colour']);
+Blockly.FieldColourSlider.fromJson = function (options) {
+  return new Blockly.FieldColourSlider(options["colour"]);
 };
 
 /**
@@ -77,13 +80,13 @@ Blockly.FieldColourSlider.activateEyedropper_ = null;
 /**
  * Path to the eyedropper svg icon.
  */
-Blockly.FieldColourSlider.EYEDROPPER_PATH = 'eyedropper.svg';
+Blockly.FieldColourSlider.EYEDROPPER_PATH = "eyedropper.svg";
 
 /**
  * Install this field on a block.
  * @param {!Blockly.Block} block The block containing this field.
  */
-Blockly.FieldColourSlider.prototype.init = function(block) {
+Blockly.FieldColourSlider.prototype.init = function (block) {
   if (this.fieldGroup_) {
     // Colour slider has already been initialized once.
     return;
@@ -96,7 +99,7 @@ Blockly.FieldColourSlider.prototype.init = function(block) {
  * Return the current colour.
  * @return {string} Current colour in '#rrggbb' format.
  */
-Blockly.FieldColourSlider.prototype.getValue = function() {
+Blockly.FieldColourSlider.prototype.getValue = function () {
   return this.colour_;
 };
 
@@ -104,18 +107,32 @@ Blockly.FieldColourSlider.prototype.getValue = function() {
  * Set the colour.
  * @param {string} colour The new colour in '#rrggbb' format.
  */
-Blockly.FieldColourSlider.prototype.setValue = function(colour) {
-  if (this.sourceBlock_ && Blockly.Events.isEnabled() &&
-      this.colour_ != colour) {
-    Blockly.Events.fire(new Blockly.Events.BlockChange(
-        this.sourceBlock_, 'field', this.name, this.colour_, colour));
+Blockly.FieldColourSlider.prototype.setValue = function (colour) {
+  if (
+    this.sourceBlock_ &&
+    Blockly.Events.isEnabled() &&
+    this.colour_ != colour
+  ) {
+    Blockly.Events.fire(
+      new Blockly.Events.BlockChange(
+        this.sourceBlock_,
+        "field",
+        this.name,
+        this.colour_,
+        colour
+      )
+    );
   }
   this.colour_ = colour;
   if (this.sourceBlock_) {
     // Set the colours to this value.
     // The renderer expects to be able to use the secondary colour as the fill for a shadow.
-    this.sourceBlock_.setColour(colour, colour, this.sourceBlock_.getColourTertiary(),
-        this.sourceBlock_.getColourQuaternary());
+    this.sourceBlock_.setColour(
+      colour,
+      colour,
+      this.sourceBlock_.getColourTertiary(),
+      this.sourceBlock_.getColourQuaternary()
+    );
   }
   this.updateSliderHandles_();
   this.updateDom_();
@@ -127,18 +144,20 @@ Blockly.FieldColourSlider.prototype.setValue = function(colour) {
  * @return {string} Array colour hex colour stops for the given channel
  * @private
  */
-Blockly.FieldColourSlider.prototype.createColourStops_ = function(channel) {
-  var stops = [];
-  for(var n = 0; n <= 360; n += 20) {
+Blockly.FieldColourSlider.prototype.createColourStops_ = function (channel) {
+  const stops = [];
+  for (let n = 0; n <= 360; n += 20) {
     switch (channel) {
-      case 'hue':
+      case "hue":
         stops.push(goog.color.hsvToHex(n, this.saturation_, this.brightness_));
         break;
-      case 'saturation':
+      case "saturation":
         stops.push(goog.color.hsvToHex(this.hue_, n / 360, this.brightness_));
         break;
-      case 'brightness':
-        stops.push(goog.color.hsvToHex(this.hue_, this.saturation_, 255 * n / 360));
+      case "brightness":
+        stops.push(
+          goog.color.hsvToHex(this.hue_, this.saturation_, (255 * n) / 360)
+        );
         break;
       default:
         throw new Error("Unknown channel for colour sliders: " + channel);
@@ -153,35 +172,56 @@ Blockly.FieldColourSlider.prototype.createColourStops_ = function(channel) {
  * @param {string} channel – Either "hue", "saturation" or "value".
  * @private
  */
-Blockly.FieldColourSlider.prototype.setGradient_ = function(node, channel) {
-  var gradient = this.createColourStops_(channel).join(',');
-  goog.style.setStyle(node, 'background',
-      '-moz-linear-gradient(left, ' + gradient + ')');
-  goog.style.setStyle(node, 'background',
-      '-webkit-linear-gradient(left, ' + gradient + ')');
-  goog.style.setStyle(node, 'background',
-      '-o-linear-gradient(left, ' + gradient + ')');
-  goog.style.setStyle(node, 'background',
-      '-ms-linear-gradient(left, ' + gradient + ')');
-  goog.style.setStyle(node, 'background',
-      'linear-gradient(left, ' + gradient + ')');
+Blockly.FieldColourSlider.prototype.setGradient_ = function (node, channel) {
+  const gradient = this.createColourStops_(channel).join(",");
+  goog.style.setStyle(
+    node,
+    "background",
+    "-moz-linear-gradient(left, " + gradient + ")"
+  );
+  goog.style.setStyle(
+    node,
+    "background",
+    "-webkit-linear-gradient(left, " + gradient + ")"
+  );
+  goog.style.setStyle(
+    node,
+    "background",
+    "-o-linear-gradient(left, " + gradient + ")"
+  );
+  goog.style.setStyle(
+    node,
+    "background",
+    "-ms-linear-gradient(left, " + gradient + ")"
+  );
+  goog.style.setStyle(
+    node,
+    "background",
+    "linear-gradient(left, " + gradient + ")"
+  );
 };
 
 /**
  * Update the readouts and slider backgrounds after value has changed.
  * @private
  */
-Blockly.FieldColourSlider.prototype.updateDom_ = function() {
+Blockly.FieldColourSlider.prototype.updateDom_ = function () {
   if (this.hueSlider_) {
     // Update the slider backgrounds
-    this.setGradient_(this.hueSlider_.getElement(), 'hue');
-    this.setGradient_(this.saturationSlider_.getElement(), 'saturation');
-    this.setGradient_(this.brightnessSlider_.getElement(), 'brightness');
+    this.setGradient_(this.hueSlider_.getElement(), "hue");
+    this.setGradient_(this.saturationSlider_.getElement(), "saturation");
+    this.setGradient_(this.brightnessSlider_.getElement(), "brightness");
 
     // Update the readouts
-    this.hueReadout_.textContent = Math.floor(100 * this.hue_ / 360).toFixed(0);
-    this.saturationReadout_.textContent = Math.floor(100 * this.saturation_).toFixed(0);
-    this.brightnessReadout_.textContent = Math.floor(100 * this.brightness_ / 255).toFixed(0);
+    this.hueReadout_.textContent = Math.floor((100 * this.hue_) / 360).toFixed(
+      0
+    );
+    this.saturationReadout_.textContent = Math.floor(
+      100 * this.saturation_
+    ).toFixed(0);
+    this.brightnessReadout_.textContent = Math.floor(
+      (100 * this.brightness_) / 255
+    ).toFixed(0);
   }
 };
 
@@ -189,7 +229,7 @@ Blockly.FieldColourSlider.prototype.updateDom_ = function() {
  * Update the slider handle positions from the current field value.
  * @private
  */
-Blockly.FieldColourSlider.prototype.updateSliderHandles_ = function() {
+Blockly.FieldColourSlider.prototype.updateSliderHandles_ = function () {
   if (this.hueSlider_) {
     // Don't let the following calls to setValue for each of the sliders
     // trigger the slider callbacks (which then call setValue on this field again
@@ -206,12 +246,12 @@ Blockly.FieldColourSlider.prototype.updateSliderHandles_ = function() {
  * Get the text from this field.  Used when the block is collapsed.
  * @return {string} Current text.
  */
-Blockly.FieldColourSlider.prototype.getText = function() {
-  var colour = this.colour_;
+Blockly.FieldColourSlider.prototype.getText = function () {
+  let colour = this.colour_;
   // Try to use #rgb format if possible, rather than #rrggbb.
-  var m = colour.match(/^#(.)\1(.)\2(.)\3$/);
+  const m = colour.match(/^#(.)\1(.)\2(.)\3$/);
   if (m) {
-    colour = '#' + m[1] + m[2] + m[3];
+    colour = "#" + m[1] + m[2] + m[3];
   }
   return colour;
 };
@@ -222,13 +262,13 @@ Blockly.FieldColourSlider.prototype.getText = function() {
  * @return {Array} The container node and the readout node.
  * @private
  */
-Blockly.FieldColourSlider.prototype.createLabelDom_ = function(labelText) {
-  var labelContainer = document.createElement('div');
-  labelContainer.setAttribute('class', 'scratchColourPickerLabel');
-  var readout = document.createElement('span');
-  readout.setAttribute('class', 'scratchColourPickerReadout');
-  var label = document.createElement('span');
-  label.setAttribute('class', 'scratchColourPickerLabelText');
+Blockly.FieldColourSlider.prototype.createLabelDom_ = function (labelText) {
+  const labelContainer = document.createElement("div");
+  labelContainer.setAttribute("class", "scratchColourPickerLabel");
+  const readout = document.createElement("span");
+  readout.setAttribute("class", "scratchColourPickerReadout");
+  const label = document.createElement("span");
+  label.setAttribute("class", "scratchColourPickerLabelText");
   label.textContent = labelText;
   labelContainer.appendChild(label);
   labelContainer.appendChild(readout);
@@ -241,23 +281,29 @@ Blockly.FieldColourSlider.prototype.createLabelDom_ = function(labelText) {
  * @return {function} the callback for slider update
  * @private
  */
-Blockly.FieldColourSlider.prototype.sliderCallbackFactory_ = function(channel) {
-  var thisField = this;
-  return function(event) {
+Blockly.FieldColourSlider.prototype.sliderCallbackFactory_ = function (
+  channel
+) {
+  const thisField = this;
+  return function (event) {
     if (!thisField.sliderCallbacksEnabled_) return;
-    var channelValue = event.target.getValue();
+    const channelValue = event.target.getValue();
     switch (channel) {
-      case 'hue':
+      case "hue":
         thisField.hue_ = channelValue;
         break;
-      case 'saturation':
+      case "saturation":
         thisField.saturation_ = channelValue;
         break;
-      case 'brightness':
+      case "brightness":
         thisField.brightness_ = channelValue;
         break;
     }
-    var colour = goog.color.hsvToHex(thisField.hue_, thisField.saturation_, thisField.brightness_);
+    let colour = goog.color.hsvToHex(
+      thisField.hue_,
+      thisField.saturation_,
+      thisField.brightness_
+    );
     if (thisField.sourceBlock_) {
       // Call any validation function, and allow it to override.
       colour = thisField.callValidator(colour);
@@ -272,11 +318,11 @@ Blockly.FieldColourSlider.prototype.sliderCallbackFactory_ = function(channel) {
  * Activate the eyedropper, passing in a callback for setting the field value.
  * @private
  */
-Blockly.FieldColourSlider.prototype.activateEyedropperInternal_ = function() {
-  var thisField = this;
-  Blockly.FieldColourSlider.activateEyedropper_(function(value) {
+Blockly.FieldColourSlider.prototype.activateEyedropperInternal_ = function () {
+  const thisField = this;
+  Blockly.FieldColourSlider.activateEyedropper_(function (value) {
     // Update the internal hue/saturation/brightness values so sliders update.
-    var hsv = goog.color.hexToHsv(value);
+    const hsv = goog.color.hexToHsv(value);
     thisField.hue_ = hsv[0];
     thisField.saturation_ = hsv[1];
     thisField.brightness_ = hsv[2];
@@ -288,19 +334,19 @@ Blockly.FieldColourSlider.prototype.activateEyedropperInternal_ = function() {
  * Create hue, saturation and brightness sliders under the colour field.
  * @private
  */
-Blockly.FieldColourSlider.prototype.showEditor_ = function() {
+Blockly.FieldColourSlider.prototype.showEditor_ = function () {
   Blockly.DropDownDiv.hideWithoutAnimation();
   Blockly.DropDownDiv.clearContent();
-  var div = Blockly.DropDownDiv.getContentDiv();
+  const div = Blockly.DropDownDiv.getContentDiv();
 
   // Init color component values that are used while the editor is open
   // in order to keep the slider values stable.
-  var hsv = goog.color.hexToHsv(this.getValue());
+  const hsv = goog.color.hexToHsv(this.getValue());
   this.hue_ = hsv[0];
   this.saturation_ = hsv[1];
   this.brightness_ = hsv[2];
 
-  var hueElements = this.createLabelDom_(Blockly.Msg.COLOUR_HUE_LABEL);
+  const hueElements = this.createLabelDom_(Blockly.Msg.COLOUR_HUE_LABEL);
   div.appendChild(hueElements[0]);
   this.hueReadout_ = hueElements[1];
   this.hueSlider_ = new goog.ui.Slider();
@@ -310,8 +356,9 @@ Blockly.FieldColourSlider.prototype.showEditor_ = function() {
   this.hueSlider_.setMoveToPointEnabled(true);
   this.hueSlider_.render(div);
 
-  var saturationElements =
-      this.createLabelDom_(Blockly.Msg.COLOUR_SATURATION_LABEL);
+  const saturationElements = this.createLabelDom_(
+    Blockly.Msg.COLOUR_SATURATION_LABEL
+  );
   div.appendChild(saturationElements[0]);
   this.saturationReadout_ = saturationElements[1];
   this.saturationSlider_ = new goog.ui.Slider();
@@ -322,8 +369,9 @@ Blockly.FieldColourSlider.prototype.showEditor_ = function() {
   this.saturationSlider_.setMaximum(1.0);
   this.saturationSlider_.render(div);
 
-  var brightnessElements =
-      this.createLabelDom_(Blockly.Msg.COLOUR_BRIGHTNESS_LABEL);
+  const brightnessElements = this.createLabelDom_(
+    Blockly.Msg.COLOUR_BRIGHTNESS_LABEL
+  );
   div.appendChild(brightnessElements[0]);
   this.brightnessReadout_ = brightnessElements[1];
   this.brightnessSlider_ = new goog.ui.Slider();
@@ -334,18 +382,27 @@ Blockly.FieldColourSlider.prototype.showEditor_ = function() {
   this.brightnessSlider_.render(div);
 
   if (Blockly.FieldColourSlider.activateEyedropper_) {
-    var button = document.createElement('button');
-    button.setAttribute('class', 'scratchEyedropper');
-    var image = document.createElement('img');
-    image.src = Blockly.mainWorkspace.options.pathToMedia + Blockly.FieldColourSlider.EYEDROPPER_PATH;
+    const button = document.createElement("button");
+    button.setAttribute("class", "scratchEyedropper");
+    const image = document.createElement("img");
+    image.src =
+      Blockly.mainWorkspace.options.pathToMedia +
+      Blockly.FieldColourSlider.EYEDROPPER_PATH;
     button.appendChild(image);
     div.appendChild(button);
     Blockly.FieldColourSlider.eyedropperEventData_ =
-        Blockly.bindEventWithChecks_(button, 'click', this,
-            this.activateEyedropperInternal_);
+      Blockly.bindEventWithChecks_(
+        button,
+        "click",
+        this,
+        this.activateEyedropperInternal_
+      );
   }
 
-  Blockly.DropDownDiv.setColour(Blockly.Colours.valueReportBackground, Blockly.Colours.valueReportBorder);
+  Blockly.DropDownDiv.setColour(
+    Blockly.Colours.valueReportBackground,
+    Blockly.Colours.valueReportBorder
+  );
   Blockly.DropDownDiv.setCategory(this.sourceBlock_.parentBlock_.getCategory());
   Blockly.DropDownDiv.showPositionedByBlock(this, this.sourceBlock_);
 
@@ -356,26 +413,36 @@ Blockly.FieldColourSlider.prototype.showEditor_ = function() {
   // Enable callbacks for the sliders
   this.sliderCallbacksEnabled_ = true;
 
-  Blockly.FieldColourSlider.hueChangeEventKey_ = goog.events.listen(this.hueSlider_,
-      goog.ui.Component.EventType.CHANGE,
-      this.sliderCallbackFactory_('hue'));
-  Blockly.FieldColourSlider.saturationChangeEventKey_ = goog.events.listen(this.saturationSlider_,
-      goog.ui.Component.EventType.CHANGE,
-      this.sliderCallbackFactory_('saturation'));
-  Blockly.FieldColourSlider.brightnessChangeEventKey_ = goog.events.listen(this.brightnessSlider_,
-      goog.ui.Component.EventType.CHANGE,
-      this.sliderCallbackFactory_('brightness'));
+  Blockly.FieldColourSlider.hueChangeEventKey_ = goog.events.listen(
+    this.hueSlider_,
+    goog.ui.Component.EventType.CHANGE,
+    this.sliderCallbackFactory_("hue")
+  );
+  Blockly.FieldColourSlider.saturationChangeEventKey_ = goog.events.listen(
+    this.saturationSlider_,
+    goog.ui.Component.EventType.CHANGE,
+    this.sliderCallbackFactory_("saturation")
+  );
+  Blockly.FieldColourSlider.brightnessChangeEventKey_ = goog.events.listen(
+    this.brightnessSlider_,
+    goog.ui.Component.EventType.CHANGE,
+    this.sliderCallbackFactory_("brightness")
+  );
 };
 
-Blockly.FieldColourSlider.prototype.dispose = function() {
+Blockly.FieldColourSlider.prototype.dispose = function () {
   if (Blockly.FieldColourSlider.hueChangeEventKey_) {
     goog.events.unlistenByKey(Blockly.FieldColourSlider.hueChangeEventKey_);
   }
   if (Blockly.FieldColourSlider.saturationChangeEventKey_) {
-    goog.events.unlistenByKey(Blockly.FieldColourSlider.saturationChangeEventKey_);
+    goog.events.unlistenByKey(
+      Blockly.FieldColourSlider.saturationChangeEventKey_
+    );
   }
   if (Blockly.FieldColourSlider.brightnessChangeEventKey_) {
-    goog.events.unlistenByKey(Blockly.FieldColourSlider.brightnessChangeEventKey_);
+    goog.events.unlistenByKey(
+      Blockly.FieldColourSlider.brightnessChangeEventKey_
+    );
   }
   if (Blockly.FieldColourSlider.eyedropperEventData_) {
     Blockly.unbindEvent_(Blockly.FieldColourSlider.eyedropperEventData_);
@@ -384,4 +451,4 @@ Blockly.FieldColourSlider.prototype.dispose = function() {
   Blockly.FieldColourSlider.superClass_.dispose.call(this);
 };
 
-Blockly.Field.register('field_colour_slider', Blockly.FieldColourSlider);
+Blockly.Field.register("field_colour_slider", Blockly.FieldColourSlider);

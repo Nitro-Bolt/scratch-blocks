@@ -22,10 +22,9 @@
  * @fileoverview Blockly constants.
  * @author fenichel@google.com (Rachel Fenichel)
  */
-'use strict';
+"use strict";
 
-goog.provide('Blockly.constants');
-
+goog.provide("Blockly.constants");
 
 /**
  * Number of pixels the mouse must move before a drag starts.
@@ -112,7 +111,7 @@ Blockly.HSV_VALUE = 0.65;
 Blockly.SPRITE = {
   width: 96,
   height: 124,
-  url: 'sprites.png'
+  url: "sprites.png",
 };
 
 // Constants below this point are not intended to be changed.
@@ -121,13 +120,13 @@ Blockly.SPRITE = {
  * Required name space for SVG elements.
  * @const
  */
-Blockly.SVG_NS = 'http://www.w3.org/2000/svg';
+Blockly.SVG_NS = "http://www.w3.org/2000/svg";
 
 /**
  * Required name space for HTML elements.
  * @const
  */
-Blockly.HTML_NS = 'http://www.w3.org/1999/xhtml';
+Blockly.HTML_NS = "http://www.w3.org/1999/xhtml";
 
 /**
  * ENUM for a right-facing value input.  E.g. 'set item to' or 'return'.
@@ -213,28 +212,16 @@ Blockly.OPPOSITE_TYPE[Blockly.NEXT_STATEMENT] = Blockly.PREVIOUS_STATEMENT;
 Blockly.OPPOSITE_TYPE[Blockly.PREVIOUS_STATEMENT] = Blockly.NEXT_STATEMENT;
 
 /**
- * ENUM for toolbox and flyout at top of screen.
- * @const
- */
-Blockly.TOOLBOX_AT_TOP = 0;
-
-/**
- * ENUM for toolbox and flyout at bottom of screen.
- * @const
- */
-Blockly.TOOLBOX_AT_BOTTOM = 1;
-
-/**
  * ENUM for toolbox and flyout at left of screen.
  * @const
  */
-Blockly.TOOLBOX_AT_LEFT = 2;
+Blockly.TOOLBOX_AT_LEFT = 0;
 
 /**
  * ENUM for toolbox and flyout at right of screen.
  * @const
  */
-Blockly.TOOLBOX_AT_RIGHT = 3;
+Blockly.TOOLBOX_AT_RIGHT = 1;
 
 /**
  * ENUM for output shape: hexagonal (booleans/predicates).
@@ -265,20 +252,20 @@ Blockly.OUTPUT_SHAPE_OBJECT = 4;
  * @const
  */
 Blockly.Categories = {
-  "motion": "motion",
-  "looks": "looks",
-  "sound": "sounds",
-  "assets": "assets",
-  "pen": "pen",
-  "data": "data",
-  "dataLists": "data-lists",
-  "dataTables": "data-tables",
-  "json": "json",
-  "event": "events",
-  "control": "control",
-  "sensing": "sensing",
-  "operators": "operators",
-  "more": "more"
+  motion: "motion",
+  looks: "looks",
+  sound: "sounds",
+  assets: "assets",
+  pen: "pen",
+  data: "data",
+  dataLists: "data-lists",
+  dataTables: "data-tables",
+  json: "json",
+  event: "events",
+  control: "control",
+  sensing: "sensing",
+  operators: "operators",
+  more: "more",
 };
 
 /**
@@ -307,7 +294,7 @@ Blockly.DELETE_AREA_TOOLBOX = 2;
  * variable blocks.
  * @const {string}
  */
-Blockly.VARIABLE_CATEGORY_NAME = 'VARIABLE';
+Blockly.VARIABLE_CATEGORY_NAME = "VARIABLE";
 
 /**
  * String for use in the "custom" attribute of a category in toolbox xml.
@@ -315,7 +302,7 @@ Blockly.VARIABLE_CATEGORY_NAME = 'VARIABLE';
  * procedure blocks.
  * @const {string}
  */
-Blockly.PROCEDURE_CATEGORY_NAME = 'PROCEDURE';
+Blockly.PROCEDURE_CATEGORY_NAME = "PROCEDURE";
 
 /**
  * String for use in the dropdown created in field_variable.
@@ -323,7 +310,7 @@ Blockly.PROCEDURE_CATEGORY_NAME = 'PROCEDURE';
  * variable...' and if selected, should trigger the prompt to rename a variable.
  * @const {string}
  */
-Blockly.RENAME_VARIABLE_ID = 'RENAME_VARIABLE_ID';
+Blockly.RENAME_VARIABLE_ID = "RENAME_VARIABLE_ID";
 
 /**
  * String for use in the dropdown created in field_variable.
@@ -331,7 +318,7 @@ Blockly.RENAME_VARIABLE_ID = 'RENAME_VARIABLE_ID';
  * variable' and if selected, should trigger the prompt to delete a variable.
  * @const {string}
  */
-Blockly.DELETE_VARIABLE_ID = 'DELETE_VARIABLE_ID';
+Blockly.DELETE_VARIABLE_ID = "DELETE_VARIABLE_ID";
 
 /**
  * String for use in the dropdown created in field_variable,
@@ -340,7 +327,7 @@ Blockly.DELETE_VARIABLE_ID = 'DELETE_VARIABLE_ID';
  * and if selected, should trigger the prompt to create a new message.
  * @const {string}
  */
-Blockly.NEW_BROADCAST_MESSAGE_ID = 'NEW_BROADCAST_MESSAGE_ID';
+Blockly.NEW_BROADCAST_MESSAGE_ID = "NEW_BROADCAST_MESSAGE_ID";
 
 /**
  * String for use in the dropdown created in field_variable,
@@ -349,7 +336,7 @@ Blockly.NEW_BROADCAST_MESSAGE_ID = 'NEW_BROADCAST_MESSAGE_ID';
  * and if selected, should trigger the prompt to create a new variable.
  * @const {string}
  */
-Blockly.NEW_VARIABLE_OPTION_ID = 'NEW_VARIABLE_OPTION_ID';
+Blockly.NEW_VARIABLE_OPTION_ID = "NEW_VARIABLE_OPTION_ID";
 
 /**
  * String for use in the dropdown created in field_variable,
@@ -359,7 +346,7 @@ Blockly.NEW_VARIABLE_OPTION_ID = 'NEW_VARIABLE_OPTION_ID';
  * broadcast message.
  * @const {string}
  */
-Blockly.RENAME_BROADCAST_ID = 'RENAME_BROADCAST_ID';
+Blockly.RENAME_BROADCAST_ID = "RENAME_BROADCAST_ID";
 
 /**
  * String for use in the dropdown created in field_variable,
@@ -369,7 +356,7 @@ Blockly.RENAME_BROADCAST_ID = 'RENAME_BROADCAST_ID';
  * message.
  * @const {string}
  */
-Blockly.DELETE_BROADCAST_ID = 'DELETE_BROADCAST_ID';
+Blockly.DELETE_BROADCAST_ID = "DELETE_BROADCAST_ID";
 
 /**
  * String representing the variable type of broadcast message blocks.
@@ -377,7 +364,7 @@ Blockly.DELETE_BROADCAST_ID = 'DELETE_BROADCAST_ID';
  * indicates that the current variable is a broadcast message.
  * @const {string}
  */
-Blockly.BROADCAST_MESSAGE_VARIABLE_TYPE = 'broadcast_msg';
+Blockly.BROADCAST_MESSAGE_VARIABLE_TYPE = "broadcast_msg";
 
 /**
  * String representing the variable type of table blocks.
@@ -385,7 +372,7 @@ Blockly.BROADCAST_MESSAGE_VARIABLE_TYPE = 'broadcast_msg';
  * indicates that the current variable is a table.
  * @const {string}
  */
-Blockly.TABLE_VARIABLE_TYPE = 'table';
+Blockly.TABLE_VARIABLE_TYPE = "table";
 
 /**
  * String representing the variable type of list blocks.
@@ -393,7 +380,7 @@ Blockly.TABLE_VARIABLE_TYPE = 'table';
  * indicates that the current variable is a list.
  * @const {string}
  */
-Blockly.LIST_VARIABLE_TYPE = 'list';
+Blockly.LIST_VARIABLE_TYPE = "list";
 
 // TODO (#1251) Replace '' below with 'scalar', and start using this constant
 // everywhere.
@@ -403,25 +390,25 @@ Blockly.LIST_VARIABLE_TYPE = 'list';
  * indicates that the current variable is a scalar variable.
  * @const {string}
  */
-Blockly.SCALAR_VARIABLE_TYPE = '';
+Blockly.SCALAR_VARIABLE_TYPE = "";
 
 /**
  * The type of all procedure definition blocks.
  * @const {string}
  */
-Blockly.PROCEDURES_DEFINITION_BLOCK_TYPE = 'procedures_definition';
+Blockly.PROCEDURES_DEFINITION_BLOCK_TYPE = "procedures_definition";
 
 /**
  * The type of all procedure prototype blocks.
  * @const {string}
  */
-Blockly.PROCEDURES_PROTOTYPE_BLOCK_TYPE = 'procedures_prototype';
+Blockly.PROCEDURES_PROTOTYPE_BLOCK_TYPE = "procedures_prototype";
 
 /**
  * The type of all procedure call blocks.
  * @const {string}
  */
-Blockly.PROCEDURES_CALL_BLOCK_TYPE = 'procedures_call';
+Blockly.PROCEDURES_CALL_BLOCK_TYPE = "procedures_call";
 
 /**
  * Enum for procedure call statements.
@@ -452,19 +439,19 @@ Blockly.PROCEDURES_CALL_TYPE_ARRAY = 4;
  * The type of all procedure return blocks.
  * @const {string}
  */
-Blockly.PROCEDURES_RETURN_BLOCK_TYPE = 'procedures_return';
+Blockly.PROCEDURES_RETURN_BLOCK_TYPE = "procedures_return";
 
 /**
  * The type of all procedure set parameter blocks.
  * @const {string}
  */
-Blockly.PROCEDURES_SET_PARAM_BLOCK_TYPE = 'procedures_set_param';
+Blockly.PROCEDURES_SET_PARAM_BLOCK_TYPE = "procedures_set_param";
 
 /**
  * ENUM for flyout status button states.
  * @const
  */
 Blockly.StatusButtonState = {
-  "READY": "ready",
-  "NOT_READY": "not ready",
+  READY: "ready",
+  NOT_READY: "not ready",
 };

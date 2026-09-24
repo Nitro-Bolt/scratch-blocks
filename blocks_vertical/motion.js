@@ -18,596 +18,593 @@
  * limitations under the License.
  */
 
-'use strict';
+"use strict";
 
-goog.provide('Blockly.Blocks.motion');
+goog.provide("Blockly.Blocks.motion");
 
-goog.require('Blockly.Blocks');
-goog.require('Blockly.Colours');
-goog.require('Blockly.constants');
-goog.require('Blockly.ScratchBlocks.VerticalExtensions');
+goog.require("Blockly.Blocks");
+goog.require("Blockly.Colours");
+goog.require("Blockly.constants");
+goog.require("Blockly.ScratchBlocks.VerticalExtensions");
 
-
-Blockly.Blocks['motion_movesteps'] = {
+Blockly.Blocks["motion_movesteps"] = {
   /**
    * Block to move steps.
    * @this Blockly.Block
    */
-  init: function() {
+  init: function () {
     this.jsonInit({
-      "message0": Blockly.Msg.MOTION_MOVESTEPS,
-      "args0": [
+      message0: Blockly.Msg.MOTION_MOVESTEPS,
+      args0: [
         {
-          "type": "input_value",
-          "name": "STEPS"
-        }
+          type: "input_value",
+          name: "STEPS",
+        },
       ],
-      "category": Blockly.Categories.motion,
-      "extensions": ["colours_motion", "shape_statement"]
+      category: Blockly.Categories.motion,
+      extensions: ["colours_motion", "shape_statement"],
     });
-  }
+  },
 };
 
-Blockly.Blocks['motion_turnright'] = {
+Blockly.Blocks["motion_turnright"] = {
   /**
    * Block to turn right.
    * @this Blockly.Block
    */
-  init: function() {
+  init: function () {
     this.jsonInit({
-      "message0": Blockly.Msg.MOTION_TURNRIGHT,
-      "args0": [
+      message0: Blockly.Msg.MOTION_TURNRIGHT,
+      args0: [
         {
-          "type": "field_image",
-          "src": Blockly.mainWorkspace.options.pathToMedia + "rotate-right.svg",
-          "width": 24,
-          "height": 24
+          type: "field_image",
+          src: Blockly.mainWorkspace.options.pathToMedia + "rotate-right.svg",
+          width: 24,
+          height: 24,
         },
         {
-          "type": "input_value",
-          "name": "DEGREES"
-        }
+          type: "input_value",
+          name: "DEGREES",
+        },
       ],
-      "category": Blockly.Categories.motion,
-      "extensions": ["colours_motion", "shape_statement"],
-      "switches": ["motion_turnleft"]
+      category: Blockly.Categories.motion,
+      extensions: ["colours_motion", "shape_statement"],
+      switches: ["motion_turnleft"],
     });
-  }
+  },
 };
 
-Blockly.Blocks['motion_turnleft'] = {
+Blockly.Blocks["motion_turnleft"] = {
   /**
    * Block to turn left.
    * @this Blockly.Block
    */
-  init: function() {
+  init: function () {
     this.jsonInit({
-      "message0": Blockly.Msg.MOTION_TURNLEFT,
-      "args0": [
+      message0: Blockly.Msg.MOTION_TURNLEFT,
+      args0: [
         {
-          "type": "field_image",
-          "src": Blockly.mainWorkspace.options.pathToMedia + "rotate-left.svg",
-          "width": 24,
-          "height": 24
+          type: "field_image",
+          src: Blockly.mainWorkspace.options.pathToMedia + "rotate-left.svg",
+          width: 24,
+          height: 24,
         },
         {
-          "type": "input_value",
-          "name": "DEGREES"
-        }
+          type: "input_value",
+          name: "DEGREES",
+        },
       ],
-      "category": Blockly.Categories.motion,
-      "extensions": ["colours_motion", "shape_statement"],
-      "switches": ["motion_turnright"]
+      category: Blockly.Categories.motion,
+      extensions: ["colours_motion", "shape_statement"],
+      switches: ["motion_turnright"],
     });
-  }
+  },
 };
 
-Blockly.Blocks['motion_pointindirection'] = {
+Blockly.Blocks["motion_pointindirection"] = {
   /**
    * Block to point in direction.
    * @this Blockly.Block
    */
-  init: function() {
+  init: function () {
     this.jsonInit({
-      "message0": Blockly.Msg.MOTION_POINTINDIRECTION,
-      "args0": [
+      message0: Blockly.Msg.MOTION_POINTINDIRECTION,
+      args0: [
         {
-          "type": "input_value",
-          "name": "DIRECTION"
-        }
+          type: "input_value",
+          name: "DIRECTION",
+        },
       ],
-      "category": Blockly.Categories.motion,
-      "extensions": ["colours_motion", "shape_statement"]
+      category: Blockly.Categories.motion,
+      extensions: ["colours_motion", "shape_statement"],
     });
-  }
+  },
 };
 
-Blockly.Blocks['motion_pointtowards_menu'] = {
+Blockly.Blocks["motion_pointtowards_menu"] = {
   /**
    * Point towards drop-down menu.
    * @this Blockly.Block
    */
-  init: function() {
+  init: function () {
     this.jsonInit({
-      "message0": "%1",
-      "args0": [
+      message0: "%1",
+      args0: [
         {
-          "type": "field_dropdown",
-          "name": "TOWARDS",
-          "options": [
-            [Blockly.Msg.MOTION_POINTTOWARDS_POINTER, '_mouse_'],
-            [Blockly.Msg.MOTION_POINTTOWARDS_RANDOM, '_random_']
-          ]
-        }
+          type: "field_dropdown",
+          name: "TOWARDS",
+          options: [
+            [Blockly.Msg.MOTION_POINTTOWARDS_POINTER, "_mouse_"],
+            [Blockly.Msg.MOTION_POINTTOWARDS_RANDOM, "_random_"],
+          ],
+        },
       ],
-      "colour": Blockly.Colours.motion.secondary,
-      "colourSecondary": Blockly.Colours.motion.secondary,
-      "colourTertiary": Blockly.Colours.motion.tertiary,
-      "colourQuaternary": Blockly.Colours.motion.quaternary,
-      "extensions": ["output_string"]
+      colour: Blockly.Colours.motion.secondary,
+      colourSecondary: Blockly.Colours.motion.secondary,
+      colourTertiary: Blockly.Colours.motion.tertiary,
+      colourQuaternary: Blockly.Colours.motion.quaternary,
+      extensions: ["output_string"],
     });
-  }
+  },
 };
 
-Blockly.Blocks['motion_pointtowards'] = {
+Blockly.Blocks["motion_pointtowards"] = {
   /**
    * Block to point in direction.
    * @this Blockly.Block
    */
-  init: function() {
+  init: function () {
     this.jsonInit({
-      "message0": Blockly.Msg.MOTION_POINTTOWARDS,
-      "args0": [
+      message0: Blockly.Msg.MOTION_POINTTOWARDS,
+      args0: [
         {
-          "type": "input_value",
-          "name": "TOWARDS"
-        }
+          type: "input_value",
+          name: "TOWARDS",
+        },
       ],
-      "category": Blockly.Categories.motion,
-      "extensions": ["colours_motion", "shape_statement"]
+      category: Blockly.Categories.motion,
+      extensions: ["colours_motion", "shape_statement"],
     });
-  }
+  },
 };
 
-Blockly.Blocks['motion_goto_menu'] = {
+Blockly.Blocks["motion_goto_menu"] = {
   /**
    * Go to drop-down menu.
    * @this Blockly.Block
    */
-  init: function() {
+  init: function () {
     this.jsonInit({
-      "message0": "%1",
-      "args0": [
+      message0: "%1",
+      args0: [
         {
-          "type": "field_dropdown",
-          "name": "TO",
-          "options": [
-            [Blockly.Msg.MOTION_GOTO_POINTER, '_mouse_'],
-            [Blockly.Msg.MOTION_GOTO_RANDOM, '_random_']
-          ]
-        }
+          type: "field_dropdown",
+          name: "TO",
+          options: [
+            [Blockly.Msg.MOTION_GOTO_POINTER, "_mouse_"],
+            [Blockly.Msg.MOTION_GOTO_RANDOM, "_random_"],
+          ],
+        },
       ],
-      "colour": Blockly.Colours.motion.secondary,
-      "colourSecondary": Blockly.Colours.motion.secondary,
-      "colourTertiary": Blockly.Colours.motion.tertiary,
-      "colourQuaternary": Blockly.Colours.motion.quaternary,
-      "extensions": ["output_string"]
+      colour: Blockly.Colours.motion.secondary,
+      colourSecondary: Blockly.Colours.motion.secondary,
+      colourTertiary: Blockly.Colours.motion.tertiary,
+      colourQuaternary: Blockly.Colours.motion.quaternary,
+      extensions: ["output_string"],
     });
-  }
+  },
 };
 
-Blockly.Blocks['motion_gotoxy'] = {
+Blockly.Blocks["motion_gotoxy"] = {
   /**
    * Block to go to X, Y.
    * @this Blockly.Block
    */
-  init: function() {
+  init: function () {
     this.jsonInit({
-      "message0": Blockly.Msg.MOTION_GOTOXY,
-      "args0": [
+      message0: Blockly.Msg.MOTION_GOTOXY,
+      args0: [
         {
-          "type": "input_value",
-          "name": "X"
+          type: "input_value",
+          name: "X",
         },
         {
-          "type": "input_value",
-          "name": "Y"
-        }
+          type: "input_value",
+          name: "Y",
+        },
       ],
-      "category": Blockly.Categories.motion,
-      "extensions": ["colours_motion", "shape_statement"]
+      category: Blockly.Categories.motion,
+      extensions: ["colours_motion", "shape_statement"],
     });
-  }
+  },
 };
 
-Blockly.Blocks['motion_goto'] = {
+Blockly.Blocks["motion_goto"] = {
   /**
    * Block to go to a menu item.
    * @this Blockly.Block
    */
-  init: function() {
+  init: function () {
     this.jsonInit({
-      "message0": Blockly.Msg.MOTION_GOTO,
-      "args0": [
+      message0: Blockly.Msg.MOTION_GOTO,
+      args0: [
         {
-          "type": "input_value",
-          "name": "TO"
-        }
+          type: "input_value",
+          name: "TO",
+        },
       ],
-      "category": Blockly.Categories.motion,
-      "extensions": ["colours_motion", "shape_statement"]
+      category: Blockly.Categories.motion,
+      extensions: ["colours_motion", "shape_statement"],
     });
-  }
+  },
 };
 
-Blockly.Blocks['motion_glidesecstoxy'] = {
+Blockly.Blocks["motion_glidesecstoxy"] = {
   /**
    * Block to glide for a specified time.
    * @this Blockly.Block
    */
-  init: function() {
+  init: function () {
     this.jsonInit({
-      "message0": Blockly.Msg.MOTION_GLIDESECSTOXY,
-      "args0": [
+      message0: Blockly.Msg.MOTION_GLIDESECSTOXY,
+      args0: [
         {
-          "type": "input_value",
-          "name": "SECS"
+          type: "input_value",
+          name: "SECS",
         },
         {
-          "type": "input_value",
-          "name": "X"
+          type: "input_value",
+          name: "X",
         },
         {
-          "type": "input_value",
-          "name": "Y"
-        }
+          type: "input_value",
+          name: "Y",
+        },
       ],
-      "category": Blockly.Categories.motion,
-      "extensions": ["colours_motion", "shape_statement"]
+      category: Blockly.Categories.motion,
+      extensions: ["colours_motion", "shape_statement"],
     });
-  }
+  },
 };
 
-Blockly.Blocks['motion_glideto_menu'] = {
+Blockly.Blocks["motion_glideto_menu"] = {
   /**
    * Glide to drop-down menu
    * @this Blockly.Block
    */
-  init: function() {
+  init: function () {
     this.jsonInit({
-      "message0": "%1",
-      "args0": [
+      message0: "%1",
+      args0: [
         {
-          "type": "field_dropdown",
-          "name": "TO",
-          "options": [
-            [Blockly.Msg.MOTION_GLIDETO_POINTER, '_mouse_'],
-            [Blockly.Msg.MOTION_GLIDETO_RANDOM, '_random_']
-          ]
-        }
+          type: "field_dropdown",
+          name: "TO",
+          options: [
+            [Blockly.Msg.MOTION_GLIDETO_POINTER, "_mouse_"],
+            [Blockly.Msg.MOTION_GLIDETO_RANDOM, "_random_"],
+          ],
+        },
       ],
-      "colour": Blockly.Colours.motion.secondary,
-      "colourSecondary": Blockly.Colours.motion.secondary,
-      "colourTertiary": Blockly.Colours.motion.tertiary,
-      "colourQuaternary": Blockly.Colours.motion.quaternary,
-      "extensions": ["output_string"]
+      colour: Blockly.Colours.motion.secondary,
+      colourSecondary: Blockly.Colours.motion.secondary,
+      colourTertiary: Blockly.Colours.motion.tertiary,
+      colourQuaternary: Blockly.Colours.motion.quaternary,
+      extensions: ["output_string"],
     });
-  }
+  },
 };
 
-Blockly.Blocks['motion_glideto'] = {
+Blockly.Blocks["motion_glideto"] = {
   /**
    * Block to glide to a menu item
    * @this Blockly.Block
    */
-  init: function() {
+  init: function () {
     this.jsonInit({
-      "message0": Blockly.Msg.MOTION_GLIDETO,
-      "args0": [
+      message0: Blockly.Msg.MOTION_GLIDETO,
+      args0: [
         {
-          "type": "input_value",
-          "name": "SECS"
+          type: "input_value",
+          name: "SECS",
         },
         {
-          "type": "input_value",
-          "name": "TO"
-        }
+          type: "input_value",
+          name: "TO",
+        },
       ],
-      "category": Blockly.Categories.motion,
-      "extensions": ["colours_motion", "shape_statement"]
+      category: Blockly.Categories.motion,
+      extensions: ["colours_motion", "shape_statement"],
     });
-  }
+  },
 };
 
-Blockly.Blocks['motion_changexby'] = {
+Blockly.Blocks["motion_changexby"] = {
   /**
    * Block to change X.
    * @this Blockly.Block
    */
-  init: function() {
+  init: function () {
     this.jsonInit({
-      "message0": Blockly.Msg.MOTION_CHANGEXBY,
-      "args0": [
+      message0: Blockly.Msg.MOTION_CHANGEXBY,
+      args0: [
         {
-          "type": "input_value",
-          "name": "DX"
-        }
+          type: "input_value",
+          name: "DX",
+        },
       ],
-      "category": Blockly.Categories.motion,
-      "extensions": ["colours_motion", "shape_statement"],
-      "switches": [
-        { id: 'motion_setx',      inputs: [['DX', 'X']]  },
-        { id: 'motion_sety',      inputs: [['DX', 'Y']]  },
-        { id: 'motion_changeyby', inputs: [['DX', 'DY']] }
-      ]
+      category: Blockly.Categories.motion,
+      extensions: ["colours_motion", "shape_statement"],
+      switches: [
+        { id: "motion_setx", inputs: [["DX", "X"]] },
+        { id: "motion_sety", inputs: [["DX", "Y"]] },
+        { id: "motion_changeyby", inputs: [["DX", "DY"]] },
+      ],
     });
-  }
+  },
 };
 
-Blockly.Blocks['motion_setx'] = {
+Blockly.Blocks["motion_setx"] = {
   /**
    * Block to set X.
    * @this Blockly.Block
    */
-  init: function() {
+  init: function () {
     this.jsonInit({
-      "message0": Blockly.Msg.MOTION_SETX,
-      "args0": [
+      message0: Blockly.Msg.MOTION_SETX,
+      args0: [
         {
-          "type": "input_value",
-          "name": "X"
-        }
+          type: "input_value",
+          name: "X",
+        },
       ],
-      "category": Blockly.Categories.motion,
-      "extensions": ["colours_motion", "shape_statement"],
-      "switches": [{ id: 'motion_changexby', inputs: [['X', 'DX']] },
-        { id: 'motion_sety',      inputs: [['X', 'Y']]  },
-        { id: 'motion_changeyby', inputs: [['X', 'DY']] }]
+      category: Blockly.Categories.motion,
+      extensions: ["colours_motion", "shape_statement"],
+      switches: [
+        { id: "motion_changexby", inputs: [["X", "DX"]] },
+        { id: "motion_sety", inputs: [["X", "Y"]] },
+        { id: "motion_changeyby", inputs: [["X", "DY"]] },
+      ],
     });
-  }
+  },
 };
 
-Blockly.Blocks['motion_changeyby'] = {
+Blockly.Blocks["motion_changeyby"] = {
   /**
    * Block to change Y.
    * @this Blockly.Block
    */
-  init: function() {
+  init: function () {
     this.jsonInit({
-      "message0": Blockly.Msg.MOTION_CHANGEYBY,
-      "args0": [
+      message0: Blockly.Msg.MOTION_CHANGEYBY,
+      args0: [
         {
-          "type": "input_value",
-          "name": "DY"
-        }
+          type: "input_value",
+          name: "DY",
+        },
       ],
-      "category": Blockly.Categories.motion,
-      "extensions": ["colours_motion", "shape_statement"],
-      "switches": [
-        { id: 'motion_setx',      inputs: [['DY', 'X']]  },
-        { id: 'motion_changexby', inputs: [['DY', 'DX']] },
-        { id: 'motion_sety',      inputs: [['DY', 'Y']]  }
-      ]
+      category: Blockly.Categories.motion,
+      extensions: ["colours_motion", "shape_statement"],
+      switches: [
+        { id: "motion_setx", inputs: [["DY", "X"]] },
+        { id: "motion_changexby", inputs: [["DY", "DX"]] },
+        { id: "motion_sety", inputs: [["DY", "Y"]] },
+      ],
     });
-  }
+  },
 };
 
-Blockly.Blocks['motion_sety'] = {
+Blockly.Blocks["motion_sety"] = {
   /**
    * Block to set Y.
    * @this Blockly.Block
    */
-  init: function() {
+  init: function () {
     this.jsonInit({
-      "message0": Blockly.Msg.MOTION_SETY,
-      "args0": [
+      message0: Blockly.Msg.MOTION_SETY,
+      args0: [
         {
-          "type": "input_value",
-          "name": "Y"
-        }
+          type: "input_value",
+          name: "Y",
+        },
       ],
-      "category": Blockly.Categories.motion,
-      "extensions": ["colours_motion", "shape_statement"],
-      "switches": [
-        { id: 'motion_setx',      inputs: [['Y', 'X']]  },
-        { id: 'motion_changexby', inputs: [['Y', 'DX']] },
-        { id: 'motion_changeyby', inputs: [['Y', 'DY']] }
-      ]
+      category: Blockly.Categories.motion,
+      extensions: ["colours_motion", "shape_statement"],
+      switches: [
+        { id: "motion_setx", inputs: [["Y", "X"]] },
+        { id: "motion_changexby", inputs: [["Y", "DX"]] },
+        { id: "motion_changeyby", inputs: [["Y", "DY"]] },
+      ],
     });
-  }
+  },
 };
 
-Blockly.Blocks['motion_ifonedgebounce'] = {
+Blockly.Blocks["motion_ifonedgebounce"] = {
   /**
    * Block to bounce on edge.
    * @this Blockly.Block
    */
-  init: function() {
+  init: function () {
     this.jsonInit({
-      "message0": Blockly.Msg.MOTION_IFONEDGEBOUNCE,
-      "category": Blockly.Categories.motion,
-      "extensions": ["colours_motion", "shape_statement"]
+      message0: Blockly.Msg.MOTION_IFONEDGEBOUNCE,
+      category: Blockly.Categories.motion,
+      extensions: ["colours_motion", "shape_statement"],
     });
-  }
+  },
 };
 
-Blockly.Blocks['motion_setrotationstyle'] = {
+Blockly.Blocks["motion_setrotationstyle"] = {
   /**
    * Block to set rotation style.
    * @this Blockly.Block
    */
-  init: function() {
+  init: function () {
     this.jsonInit({
-      "message0": Blockly.Msg.MOTION_SETROTATIONSTYLE,
-      "args0": [
+      message0: Blockly.Msg.MOTION_SETROTATIONSTYLE,
+      args0: [
         {
-          "type": "field_dropdown",
-          "name": "STYLE",
-          "options": [
-            [Blockly.Msg.MOTION_SETROTATIONSTYLE_LEFTRIGHT, 'left-right'],
-            [Blockly.Msg.MOTION_SETROTATIONSTYLE_DONTROTATE, 'don\'t rotate'],
-            [Blockly.Msg.MOTION_SETROTATIONSTYLE_ALLAROUND, 'all around']
-          ]
-        }
+          type: "field_dropdown",
+          name: "STYLE",
+          options: [
+            [Blockly.Msg.MOTION_SETROTATIONSTYLE_LEFTRIGHT, "left-right"],
+            [Blockly.Msg.MOTION_SETROTATIONSTYLE_DONTROTATE, "don't rotate"],
+            [Blockly.Msg.MOTION_SETROTATIONSTYLE_ALLAROUND, "all around"],
+          ],
+        },
       ],
-      "category": Blockly.Categories.motion,
-      "extensions": ["colours_motion", "shape_statement"]
+      category: Blockly.Categories.motion,
+      extensions: ["colours_motion", "shape_statement"],
     });
-  }
+  },
 };
 
-Blockly.Blocks['motion_xposition'] = {
+Blockly.Blocks["motion_xposition"] = {
   /**
    * Block to report X.
    * @this Blockly.Block
    */
-  init: function() {
+  init: function () {
     this.jsonInit({
-      "message0": Blockly.Msg.MOTION_XPOSITION,
-      "category": Blockly.Categories.motion,
-      "checkboxInFlyout": true,
-      "extensions": ["colours_motion", "output_number"],
-      "switches": [
-        'motion_yposition'
-      ]
+      message0: Blockly.Msg.MOTION_XPOSITION,
+      category: Blockly.Categories.motion,
+      checkboxInFlyout: true,
+      extensions: ["colours_motion", "output_number"],
+      switches: ["motion_yposition"],
     });
-  }
+  },
 };
 
-Blockly.Blocks['motion_yposition'] = {
+Blockly.Blocks["motion_yposition"] = {
   /**
    * Block to report Y.
    * @this Blockly.Block
    */
-  init: function() {
+  init: function () {
     this.jsonInit({
-      "message0": Blockly.Msg.MOTION_YPOSITION,
-      "category": Blockly.Categories.motion,
-      "checkboxInFlyout": true,
-      "extensions": ["colours_motion", "output_number"],
-      "switches": [
-        'motion_xposition'
-      ]
+      message0: Blockly.Msg.MOTION_YPOSITION,
+      category: Blockly.Categories.motion,
+      checkboxInFlyout: true,
+      extensions: ["colours_motion", "output_number"],
+      switches: ["motion_xposition"],
     });
-  }
+  },
 };
 
-Blockly.Blocks['motion_direction'] = {
+Blockly.Blocks["motion_direction"] = {
   /**
    * Block to report direction.
    * @this Blockly.Block
    */
-  init: function() {
+  init: function () {
     this.jsonInit({
-      "message0": Blockly.Msg.MOTION_DIRECTION,
-      "category": Blockly.Categories.motion,
-      "checkboxInFlyout": true,
-      "extensions": ["colours_motion", "output_number"]
+      message0: Blockly.Msg.MOTION_DIRECTION,
+      category: Blockly.Categories.motion,
+      checkboxInFlyout: true,
+      extensions: ["colours_motion", "output_number"],
     });
-  }
+  },
 };
 
-Blockly.Blocks['motion_scroll_right'] = {
+Blockly.Blocks["motion_scroll_right"] = {
   /**
    * Block to scroll the stage right. Does not actually do anything. This is
    * an obsolete block that is implemented for compatibility with Scratch 2.0
    * projects.
    * @this Blockly.Block
    */
-  init: function() {
+  init: function () {
     this.jsonInit({
-      "message0": Blockly.Msg.MOTION_SCROLLRIGHT,
-      "args0": [
+      message0: Blockly.Msg.MOTION_SCROLLRIGHT,
+      args0: [
         {
-          "type": "input_value",
-          "name": "DISTANCE"
-        }
+          type: "input_value",
+          name: "DISTANCE",
+        },
       ],
-      "category": Blockly.Categories.motion,
-      "extensions": ["colours_motion", "shape_statement"]
+      category: Blockly.Categories.motion,
+      extensions: ["colours_motion", "shape_statement"],
     });
-  }
+  },
 };
 
-Blockly.Blocks['motion_scroll_up'] = {
+Blockly.Blocks["motion_scroll_up"] = {
   /**
    * Block to scroll the stage up. Does not actually do anything. This is an
    * obsolete block that is implemented for compatibility with Scratch 2.0
    * projects.
    * @this Blockly.Block
    */
-  init: function() {
+  init: function () {
     this.jsonInit({
-      "message0": Blockly.Msg.MOTION_SCROLLUP,
-      "args0": [
+      message0: Blockly.Msg.MOTION_SCROLLUP,
+      args0: [
         {
-          "type": "input_value",
-          "name": "DISTANCE"
-        }
+          type: "input_value",
+          name: "DISTANCE",
+        },
       ],
-      "category": Blockly.Categories.motion,
-      "extensions": ["colours_motion", "shape_statement"]
+      category: Blockly.Categories.motion,
+      extensions: ["colours_motion", "shape_statement"],
     });
-  }
+  },
 };
 
-Blockly.Blocks['motion_align_scene'] = {
+Blockly.Blocks["motion_align_scene"] = {
   /**
    * Block to change the stage's scrolling alignment. Does not actually do
    * anything. This is an obsolete block that is implemented for compatibility
    * with Scratch 2.0 projects.
    * @this Blockly.Block
    */
-  init: function() {
+  init: function () {
     this.jsonInit({
-      "message0": Blockly.Msg.MOTION_ALIGNSCENE,
-      "args0": [
+      message0: Blockly.Msg.MOTION_ALIGNSCENE,
+      args0: [
         {
-          "type": "field_dropdown",
-          "name": "ALIGNMENT",
-          "options": [
-            [Blockly.Msg.MOTION_ALIGNSCENE_BOTTOMLEFT, 'bottom-left'],
-            [Blockly.Msg.MOTION_ALIGNSCENE_BOTTOMRIGHT, 'bottom-right'],
-            [Blockly.Msg.MOTION_ALIGNSCENE_MIDDLE, 'middle'],
-            [Blockly.Msg.MOTION_ALIGNSCENE_TOPLEFT, 'top-left'],
-            [Blockly.Msg.MOTION_ALIGNSCENE_TOPRIGHT, 'top-right']
-          ]
-        }
+          type: "field_dropdown",
+          name: "ALIGNMENT",
+          options: [
+            [Blockly.Msg.MOTION_ALIGNSCENE_BOTTOMLEFT, "bottom-left"],
+            [Blockly.Msg.MOTION_ALIGNSCENE_BOTTOMRIGHT, "bottom-right"],
+            [Blockly.Msg.MOTION_ALIGNSCENE_MIDDLE, "middle"],
+            [Blockly.Msg.MOTION_ALIGNSCENE_TOPLEFT, "top-left"],
+            [Blockly.Msg.MOTION_ALIGNSCENE_TOPRIGHT, "top-right"],
+          ],
+        },
       ],
-      "category": Blockly.Categories.motion,
-      "extensions": ["colours_motion", "shape_statement"]
+      category: Blockly.Categories.motion,
+      extensions: ["colours_motion", "shape_statement"],
     });
-  }
+  },
 };
 
-Blockly.Blocks['motion_xscroll'] = {
+Blockly.Blocks["motion_xscroll"] = {
   /**
    * Block to report the stage's scroll position's X value. Does not actually
    * do anything. This is an obsolete block that is implemented for
    * compatibility with Scratch 2.0 projects.
    * @this Blockly.Block
    */
-  init: function() {
+  init: function () {
     this.jsonInit({
-      "message0": Blockly.Msg.MOTION_XSCROLL,
-      "category": Blockly.Categories.motion,
-      "extensions": ["colours_motion", "output_number"]
+      message0: Blockly.Msg.MOTION_XSCROLL,
+      category: Blockly.Categories.motion,
+      extensions: ["colours_motion", "output_number"],
     });
-  }
+  },
 };
 
-Blockly.Blocks['motion_yscroll'] = {
+Blockly.Blocks["motion_yscroll"] = {
   /**
    * Block to report the stage's scroll position's Y value. Does not actually
    * do anything. This is an obsolete block that is implemented for
    * compatibility with Scratch 2.0 projects.
    * @this Blockly.Block
    */
-  init: function() {
+  init: function () {
     this.jsonInit({
-      "message0": Blockly.Msg.MOTION_YSCROLL,
-      "category": Blockly.Categories.motion,
-      "extensions": ["colours_motion", "output_number"]
+      message0: Blockly.Msg.MOTION_YSCROLL,
+      category: Blockly.Categories.motion,
+      extensions: ["colours_motion", "output_number"],
     });
-  }
+  },
 };

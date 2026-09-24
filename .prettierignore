@@ -1,0 +1,15 @@
+node_modules
+dist
+gh-pages
+media
+msg
+
+blockly_compressed*.js
+blockly_uncompressed*.js
+blocks_compressed*.js
+local_blockly_compressed*.js
+pnpm-lock.yaml
+build/test_expect.js
+
+*.md
+*.svg

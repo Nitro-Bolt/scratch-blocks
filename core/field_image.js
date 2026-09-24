@@ -22,15 +22,12 @@
  * @fileoverview Image field.  Used for pictures, icons, etc.
  * @author fraser@google.com (Neil Fraser)
  */
-'use strict';
+"use strict";
 
-goog.provide('Blockly.FieldImage');
+goog.provide("Blockly.FieldImage");
 
-goog.require('Blockly.Field');
-goog.require('goog.dom');
-goog.require('goog.math.Size');
-goog.require('goog.userAgent');
-
+goog.require("Blockly.Field");
+goog.require("goog.math.Size");
 
 /**
  * Class for an image on a block.
@@ -42,14 +39,14 @@ goog.require('goog.userAgent');
  * @extends {Blockly.Field}
  * @constructor
  */
-Blockly.FieldImage = function(src, width, height, opt_alt, flip_rtl) {
+Blockly.FieldImage = function (src, width, height, opt_alt, flip_rtl) {
   this.sourceBlock_ = null;
 
   // Ensure height and width are numbers.  Strings are bad at math.
   this.height_ = Number(height);
   this.width_ = Number(width);
   this.size_ = new goog.math.Size(this.width_, this.height_);
-  this.text_ = opt_alt || '';
+  this.text_ = opt_alt || "";
   this.flipRTL_ = flip_rtl;
   this.setValue(src);
 };
@@ -64,13 +61,16 @@ goog.inherits(Blockly.FieldImage, Blockly.Field);
  * @package
  * @nocollapse
  */
-Blockly.FieldImage.fromJson = function(options) {
-  var src = Blockly.utils.replaceMessageReferences(options['src']);
-  var width = Number(Blockly.utils.replaceMessageReferences(options['width']));
-  var height =
-      Number(Blockly.utils.replaceMessageReferences(options['height']));
-  var alt = Blockly.utils.replaceMessageReferences(options['alt']);
-  var flip_rtl = !!options['flip_rtl'] || !!options['flipRtl'];
+Blockly.FieldImage.fromJson = function (options) {
+  const src = Blockly.utils.replaceMessageReferences(options["src"]);
+  const width = Number(
+    Blockly.utils.replaceMessageReferences(options["width"])
+  );
+  const height = Number(
+    Blockly.utils.replaceMessageReferences(options["height"])
+  );
+  const alt = Blockly.utils.replaceMessageReferences(options["alt"]);
+  const flip_rtl = !!options["flip_rtl"] || !!options["flipRtl"];
   return new Blockly.FieldImage(src, width, height, alt, flip_rtl);
 };
 
@@ -82,25 +82,26 @@ Blockly.FieldImage.prototype.EDITABLE = false;
 /**
  * Install this image on a block.
  */
-Blockly.FieldImage.prototype.init = function() {
+Blockly.FieldImage.prototype.init = function () {
   if (this.fieldGroup_) {
     // Image has already been initialized once.
     return;
   }
   // Build the DOM.
   /** @type {SVGElement} */
-  this.fieldGroup_ = Blockly.utils.createSvgElement('g', {}, null);
+  this.fieldGroup_ = Blockly.utils.createSvgElement("g", {}, null);
   if (!this.visible_) {
-    this.fieldGroup_.style.display = 'none';
+    this.fieldGroup_.style.display = "none";
   }
   /** @type {SVGElement} */
   this.imageElement_ = Blockly.utils.createSvgElement(
-      'image',
-      {
-        'height': this.height_ + 'px',
-        'width': this.width_ + 'px'
-      },
-      this.fieldGroup_);
+    "image",
+    {
+      height: this.height_ + "px",
+      width: this.width_ + "px",
+    },
+    this.fieldGroup_
+  );
   this.setValue(this.src_);
   this.sourceBlock_.getSvgRoot().appendChild(this.fieldGroup_);
 
@@ -112,8 +113,8 @@ Blockly.FieldImage.prototype.init = function() {
 /**
  * Dispose of all DOM objects belonging to this text.
  */
-Blockly.FieldImage.prototype.dispose = function() {
-  goog.dom.removeNode(this.fieldGroup_);
+Blockly.FieldImage.prototype.dispose = function () {
+  if (this.fieldGroup_) this.fieldGroup_.remove();
   this.fieldGroup_ = null;
   this.imageElement_ = null;
 };
@@ -123,7 +124,7 @@ Blockly.FieldImage.prototype.dispose = function() {
  * @param {string|!Element} newTip Text for tooltip or a parent element to
  *     link to for its tooltip.
  */
-Blockly.FieldImage.prototype.setTooltip = function(newTip) {
+Blockly.FieldImage.prototype.setTooltip = function (newTip) {
   this.imageElement_.tooltip = newTip;
 };
 
@@ -132,7 +133,7 @@ Blockly.FieldImage.prototype.setTooltip = function(newTip) {
  * @return {string} Current text.
  * @override
  */
-Blockly.FieldImage.prototype.getValue = function() {
+Blockly.FieldImage.prototype.getValue = function () {
   return this.src_;
 };
 
@@ -141,7 +142,7 @@ Blockly.FieldImage.prototype.getValue = function() {
  * @param {?string} src New source.
  * @override
  */
-Blockly.FieldImage.prototype.setValue = function(src) {
+Blockly.FieldImage.prototype.setValue = function (src) {
   if (src === null) {
     // No change if null.
     return;
@@ -150,13 +151,16 @@ Blockly.FieldImage.prototype.setValue = function(src) {
   if (this.imageElement_) {
     // Extension blocks can't rely on having access to pathToMedia, so we allow this fake URL
     // protocol instead.
-    var mediaPrefix = 'media://';
+    const mediaPrefix = "media://";
     if (src.startsWith(mediaPrefix)) {
-      var pathToMedia = this.sourceBlock_.workspace.options.pathToMedia;
+      const pathToMedia = this.sourceBlock_.workspace.options.pathToMedia;
       src = pathToMedia + src.substring(mediaPrefix.length);
     }
-    this.imageElement_.setAttributeNS('http://www.w3.org/1999/xlink',
-        'xlink:href', src || '');
+    this.imageElement_.setAttributeNS(
+      "http://www.w3.org/1999/xlink",
+      "xlink:href",
+      src || ""
+    );
   }
 };
 
@@ -164,7 +168,7 @@ Blockly.FieldImage.prototype.setValue = function(src) {
  * Get whether to flip this image in RTL
  * @return {boolean} True if we should flip in RTL.
  */
-Blockly.FieldImage.prototype.getFlipRTL = function() {
+Blockly.FieldImage.prototype.getFlipRTL = function () {
   return this.flipRTL_;
 };
 
@@ -173,7 +177,7 @@ Blockly.FieldImage.prototype.getFlipRTL = function() {
  * @param {?string} alt New alt text.
  * @override
  */
-Blockly.FieldImage.prototype.setText = function(alt) {
+Blockly.FieldImage.prototype.setText = function (alt) {
   if (alt === null) {
     // No change if null.
     return;
@@ -185,7 +189,7 @@ Blockly.FieldImage.prototype.setText = function(alt) {
  * Images are fixed width, no need to render.
  * @private
  */
-Blockly.FieldImage.prototype.render_ = function() {
+Blockly.FieldImage.prototype.render_ = function () {
   // NOP
 };
 
@@ -193,8 +197,8 @@ Blockly.FieldImage.prototype.render_ = function() {
  * Images are fixed width, no need to update.
  * @private
  */
-Blockly.FieldImage.prototype.updateWidth = function() {
+Blockly.FieldImage.prototype.updateWidth = function () {
   // NOP
 };
 
-Blockly.Field.register('field_image', Blockly.FieldImage);
+Blockly.Field.register("field_image", Blockly.FieldImage);

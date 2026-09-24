@@ -1,8 +1,11 @@
-<!DOCTYPE html>
+<!doctype html>
 <html>
   <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
 
     <title>Vertical Playground</title>
 
@@ -32,7 +35,7 @@
     <script src="../blocks_vertical/default_toolbox.js"></script>
 
     <script>
-      'use strict';
+      "use strict";
 
       window.ScratchBlocks = Blockly;
 
@@ -42,11 +45,11 @@
         var soundsEnabled = null;
         if (sessionStorage) {
           // Restore sounds state.
-          soundsEnabled = sessionStorage.getItem('soundsEnabled');
+          soundsEnabled = sessionStorage.getItem("soundsEnabled");
           if (soundsEnabled === null) {
             soundsEnabled = true;
           } else {
-            soundsEnabled = (soundsEnabled === 'true');
+            soundsEnabled = soundsEnabled === "true";
           }
         } else {
           soundsEnabled = true;
@@ -56,35 +59,33 @@
         // Setup blocks
         // Parse the URL arguments.
         var match = location.search.match(/dir=([^&]+)/);
-        var rtl = match && match[1] == 'rtl';
+        var rtl = match && match[1] == "rtl";
         document.forms.options.elements.dir.selectedIndex = Number(rtl);
         var toolbox = getToolboxElement();
-        document.forms.options.elements.toolbox.selectedIndex =
-          toolbox ? 1: 0;
+        document.forms.options.elements.toolbox.selectedIndex = toolbox ? 1 : 0;
 
         match = location.search.match(/side=([^&]+)/);
 
-        var side = match ? match[1] : 'start';
+        var side = match ? match[1] : "start";
 
         document.forms.options.elements.side.value = side;
 
         match = location.search.match(/locale=([^&]+)/);
-        var locale = match ? match[1] : 'en';
+        var locale = match ? match[1] : "en";
         Blockly.ScratchMsgs.setLocale(locale);
         document.forms.options.elements.locale.value = locale;
 
         // Create main workspace.
-        workspace = Blockly.inject('blocklyDiv', {
+        workspace = Blockly.inject("blocklyDiv", {
           comments: true,
           disable: false,
           collapse: true,
-          media: '../media/',
+          media: "../media/",
           readOnly: false,
           rtl: rtl,
           scrollbars: true,
           toolbox: toolbox,
-          toolboxPosition: side == 'top' || side == 'start' ? 'start' : 'end',
-          horizontalLayout: side == 'top' || side == 'bottom',
+          toolboxPosition: side,
           sounds: soundsEnabled,
           zoom: {
             controls: true,
@@ -92,41 +93,43 @@
             startScale: 0.675,
             maxScale: 4,
             minScale: 0.25,
-            scaleSpeed: 1.1
+            scaleSpeed: 1.1,
           },
           colours: {
-            fieldShadow: 'rgba(255, 255, 255, 0.3)',
-            dragShadowOpacity: 0.6
-          }
+            fieldShadow: "rgba(255, 255, 255, 0.3)",
+            dragShadowOpacity: 0.6,
+          },
         });
 
         if (sessionStorage) {
           // Restore previously displayed text.
-          var text = sessionStorage.getItem('textarea');
+          var text = sessionStorage.getItem("textarea");
           if (text) {
-            document.getElementById('importExport').value = text;
+            document.getElementById("importExport").value = text;
           }
           taChange();
         }
 
         if (sessionStorage) {
           // Restore event logging state.
-          var state = sessionStorage.getItem('logEvents');
+          var state = sessionStorage.getItem("logEvents");
           logEvents(Boolean(state));
 
           // Restore flyout event logging state.
-          state = sessionStorage.getItem('logFlyoutEvents');
+          state = sessionStorage.getItem("logFlyoutEvents");
           logFlyoutEvents(Boolean(state));
         }
       }
 
       function getToolboxElement() {
         var match = location.search.match(/toolbox=([^&]+)/);
-        return document.getElementById('toolbox-' + (match ? match[1] : 'categories'));
+        return document.getElementById(
+          "toolbox-" + (match ? match[1] : "categories")
+        );
       }
 
       function toXml() {
-        var output = document.getElementById('importExport');
+        var output = document.getElementById("importExport");
         var xml = Blockly.Xml.workspaceToDom(workspace);
         output.value = Blockly.Xml.domToPrettyText(xml);
         output.focus();
@@ -135,7 +138,7 @@
       }
 
       function fromXml() {
-        var input = document.getElementById('importExport');
+        var input = document.getElementById("importExport");
         var xml = Blockly.Xml.textToDom(input.value);
         Blockly.Xml.domToWorkspace(xml, workspace);
         workspace.refreshToolboxSelection_();
@@ -145,9 +148,9 @@
       // Disable the "Import from XML" button if the XML is invalid.
       // Preserve text between page reloads.
       function taChange() {
-        var textarea = document.getElementById('importExport');
+        var textarea = document.getElementById("importExport");
         if (sessionStorage) {
-          sessionStorage.setItem('textarea', textarea.value)
+          sessionStorage.setItem("textarea", textarea.value);
         }
         var valid = true;
         try {
@@ -155,14 +158,14 @@
         } catch (e) {
           valid = false;
         }
-        document.getElementById('import').disabled = !valid;
+        document.getElementById("import").disabled = !valid;
       }
 
       function logEvents(state) {
-        var checkbox = document.getElementById('logCheck');
+        var checkbox = document.getElementById("logCheck");
         checkbox.checked = state;
         if (sessionStorage) {
-          sessionStorage.setItem('logEvents', state ? 'checked' : '');
+          sessionStorage.setItem("logEvents", state ? "checked" : "");
         }
         if (state) {
           workspace.addChangeListener(logger);
@@ -172,14 +175,15 @@
       }
 
       function logFlyoutEvents(state) {
-        var checkbox = document.getElementById('logFlyoutCheck');
+        var checkbox = document.getElementById("logFlyoutCheck");
         checkbox.checked = state;
         var soundsEnabled = null;
         if (sessionStorage) {
-          sessionStorage.setItem('logFlyoutEvents', state ? 'checked' : '');
+          sessionStorage.setItem("logFlyoutEvents", state ? "checked" : "");
         }
-        var flyoutWorkspace = (workspace.flyout_) ? workspace.flyout_.workspace_ :
-          workspace.toolbox_.flyout_.workspace_;
+        var flyoutWorkspace = workspace.flyout_
+          ? workspace.flyout_.workspace_
+          : workspace.toolbox_.flyout_.workspace_;
         if (state) {
           flyoutWorkspace.addChangeListener(logger);
         } else {
@@ -219,10 +223,10 @@
         var prototypes = [];
         var toolbox = workspace.options.languageTree;
         if (!toolbox) {
-          console.error('Toolbox not found; add a toolbox element to the DOM.');
+          console.error("Toolbox not found; add a toolbox element to the DOM.");
           return;
         }
-        var blocks = toolbox.getElementsByTagName('block');
+        var blocks = toolbox.getElementsByTagName("block");
         for (var i = 0; i < n; i++) {
           var blockXML = blocks[Math.floor(Math.random() * blocks.length)];
           var block = Blockly.Xml.domToBlock(blockXML, workspace);
@@ -239,62 +243,67 @@
         '    <value name="OPERAND1">',
         '     <shadow type="text">',
         '      <field name="TEXT">foo</field>',
-        '     </shadow>',
-        '    </value>',
+        "     </shadow>",
+        "    </value>",
         '    <value name="OPERAND2">',
         '      <shadow type="operator_equals"></shadow>',
-        '    </value>',
-        '  </shadow>'
-      ].join('\n');
+        "    </value>",
+        "  </shadow>",
+      ].join("\n");
 
       var spaghettiXml = [
         '  <block type="control_if_else">',
         '    <value name="CONDITION">',
         '      <shadow type="operator_equals"></shadow>',
-        '    </value>',
+        "    </value>",
         '    <statement name="SUBSTACK"></statement>',
         '    <statement name="SUBSTACK2"></statement>',
-        '    <next></next>',
-        '  </block>'
-      ].join('\n');
+        "    <next></next>",
+        "  </block>",
+      ].join("\n");
 
       function spaghetti(n) {
         console.log("Starting spaghetti.  This may take some time...");
         var xml = spaghettiXml;
         // Nest if/else statements deeply.
-        for(var i = 0; i < 2 * n; i++) {
-          xml = xml.replace(/(<statement name="SUBSTACK2?"?>)<\//g,
-              '$1' + spaghettiXml + '</');
+        for (var i = 0; i < 2 * n; i++) {
+          xml = xml.replace(
+            /(<statement name="SUBSTACK2?"?>)<\//g,
+            "$1" + spaghettiXml + "</"
+          );
         }
         // Stack a bit.
-        for(var i = 0; i < n; i++) {
-          xml = xml.replace(/(<next>)<\//g,
-          '$1' + spaghettiXml + '</');
+        for (var i = 0; i < n; i++) {
+          xml = xml.replace(/(<next>)<\//g, "$1" + spaghettiXml + "</");
         }
 
         // Nest boolean comparisons.
         var equalsBlock = equalsXml;
         for (var i = 0; i < n; i++) {
           equalsBlock = equalsBlock.replace(
-              /(<shadow( type="operator_equals")?>)<\/shadow>/g, equalsXml);
+            /(<shadow( type="operator_equals")?>)<\/shadow>/g,
+            equalsXml
+          );
         }
 
         // Put the nested boolean comparisons into if/else statements.
-        xml = xml.replace(/(<shadow( type="operator_equals")?>)<\/shadow>/g,
-            equalsBlock);
+        xml = xml.replace(
+          /(<shadow( type="operator_equals")?>)<\/shadow>/g,
+          equalsBlock
+        );
 
-        xml = '<xml xmlns="http://www.w3.org/1999/xhtml">' + xml + '</xml>';
+        xml = '<xml xmlns="http://www.w3.org/1999/xhtml">' + xml + "</xml>";
         var dom = Blockly.Xml.textToDom(xml);
-        console.time('Spaghetti domToWorkspace');
+        console.time("Spaghetti domToWorkspace");
         Blockly.Xml.domToWorkspace(dom, workspace);
-        console.timeEnd('Spaghetti domToWorkspace');
+        console.timeEnd("Spaghetti domToWorkspace");
       }
 
       function setSoundsEnabled(state) {
-        var checkbox = document.getElementById('soundsEnabled');
-        checkbox.checked = (state) ? 'checked' : '';
+        var checkbox = document.getElementById("soundsEnabled");
+        checkbox.checked = state ? "checked" : "";
         if (sessionStorage) {
-          sessionStorage.setItem('soundsEnabled', state);
+          sessionStorage.setItem("soundsEnabled", state);
         }
       }
 
@@ -302,8 +311,8 @@
         if (Blockly.selected) {
           workspace.reportValue(
             Blockly.selected.id,
-            document.getElementById('reportValue').value,
-            document.getElementById('reportError').checked
+            document.getElementById("reportValue").value,
+            document.getElementById("reportError").checked
           );
         }
       }
@@ -317,46 +326,55 @@
       }
 
       function tryCoreReload() {
-        var input = document.querySelector('input#coreValue');
-        if (input.value.trim() == '') {
-          input.value = '';
-          alert('Please supply a valid file :c');
+        var input = document.querySelector("input#coreValue");
+        if (input.value.trim() == "") {
+          input.value = "";
+          alert("Please supply a valid file :c");
           return;
         }
-        if (input.value.endsWith('.js')) {
-          console.warn('If you are trying to load a file that ends with an extra .js then just put the `.js` extension count +1.');
-          console.warn('but then again, if you are doing that it is bad practice... so fix it :)');
+        if (input.value.endsWith(".js")) {
+          console.warn(
+            "If you are trying to load a file that ends with an extra .js then just put the `.js` extension count +1."
+          );
+          console.warn(
+            "but then again, if you are doing that it is bad practice... so fix it :)"
+          );
           input.value = input.value.slice(0, -3);
         }
-        var file = 'core/' + input.value + '.js';
-        console.log('Attempting to reload: ' + file);
-        var script = Array.from(document.scripts).find(script => script.src.endsWith(file));
+        var file = "core/" + input.value + ".js";
+        console.log("Attempting to reload: " + file);
+        var script = Array.from(document.scripts).find((script) =>
+          script.src.endsWith(file)
+        );
         if (!script) {
-          alert('Unable to find core file, are you sure it was loaded?');
+          alert("Unable to find core file, are you sure it was loaded?");
           return;
         }
-        var next = document.createElement('script');
+        var next = document.createElement("script");
         next.onabort = () => {
-          alert('Script reload was aborted.');
+          alert("Script reload was aborted.");
           next.remove();
         };
         next.onerror = (e) => {
-          alert('Script reload failed as the script had an error, please check your console.');
+          alert(
+            "Script reload failed as the script had an error, please check your console."
+          );
           next.remove();
           throw e;
         };
         next.onload = () => {
-          console.log('Reloaded core file.');
+          console.log("Reloaded core file.");
           script.remove();
         };
-        next.type = 'text/javascript';
+        next.type = "text/javascript";
         next.src = script.src;
         document.body.appendChild(next);
       }
     </script>
 
     <style>
-      html, body {
+      html,
+      body {
         height: 100%;
       }
 
@@ -523,94 +541,125 @@
     </p>
 
     <form id="options">
-        <select name="dir" onchange="document.forms.options.submit()">
-          <option value="ltr">LTR</option>
-          <option value="rtl">RTL</option>
-        </select>
-        <select name="toolbox" onchange="document.forms.options.submit()">
-          <option value="categories">Categories</option>
-          <option value="simple">Simple</option>
-        </select>
-        <select name="side" onchange="document.forms.options.submit()">
-          <option value="start">Start</option>
-          <option value="end">End</option>
-          <option value="top">Top</option>
-          <option value="bottom">Bottom</option>
-        </select>
-        <select name="locale" onchange="setLocale(this.value)">
-          <option value="en">English</option>
-          <option value="ca">Catalan</option>
-          <option value="cs">Czech</option>
-          <option value="da">Danish</option>
-          <option value="nl">Dutch</option>
-          <option value="fi">Finnish</option>
-          <option value="fr">French</option>
-          <option value="de">German</option>
-          <option value="el">Greek</option>
-          <option value="he">Hebrew</option>
-          <option value="hu">Hungarian</option>
-          <option value="id">Indonesian</option>
-          <option value="ga">Irish Gaelic</option>
-          <option value="it">Italian</option>
-          <option value="ja">Japanese</option>
-          <option value="ja-Hira">Japanese(Hira)</option>
-          <option value="mi">Maori</option>
-          <option value="nb">Norwegian (Bokmal)</option>
-          <option value="pt">Portuguese</option>
-          <option value="pt-br">Portuguese (Brazil)</option>
-          <option value="gd">Scottish Gaelic</option>
-          <option value="sr">Serbian</option>
-          <option value="sl">Slovenian</option>
-          <option value="es">Spanish</option>
-          <option value="es-419">Spanish (Latin America)</option>
-          <option value="sv">Swedish</option>
-          <option value="tr">Turkish</option>
-          <option value="uk">Ukranian</option>
-          <option value="vi">Vietnamese</option>
-          <option value="cy">Welsh</option>
-          <option value="zh-cn">Chinese (China)</option>
-          <option value="zh-tw">Chinese (TW)</option>
-        </select>
-      </form>
+      <select name="dir" onchange="document.forms.options.submit()">
+        <option value="ltr">LTR</option>
+        <option value="rtl">RTL</option>
+      </select>
+      <select name="toolbox" onchange="document.forms.options.submit()">
+        <option value="categories">Categories</option>
+        <option value="simple">Simple</option>
+      </select>
+      <select name="side" onchange="document.forms.options.submit()">
+        <option value="start">Start</option>
+        <option value="end">End</option>
+      </select>
+      <select name="locale" onchange="setLocale(this.value)">
+        <option value="en">English</option>
+        <option value="ca">Catalan</option>
+        <option value="cs">Czech</option>
+        <option value="da">Danish</option>
+        <option value="nl">Dutch</option>
+        <option value="fi">Finnish</option>
+        <option value="fr">French</option>
+        <option value="de">German</option>
+        <option value="el">Greek</option>
+        <option value="he">Hebrew</option>
+        <option value="hu">Hungarian</option>
+        <option value="id">Indonesian</option>
+        <option value="ga">Irish Gaelic</option>
+        <option value="it">Italian</option>
+        <option value="ja">Japanese</option>
+        <option value="ja-Hira">Japanese(Hira)</option>
+        <option value="mi">Maori</option>
+        <option value="nb">Norwegian (Bokmal)</option>
+        <option value="pt">Portuguese</option>
+        <option value="pt-br">Portuguese (Brazil)</option>
+        <option value="gd">Scottish Gaelic</option>
+        <option value="sr">Serbian</option>
+        <option value="sl">Slovenian</option>
+        <option value="es">Spanish</option>
+        <option value="es-419">Spanish (Latin America)</option>
+        <option value="sv">Swedish</option>
+        <option value="tr">Turkish</option>
+        <option value="uk">Ukranian</option>
+        <option value="vi">Vietnamese</option>
+        <option value="cy">Welsh</option>
+        <option value="zh-cn">Chinese (China)</option>
+        <option value="zh-tw">Chinese (TW)</option>
+      </select>
+    </form>
 
     <p>
-      <input type="button" value="Export to XML" onclick="toXml()">
+      <input type="button" value="Export to XML" onclick="toXml()" />
       &nbsp;
-      <input type="button" value="Import from XML" onclick="fromXml()" id="import">
-      <br>
-      <textarea id="importExport" style="width: 26%; height: 12em"
-        onchange="taChange();" onkeyup="taChange()"></textarea>
+      <input
+        type="button"
+        value="Import from XML"
+        onclick="fromXml()"
+        id="import"
+      />
+      <br />
+      <textarea
+        id="importExport"
+        style="width: 26%; height: 12em"
+        onchange="taChange()"
+        onkeyup="taChange()"
+      ></textarea>
     </p>
 
-    <hr>
+    <hr />
 
     <p>
       Log events: &nbsp;
-      <input type="checkbox" onclick="logEvents(this.checked)" id="logCheck">
+      <input type="checkbox" onclick="logEvents(this.checked)" id="logCheck" />
     </p>
 
     <p>
       Stress test: &nbsp;
-      <input type="button" value="Sprinkles!" onclick="sprinkles(100)">
-      <input type="button" value="Spaghetti!" onclick="spaghetti(3)">
+      <input type="button" value="Sprinkles!" onclick="sprinkles(100)" />
+      <input type="button" value="Spaghetti!" onclick="spaghetti(3)" />
     </p>
 
     <p>
       Glows: &nbsp;
-      <input type="button" value="Glow last clicked block" onclick="glowBlock()" />
-      <input type="button" value="Unglow last clicked block" onclick="unglowBlock()" />
-      <input type="button" value="Stack glow last clicked block" onclick="glowStack()" />
-      <input type="button" value="Stack unglow last clicked block" onclick="unglowStack()" />
+      <input
+        type="button"
+        value="Glow last clicked block"
+        onclick="glowBlock()"
+      />
+      <input
+        type="button"
+        value="Unglow last clicked block"
+        onclick="unglowBlock()"
+      />
+      <input
+        type="button"
+        value="Stack glow last clicked block"
+        onclick="glowStack()"
+      />
+      <input
+        type="button"
+        value="Stack unglow last clicked block"
+        onclick="unglowStack()"
+      />
     </p>
 
     <p>
       Log flyout events: &nbsp;
-      <input type="checkbox" onclick="logFlyoutEvents(this.checked)" id="logFlyoutCheck">
+      <input
+        type="checkbox"
+        onclick="logFlyoutEvents(this.checked)"
+        id="logFlyoutCheck"
+      />
     </p>
 
     <p>
       Enable sounds (after refresh): &nbsp;
-      <input type="checkbox" onclick="setSoundsEnabled(this.checked)" id="soundsEnabled">
+      <input
+        type="checkbox"
+        onclick="setSoundsEnabled(this.checked)"
+        id="soundsEnabled"
+      />
     </p>
 
     <p>
@@ -621,8 +670,12 @@
     <p>
       Report:
       <input id="reportValue" type="text" value="123" />
-      <input type="button" value="Report last clicked block" onclick="reportDemo()" />
-      <br/>
+      <input
+        type="button"
+        value="Report last clicked block"
+        onclick="reportDemo()"
+      />
+      <br />
       Report as error:
       <input id="reportError" type="checkbox" />
     </p>

@@ -1,60 +1,55 @@
-require('chromedriver');
-var webdriver = require('selenium-webdriver');
-var chrome = require('selenium-webdriver/chrome');
-var builder = new webdriver.Builder().forBrowser('chrome');
+const path = require("path");
+const { pathToFileURL } = require("url");
+const webdriver = require("selenium-webdriver");
+const chrome = require("selenium-webdriver/chrome");
+const options = new chrome.Options().addArguments("--headless=new");
 
 if (process.env.CI) {
-  const options = new chrome.Options().headless();
-  if (process.platform === 'linux') {
-    options.addArguments('no-sandbox');
+  if (process.platform === "linux") {
+    options.addArguments("--no-sandbox");
   }
-  builder.setChromeOptions(options);
 }
 
-var browser = builder.build();
-
 // Parse jsunit html report, exit(1) if there are any failures.
-var testHtml = function (htmlString) {
-  var regex = /[\d]+\spassed,\s([\d]+)\sfailed./i;
-  var numOfFailure = regex.exec(htmlString)[1];
-  var regex2 = /Unit Tests for .*]/;
-  var testStatus = regex2.exec(htmlString)[0];
+const testHtml = function (htmlString) {
+  const regex = /[\d]+\spassed,\s([\d]+)\sfailed./i;
+  const numOfFailures = Number.parseInt(regex.exec(htmlString)[1], 10);
+  const regex2 = /Unit Tests for .*]/;
+  const testStatus = regex2.exec(htmlString)[0];
   console.log("============Unit Test Summary=================");
   console.log(testStatus);
-  var regex3 = /\d+ passed,\s\d+ failed/;
-  var detail = regex3.exec(htmlString)[0];
+  const regex3 = /\d+ passed,\s\d+ failed/;
+  const detail = regex3.exec(htmlString)[0];
   console.log(detail);
   console.log("============Unit Test Summary=================");
-  if (parseInt(numOfFailure) !== 0) {
-    console.log(htmlString);
-    process.exit(1);
-  }
+  if (numOfFailures !== 0) throw new Error(htmlString);
 };
 
-var path = process.cwd();
-
-var runTests = async function () {
+const runTests = async function () {
+  const browser = await new webdriver.Builder()
+    .forBrowser("chrome")
+    .setChromeOptions(options)
+    .build();
   try {
-    var element, text;
-
-    await browser.get("file://" + path + "/tests/jsunit/vertical_tests.html");
-    await browser.sleep(5000);
-    element = await browser.findElement({id: "closureTestRunnerLog"});
-    text = await element.getText();
-    testHtml(text);
-
-    await browser.get("file://" + path + "/tests/jsunit/horizontal_tests.html");
-    await browser.sleep(5000);
-    element = await browser.findElement({id: "closureTestRunnerLog"});
-    text = await element.getText();
-    testHtml(text);
-  }
-  finally {
+    const url = pathToFileURL(
+      path.resolve(__dirname, "vertical_tests.html")
+    ).href;
+    await browser.get(url);
+    const element = await browser.wait(
+      webdriver.until.elementLocated({ id: "closureTestRunnerLog" }),
+      30000
+    );
+    await browser.wait(
+      async () => /\d+ passed,\s\d+ failed/.test(await element.getText()),
+      30000
+    );
+    testHtml(await browser.executeScript("return G_testRunner.getReport();"));
+  } finally {
     await browser.quit();
   }
 };
 
-runTests().catch(e => {
+runTests().catch((e) => {
   console.error(e);
   process.exit(1);
 });

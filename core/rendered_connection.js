@@ -22,12 +22,11 @@
  * @fileoverview Components for creating connections between blocks.
  * @author fenichel@google.com (Rachel Fenichel)
  */
-'use strict';
+"use strict";
 
-goog.provide('Blockly.RenderedConnection');
+goog.provide("Blockly.RenderedConnection");
 
-goog.require('Blockly.Connection');
-
+goog.require("Blockly.Connection");
 
 /**
  * Class for a connection between blocks that may be rendered on screen.
@@ -36,7 +35,7 @@ goog.require('Blockly.Connection');
  * @extends {Blockly.Connection}
  * @constructor
  */
-Blockly.RenderedConnection = function(source, type) {
+Blockly.RenderedConnection = function (source, type) {
   Blockly.RenderedConnection.superClass_.constructor.call(this, source, type);
 
   /**
@@ -55,9 +54,9 @@ goog.inherits(Blockly.RenderedConnection, Blockly.Connection);
  *     the distance to.
  * @return {number} The distance between connections, in workspace units.
  */
-Blockly.RenderedConnection.prototype.distanceFrom = function(otherConnection) {
-  var xDiff = this.x_ - otherConnection.x_;
-  var yDiff = this.y_ - otherConnection.y_;
+Blockly.RenderedConnection.prototype.distanceFrom = function (otherConnection) {
+  const xDiff = this.x_ - otherConnection.x_;
+  const yDiff = this.y_ - otherConnection.y_;
   return Math.sqrt(xDiff * xDiff + yDiff * yDiff);
 };
 
@@ -68,18 +67,20 @@ Blockly.RenderedConnection.prototype.distanceFrom = function(otherConnection) {
  *     from.
  * @private
  */
-Blockly.RenderedConnection.prototype.bumpAwayFrom_ = function(staticConnection) {
+Blockly.RenderedConnection.prototype.bumpAwayFrom_ = function (
+  staticConnection
+) {
   if (this.sourceBlock_.workspace.isDragging()) {
     // Don't move blocks around while the user is doing the same.
     return;
   }
   // Move the root block.
-  var rootBlock = this.sourceBlock_.getRootBlock();
+  let rootBlock = this.sourceBlock_.getRootBlock();
   if (rootBlock.isInFlyout) {
     // Don't move blocks around in a flyout.
     return;
   }
-  var reverse = false;
+  let reverse = false;
   if (!rootBlock.isMovable()) {
     // Can't bump an uneditable block away.
     // Check to see if the other block is movable.
@@ -92,10 +93,10 @@ Blockly.RenderedConnection.prototype.bumpAwayFrom_ = function(staticConnection) 
     reverse = true;
   }
   // Raise it to the top for extra visibility.
-  var selected = Blockly.selected == rootBlock;
+  const selected = Blockly.selected == rootBlock;
   selected || rootBlock.addSelect();
-  var dx = (staticConnection.x_ + Blockly.SNAP_RADIUS) - this.x_;
-  var dy = (staticConnection.y_ + Blockly.SNAP_RADIUS) - this.y_;
+  let dx = staticConnection.x_ + Blockly.SNAP_RADIUS - this.x_;
+  let dy = staticConnection.y_ + Blockly.SNAP_RADIUS - this.y_;
   if (reverse) {
     // When reversing a bump due to an uneditable block, bump up.
     dy = -dy;
@@ -112,7 +113,7 @@ Blockly.RenderedConnection.prototype.bumpAwayFrom_ = function(staticConnection) 
  * @param {number} x New absolute x coordinate, in workspace coordinates.
  * @param {number} y New absolute y coordinate, in workspace coordinates.
  */
-Blockly.RenderedConnection.prototype.moveTo = function(x, y) {
+Blockly.RenderedConnection.prototype.moveTo = function (x, y) {
   // Remove it from its old location in the database (if already present)
   if (this.inDB_) {
     this.db_.removeConnection_(this);
@@ -130,7 +131,7 @@ Blockly.RenderedConnection.prototype.moveTo = function(x, y) {
  * @param {number} dx Change to x coordinate, in workspace units.
  * @param {number} dy Change to y coordinate, in workspace units.
  */
-Blockly.RenderedConnection.prototype.moveBy = function(dx, dy) {
+Blockly.RenderedConnection.prototype.moveBy = function (dx, dy) {
   this.moveTo(this.x_ + dx, this.y_ + dy);
 };
 
@@ -140,9 +141,11 @@ Blockly.RenderedConnection.prototype.moveBy = function(dx, dy) {
  * @param {!goog.math.Coordinate} blockTL The location of the top left corner
  *     of the block, in workspace coordinates.
  */
-Blockly.RenderedConnection.prototype.moveToOffset = function(blockTL) {
-  this.moveTo(blockTL.x + this.offsetInBlock_.x,
-      blockTL.y + this.offsetInBlock_.y);
+Blockly.RenderedConnection.prototype.moveToOffset = function (blockTL) {
+  this.moveTo(
+    blockTL.x + this.offsetInBlock_.x,
+    blockTL.y + this.offsetInBlock_.y
+  );
 };
 
 /**
@@ -150,7 +153,7 @@ Blockly.RenderedConnection.prototype.moveToOffset = function(blockTL) {
  * @param {number} x The new relative x, in workspace units.
  * @param {number} y The new relative y, in workspace units.
  */
-Blockly.RenderedConnection.prototype.setOffsetInBlock = function(x, y) {
+Blockly.RenderedConnection.prototype.setOffsetInBlock = function (x, y) {
   this.offsetInBlock_.x = x;
   this.offsetInBlock_.y = y;
 };
@@ -159,19 +162,23 @@ Blockly.RenderedConnection.prototype.setOffsetInBlock = function(x, y) {
  * Move the blocks on either side of this connection right next to each other.
  * @private
  */
-Blockly.RenderedConnection.prototype.tighten_ = function() {
-  var dx = this.targetConnection.x_ - this.x_;
-  var dy = this.targetConnection.y_ - this.y_;
+Blockly.RenderedConnection.prototype.tighten_ = function () {
+  const dx = this.targetConnection.x_ - this.x_;
+  const dy = this.targetConnection.y_ - this.y_;
   if (dx != 0 || dy != 0) {
-    var block = this.targetBlock();
-    var svgRoot = block.getSvgRoot();
+    const block = this.targetBlock();
+    const svgRoot = block.getSvgRoot();
     if (!svgRoot) {
-      throw 'block is not rendered.';
+      throw "block is not rendered.";
     }
     // Workspace coordinates.
-    var xy = Blockly.utils.getRelativeXY(svgRoot);
-    block.getSvgRoot().setAttribute('transform',
-        'translate(' + (xy.x - dx) + ',' + (xy.y - dy) + ')');
+    const xy = Blockly.utils.getRelativeXY(svgRoot);
+    block
+      .getSvgRoot()
+      .setAttribute(
+        "transform",
+        "translate(" + (xy.x - dx) + "," + (xy.y - dy) + ")"
+      );
     block.moveConnections_(-dx, -dy);
   }
 };
@@ -186,28 +193,33 @@ Blockly.RenderedConnection.prototype.tighten_ = function() {
  *     properties: 'connection' which is either another connection or null,
  *     and 'radius' which is the distance.
  */
-Blockly.RenderedConnection.prototype.closest = function(maxLimit, dxy) {
+Blockly.RenderedConnection.prototype.closest = function (maxLimit, dxy) {
   return this.dbOpposite_.searchForClosest(this, maxLimit, dxy);
 };
 
 /**
  * Add highlighting around this connection.
  */
-Blockly.RenderedConnection.prototype.highlight = function() {
-  var steps;
-  steps = 'm -20,0 h 5 ' + Blockly.BlockSvg.NOTCH_PATH_LEFT + ' h 5';
-  var xy = this.sourceBlock_.getRelativeToSurfaceXY();
-  var x = this.x_ - xy.x;
-  var y = this.y_ - xy.y;
+Blockly.RenderedConnection.prototype.highlight = function () {
+  const steps = "m -20,0 h 5 " + Blockly.BlockSvg.NOTCH_PATH_LEFT + " h 5";
+  const xy = this.sourceBlock_.getRelativeToSurfaceXY();
+  const x = this.x_ - xy.x;
+  const y = this.y_ - xy.y;
   Blockly.Connection.highlightedPath_ = Blockly.utils.createSvgElement(
-      'path',
-      {
-        'class': 'blocklyHighlightedConnectionPath',
-        'd': steps,
-        transform: 'translate(' + x + ',' + y + ')' +
-            (this.sourceBlock_.RTL ? ' scale(-1 1)' : '')
-      },
-      this.sourceBlock_.getSvgRoot());
+    "path",
+    {
+      class: "blocklyHighlightedConnectionPath",
+      d: steps,
+      transform:
+        "translate(" +
+        x +
+        "," +
+        y +
+        ")" +
+        (this.sourceBlock_.RTL ? " scale(-1 1)" : ""),
+    },
+    this.sourceBlock_.getSvgRoot()
+  );
 };
 
 /**
@@ -216,20 +228,20 @@ Blockly.RenderedConnection.prototype.highlight = function() {
  * Also unhides down-stream comments.
  * @return {!Array.<!Blockly.Block>} List of blocks to render.
  */
-Blockly.RenderedConnection.prototype.unhideAll = function() {
+Blockly.RenderedConnection.prototype.unhideAll = function () {
   this.setHidden(false);
   // All blocks that need unhiding must be unhidden before any rendering takes
   // place, since rendering requires knowing the dimensions of lower blocks.
   // Also, since rendering a block renders all its parents, we only need to
   // render the leaf nodes.
-  var renderList = [];
+  const renderList = [];
   if (this.type != Blockly.INPUT_VALUE && this.type != Blockly.NEXT_STATEMENT) {
     // Only spider down.
     return renderList;
   }
-  var block = this.targetBlock();
+  const block = this.targetBlock();
   if (block) {
-    var connections;
+    let connections;
     if (block.isCollapsed()) {
       // This block should only be partially revealed since it is collapsed.
       connections = [];
@@ -240,7 +252,7 @@ Blockly.RenderedConnection.prototype.unhideAll = function() {
       // Show all connections of this block.
       connections = block.getConnections_(true);
     }
-    for (var i = 0; i < connections.length; i++) {
+    for (let i = 0; i < connections.length; i++) {
       renderList.push.apply(renderList, connections[i].unhideAll());
     }
     if (!renderList.length) {
@@ -254,8 +266,9 @@ Blockly.RenderedConnection.prototype.unhideAll = function() {
 /**
  * Remove the highlighting around this connection.
  */
-Blockly.RenderedConnection.prototype.unhighlight = function() {
-  goog.dom.removeNode(Blockly.Connection.highlightedPath_);
+Blockly.RenderedConnection.prototype.unhighlight = function () {
+  if (Blockly.Connection.highlightedPath_)
+    Blockly.Connection.highlightedPath_.remove();
   delete Blockly.Connection.highlightedPath_;
 };
 
@@ -263,7 +276,7 @@ Blockly.RenderedConnection.prototype.unhighlight = function() {
  * Set whether this connections is hidden (not tracked in a database) or not.
  * @param {boolean} hidden True if connection is hidden.
  */
-Blockly.RenderedConnection.prototype.setHidden = function(hidden) {
+Blockly.RenderedConnection.prototype.setHidden = function (hidden) {
   this.hidden_ = hidden;
   if (hidden && this.inDB_) {
     this.db_.removeConnection_(this);
@@ -277,20 +290,21 @@ Blockly.RenderedConnection.prototype.setHidden = function(hidden) {
  * attached to this connection.  This happens when a block is collapsed.
  * Also hides down-stream comments.
  */
-Blockly.RenderedConnection.prototype.hideAll = function() {
+Blockly.RenderedConnection.prototype.hideAll = function () {
+  let j;
   this.setHidden(true);
   if (this.targetConnection) {
-    var blocks = this.targetBlock().getDescendants(false);
-    for (var i = 0; i < blocks.length; i++) {
-      var block = blocks[i];
+    const blocks = this.targetBlock().getDescendants(false);
+    for (let i = 0; i < blocks.length; i++) {
+      const block = blocks[i];
       // Hide all connections of all children.
-      var connections = block.getConnections_(true);
-      for (var j = 0; j < connections.length; j++) {
+      const connections = block.getConnections_(true);
+      for (j = 0; j < connections.length; j++) {
         connections[j].setHidden(true);
       }
       // Close all bubbles of all children.
-      var icons = block.getIcons();
-      for (var j = 0; j < icons.length; j++) {
+      const icons = block.getIcons();
+      for (j = 0; j < icons.length; j++) {
         icons[j].setVisible(false);
       }
     }
@@ -304,14 +318,18 @@ Blockly.RenderedConnection.prototype.hideAll = function() {
  *     workspace units.
  * @return {boolean} True if the connection is allowed, false otherwise.
  */
-Blockly.RenderedConnection.prototype.isConnectionAllowed = function(candidate,
-    maxRadius) {
+Blockly.RenderedConnection.prototype.isConnectionAllowed = function (
+  candidate,
+  maxRadius
+) {
   if (this.distanceFrom(candidate) > maxRadius) {
     return false;
   }
 
-  return Blockly.RenderedConnection.superClass_.isConnectionAllowed.call(this,
-      candidate);
+  return Blockly.RenderedConnection.superClass_.isConnectionAllowed.call(
+    this,
+    candidate
+  );
 };
 
 /**
@@ -320,10 +338,15 @@ Blockly.RenderedConnection.prototype.isConnectionAllowed = function(candidate,
  * @param {!Blockly.Block} childBlock The inferior block.
  * @private
  */
-Blockly.RenderedConnection.prototype.disconnectInternal_ = function(parentBlock,
-    childBlock) {
-  Blockly.RenderedConnection.superClass_.disconnectInternal_.call(this,
-      parentBlock, childBlock);
+Blockly.RenderedConnection.prototype.disconnectInternal_ = function (
+  parentBlock,
+  childBlock
+) {
+  Blockly.RenderedConnection.superClass_.disconnectInternal_.call(
+    this,
+    parentBlock,
+    childBlock
+  );
   // Rerender the parent so that it may reflow.
   if (parentBlock.rendered) {
     parentBlock.render();
@@ -339,15 +362,15 @@ Blockly.RenderedConnection.prototype.disconnectInternal_ = function(parentBlock,
  * Render/rerender blocks as needed.
  * @private
  */
-Blockly.RenderedConnection.prototype.respawnShadow_ = function() {
-  var parentBlock = this.getSourceBlock();
+Blockly.RenderedConnection.prototype.respawnShadow_ = function () {
+  const parentBlock = this.getSourceBlock();
   // Respawn the shadow block if there is one.
-  var shadow = this.getShadowDom();
+  const shadow = this.getShadowDom();
   if (parentBlock.workspace && shadow && Blockly.Events.recordUndo) {
     Blockly.RenderedConnection.superClass_.respawnShadow_.call(this);
-    var blockShadow = this.targetBlock();
+    const blockShadow = this.targetBlock();
     if (!blockShadow) {
-      throw 'Couldn\'t respawn the shadow block that should exist here.';
+      throw "Couldn't respawn the shadow block that should exist here.";
     }
     blockShadow.initSvg();
     blockShadow.render(false);
@@ -365,7 +388,7 @@ Blockly.RenderedConnection.prototype.respawnShadow_ = function() {
  * @return {!Array.<!Blockly.Connection>} List of connections.
  * @private
  */
-Blockly.RenderedConnection.prototype.neighbours_ = function(maxLimit) {
+Blockly.RenderedConnection.prototype.neighbours_ = function (maxLimit) {
   return this.dbOpposite_.getNeighbours(this, maxLimit);
 };
 
@@ -375,12 +398,12 @@ Blockly.RenderedConnection.prototype.neighbours_ = function(maxLimit) {
  * @param {!Blockly.Connection} childConnection Connection on inferior block.
  * @private
  */
-Blockly.RenderedConnection.prototype.connect_ = function(childConnection) {
+Blockly.RenderedConnection.prototype.connect_ = function (childConnection) {
   Blockly.RenderedConnection.superClass_.connect_.call(this, childConnection);
 
-  var parentConnection = this;
-  var parentBlock = parentConnection.getSourceBlock();
-  var childBlock = childConnection.getSourceBlock();
+  const parentConnection = this;
+  const parentBlock = parentConnection.getSourceBlock();
+  const childBlock = childConnection.getSourceBlock();
 
   if (parentBlock.rendered) {
     parentBlock.updateDisabled();
@@ -389,8 +412,10 @@ Blockly.RenderedConnection.prototype.connect_ = function(childConnection) {
     childBlock.updateDisabled();
   }
   if (parentBlock.rendered && childBlock.rendered) {
-    if (parentConnection.type == Blockly.NEXT_STATEMENT ||
-        parentConnection.type == Blockly.PREVIOUS_STATEMENT) {
+    if (
+      parentConnection.type == Blockly.NEXT_STATEMENT ||
+      parentConnection.type == Blockly.PREVIOUS_STATEMENT
+    ) {
       // Child block may need to square off its corners if it is in a stack.
       // Rendering a child will render its parent.
       childBlock.render();
@@ -406,10 +431,10 @@ Blockly.RenderedConnection.prototype.connect_ = function(childConnection) {
  * Function to be called when this connection's compatible types have changed.
  * @private
  */
-Blockly.RenderedConnection.prototype.onCheckChanged_ = function() {
+Blockly.RenderedConnection.prototype.onCheckChanged_ = function () {
   // The new value type may not be compatible with the existing connection.
   if (this.isConnected() && !this.checkType_(this.targetConnection)) {
-    var child = this.isSuperior() ? this.targetBlock() : this.sourceBlock_;
+    const child = this.isSuperior() ? this.targetBlock() : this.sourceBlock_;
     child.unplug();
     // Bump away.
     this.sourceBlock_.bumpNeighbours_();

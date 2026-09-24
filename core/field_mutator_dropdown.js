@@ -22,15 +22,14 @@
  * @fileoverview A dropdown that transforms its source block when its value changes.
  * @author Cubester@NitroBolt
  */
-'use strict';
+"use strict";
 
-goog.provide('Blockly.FieldMutatorDropdown');
+goog.provide("Blockly.FieldMutatorDropdown");
 
-goog.require('Blockly.Events');
-goog.require('Blockly.Events.BlockCreate');
-goog.require('Blockly.FieldDropdown');
-goog.require('Blockly.Xml');
-
+goog.require("Blockly.Events");
+goog.require("Blockly.Events.BlockCreate");
+goog.require("Blockly.FieldDropdown");
+goog.require("Blockly.Xml");
 
 /**
  * A dropdown field with a transformation for each option value.
@@ -46,11 +45,17 @@ goog.require('Blockly.Xml');
  * @extends {Blockly.FieldDropdown}
  * @constructor
  */
-Blockly.FieldMutatorDropdown = function(menuGenerator, transformations,
-    opt_validator) {
+Blockly.FieldMutatorDropdown = function (
+  menuGenerator,
+  transformations,
+  opt_validator
+) {
   this.transformations_ = transformations || {};
   Blockly.FieldMutatorDropdown.superClass_.constructor.call(
-      this, menuGenerator, opt_validator);
+    this,
+    menuGenerator,
+    opt_validator
+  );
 };
 goog.inherits(Blockly.FieldMutatorDropdown, Blockly.FieldDropdown);
 
@@ -61,9 +66,11 @@ goog.inherits(Blockly.FieldMutatorDropdown, Blockly.FieldDropdown);
  * @package
  * @nocollapse
  */
-Blockly.FieldMutatorDropdown.fromJson = function(element) {
+Blockly.FieldMutatorDropdown.fromJson = function (element) {
   return new Blockly.FieldMutatorDropdown(
-      element['options'], element['transformations']);
+    element["options"],
+    element["transformations"]
+  );
 };
 
 /**
@@ -79,32 +86,38 @@ Blockly.FieldMutatorDropdown.fromJson = function(element) {
  * @param {!Object} transformation The declarative transformation.
  * @param {boolean=} opt_isValueChange Whether the selected value just changed.
  */
-Blockly.FieldMutatorDropdown.applyTransformationToBlock = function(
-    block, transformation, opt_isValueChange) {
-  if (Object.prototype.hasOwnProperty.call(transformation, 'outputShape')) {
-    block.setOutputShape(transformation['outputShape']);
+Blockly.FieldMutatorDropdown.applyTransformationToBlock = function (
+  block,
+  transformation,
+  opt_isValueChange
+) {
+  let shadow;
+  if (Object.prototype.hasOwnProperty.call(transformation, "outputShape")) {
+    block.setOutputShape(transformation["outputShape"]);
   }
-  if (Object.prototype.hasOwnProperty.call(transformation, 'outputCheck')) {
-    block.setOutput(true, transformation['outputCheck']);
+  if (Object.prototype.hasOwnProperty.call(transformation, "outputCheck")) {
+    block.setOutput(true, transformation["outputCheck"]);
   }
-  if (Object.prototype.hasOwnProperty.call(
-      transformation, 'previousStatement')) {
-    block.setPreviousStatement(!!transformation['previousStatement']);
+  if (
+    Object.prototype.hasOwnProperty.call(transformation, "previousStatement")
+  ) {
+    block.setPreviousStatement(!!transformation["previousStatement"]);
   }
-  if (Object.prototype.hasOwnProperty.call(transformation, 'nextStatement')) {
-    block.setNextStatement(!!transformation['nextStatement']);
+  if (Object.prototype.hasOwnProperty.call(transformation, "nextStatement")) {
+    block.setNextStatement(!!transformation["nextStatement"]);
   }
-  if (Object.prototype.hasOwnProperty.call(transformation, 'inputsInline')) {
-    block.setInputsInline(!!transformation['inputsInline']);
+  if (Object.prototype.hasOwnProperty.call(transformation, "inputsInline")) {
+    block.setInputsInline(!!transformation["inputsInline"]);
   }
 
-  if (opt_isValueChange && transformation['disconnectInputs']) {
-    var disconnectInputs = transformation['disconnectInputs'];
-    for (var i = 0; i < disconnectInputs.length; i++) {
-      var disconnectInput = block.getInput(disconnectInputs[i]);
-      var disconnectConnection = disconnectInput && disconnectInput.connection;
-      var disconnectBlock = disconnectConnection &&
-          disconnectConnection.targetBlock();
+  if (opt_isValueChange && transformation["disconnectInputs"]) {
+    const disconnectInputs = transformation["disconnectInputs"];
+    for (let i = 0; i < disconnectInputs.length; i++) {
+      const disconnectInput = block.getInput(disconnectInputs[i]);
+      const disconnectConnection =
+        disconnectInput && disconnectInput.connection;
+      const disconnectBlock =
+        disconnectConnection && disconnectConnection.targetBlock();
       if (disconnectConnection) {
         disconnectConnection.setShadowDom(null);
       }
@@ -117,11 +130,11 @@ Blockly.FieldMutatorDropdown.applyTransformationToBlock = function(
     }
   }
 
-  var inputChecks = transformation['inputChecks'];
+  const inputChecks = transformation["inputChecks"];
   if (inputChecks) {
-    for (var inputName in inputChecks) {
+    for (const inputName in inputChecks) {
       if (Object.prototype.hasOwnProperty.call(inputChecks, inputName)) {
-        var input = block.getInput(inputName);
+        const input = block.getInput(inputName);
         if (input) {
           input.setCheck(inputChecks[inputName]);
         }
@@ -129,20 +142,21 @@ Blockly.FieldMutatorDropdown.applyTransformationToBlock = function(
     }
   }
 
-  var inputShadows = transformation['inputShadows'];
+  const inputShadows = transformation["inputShadows"];
   if (inputShadows) {
-    for (var shadowInputName in inputShadows) {
-      if (!Object.prototype.hasOwnProperty.call(
-          inputShadows, shadowInputName)) {
+    for (const shadowInputName in inputShadows) {
+      if (
+        !Object.prototype.hasOwnProperty.call(inputShadows, shadowInputName)
+      ) {
         continue;
       }
-      var shadowInput = block.getInput(shadowInputName);
+      const shadowInput = block.getInput(shadowInputName);
       if (!shadowInput || !shadowInput.connection) {
         continue;
       }
-      var connection = shadowInput.connection;
-      var target = connection.targetBlock();
-      var shadowDefinition = inputShadows[shadowInputName];
+      const connection = shadowInput.connection;
+      const target = connection.targetBlock();
+      const shadowDefinition = inputShadows[shadowInputName];
       if (!shadowDefinition) {
         connection.setShadowDom(null);
         if (target && target.isShadow()) {
@@ -155,12 +169,11 @@ Blockly.FieldMutatorDropdown.applyTransformationToBlock = function(
         continue;
       }
 
-      var shadow;
       Blockly.Events.disable();
       try {
-        shadow = block.workspace.newBlock(shadowDefinition['opcode']);
-        var fields = shadowDefinition['fields'] || {};
-        for (var fieldName in fields) {
+        shadow = block.workspace.newBlock(shadowDefinition["opcode"]);
+        const fields = shadowDefinition["fields"] || {};
+        for (const fieldName in fields) {
           if (Object.prototype.hasOwnProperty.call(fields, fieldName)) {
             shadow.setFieldValue(fields[fieldName], fieldName);
           }
@@ -177,8 +190,8 @@ Blockly.FieldMutatorDropdown.applyTransformationToBlock = function(
         Blockly.Events.fire(new Blockly.Events.BlockCreate(shadow));
       }
       shadow.outputConnection.connect(connection);
-      var shadowDom = Blockly.Xml.blockToDom(shadow);
-      shadowDom.removeAttribute('id');
+      const shadowDom = Blockly.Xml.blockToDom(shadow);
+      shadowDom.removeAttribute("id");
       connection.setShadowDom(shadowDom);
     }
   }
@@ -189,18 +202,25 @@ Blockly.FieldMutatorDropdown.applyTransformationToBlock = function(
  * @param {*} newValue The selected value.
  * @param {*=} opt_oldValue The previous value.
  */
-Blockly.FieldMutatorDropdown.prototype.applyTransformation = function(
-    newValue, opt_oldValue) {
-  if (!this.sourceBlock_ ||
-      !Object.prototype.hasOwnProperty.call(this.transformations_, newValue)) {
+Blockly.FieldMutatorDropdown.prototype.applyTransformation = function (
+  newValue,
+  opt_oldValue
+) {
+  if (
+    !this.sourceBlock_ ||
+    !Object.prototype.hasOwnProperty.call(this.transformations_, newValue)
+  ) {
     return;
   }
-  var transformation = this.transformations_[newValue];
-  if (typeof transformation === 'function') {
+  const transformation = this.transformations_[newValue];
+  if (typeof transformation === "function") {
     transformation(this.sourceBlock_, newValue, opt_oldValue, this);
   } else if (transformation) {
     Blockly.FieldMutatorDropdown.applyTransformationToBlock(
-        this.sourceBlock_, transformation, newValue !== opt_oldValue);
+      this.sourceBlock_,
+      transformation,
+      newValue !== opt_oldValue
+    );
   }
   if (this.sourceBlock_.rendered) {
     this.sourceBlock_.render();
@@ -212,7 +232,7 @@ Blockly.FieldMutatorDropdown.prototype.applyTransformation = function(
  * Reapply the selected transformation after XML has restored all child blocks.
  * This normalizes option-specific inputs which occur after fields in the XML.
  */
-Blockly.FieldMutatorDropdown.prototype.reapplyTransformation = function() {
+Blockly.FieldMutatorDropdown.prototype.reapplyTransformation = function () {
   this.applyTransformation(this.getValue(), this.getValue());
 };
 
@@ -222,14 +242,16 @@ Blockly.FieldMutatorDropdown.prototype.reapplyTransformation = function() {
  * serialized field value.
  * @param {*} newValue The new value.
  */
-Blockly.FieldMutatorDropdown.prototype.setValue = function(newValue) {
-  var oldValue = this.getValue();
+Blockly.FieldMutatorDropdown.prototype.setValue = function (newValue) {
+  const oldValue = this.getValue();
   if (newValue === null || newValue === oldValue) {
     return;
   }
 
-  var startedEventGroup = !!this.sourceBlock_ && Blockly.Events.isEnabled() &&
-      !Blockly.Events.getGroup();
+  const startedEventGroup =
+    !!this.sourceBlock_ &&
+    Blockly.Events.isEnabled() &&
+    !Blockly.Events.getGroup();
   if (startedEventGroup) {
     Blockly.Events.setGroup(true);
   }
@@ -243,5 +265,4 @@ Blockly.FieldMutatorDropdown.prototype.setValue = function(newValue) {
   }
 };
 
-Blockly.Field.register('field_mutator_dropdown',
-    Blockly.FieldMutatorDropdown);
+Blockly.Field.register("field_mutator_dropdown", Blockly.FieldMutatorDropdown);

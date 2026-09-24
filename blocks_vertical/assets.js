@@ -18,202 +18,201 @@
  * limitations under the License.
  */
 
-'use strict';
+"use strict";
 
-goog.provide('Blockly.Blocks.assets');
+goog.provide("Blockly.Blocks.assets");
 
-goog.require('Blockly.Blocks');
-goog.require('Blockly.Colours');
-goog.require('Blockly.constants');
-goog.require('Blockly.ScratchBlocks.VerticalExtensions');
+goog.require("Blockly.Blocks");
+goog.require("Blockly.Colours");
+goog.require("Blockly.constants");
+goog.require("Blockly.ScratchBlocks.VerticalExtensions");
 
-
-Blockly.Blocks['assets_menu'] = {
+Blockly.Blocks["assets_menu"] = {
   /**
    * Assets drop-down menu.
    * @this Blockly.Block
    */
-  init: function() {
+  init: function () {
     this.jsonInit({
-      "message0": "%1",
-      "args0": [
+      message0: "%1",
+      args0: [
         {
-          "type": "field_dropdown",
-          "name": "ASSET_MENU",
-          "options": [
-            ['horse.jpeg', 'horse.jpeg'],
+          type: "field_dropdown",
+          name: "ASSET_MENU",
+          options: [
+            ["horse.jpeg", "horse.jpeg"],
             ["jeffery's files.pdf", "jeffery's files.pdf"],
-            ['monkey.glb', 'monkey.glb']
-          ]
-        }
+            ["monkey.glb", "monkey.glb"],
+          ],
+        },
       ],
-      "category": Blockly.Categories.assets,
-      "extensions": ["colours_assets", "output_string"]
+      category: Blockly.Categories.assets,
+      extensions: ["colours_assets", "output_string"],
     });
-  }
+  },
 };
 
-Blockly.Blocks['assets_sprite_menu'] = {
+Blockly.Blocks["assets_sprite_menu"] = {
   /**
    * Sprite drop-down menu for assets.
    * @this Blockly.Block
    */
-  init: function() {
+  init: function () {
     this.jsonInit({
-      "message0": "%1",
-      "args0": [
+      message0: "%1",
+      args0: [
         {
-          "type": "field_dropdown",
-          "name": "SPRITE_OPTION",
-          "options": []
-        }
+          type: "field_dropdown",
+          name: "SPRITE_OPTION",
+          options: [],
+        },
       ],
-      "category": Blockly.Categories.assets,
-      "extensions": ["colours_assets", "output_string"]
+      category: Blockly.Categories.assets,
+      extensions: ["colours_assets", "output_string"],
     });
-  }
+  },
 };
 
-Blockly.Blocks['assets_file_as_type'] = {
+Blockly.Blocks["assets_file_as_type"] = {
   /**
    * Block to report the data of an asset
    * @this Blockly.Block
    */
-  init: function() {
+  init: function () {
     this.jsonInit({
-      "message0": Blockly.Msg.ASSETS_FILE_AS_TYPE,
-      "args0": [
+      message0: Blockly.Msg.ASSETS_FILE_AS_TYPE,
+      args0: [
         {
-          "type": "input_value",
-          "name": "ASSET_MENU"
+          type: "input_value",
+          name: "ASSET_MENU",
         },
         {
-          "type": "field_dropdown",
-          "name": "TYPE",
-          "options": [
-            [Blockly.Msg.ASSETS_FILE_AS_TYPE_TEXT, 'text'],
-            [Blockly.Msg.ASSETS_FILE_AS_TYPE_DATA_URI, 'data: uri']
-          ]
-        }
+          type: "field_dropdown",
+          name: "TYPE",
+          options: [
+            [Blockly.Msg.ASSETS_FILE_AS_TYPE_TEXT, "text"],
+            [Blockly.Msg.ASSETS_FILE_AS_TYPE_DATA_URI, "data: uri"],
+          ],
+        },
       ],
-      "category": Blockly.Categories.assets,
-      "extensions": ["colours_assets", "output_string"]
+      category: Blockly.Categories.assets,
+      extensions: ["colours_assets", "output_string"],
     });
-  }
+  },
 };
 
-Blockly.Blocks['assets_all'] = {
+Blockly.Blocks["assets_all"] = {
   /**
    * Block to report all asset names in a sprite
    * @this Blockly.Block
    */
-  init: function() {
+  init: function () {
     this.jsonInit({
-      "message0": Blockly.Msg.ASSETS_ALL,
-      "args0": [
+      message0: Blockly.Msg.ASSETS_ALL,
+      args0: [
         {
-          "type": "input_value",
-          "name": "SPRITE"
-        }
+          type: "input_value",
+          name: "SPRITE",
+        },
       ],
-      "category": Blockly.Categories.assets,
-      "extensions": ["colours_assets", "output_array"]
+      category: Blockly.Categories.assets,
+      extensions: ["colours_assets", "output_array"],
     });
-  }
+  },
 };
 
-Blockly.Blocks['assets_metadata'] = {
+Blockly.Blocks["assets_metadata"] = {
   /**
    * Block to report the metadata of an asset
    * @this Blockly.Block
    */
-  init: function() {
+  init: function () {
     this.jsonInit({
-      "message0": Blockly.Msg.ASSETS_METADATA,
-      "args0": [
+      message0: Blockly.Msg.ASSETS_METADATA,
+      args0: [
         {
-          "type": "field_dropdown",
-          "name": "TYPE",
-          "options": [
-            [Blockly.Msg.ASSETS_METADATA_NAME, 'name'],
-            [Blockly.Msg.ASSETS_METADATA_EXTENSION, 'extension'],
-            [Blockly.Msg.ASSETS_METADATA_CONTENT_TYPE, 'content type'],
-            [Blockly.Msg.ASSETS_METADATA_LAST_MODIFIED, 'last modified'],
-            [Blockly.Msg.ASSETS_METADATA_MD5, 'md5']
-          ]
+          type: "field_dropdown",
+          name: "TYPE",
+          options: [
+            [Blockly.Msg.ASSETS_METADATA_NAME, "name"],
+            [Blockly.Msg.ASSETS_METADATA_EXTENSION, "extension"],
+            [Blockly.Msg.ASSETS_METADATA_CONTENT_TYPE, "content type"],
+            [Blockly.Msg.ASSETS_METADATA_LAST_MODIFIED, "last modified"],
+            [Blockly.Msg.ASSETS_METADATA_MD5, "md5"],
+          ],
         },
         {
-          "type": "input_value",
-          "name": "ASSET_MENU"
-        }
+          type: "input_value",
+          name: "ASSET_MENU",
+        },
       ],
-      "category": Blockly.Categories.assets,
-      "extensions": ["colours_assets", "output_string"]
+      category: Blockly.Categories.assets,
+      extensions: ["colours_assets", "output_string"],
     });
-  }
+  },
 };
 
-Blockly.Blocks['assets_set'] = {
+Blockly.Blocks["assets_set"] = {
   /**
    * Block to set a piece of metadata in an asset
    * @this Blockly.Block
    */
-  init: function() {
+  init: function () {
     this.jsonInit({
-      "message0": Blockly.Msg.ASSETS_SET,
-      "args0": [
+      message0: Blockly.Msg.ASSETS_SET,
+      args0: [
         {
-          "type": "field_dropdown",
-          "name": "TYPE",
-          "options": [
-            [Blockly.Msg.ASSETS_METADATA_NAME, 'name'],
-            [Blockly.Msg.ASSETS_METADATA_EXTENSION, 'extension'],
-            [Blockly.Msg.ASSETS_METADATA_CONTENT_TYPE, 'content type']
-          ]
+          type: "field_dropdown",
+          name: "TYPE",
+          options: [
+            [Blockly.Msg.ASSETS_METADATA_NAME, "name"],
+            [Blockly.Msg.ASSETS_METADATA_EXTENSION, "extension"],
+            [Blockly.Msg.ASSETS_METADATA_CONTENT_TYPE, "content type"],
+          ],
         },
         {
-          "type": "input_value",
-          "name": "ASSET_MENU"
+          type: "input_value",
+          name: "ASSET_MENU",
         },
         {
-          "type": "input_value",
-          "name": "VALUE"
-        }
+          type: "input_value",
+          name: "VALUE",
+        },
       ],
-      "category": Blockly.Categories.assets,
-      "extensions": ["colours_assets", "shape_statement"]
+      category: Blockly.Categories.assets,
+      extensions: ["colours_assets", "shape_statement"],
     });
-  }
+  },
 };
 
-Blockly.Blocks['assets_write'] = {
+Blockly.Blocks["assets_write"] = {
   /**
    * Block to set the content of an asset
    * @this Blockly.Block
    */
-  init: function() {
+  init: function () {
     this.jsonInit({
-      "message0": Blockly.Msg.ASSETS_WRITE,
-      "args0": [
+      message0: Blockly.Msg.ASSETS_WRITE,
+      args0: [
         {
-          "type": "input_value",
-          "name": "VALUE"
+          type: "input_value",
+          name: "VALUE",
         },
         {
-          "type": "field_dropdown",
-          "name": "TYPE",
-          "options": [
-            [Blockly.Msg.ASSETS_FILE_AS_TYPE_TEXT, 'text'],
-            [Blockly.Msg.ASSETS_FILE_AS_TYPE_DATA_URI, 'data: uri']
-          ]
+          type: "field_dropdown",
+          name: "TYPE",
+          options: [
+            [Blockly.Msg.ASSETS_FILE_AS_TYPE_TEXT, "text"],
+            [Blockly.Msg.ASSETS_FILE_AS_TYPE_DATA_URI, "data: uri"],
+          ],
         },
         {
-          "type": "input_value",
-          "name": "ASSET_MENU"
-        }
+          type: "input_value",
+          name: "ASSET_MENU",
+        },
       ],
-      "category": Blockly.Categories.assets,
-      "extensions": ["colours_assets", "shape_statement"]
+      category: Blockly.Categories.assets,
+      extensions: ["colours_assets", "shape_statement"],
     });
-  }
+  },
 };

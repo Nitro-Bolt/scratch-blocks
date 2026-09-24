@@ -138,7 +138,7 @@ Blockly.Msg.JSON_SORT = 'sort %1 by %2 %3 %4 %5';
 Blockly.Msg.JSON_SORT_A = 'a';
 Blockly.Msg.JSON_SORT_B = 'b';
 Blockly.Msg.JSON_SPLIT_SPLIT = 'split';
-Blockly.Msg.JSON_SPLIT_JOIN = 'join'
+Blockly.Msg.JSON_SPLIT_JOIN = 'join';
 Blockly.Msg.JSON_SPLIT_DELIMITER = 'with delimiter';
 Blockly.Msg.JSON_KEY = 'key';
 Blockly.Msg.JSON_BAR = 'bar';
@@ -420,8 +420,8 @@ Blockly.Msg.REMOVE_COMMENT = 'Remove Comment';
 Blockly.Msg.DELETE_BLOCK = 'Delete Block';
 Blockly.Msg.DELETE_X_BLOCKS = 'Delete %1 Blocks';
 Blockly.Msg.DELETE_ALL_BLOCKS = 'Delete all %1 blocks?';
-Blockly.Msg.DELETE_ORPHANS = 'Delete orphaned Block'
-Blockly.Msg.DELETE_X_ORPHANS = 'Delete %1 orphaned Blocks'
+Blockly.Msg.DELETE_ORPHANS = 'Delete orphaned Block';
+Blockly.Msg.DELETE_X_ORPHANS = 'Delete %1 orphaned Blocks';
 Blockly.Msg.DELETE_ALL_ORPHANS = 'Delete all %1 orphaned blocks?';
 Blockly.Msg.DELETE_UNUSED_VAR = 'Clean up variable';
 Blockly.Msg.DELETE_UNUSED_VARS = 'Clean up variables';
@@ -471,7 +471,6 @@ Blockly.Msg.VARIABLE_ALREADY_EXISTS_FOR_ANOTHER_TYPE = 'A variable named "%1" al
 Blockly.Msg.DELETE_VARIABLE_CONFIRMATION = 'Delete %1 uses of the "%2" variable?';
 Blockly.Msg.CANNOT_DELETE_VARIABLE_PROCEDURE = 'Can\'t delete the variable "%1" because it\'s part of the definition of the function "%2"';
 Blockly.Msg.DELETE_VARIABLE = 'Delete the "%1" variable';
-
 
 // Custom Procedures
 // @todo Remove these once fully managed by Scratch VM / Scratch GUI

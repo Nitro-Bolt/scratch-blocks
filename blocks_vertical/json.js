@@ -18,946 +18,940 @@
  * limitations under the License.
  */
 
-'use strict';
+"use strict";
 
-goog.provide('Blockly.Blocks.json');
+goog.provide("Blockly.Blocks.json");
 
-goog.require('Blockly.Blocks');
-goog.require('Blockly.Colours');
-goog.require('Blockly.constants');
-goog.require('Blockly.ScratchBlocks.VerticalExtensions');
+goog.require("Blockly.Blocks");
+goog.require("Blockly.Colours");
+goog.require("Blockly.constants");
+goog.require("Blockly.ScratchBlocks.VerticalExtensions");
 
-
-Blockly.Blocks['json_new_object'] = {
+Blockly.Blocks["json_new_object"] = {
   /**
    * Returns a new Object
    * @this Blockly.Block
    */
-  init: function() {
+  init: function () {
     this.jsonInit({
-      "message0": Blockly.Msg.JSON_NEW_OBJECT,
-      "category": Blockly.Categories.json,
-      "extensions": ["colours_json", "output_object"]
+      message0: Blockly.Msg.JSON_NEW_OBJECT,
+      category: Blockly.Categories.json,
+      extensions: ["colours_json", "output_object"],
     });
-  }
+  },
 };
 
-Blockly.Blocks['json_object'] = {
+Blockly.Blocks["json_object"] = {
   /**
    * @this Blockly.Block
    */
-  init: function() {
+  init: function () {
     this.jsonInit({
-      "message0": Blockly.Msg.JSON_OBJECT,
-      "args0": [
+      message0: Blockly.Msg.JSON_OBJECT,
+      args0: [
         {
-          "type": "extendable",
-          "name": "ITEMS",
-          "args": [
+          type: "extendable",
+          name: "ITEMS",
+          args: [
             {
-              "type": "input_value",
-              "name": "KEY",
-              "shadowOpcode": "text",
-              "shadowFieldName": "TEXT",
-              "shadowFieldValue": ""
+              type: "input_value",
+              name: "KEY",
+              shadowOpcode: "text",
+              shadowFieldName: "TEXT",
+              shadowFieldValue: "",
             },
             {
-              "type": "field_label",
-              "text": ":"
+              type: "field_label",
+              text: ":",
             },
             {
-              "type": "input_value",
-              "name": "VALUE",
-              "shadowOpcode": "text",
-              "shadowFieldName": "TEXT",
-              "shadowFieldValue": ""
+              type: "input_value",
+              name: "VALUE",
+              shadowOpcode: "text",
+              shadowFieldName: "TEXT",
+              shadowFieldValue: "",
             },
           ],
-          "separator": ",",
-          "minInputs": 0
+          separator: ",",
+          minInputs: 0,
         },
       ],
-      "category": Blockly.Categories.json,
-      "extensions": ["colours_json", "output_object"]
+      category: Blockly.Categories.json,
+      extensions: ["colours_json", "output_object"],
     });
-  }
+  },
 };
 
-Blockly.Blocks['json_get_properties'] = {
+Blockly.Blocks["json_get_properties"] = {
   /**
    * Fetches keys, values, or entries of an object based on selection.
    * @this Blockly.Block
    */
-  init: function() {
+  init: function () {
     this.jsonInit({
-      "message0": Blockly.Msg.JSON_GET_PROPERTIES,
-      "args0": [
+      message0: Blockly.Msg.JSON_GET_PROPERTIES,
+      args0: [
         {
-          "type": "field_dropdown",
-          "name": "PROPERTY",
-          "options": [
+          type: "field_dropdown",
+          name: "PROPERTY",
+          options: [
             [Blockly.Msg.JSON_GET_PROPERTIES_KEYS, "keys"],
             [Blockly.Msg.JSON_GET_PROPERTIES_VALUES, "values"],
-            [Blockly.Msg.JSON_GET_PROPERTIES_ENTRIES, "entries"]
-          ]
+            [Blockly.Msg.JSON_GET_PROPERTIES_ENTRIES, "entries"],
+          ],
         },
         {
-          "type": "input_value",
-          "name": "OBJ",
-          "check": "Object"
-        }
+          type: "input_value",
+          name: "OBJ",
+          check: "Object",
+        },
       ],
-      "category": Blockly.Categories.json,
-      "extensions": ["colours_json", "output_array"]
+      category: Blockly.Categories.json,
+      extensions: ["colours_json", "output_array"],
     });
-  }
+  },
 };
 
-Blockly.Blocks['json_value_of_key'] = {
+Blockly.Blocks["json_value_of_key"] = {
   /**
    * Fetches the value of the target key
    * @this Blockly.Block
    */
-  init: function() {
+  init: function () {
     this.jsonInit({
-      "message0": Blockly.Msg.JSON_VALUE_OF_KEY,
-      "args0": [
+      message0: Blockly.Msg.JSON_VALUE_OF_KEY,
+      args0: [
         {
-          "type": "input_value",
-          "name": "KEY"
+          type: "input_value",
+          name: "KEY",
         },
         {
-          "type": "input_value",
-          "name": "OBJ",
-          "check": "Object"
-        }
+          type: "input_value",
+          name: "OBJ",
+          check: "Object",
+        },
       ],
-      "output": null,
-      "category": Blockly.Categories.json,
-      "extensions": ["colours_json"],
-      "outputShape": Blockly.OUTPUT_SHAPE_ROUND,
-      "switches": [
-        'json_set_key',
-        'json_delete_key'
-      ]
+      output: null,
+      category: Blockly.Categories.json,
+      extensions: ["colours_json"],
+      outputShape: Blockly.OUTPUT_SHAPE_ROUND,
+      switches: ["json_set_key", "json_delete_key"],
     });
-  }
+  },
 };
 
-Blockly.Blocks['json_set_key'] = {
+Blockly.Blocks["json_set_key"] = {
   /**
    * Sets the value of the target key
    * @this Blockly.Block
    */
-  init: function() {
+  init: function () {
     this.jsonInit({
-      "message0": Blockly.Msg.JSON_SET_KEY,
-      "args0": [
+      message0: Blockly.Msg.JSON_SET_KEY,
+      args0: [
         {
-          "type": "input_value",
-          "name": "KEY",
-          "shadowOpcode": "text",
-          "shadowFieldName": "TEXT",
-          "shadowFieldValue": ""
+          type: "input_value",
+          name: "KEY",
+          shadowOpcode: "text",
+          shadowFieldName: "TEXT",
+          shadowFieldValue: "",
         },
         {
-          "type": "input_value",
-          "name": "OBJ",
-          "check": "Object"
+          type: "input_value",
+          name: "OBJ",
+          check: "Object",
         },
         {
-          "type": "input_value",
-          "name": "VALUE",
-          "shadowOpcode": "text",
-          "shadowFieldName": "TEXT",
-          "shadowFieldValue": ""
-        }
+          type: "input_value",
+          name: "VALUE",
+          shadowOpcode: "text",
+          shadowFieldName: "TEXT",
+          shadowFieldValue: "",
+        },
       ],
-      "category": Blockly.Categories.json,
-      "extensions": ["colours_json", "output_object"],
-      "switches": [
-        { id: 'json_value_of_key', splitInputs: ['VALUE'] },
-        { id: 'json_delete_key', splitInputs: ['VALUE'] }
-      ]
+      category: Blockly.Categories.json,
+      extensions: ["colours_json", "output_object"],
+      switches: [
+        { id: "json_value_of_key", splitInputs: ["VALUE"] },
+        { id: "json_delete_key", splitInputs: ["VALUE"] },
+      ],
     });
-  }
+  },
 };
 
-Blockly.Blocks['json_delete_key'] = {
+Blockly.Blocks["json_delete_key"] = {
   /**
    * Deletes the target key
    * @this Blockly.Block
    */
-  init: function() {
+  init: function () {
     this.jsonInit({
-      "message0": Blockly.Msg.JSON_DELETE_KEY,
-      "args0": [
+      message0: Blockly.Msg.JSON_DELETE_KEY,
+      args0: [
         {
-          "type": "input_value",
-          "name": "KEY"
+          type: "input_value",
+          name: "KEY",
         },
         {
-          "type": "input_value",
-          "name": "OBJ",
-          "check": "Object"
-        }
+          type: "input_value",
+          name: "OBJ",
+          check: "Object",
+        },
       ],
-      "category": Blockly.Categories.json,
-      "extensions": ["colours_json", "output_object"],
-      "switches": [
-        'json_value_of_key',
-        'json_set_key'
-      ]
+      category: Blockly.Categories.json,
+      extensions: ["colours_json", "output_object"],
+      switches: ["json_value_of_key", "json_set_key"],
     });
-  }
+  },
 };
 
-Blockly.Blocks['json_merge_object'] = {
+Blockly.Blocks["json_merge_object"] = {
   /**
    * Merge objects
    * @this Blockly.Block
    */
-  init: function() {
+  init: function () {
     this.jsonInit({
-      "message0": Blockly.Msg.JSON_MERGE,
-      "args0": [
+      message0: Blockly.Msg.JSON_MERGE,
+      args0: [
         {
-          "type": "extendable",
-          "name": "ITEMS",
-          "args": [
+          type: "extendable",
+          name: "ITEMS",
+          args: [
             {
-              "type": "input_value",
-              "name": "ITEM",
-              "check": "Object"
+              type: "input_value",
+              name: "ITEM",
+              check: "Object",
             },
           ],
-          "separator": "",
-          "minInputs": 2
+          separator: "",
+          minInputs: 2,
         },
       ],
-      "category": Blockly.Categories.json,
-      "extensions": ["colours_json", "output_object"]
+      category: Blockly.Categories.json,
+      extensions: ["colours_json", "output_object"],
     });
-  }
+  },
 };
 
-Blockly.Blocks['json_has_key'] = {
+Blockly.Blocks["json_has_key"] = {
   /**
    * Checks if object has target key
    * @this Blockly.Block
    */
-  init: function() {
+  init: function () {
     this.jsonInit({
-      "message0": Blockly.Msg.JSON_HAS_KEY,
-      "args0": [
+      message0: Blockly.Msg.JSON_HAS_KEY,
+      args0: [
         {
-          "type": "input_value",
-          "name": "OBJ",
-          "check": "Object"
+          type: "input_value",
+          name: "OBJ",
+          check: "Object",
         },
         {
-          "type": "input_value",
-          "name": "KEY"
-        }
+          type: "input_value",
+          name: "KEY",
+        },
       ],
-      "category": Blockly.Categories.json,
-      "extensions": ["colours_json", "output_boolean"]
+      category: Blockly.Categories.json,
+      extensions: ["colours_json", "output_boolean"],
     });
-  }
+  },
 };
 
-Blockly.Blocks['json_new_array'] = {
+Blockly.Blocks["json_new_array"] = {
   /**
    * Returns a new Array
    * @this Blockly.Block
    */
-  init: function() {
+  init: function () {
     this.jsonInit({
-      "message0": Blockly.Msg.JSON_NEW_ARRAY,
-      "category": Blockly.Categories.json,
-      "extensions": ["colours_json", "output_array"]
+      message0: Blockly.Msg.JSON_NEW_ARRAY,
+      category: Blockly.Categories.json,
+      extensions: ["colours_json", "output_array"],
     });
-  }
+  },
 };
 
-Blockly.Blocks['json_array'] = {
+Blockly.Blocks["json_array"] = {
   /**
    * @this Blockly.Block
    */
-  init: function() {
+  init: function () {
     this.jsonInit({
-      "message0": Blockly.Msg.JSON_ARRAY,
-      "args0": [
+      message0: Blockly.Msg.JSON_ARRAY,
+      args0: [
         {
-          "type": "extendable",
-          "name": "ITEMS",
-          "args": [
+          type: "extendable",
+          name: "ITEMS",
+          args: [
             {
-              "type": "input_value",
-              "name": "ITEM",
-              "shadowOpcode": "text",
-              "shadowFieldName": "TEXT",
-              "shadowFieldValue": ""
+              type: "input_value",
+              name: "ITEM",
+              shadowOpcode: "text",
+              shadowFieldName: "TEXT",
+              shadowFieldValue: "",
             },
           ],
-          "separator": "",
-          "minInputs": 0
+          separator: "",
+          minInputs: 0,
         },
       ],
-      "category": Blockly.Categories.json,
-      "extensions": ["colours_json", "output_array"]
+      category: Blockly.Categories.json,
+      extensions: ["colours_json", "output_array"],
     });
-  }
+  },
 };
 
-Blockly.Blocks['json_indexmenu'] = {
+Blockly.Blocks["json_indexmenu"] = {
   /**
    * JSON index menu
    * @this Blockly.Block
    */
-  init: function() {
+  init: function () {
     this.jsonInit({
-      "message0": "%1",
-      "args0": [
+      message0: "%1",
+      args0: [
         {
-          "type": "field_numberdropdown",
-          "name": "INDEX",
-          "value": "0",
-          "min": 0,
-          "precision": 1,
-          "options": [
+          type: "field_numberdropdown",
+          name: "INDEX",
+          value: "0",
+          min: 0,
+          precision: 1,
+          options: [
             ["0", "0"],
             [Blockly.Msg.DATA_INDEX_LAST, "last"],
-            [Blockly.Msg.DATA_INDEX_RANDOM, "random"]
-          ]
-        }
+            [Blockly.Msg.DATA_INDEX_RANDOM, "random"],
+          ],
+        },
       ],
-      "category": Blockly.Categories.json,
-      "extensions": ["colours_textfield", "output_string"]
+      category: Blockly.Categories.json,
+      extensions: ["colours_textfield", "output_string"],
     });
-  }
+  },
 };
 
-Blockly.Blocks['json_value_of_index'] = {
+Blockly.Blocks["json_value_of_index"] = {
   /**
    * Fetches the value of the given index
    * @this Blockly.Block
    */
-  init: function() {
+  init: function () {
     this.jsonInit({
-      "message0": Blockly.Msg.JSON_VALUE_OF_INDEX,
-      "args0": [
+      message0: Blockly.Msg.JSON_VALUE_OF_INDEX,
+      args0: [
         {
-          "type": "input_value",
-          "name": "INDEX"
+          type: "input_value",
+          name: "INDEX",
         },
         {
-          "type": "input_value",
-          "name": "ARR",
-          "check": "Array"
-        }
+          type: "input_value",
+          name: "ARR",
+          check: "Array",
+        },
       ],
-      "output": null,
-      "category": Blockly.Categories.json,
-      "extensions": ["colours_json"],
-      "outputShape": Blockly.OUTPUT_SHAPE_ROUND,
-      "switches": [
-        'json_replace_index',
-        'json_delete_index'
-      ]
+      output: null,
+      category: Blockly.Categories.json,
+      extensions: ["colours_json"],
+      outputShape: Blockly.OUTPUT_SHAPE_ROUND,
+      switches: ["json_replace_index", "json_delete_index"],
     });
-  }
+  },
 };
 
-Blockly.Blocks['json_index_of_value'] = {
+Blockly.Blocks["json_index_of_value"] = {
   /**
    * Fetches the index of the given value
    * @this Blockly.Block
    */
-  init: function() {
+  init: function () {
     this.jsonInit({
-      "message0": Blockly.Msg.JSON_INDEX_OF_VALUE,
-      "args0": [
+      message0: Blockly.Msg.JSON_INDEX_OF_VALUE,
+      args0: [
         {
-          "type": "input_value",
-          "name": "VALUE"
+          type: "input_value",
+          name: "VALUE",
         },
         {
-          "type": "input_value",
-          "name": "ARR",
-          "check": "Array"
-        }
+          type: "input_value",
+          name: "ARR",
+          check: "Array",
+        },
       ],
-      "category": Blockly.Categories.json,
-      "extensions": ["colours_json", "output_number"]
+      category: Blockly.Categories.json,
+      extensions: ["colours_json", "output_number"],
     });
-  }
+  },
 };
 
-Blockly.Blocks['json_add_item'] = {
+Blockly.Blocks["json_add_item"] = {
   /**
    * Adds a new item to the Array
    * @this Blockly.Block
    */
-  init: function() {
+  init: function () {
     this.jsonInit({
-      "message0": Blockly.Msg.JSON_ADD_ITEM,
-      "args0": [
+      message0: Blockly.Msg.JSON_ADD_ITEM,
+      args0: [
         {
-          "type": "extendable",
-          "name": "ITEMS",
-          "args": [
+          type: "extendable",
+          name: "ITEMS",
+          args: [
             {
-              "type": "input_value",
-              "name": "ITEM",
-              "shadowOpcode": "text",
-              "shadowFieldName": "TEXT",
-              "shadowFieldValue": Blockly.Msg.JSON_BAR
+              type: "input_value",
+              name: "ITEM",
+              shadowOpcode: "text",
+              shadowFieldName: "TEXT",
+              shadowFieldValue: Blockly.Msg.JSON_BAR,
             },
           ],
-          "separator": "",
-          "minInputs": 1
+          separator: "",
+          minInputs: 1,
         },
         {
-          "type": "input_value",
-          "name": "ARR",
-          "check": "Array"
-        }
+          type: "input_value",
+          name: "ARR",
+          check: "Array",
+        },
       ],
-      "category": Blockly.Categories.json,
-      "extensions": ["colours_json", "output_array"]
+      category: Blockly.Categories.json,
+      extensions: ["colours_json", "output_array"],
     });
-  }
+  },
 };
 
-Blockly.Blocks['json_replace_index'] = {
+Blockly.Blocks["json_replace_index"] = {
   /**
    * Replaces an item indexed with another item in an Array
    * @this Blockly.Block
    */
-  init: function() {
+  init: function () {
     this.jsonInit({
-      "message0": Blockly.Msg.JSON_REPLACE_INDEX,
-      "args0": [
+      message0: Blockly.Msg.JSON_REPLACE_INDEX,
+      args0: [
         {
-          "type": "input_value",
-          "name": "INDEX"
+          type: "input_value",
+          name: "INDEX",
         },
         {
-          "type": "input_value",
-          "name": "ARR",
-          "check": "Array"
+          type: "input_value",
+          name: "ARR",
+          check: "Array",
         },
         {
-          "type": "input_value",
-          "name": "ITEM"
-        }
+          type: "input_value",
+          name: "ITEM",
+        },
       ],
-      "category": Blockly.Categories.json,
-      "extensions": ["colours_json", "output_array"],
-      "switches": [
-        { id: 'json_value_of_index', splitInputs: ['ITEM'] },
-        { id: 'json_delete_index', splitInputs: ['ITEM'] }
-      ]
+      category: Blockly.Categories.json,
+      extensions: ["colours_json", "output_array"],
+      switches: [
+        { id: "json_value_of_index", splitInputs: ["ITEM"] },
+        { id: "json_delete_index", splitInputs: ["ITEM"] },
+      ],
     });
-  }
+  },
 };
 
-Blockly.Blocks['json_delete_index'] = {
+Blockly.Blocks["json_delete_index"] = {
   /**
    * Deletes the value of the given index
    * @this Blockly.Block
    */
-  init: function() {
+  init: function () {
     this.jsonInit({
-      "message0": Blockly.Msg.JSON_DELETE_INDEX,
-      "args0": [
+      message0: Blockly.Msg.JSON_DELETE_INDEX,
+      args0: [
         {
-          "type": "input_value",
-          "name": "INDEX"
+          type: "input_value",
+          name: "INDEX",
         },
         {
-          "type": "input_value",
-          "name": "ARR",
-          "check": "Array"
-        }
+          type: "input_value",
+          name: "ARR",
+          check: "Array",
+        },
       ],
-      "category": Blockly.Categories.json,
-      "extensions": ["colours_json", "output_array"],
-      "switches": [
-        'json_value_of_index',
-        'json_replace_index'
-      ]
+      category: Blockly.Categories.json,
+      extensions: ["colours_json", "output_array"],
+      switches: ["json_value_of_index", "json_replace_index"],
     });
-  }
+  },
 };
 
-Blockly.Blocks['json_delete_all_occurrences'] = {
+Blockly.Blocks["json_delete_all_occurrences"] = {
   /**
    * Deletes all occurrences of a item from the Array
    * @this Blockly.Block
    */
-  init: function() {
+  init: function () {
     this.jsonInit({
-      "message0": Blockly.Msg.JSON_DELETE_ALL_OCCURRENCES,
-      "args0": [
+      message0: Blockly.Msg.JSON_DELETE_ALL_OCCURRENCES,
+      args0: [
         {
-          "type": "input_value",
-          "name": "ITEM"
+          type: "input_value",
+          name: "ITEM",
         },
         {
-          "type": "input_value",
-          "name": "ARR",
-          "check": "Array"
-        }
+          type: "input_value",
+          name: "ARR",
+          check: "Array",
+        },
       ],
-      "category": Blockly.Categories.json,
-      "extensions": ["colours_json", "output_array"]
+      category: Blockly.Categories.json,
+      extensions: ["colours_json", "output_array"],
     });
-  }
+  },
 };
 
-Blockly.Blocks['json_merge_array'] = {
+Blockly.Blocks["json_merge_array"] = {
   /**
    * Merge arrays
    * @this Blockly.Block
    */
-  init: function() {
+  init: function () {
     this.jsonInit({
-      "message0": Blockly.Msg.JSON_MERGE,
-      "args0": [
+      message0: Blockly.Msg.JSON_MERGE,
+      args0: [
         {
-          "type": "extendable",
-          "name": "ITEMS",
-          "args": [
+          type: "extendable",
+          name: "ITEMS",
+          args: [
             {
-              "type": "input_value",
-              "name": "ITEM",
-              "check": "Array"
+              type: "input_value",
+              name: "ITEM",
+              check: "Array",
             },
           ],
-          "separator": "",
-          "minInputs": 2
+          separator: "",
+          minInputs: 2,
         },
       ],
-      "category": Blockly.Categories.json,
-      "extensions": ["colours_json", "output_array"]
+      category: Blockly.Categories.json,
+      extensions: ["colours_json", "output_array"],
     });
-  }
+  },
 };
 
-Blockly.Blocks['json_has_item'] = {
+Blockly.Blocks["json_has_item"] = {
   /**
    * Checks if Array has target item
    * @this Blockly.Block
    */
-  init: function() {
+  init: function () {
     this.jsonInit({
-      "message0": Blockly.Msg.JSON_HAS_ITEM,
-      "args0": [
+      message0: Blockly.Msg.JSON_HAS_ITEM,
+      args0: [
         {
-          "type": "input_value",
-          "name": "ARR",
-          "check": "Array"
+          type: "input_value",
+          name: "ARR",
+          check: "Array",
         },
         {
-          "type": "input_value",
-          "name": "ITEM"
-        }
+          type: "input_value",
+          name: "ITEM",
+        },
       ],
-      "category": Blockly.Categories.json,
-      "extensions": ["colours_json", "output_boolean"]
+      category: Blockly.Categories.json,
+      extensions: ["colours_json", "output_boolean"],
     });
-  }
+  },
 };
 
-Blockly.Blocks['json_array_length'] = {
-  init: function() {
+Blockly.Blocks["json_array_length"] = {
+  init: function () {
     this.jsonInit({
-      "message0": Blockly.Msg.JSON_ARRAY_LENGTH,
-      "args0": [
+      message0: Blockly.Msg.JSON_ARRAY_LENGTH,
+      args0: [
         {
-          "type": "input_value",
-          "name": "ARR",
-          "check": "Array"
-        }
+          type: "input_value",
+          name: "ARR",
+          check: "Array",
+        },
       ],
-      "category": Blockly.Categories.json,
-      "extensions": ["colours_json", "output_number"]
+      category: Blockly.Categories.json,
+      extensions: ["colours_json", "output_number"],
     });
-  }
+  },
 };
 
-Blockly.Blocks['json_slice_array'] = {
-  init: function() {
+Blockly.Blocks["json_slice_array"] = {
+  init: function () {
     this.jsonInit({
-      "message0": Blockly.Msg.JSON_SLICE_ARRAY,
-      "args0": [
+      message0: Blockly.Msg.JSON_SLICE_ARRAY,
+      args0: [
         {
-          "type": "input_value",
-          "name": "START"
+          type: "input_value",
+          name: "START",
         },
         {
-          "type": "input_value",
-          "name": "END"
+          type: "input_value",
+          name: "END",
         },
         {
-          "type": "input_value",
-          "name": "ARR",
-          "check": "Array"
-        }
+          type: "input_value",
+          name: "ARR",
+          check: "Array",
+        },
       ],
-      "category": Blockly.Categories.json,
-      "extensions": ["colours_json", "output_array"]
+      category: Blockly.Categories.json,
+      extensions: ["colours_json", "output_array"],
     });
-  }
+  },
 };
 
-Blockly.Blocks['json_reverse_array'] = {
-  init: function() {
+Blockly.Blocks["json_reverse_array"] = {
+  init: function () {
     this.jsonInit({
-      "message0": Blockly.Msg.JSON_REVERSE_ARRAY,
-      "args0": [
+      message0: Blockly.Msg.JSON_REVERSE_ARRAY,
+      args0: [
         {
-          "type": "input_value",
-          "name": "ARR",
-          "check": "Array"
-        }
+          type: "input_value",
+          name: "ARR",
+          check: "Array",
+        },
       ],
-      "category": Blockly.Categories.json,
-      "extensions": ["colours_json", "output_array"]
+      category: Blockly.Categories.json,
+      extensions: ["colours_json", "output_array"],
     });
-  }
+  },
 };
 
-Blockly.Blocks['json_foreach'] = {
+Blockly.Blocks["json_foreach"] = {
   /**
    * Block for each item and index in array.
    * @this Blockly.Block
    */
-  init: function() {
+  init: function () {
     this.jsonInit({
-      "message0": Blockly.Msg.JSON_FOREACH,
-      "message1": "%1", // Statement
-      "message2": "%1",
-      "lastDummyAlign2": "RIGHT",
-      "args0": [
+      message0: Blockly.Msg.JSON_FOREACH,
+      message1: "%1", // Statement
+      message2: "%1",
+      lastDummyAlign2: "RIGHT",
+      args0: [
         {
-          "type": "input_value",
-          "name": "VALUE"
+          type: "input_value",
+          name: "VALUE",
         },
         {
-          "type": "input_value",
-          "name": "INDEX"
+          type: "input_value",
+          name: "INDEX",
         },
         {
-          "type": "input_value",
-          "name": "ARRAY",
-          "check": "Array"
+          type: "input_value",
+          name: "ARRAY",
+          check: "Array",
         },
       ],
-      "args1": [
+      args1: [
         {
-          "type": "input_statement",
-          "name": "SUBSTACK"
-        }
+          type: "input_statement",
+          name: "SUBSTACK",
+        },
       ],
-      "args2": [
+      args2: [
         {
-          "type": "field_image",
-          "src": Blockly.mainWorkspace.options.pathToMedia + "repeat.svg",
-          "width": 24,
-          "height": 24,
-          "alt": "*",
-          "flip_rtl": true
-        }
+          type: "field_image",
+          src: Blockly.mainWorkspace.options.pathToMedia + "repeat.svg",
+          width: 24,
+          height: 24,
+          alt: "*",
+          flip_rtl: true,
+        },
       ],
-      "category": Blockly.Categories.json,
-      "extensions": ["colours_json", "shape_statement"],
+      category: Blockly.Categories.json,
+      extensions: ["colours_json", "shape_statement"],
     });
-  }
+  },
 };
 
-Blockly.Blocks['json_foreach_value'] = {
+Blockly.Blocks["json_foreach_value"] = {
   /**
    * @this Blockly.Block
    */
-  init: function() {
+  init: function () {
     this.jsonInit({
-      "message0": Blockly.Msg.JSON_FOREACH_VALUE,
-      "output": null,
-      "outputShape": Blockly.OUTPUT_SHAPE_ROUND,
-      "category": Blockly.Categories.json,
-      "duplicateOnDrag": true,
-      "extensions": ["colours_json"],
+      message0: Blockly.Msg.JSON_FOREACH_VALUE,
+      output: null,
+      outputShape: Blockly.OUTPUT_SHAPE_ROUND,
+      category: Blockly.Categories.json,
+      duplicateOnDrag: true,
+      extensions: ["colours_json"],
     });
-  }
+  },
 };
 
-Blockly.Blocks['json_foreach_index'] = {
+Blockly.Blocks["json_foreach_index"] = {
   /**
    * @this Blockly.Block
    */
-  init: function() {
+  init: function () {
     this.jsonInit({
-      "message0": Blockly.Msg.JSON_FOREACH_INDEX,
-      "category": Blockly.Categories.json,
-      "duplicateOnDrag": true,
-      "extensions": ["colours_json", "output_number"]
+      message0: Blockly.Msg.JSON_FOREACH_INDEX,
+      category: Blockly.Categories.json,
+      duplicateOnDrag: true,
+      extensions: ["colours_json", "output_number"],
     });
-  }
+  },
 };
 
-Blockly.Blocks['json_map'] = {
+Blockly.Blocks["json_map"] = {
   /**
    * Block to map each item and index in array.
    * @this Blockly.Block
    */
-  init: function() {
+  init: function () {
     this.jsonInit({
-      "message0": Blockly.Msg.JSON_MAP,
-      "args0": [
+      message0: Blockly.Msg.JSON_MAP,
+      args0: [
         {
-          "type": "input_value",
-          "name": "ARRAY",
-          "check": "Array"
+          type: "input_value",
+          name: "ARRAY",
+          check: "Array",
         },
         {
-          "type": "input_value",
-          "name": "VALUE"
+          type: "input_value",
+          name: "VALUE",
         },
         {
-          "type": "input_value",
-          "name": "INDEX"
+          type: "input_value",
+          name: "INDEX",
         },
         {
-          "type": "field_image",
-          "src": Blockly.mainWorkspace.options.pathToMedia + "icons/json_right_arrow.svg",
-          "width": 24,
-          "height": 24,
-          "alt": "=>"
+          type: "field_image",
+          src:
+            Blockly.mainWorkspace.options.pathToMedia +
+            "icons/json_right_arrow.svg",
+          width: 24,
+          height: 24,
+          alt: "=>",
         },
         {
-          "type": "input_value",
-          "name": "METHOD"
+          type: "input_value",
+          name: "METHOD",
         },
       ],
-      "category": Blockly.Categories.json,
-      "extensions": ["colours_json", "output_array"],
+      category: Blockly.Categories.json,
+      extensions: ["colours_json", "output_array"],
     });
-  }
+  },
 };
 
-Blockly.Blocks['json_map_value'] = {
+Blockly.Blocks["json_map_value"] = {
   /**
    * @this Blockly.Block
    */
-  init: function() {
+  init: function () {
     this.jsonInit({
-      "message0": Blockly.Msg.JSON_FOREACH_VALUE,
-      "output": null,
-      "outputShape": Blockly.OUTPUT_SHAPE_ROUND,
-      "category": Blockly.Categories.json,
-      "duplicateOnDrag": true,
-      "extensions": ["colours_json"],
+      message0: Blockly.Msg.JSON_FOREACH_VALUE,
+      output: null,
+      outputShape: Blockly.OUTPUT_SHAPE_ROUND,
+      category: Blockly.Categories.json,
+      duplicateOnDrag: true,
+      extensions: ["colours_json"],
     });
-  }
+  },
 };
 
-Blockly.Blocks['json_map_index'] = {
+Blockly.Blocks["json_map_index"] = {
   /**
    * @this Blockly.Block
    */
-  init: function() {
+  init: function () {
     this.jsonInit({
-      "message0": Blockly.Msg.JSON_FOREACH_INDEX,
-      "category": Blockly.Categories.json,
-      "duplicateOnDrag": true,
-      "extensions": ["colours_json", "output_number"]
+      message0: Blockly.Msg.JSON_FOREACH_INDEX,
+      category: Blockly.Categories.json,
+      duplicateOnDrag: true,
+      extensions: ["colours_json", "output_number"],
     });
-  }
+  },
 };
 
-Blockly.Blocks['json_filter'] = {
+Blockly.Blocks["json_filter"] = {
   /**
    * Block to filter each item and index in array.
    * @this Blockly.Block
    */
-  init: function() {
+  init: function () {
     this.jsonInit({
-      "message0": Blockly.Msg.JSON_FILTER,
-      "args0": [
+      message0: Blockly.Msg.JSON_FILTER,
+      args0: [
         {
-          "type": "input_value",
-          "name": "ARRAY",
-          "check": "Array"
+          type: "input_value",
+          name: "ARRAY",
+          check: "Array",
         },
         {
-          "type": "input_value",
-          "name": "VALUE"
+          type: "input_value",
+          name: "VALUE",
         },
         {
-          "type": "input_value",
-          "name": "INDEX"
+          type: "input_value",
+          name: "INDEX",
         },
         {
-          "type": "field_image",
-          "src": Blockly.mainWorkspace.options.pathToMedia + "icons/json_right_arrow.svg",
-          "width": 24,
-          "height": 24,
-          "alt": "=>"
+          type: "field_image",
+          src:
+            Blockly.mainWorkspace.options.pathToMedia +
+            "icons/json_right_arrow.svg",
+          width: 24,
+          height: 24,
+          alt: "=>",
         },
         {
-          "type": "input_value",
-          "name": "METHOD",
-          "check": "Boolean"
+          type: "input_value",
+          name: "METHOD",
+          check: "Boolean",
         },
       ],
-      "category": Blockly.Categories.json,
-      "extensions": ["colours_json", "output_array"],
+      category: Blockly.Categories.json,
+      extensions: ["colours_json", "output_array"],
     });
-  }
+  },
 };
 
-Blockly.Blocks['json_filter_value'] = {
+Blockly.Blocks["json_filter_value"] = {
   /**
    * @this Blockly.Block
    */
-  init: function() {
+  init: function () {
     this.jsonInit({
-      "message0": Blockly.Msg.JSON_FOREACH_VALUE,
-      "output": null,
-      "outputShape": Blockly.OUTPUT_SHAPE_ROUND,
-      "category": Blockly.Categories.json,
-      "duplicateOnDrag": true,
-      "extensions": ["colours_json"],
+      message0: Blockly.Msg.JSON_FOREACH_VALUE,
+      output: null,
+      outputShape: Blockly.OUTPUT_SHAPE_ROUND,
+      category: Blockly.Categories.json,
+      duplicateOnDrag: true,
+      extensions: ["colours_json"],
     });
-  }
+  },
 };
 
-Blockly.Blocks['json_filter_index'] = {
+Blockly.Blocks["json_filter_index"] = {
   /**
    * @this Blockly.Block
    */
-  init: function() {
+  init: function () {
     this.jsonInit({
-      "message0": Blockly.Msg.JSON_FOREACH_INDEX,
-      "category": Blockly.Categories.json,
-      "duplicateOnDrag": true,
-      "extensions": ["colours_json", "output_number"]
+      message0: Blockly.Msg.JSON_FOREACH_INDEX,
+      category: Blockly.Categories.json,
+      duplicateOnDrag: true,
+      extensions: ["colours_json", "output_number"],
     });
-  }
+  },
 };
 
-Blockly.Blocks['json_sort'] = {
+Blockly.Blocks["json_sort"] = {
   /**
    * Block to sort each item and index in array.
    * @this Blockly.Block
    */
-  init: function() {
+  init: function () {
     this.jsonInit({
-      "message0": Blockly.Msg.JSON_SORT,
-      "args0": [
+      message0: Blockly.Msg.JSON_SORT,
+      args0: [
         {
-          "type": "input_value",
-          "name": "ARRAY",
-          "check": "Array"
+          type: "input_value",
+          name: "ARRAY",
+          check: "Array",
         },
         {
-          "type": "input_value",
-          "name": "A"
+          type: "input_value",
+          name: "A",
         },
         {
-          "type": "input_value",
-          "name": "B"
+          type: "input_value",
+          name: "B",
         },
         {
-          "type": "field_image",
-          "src": Blockly.mainWorkspace.options.pathToMedia + "icons/json_right_arrow.svg",
-          "width": 24,
-          "height": 24,
-          "alt": "=>"
+          type: "field_image",
+          src:
+            Blockly.mainWorkspace.options.pathToMedia +
+            "icons/json_right_arrow.svg",
+          width: 24,
+          height: 24,
+          alt: "=>",
         },
         {
-          "type": "input_value",
-          "name": "METHOD"
+          type: "input_value",
+          name: "METHOD",
         },
       ],
-      "category": Blockly.Categories.json,
-      "extensions": ["colours_json", "output_array"],
+      category: Blockly.Categories.json,
+      extensions: ["colours_json", "output_array"],
     });
-  }
+  },
 };
 
-Blockly.Blocks['json_sort_a'] = {
+Blockly.Blocks["json_sort_a"] = {
   /**
    * @this Blockly.Block
    */
-  init: function() {
+  init: function () {
     this.jsonInit({
-      "message0": Blockly.Msg.JSON_SORT_A,
-      "output": null,
-      "outputShape": Blockly.OUTPUT_SHAPE_ROUND,
-      "category": Blockly.Categories.json,
-      "duplicateOnDrag": true,
-      "extensions": ["colours_json"],
+      message0: Blockly.Msg.JSON_SORT_A,
+      output: null,
+      outputShape: Blockly.OUTPUT_SHAPE_ROUND,
+      category: Blockly.Categories.json,
+      duplicateOnDrag: true,
+      extensions: ["colours_json"],
     });
-  }
+  },
 };
 
-Blockly.Blocks['json_sort_b'] = {
+Blockly.Blocks["json_sort_b"] = {
   /**
    * @this Blockly.Block
    */
-  init: function() {
+  init: function () {
     this.jsonInit({
-      "message0": Blockly.Msg.JSON_SORT_B,
-      "output": null,
-      "outputShape": Blockly.OUTPUT_SHAPE_ROUND,
-      "category": Blockly.Categories.json,
-      "duplicateOnDrag": true,
-      "extensions": ["colours_json"]
+      message0: Blockly.Msg.JSON_SORT_B,
+      output: null,
+      outputShape: Blockly.OUTPUT_SHAPE_ROUND,
+      category: Blockly.Categories.json,
+      duplicateOnDrag: true,
+      extensions: ["colours_json"],
     });
-  }
+  },
 };
 
 Blockly.Blocks["json_split"] = {
   /**
    * @this Blockly.Block
    */
-  init: function() {
+  init: function () {
     Blockly.Extensions.apply("colours_json", this, false);
     Blockly.Extensions.apply("output_array", this, false);
     const modeTransformations = {
-      "SPLIT": {
-        "outputShape": Blockly.OUTPUT_SHAPE_SQUARE,
-        "outputCheck": "Array",
-        "disconnectInputs": ["INPUT"],
-        "inputChecks": {"INPUT": null},
-        "inputShadows": {
-          "INPUT": {
-            "opcode": "text",
-            "fields": {"TEXT": "a,b,c"}
-          }
-        }
+      SPLIT: {
+        outputShape: Blockly.OUTPUT_SHAPE_SQUARE,
+        outputCheck: "Array",
+        disconnectInputs: ["INPUT"],
+        inputChecks: { INPUT: null },
+        inputShadows: {
+          INPUT: {
+            opcode: "text",
+            fields: { TEXT: "a,b,c" },
+          },
+        },
       },
-      "JOIN": {
-        "outputShape": Blockly.OUTPUT_SHAPE_ROUND,
-        "outputCheck": null,
-        "disconnectInputs": ["INPUT"],
-        "inputChecks": {"INPUT": ["Array", "String"]},
-        "inputShadows": {"INPUT": null}
-      }
+      JOIN: {
+        outputShape: Blockly.OUTPUT_SHAPE_ROUND,
+        outputCheck: null,
+        disconnectInputs: ["INPUT"],
+        inputChecks: { INPUT: ["Array", "String"] },
+        inputShadows: { INPUT: null },
+      },
     };
-    const dropdown = new Blockly.FieldMutatorDropdown([
-      [Blockly.Msg.JSON_SPLIT_SPLIT, "SPLIT"],
-      [Blockly.Msg.JSON_SPLIT_JOIN, "JOIN"],
-    ], modeTransformations);
-    this.appendValueInput("INPUT")
-        .setCheck(null)
-        .appendField(dropdown, "MODE");
+    const dropdown = new Blockly.FieldMutatorDropdown(
+      [
+        [Blockly.Msg.JSON_SPLIT_SPLIT, "SPLIT"],
+        [Blockly.Msg.JSON_SPLIT_JOIN, "JOIN"],
+      ],
+      modeTransformations
+    );
+    this.appendValueInput("INPUT").setCheck(null).appendField(dropdown, "MODE");
     this.appendValueInput("DELIMITER")
-        .setCheck(null)
-        .appendField(Blockly.Msg.JSON_SPLIT_DELIMITER);
-  }
+      .setCheck(null)
+      .appendField(Blockly.Msg.JSON_SPLIT_DELIMITER);
+  },
 };
