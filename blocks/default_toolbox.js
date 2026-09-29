@@ -726,6 +726,13 @@ Blockly.Blocks.defaultToolbox =
   "</category>" +
   '<category name="Extensions" id="extensions" colour="#FF6680" secondaryColour="#FF4D6A" ' +
   'iconURI="../media/extensions/wedo2-block-icon.svg" showStatusButton="true">' +
+  '<block type="extension_dual_number_test" id="extension_dual_number_test"></block>' +
+  '<block type="extension_dual_string_test" id="extension_dual_string_test"></block>' +
+  '<block type="extension_dual_boolean_test" id="extension_dual_boolean_test"></block>' +
+  '<block type="extension_dual_object_test" id="extension_dual_object_test"></block>' +
+  '<block type="extension_dual_array_test" id="extension_dual_array_test"></block>' +
+  '<block type="extension_dual_colour_test" id="extension_dual_colour_test"></block>' +
+  '<sep gap="36"></sep>' +
   '<block type="extension_extendable_test" id="extension_extendable_test"></block>' +
   '<block type="extension_nested_extendable_test" id="extension_nested_extendable_test"></block>' +
   '<block type="extension_nested_extendable_inputs_test" id="extension_nested_extendable_inputs_test"></block>' +

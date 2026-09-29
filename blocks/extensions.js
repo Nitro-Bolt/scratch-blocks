@@ -27,6 +27,72 @@ goog.require("Blockly.Colours");
 goog.require("Blockly.constants");
 goog.require("Blockly.ScratchBlocks.Extensions");
 
+Blockly.Blocks["extension_dual_number_test"] = {
+  /** @this Blockly.Block */
+  init: function () {
+    this.jsonInit({
+      message0: "dual number",
+      category: Blockly.Categories.more,
+      extensions: ["colours_more", "shape_statement", "output_number"],
+    });
+  },
+};
+
+Blockly.Blocks["extension_dual_string_test"] = {
+  /** @this Blockly.Block */
+  init: function () {
+    this.jsonInit({
+      message0: "dual string",
+      category: Blockly.Categories.more,
+      extensions: ["colours_more", "shape_statement", "output_string"],
+    });
+  },
+};
+
+Blockly.Blocks["extension_dual_boolean_test"] = {
+  /** @this Blockly.Block */
+  init: function () {
+    this.jsonInit({
+      message0: "dual boolean",
+      category: Blockly.Categories.more,
+      extensions: ["colours_more", "shape_statement", "output_boolean"],
+    });
+  },
+};
+
+Blockly.Blocks["extension_dual_object_test"] = {
+  /** @this Blockly.Block */
+  init: function () {
+    this.jsonInit({
+      message0: "dual object",
+      category: Blockly.Categories.more,
+      extensions: ["colours_more", "shape_statement", "output_object"],
+    });
+  },
+};
+
+Blockly.Blocks["extension_dual_array_test"] = {
+  /** @this Blockly.Block */
+  init: function () {
+    this.jsonInit({
+      message0: "dual array",
+      category: Blockly.Categories.more,
+      extensions: ["colours_more", "shape_statement", "output_array"],
+    });
+  },
+};
+
+Blockly.Blocks["extension_dual_colour_test"] = {
+  /** @this Blockly.Block */
+  init: function () {
+    this.jsonInit({
+      message0: "dual colour",
+      category: Blockly.Categories.more,
+      extensions: ["colours_more", "shape_statement", "output_colour"],
+    });
+  },
+};
+
 Blockly.Blocks["extension_extendable_test"] = {
   /**
    * @this Blockly.Block

@@ -1391,13 +1391,22 @@ Blockly.BlockSvg.prototype.getConnections_ = function (all) {
   let i, input;
   const myConnections = [];
   if (all || this.rendered) {
-    if (this.outputConnection) {
+    if (
+      this.outputConnection &&
+      (all || this.outputConnection.isAllowedByDualBlockMode_())
+    ) {
       myConnections.push(this.outputConnection);
     }
-    if (this.previousConnection) {
+    if (
+      this.previousConnection &&
+      (all || this.previousConnection.isAllowedByDualBlockMode_())
+    ) {
       myConnections.push(this.previousConnection);
     }
-    if (this.nextConnection) {
+    if (
+      this.nextConnection &&
+      (all || this.nextConnection.isAllowedByDualBlockMode_())
+    ) {
       myConnections.push(this.nextConnection);
     }
     if (all || !this.collapsed_) {
@@ -1409,6 +1418,29 @@ Blockly.BlockSvg.prototype.getConnections_ = function (all) {
     }
   }
   return myConnections;
+};
+
+/**
+ * Return the connections which may become available during a drag. The drag
+ * manager is created before a block is unplugged, so a connected dual block
+ * must retain its alternate top-level connections for the detached state.
+ * @return {!Array.<!Blockly.RenderedConnection>} Available connections.
+ * @package
+ */
+Blockly.BlockSvg.prototype.getConnectionsForDrag_ = function () {
+  const connections = this.getConnections_(false);
+  if (!this.isDualBlock()) return connections;
+  const dualConnections = [
+    this.outputConnection,
+    this.previousConnection,
+    this.nextConnection,
+  ];
+  for (let i = 0; i < dualConnections.length; i++) {
+    if (dualConnections[i] && connections.indexOf(dualConnections[i]) === -1) {
+      connections.push(dualConnections[i]);
+    }
+  }
+  return connections;
 };
 
 /**

@@ -324,6 +324,11 @@ Blockly.Connection.prototype.canConnectWithReason_ = function (target) {
     return Blockly.Connection.REASON_DIFFERENT_WORKSPACES;
   } else if (!this.checkType_(target)) {
     return Blockly.Connection.REASON_CHECKS_FAILED;
+  } else if (
+    !this.isAllowedByDualBlockMode_() ||
+    !target.isAllowedByDualBlockMode_()
+  ) {
+    return Blockly.Connection.REASON_WRONG_TYPE;
   } else if (blockA.isShadow() && !blockB.isShadow()) {
     return Blockly.Connection.REASON_SHADOW_PARENT;
   } else if (
@@ -355,6 +360,23 @@ Blockly.Connection.prototype.canConnectWithReason_ = function (target) {
     return Blockly.Connection.REASON_DRAG_TO_DUPLICATE;
   }
   return Blockly.Connection.CAN_CONNECT;
+};
+
+/**
+ * Check whether this connection belongs to the currently active side of a
+ * dual block. Detached dual blocks expose both sides.
+ * @return {boolean} Whether this connection can currently be used.
+ * @private
+ */
+Blockly.Connection.prototype.isAllowedByDualBlockMode_ = function () {
+  const block = this.sourceBlock_;
+  if (!block.isDualBlock()) return true;
+  const mode = block.getDualBlockMode();
+  if (this == block.outputConnection) return mode !== "stack";
+  if (this == block.previousConnection || this == block.nextConnection) {
+    return mode !== "reporter";
+  }
+  return true;
 };
 
 /**

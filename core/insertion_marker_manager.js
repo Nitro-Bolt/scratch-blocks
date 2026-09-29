@@ -305,7 +305,7 @@ Blockly.InsertionMarkerManager.prototype.createMarkerBlock_ = function (
  */
 Blockly.InsertionMarkerManager.prototype.initAvailableConnections_ =
   function () {
-    const available = this.topBlock_.getConnections_(false);
+    const available = this.topBlock_.getConnectionsForDrag_();
     // Also check the last connection on this stack
     const lastOnStack = this.topBlock_.lastConnectionInStack();
     if (lastOnStack && lastOnStack != this.topBlock_.nextConnection) {

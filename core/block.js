@@ -361,11 +361,9 @@ Blockly.Block.prototype.initModel = function () {
  */
 Blockly.Block.prototype.unplug = function (opt_healStack) {
   let previousTarget;
-  if (this.outputConnection) {
-    if (this.outputConnection.isConnected()) {
-      // Disconnect from any superior block.
-      this.outputConnection.disconnect();
-    }
+  if (this.outputConnection && this.outputConnection.isConnected()) {
+    // Disconnect from any superior value input.
+    this.outputConnection.disconnect();
   } else {
     if (this.previousConnection) {
       previousTarget = null;
@@ -1126,10 +1124,6 @@ Blockly.Block.prototype.setPreviousStatement = function (
       opt_check = "normal";
     }
     if (!this.previousConnection) {
-      goog.asserts.assert(
-        !this.outputConnection,
-        "Remove output connection prior to adding previous connection."
-      );
       this.previousConnection = this.makeConnection_(
         Blockly.PREVIOUS_STATEMENT
       );
@@ -1187,10 +1181,6 @@ Blockly.Block.prototype.setOutput = function (newBoolean, opt_check) {
       opt_check = null;
     }
     if (!this.outputConnection) {
-      goog.asserts.assert(
-        !this.previousConnection,
-        "Remove previous connection prior to adding output connection."
-      );
       this.outputConnection = this.makeConnection_(Blockly.OUTPUT_VALUE);
     }
     this.outputConnection.setCheck(opt_check);
@@ -1204,6 +1194,39 @@ Blockly.Block.prototype.setOutput = function (newBoolean, opt_check) {
       this.outputConnection = null;
     }
   }
+};
+
+/** @return {boolean} Whether this block supports value and stack connections. */
+Blockly.Block.prototype.isDualBlock = function () {
+  return !!(this.outputConnection && this.previousConnection);
+};
+
+/**
+ * Return the shape currently selected by this dual block's connections.
+ * @return {string} One of "reporter", "stack", or "dual".
+ */
+Blockly.Block.prototype.getDualBlockMode = function () {
+  if (!this.isDualBlock()) return this.outputConnection ? "reporter" : "stack";
+  if (this.outputConnection && this.outputConnection.isConnected()) {
+    return "reporter";
+  }
+  if (
+    (this.previousConnection && this.previousConnection.isConnected()) ||
+    (this.nextConnection && this.nextConnection.isConnected())
+  ) {
+    return "stack";
+  }
+  return "dual";
+};
+
+/** @return {boolean} Whether the output silhouette should be rendered. */
+Blockly.Block.prototype.shouldRenderOutputShape = function () {
+  return !!this.outputConnection && this.getDualBlockMode() !== "stack";
+};
+
+/** @return {boolean} Whether statement notches should be rendered. */
+Blockly.Block.prototype.shouldRenderStatementShape = function () {
+  return !this.isDualBlock() || this.getDualBlockMode() !== "reporter";
 };
 
 /**
@@ -1413,13 +1436,6 @@ Blockly.Block.prototype.appendDummyInput = function (opt_name, opt_position) {
  */
 Blockly.Block.prototype.jsonInit = function (json) {
   let i, rawValue;
-  const warningPrefix = json["type"] ? 'Block "' + json["type"] + '": ' : "";
-
-  // Validate inputs.
-  goog.asserts.assert(
-    json["output"] == undefined || json["previousStatement"] == undefined,
-    warningPrefix + "Must not have both an output and a previousStatement."
-  );
 
   // Set basic properties of block.
   if (json["colour"] !== undefined) {
