@@ -9,7 +9,7 @@ if (isNodeJS) {
 window.BLOCKLY_DIR = (function() {
   if (!isNodeJS) {
     var scripts = document.getElementsByTagName('script');
-    var re = /(.+)[\\/]blockly_uncompressed_vertical\.js$/;
+    var re = /(.+)[\\/]blockly_uncompressed\.js$/;
     for (var i = 0, script; script = scripts[i]; i++) {
       var match = re.exec(script.src);
       if (match) {
@@ -33,7 +33,7 @@ goog.addDependency("../../../../core/block_animations.js", ["Blockly.BlockAnimat
 goog.addDependency("../../../../core/block_drag_surface.js", ["Blockly.BlockDragSurfaceSvg"], ["Blockly.utils","goog.asserts","goog.math.Coordinate"]);
 goog.addDependency("../../../../core/block_dragger.js", ["Blockly.BlockDragger"], ["Blockly.BlockAnimations","Blockly.Events.BlockMove","Blockly.Events.DragBlockOutside","Blockly.Events.EndBlockDrag","Blockly.Group","Blockly.InsertionMarkerManager","goog.math.Coordinate","goog.asserts"]);
 goog.addDependency("../../../../core/block_events.js", ["Blockly.Events.BlockBase","Blockly.Events.BlockChange","Blockly.Events.BlockCreate","Blockly.Events.BlockDelete","Blockly.Events.BlockMove","Blockly.Events.Change","Blockly.Events.Create","Blockly.Events.Delete","Blockly.Events.Move"], ["Blockly.Events","Blockly.Events.Abstract","goog.math.Coordinate"]);
-goog.addDependency("../../../../core/block_render_svg_vertical.js", ["Blockly.BlockSvg.render"], ["Blockly.BlockSvg","Blockly.FieldLabel","Blockly.SystemColourPicker","Blockly.scratchBlocksUtils","Blockly.utils"]);
+goog.addDependency("../../../../core/block_render_svg.js", ["Blockly.BlockSvg.render"], ["Blockly.BlockSvg","Blockly.FieldLabel","Blockly.SystemColourPicker","Blockly.scratchBlocksUtils","Blockly.utils"]);
 goog.addDependency("../../../../core/block_svg.js", ["Blockly.BlockSvg"], ["Blockly.Block","Blockly.BlockAnimations","Blockly.ContextMenu","Blockly.Events.Ui","Blockly.Events.BlockMove","Blockly.Grid","Blockly.RenderedConnection","Blockly.scratchBlocksUtils","Blockly.Tooltip","Blockly.Touch","Blockly.utils","goog.Timer","goog.asserts","goog.math.Coordinate"]);
 goog.addDependency("../../../../core/blockly.js", ["Blockly"], ["Blockly.ColourMutation","Blockly.BlockSvg.render","Blockly.DropDownDiv","Blockly.Events","Blockly.FieldAngle","Blockly.FieldCheckbox","Blockly.FieldColour","Blockly.FieldColourSlider","Blockly.FieldDropdown","Blockly.FieldDropdownEditor","Blockly.FieldDependentDropdown","Blockly.FieldMutatorDropdown","Blockly.FieldExtendable","Blockly.FieldImage","Blockly.FieldNote","Blockly.FieldSlider","Blockly.FieldTextInput","Blockly.FieldTextInputRemovable","Blockly.FieldTextDropdown","Blockly.FieldNumber","Blockly.FieldNumberDropdown","Blockly.FieldMatrix","Blockly.FieldVariable","Blockly.FieldVerticalSeparator","Blockly.Generator","Blockly.Msg","Blockly.Procedures","Blockly.ScratchMsgs","Blockly.Toolbox","Blockly.Touch","Blockly.WidgetDiv","Blockly.WorkspaceSvg","Blockly.constants","Blockly.inject","Blockly.utils","goog.color"]);
 goog.addDependency("../../../../core/blocks.js", ["Blockly.Blocks"], []);
