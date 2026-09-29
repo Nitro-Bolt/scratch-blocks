@@ -91,7 +91,7 @@ do
   git checkout --ours $filename && git add $filename | indent_more
 done
 
-# Scratch-blocks has a separate vertical playground and block rendering.
+# Preserve the Scratch Blocks playground and block rendering.
 git rm -f tests/playground.html core/block_render_svg.js | indent_more
 
 empty_lines

@@ -6,7 +6,7 @@ module.exports = [
   {
     mode: process.env.NODE_ENV === "production" ? "production" : "development",
     entry: {
-      vertical: "./shim/vertical.js",
+      blocks: "./shim/index.js",
     },
     output: {
       library: "ScratchBlocks",
@@ -30,7 +30,7 @@ module.exports = [
   {
     mode: process.env.NODE_ENV === "production" ? "production" : "development",
     entry: {
-      vertical: "./shim/vertical.js",
+      blocks: "./shim/index.js",
     },
     output: {
       library: "Blockly",
@@ -66,15 +66,15 @@ module.exports = [
       new CopyWebpackPlugin([
         {
           from: "node_modules/google-closure-library",
-          to: "closure-library",
+          to: "playgrounds/node_modules/google-closure-library",
         },
         {
           from: "blocks_common",
           to: "playgrounds/blocks_common",
         },
         {
-          from: "blocks_vertical",
-          to: "playgrounds/blocks_vertical",
+          from: "blocks",
+          to: "playgrounds/blocks",
         },
         {
           from: "core",

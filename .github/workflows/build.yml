@@ -71,10 +71,9 @@ jobs:
             dist
             media
             msg
-            blockly_compressed_vertical.js
-            blocks_compressed_vertical.js
+            blockly_compressed.js
             blocks_compressed.js
-            blockly_uncompressed_vertical.js
+            blockly_uncompressed.js
             package.json
             pnpm-lock.yaml
           retention-days: 1

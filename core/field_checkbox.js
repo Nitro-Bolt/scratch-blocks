@@ -69,7 +69,7 @@ Blockly.FieldCheckbox.prototype._alternateSupport = false;
 /**
  * Connect's a checkbox shadow to the specified input.
  * @param {Blockly.Input} input The boolean input to connect too.
- * This is used by block_svg_render_vertical to add swap the checkbox state on boolean values.
+ * This is used by the block renderer to swap the checkbox state on boolean values.
  */
 Blockly.FieldCheckbox.connectBoolean = function (input) {
   Blockly.Events.setGroup(true);

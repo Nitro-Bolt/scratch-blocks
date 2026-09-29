@@ -31,9 +31,7 @@ const runTests = async function () {
     .setChromeOptions(options)
     .build();
   try {
-    const url = pathToFileURL(
-      path.resolve(__dirname, "vertical_tests.html")
-    ).href;
+    const url = pathToFileURL(path.resolve(__dirname, "tests.html")).href;
     await browser.get(url);
     const element = await browser.wait(
       webdriver.until.elementLocated({ id: "closureTestRunnerLog" }),

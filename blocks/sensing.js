@@ -25,7 +25,7 @@ goog.provide("Blockly.Blocks.sensing");
 goog.require("Blockly.Blocks");
 goog.require("Blockly.Colours");
 goog.require("Blockly.constants");
-goog.require("Blockly.ScratchBlocks.VerticalExtensions");
+goog.require("Blockly.ScratchBlocks.Extensions");
 
 Blockly.Blocks["sensing_touchingobject"] = {
   /**

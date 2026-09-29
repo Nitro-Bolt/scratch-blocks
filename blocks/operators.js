@@ -25,7 +25,7 @@ goog.provide("Blockly.Blocks.operators");
 goog.require("Blockly.Blocks");
 goog.require("Blockly.Colours");
 goog.require("Blockly.constants");
-goog.require("Blockly.ScratchBlocks.VerticalExtensions");
+goog.require("Blockly.ScratchBlocks.Extensions");
 
 Blockly.Blocks["operator_add"] = {
   /**

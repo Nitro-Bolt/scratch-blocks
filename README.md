@@ -1,6 +1,6 @@
 ## Playgrounds
 
- - **Vertical blocks**: https://nitro-bolt.github.io/scratch-blocks/playgrounds/tests/vertical_playground_compressed.html
+- **Scratch Blocks playground**: https://nitro-bolt.github.io/scratch-blocks/playgrounds/tests/playground_compressed.html
 
 ## Local development
 
@@ -17,7 +17,7 @@ Install dependencies:
 npm ci
 ```
 
-Open `tests/vertical_playground.html` in a browser for development. You don't need to rebuild compressed versions for most changes. Open `tests/vertical_playground_compressed.html` instead to test if the compressed versions built properly.
+Open `tests/playground.html` in a browser for development. You don't need to rebuild compressed versions for most changes. Open `tests/playground_compressed.html` instead to test if the compressed versions built properly.
 
 To re-build compressed versions, run:
 

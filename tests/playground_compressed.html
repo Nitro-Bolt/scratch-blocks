@@ -7,38 +7,18 @@
       content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
     />
 
-    <title>Vertical Playground</title>
+    <title>Compressed Scratch Blocks Playground</title>
 
-    <script src="../blockly_uncompressed_vertical.js"></script>
+    <script src="../blockly_compressed.js"></script>
     <script src="../msg/messages.js"></script>
     <script src="../msg/scratch_msgs.js"></script>
-    <script src="../blocks_vertical/vertical_extensions.js"></script>
-    <script src="../blocks_common/math.js"></script>
-    <script src="../blocks_common/matrix.js"></script>
-    <script src="../blocks_common/note.js"></script>
-    <script src="../blocks_common/text.js"></script>
-    <script src="../blocks_common/colour.js"></script>
-    <script src="../blocks_common/checkbox.js"></script>
-    <script src="../blocks_vertical/control.js"></script>
-    <script src="../blocks_vertical/event.js"></script>
-    <script src="../blocks_vertical/motion.js"></script>
-    <script src="../blocks_vertical/looks.js"></script>
-    <script src="../blocks_vertical/procedures.js"></script>
-    <script src="../blocks_vertical/operators.js"></script>
-    <script src="../blocks_vertical/pen.js"></script>
-    <script src="../blocks_vertical/sound.js"></script>
-    <script src="../blocks_vertical/assets.js"></script>
-    <script src="../blocks_vertical/sensing.js"></script>
-    <script src="../blocks_vertical/data.js"></script>
-    <script src="../blocks_vertical/json.js"></script>
-    <script src="../blocks_vertical/extensions.js"></script>
-    <script src="../blocks_vertical/default_toolbox.js"></script>
-
+    <script src="../blocks_compressed.js"></script>
     <script>
       "use strict";
 
       window.ScratchBlocks = Blockly;
 
+      var fakeDragStack = [];
       var workspace = null;
 
       function start() {
@@ -86,6 +66,7 @@
           scrollbars: true,
           toolbox: toolbox,
           toolboxPosition: side,
+          trashcan: true,
           sounds: soundsEnabled,
           zoom: {
             controls: true,
@@ -101,14 +82,12 @@
           },
         });
 
-        if (sessionStorage) {
-          // Restore previously displayed text.
-          var text = sessionStorage.getItem("textarea");
-          if (text) {
-            document.getElementById("importExport").value = text;
-          }
-          taChange();
+        // Restore previously displayed text.
+        var text = sessionStorage.getItem("textarea");
+        if (text) {
+          document.getElementById("importExport").value = text;
         }
+        taChange();
 
         if (sessionStorage) {
           // Restore event logging state.
@@ -141,7 +120,12 @@
         var input = document.getElementById("importExport");
         var xml = Blockly.Xml.textToDom(input.value);
         Blockly.Xml.domToWorkspace(xml, workspace);
-        workspace.refreshToolboxSelection_();
+        taChange();
+      }
+
+      function toCode(lang) {
+        var output = document.getElementById("importExport");
+        output.value = Blockly[lang].workspaceToCode(workspace);
         taChange();
       }
 
@@ -177,7 +161,6 @@
       function logFlyoutEvents(state) {
         var checkbox = document.getElementById("logFlyoutCheck");
         checkbox.checked = state;
-        var soundsEnabled = null;
         if (sessionStorage) {
           sessionStorage.setItem("logFlyoutEvents", state ? "checked" : "");
         }
@@ -307,6 +290,67 @@
         }
       }
 
+      function fakeDrag(id, dx, dy, opt_workspace) {
+        var ws = opt_workspace || Blockly.getMainWorkspace();
+        var blockToDrag = ws.getBlockById(id);
+
+        if (!blockToDrag) {
+          fakeDragWrapper();
+          return;
+        }
+        var blockTop = blockToDrag.svgGroup_.getBoundingClientRect().top;
+        var blockLeft = blockToDrag.svgGroup_.getBoundingClientRect().left;
+
+        // Click somewhere on the block.
+        var mouseDownEvent = new MouseEvent("mousedown", {
+          clientX: blockLeft + 5,
+          clientY: blockTop + 5,
+        });
+        blockToDrag.onMouseDown_(mouseDownEvent);
+
+        // Throw in a move for good measure.
+        setTimeout(function () {
+          var mouseMoveEvent = new MouseEvent("mousemove", {
+            clientX: blockLeft + dx,
+            clientY: blockTop + dy,
+          });
+          blockToDrag.onMouseMove_(mouseMoveEvent);
+
+          // Drop at dx, dy.
+          setTimeout(function () {
+            var mouseUpEvent = new MouseEvent("mouseup", {
+              clientX: blockLeft + dx,
+              clientY: blockTop + dy,
+            });
+            blockToDrag.onMouseUp_(mouseUpEvent);
+
+            setTimeout(fakeDragWrapper(), 100);
+          }, 30);
+        }, 30);
+      }
+
+      function fakeDragWrapper() {
+        var dragInfo = fakeDragStack.pop();
+        if (dragInfo) {
+          fakeDrag(dragInfo.id, dragInfo.dx, dragInfo.dy, dragInfo.workspace);
+        }
+      }
+
+      function fakeManyDrags() {
+        var blockList = workspace.getAllBlocks();
+        for (var i = 0; i < 2 * blockList.length; i++) {
+          fakeDragStack.push({
+            id: blockList[Math.round(Math.random() * (blockList.length - 1))]
+              .id,
+            // Move some blocks up and to the left, but mostly down and to the right.
+            dx: Math.round((Math.random() - 0.25) * 200),
+            dy: Math.round((Math.random() - 0.25) * 200),
+            workspace: workspace,
+          });
+        }
+        fakeDragWrapper();
+      }
+
       function reportDemo() {
         if (Blockly.selected) {
           workspace.reportValue(
@@ -323,52 +367,6 @@
         Blockly.ScratchMsgs.setLocale(locale);
         Blockly.Xml.clearWorkspaceAndLoadFromXml(xml, workspace);
         workspace.getFlyout().setRecyclingEnabled(true);
-      }
-
-      function tryCoreReload() {
-        var input = document.querySelector("input#coreValue");
-        if (input.value.trim() == "") {
-          input.value = "";
-          alert("Please supply a valid file :c");
-          return;
-        }
-        if (input.value.endsWith(".js")) {
-          console.warn(
-            "If you are trying to load a file that ends with an extra .js then just put the `.js` extension count +1."
-          );
-          console.warn(
-            "but then again, if you are doing that it is bad practice... so fix it :)"
-          );
-          input.value = input.value.slice(0, -3);
-        }
-        var file = "core/" + input.value + ".js";
-        console.log("Attempting to reload: " + file);
-        var script = Array.from(document.scripts).find((script) =>
-          script.src.endsWith(file)
-        );
-        if (!script) {
-          alert("Unable to find core file, are you sure it was loaded?");
-          return;
-        }
-        var next = document.createElement("script");
-        next.onabort = () => {
-          alert("Script reload was aborted.");
-          next.remove();
-        };
-        next.onerror = (e) => {
-          alert(
-            "Script reload failed as the script had an error, please check your console."
-          );
-          next.remove();
-          throw e;
-        };
-        next.onload = () => {
-          console.log("Reloaded core file.");
-          script.remove();
-        };
-        next.type = "text/javascript";
-        next.src = script.src;
-        document.body.appendChild(next);
       }
     </script>
 
@@ -418,8 +416,111 @@
   <body onload="start()">
     <div id="collaborators"></div>
     <div id="blocklyDiv"></div>
-    <!-- Simple toolbox -->
+    <!-- Toolbox -->
     <xml id="toolbox-simple" style="display: none">
+      <block type="event_whenflagclicked"></block>
+      <block type="event_whenbroadcastreceived"> </block>
+      <block type="event_broadcast">
+        <value name="BROADCAST_OPTION">
+          <shadow type="event_broadcast_menu"></shadow>
+        </value>
+      </block>
+      <block type="event_broadcastandwait">
+        <value name="BROADCAST_OPTION">
+          <shadow type="event_broadcast_menu"></shadow>
+        </value>
+      </block>
+      <block type="control_wait">
+        <value name="DURATION">
+          <shadow type="math_positive_number">
+            <field name="NUM">1</field>
+          </shadow>
+        </value>
+      </block>
+      <block type="control_repeat">
+        <value name="TIMES">
+          <shadow type="math_whole_number">
+            <field name="NUM">10</field>
+          </shadow>
+        </value>
+      </block>
+      <block type="control_forever"></block>
+      <block type="control_if"></block>
+      <block type="control_if_else"></block>
+      <block type="control_wait_until"></block>
+      <block type="control_repeat_until"></block>
+      <block type="control_stop">
+        <value name="STOP_OPTION">
+          <shadow type="control_stop_menu"></shadow>
+        </value>
+      </block>
+      <block type="control_start_as_clone"></block>
+      <block type="control_create_clone_of">
+        <value name="CLONE_OPTION">
+          <shadow type="control_create_clone_of_menu"></shadow>
+        </value>
+      </block>
+      <block type="control_delete_this_clone"></block>
+      <block type="operator_add">
+        <value name="NUM1">
+          <shadow type="math_number">
+            <field name="NUM"></field>
+          </shadow>
+        </value>
+        <value name="NUM2">
+          <shadow type="math_number">
+            <field name="NUM"></field>
+          </shadow>
+        </value>
+      </block>
+      <block type="operator_subtract">
+        <value name="NUM1">
+          <shadow type="math_number">
+            <field name="NUM"></field>
+          </shadow>
+        </value>
+        <value name="NUM2">
+          <shadow type="math_number">
+            <field name="NUM"></field>
+          </shadow>
+        </value>
+      </block>
+      <block type="operator_multiply">
+        <value name="NUM1">
+          <shadow type="math_number">
+            <field name="NUM"></field>
+          </shadow>
+        </value>
+        <value name="NUM2">
+          <shadow type="math_number">
+            <field name="NUM"></field>
+          </shadow>
+        </value>
+      </block>
+      <block type="operator_divide">
+        <value name="NUM1">
+          <shadow type="math_number">
+            <field name="NUM"></field>
+          </shadow>
+        </value>
+        <value name="NUM2">
+          <shadow type="math_number">
+            <field name="NUM"></field>
+          </shadow>
+        </value>
+      </block>
+      <block type="operator_power">
+        <value name="NUM1">
+          <shadow type="math_number">
+            <field name="NUM"></field>
+          </shadow>
+        </value>
+        <value name="NUM2">
+          <shadow type="math_number">
+            <field name="NUM"></field>
+          </shadow>
+        </value>
+      </block>
       <block type="operator_random">
         <value name="FROM">
           <shadow type="math_number">
@@ -534,7 +635,7 @@
     </xml>
 
     <!-- Sidebar -->
-    <h1>Vertical Blocks</h1>
+    <h1>Scratch Blocks</h1>
     <p>
       <a href="javascript:void(workspace.setVisible(true))">Show</a>
       - <a href="javascript:void(workspace.setVisible(false))">Hide</a>
@@ -599,6 +700,12 @@
         id="import"
       />
       <br />
+      <input
+        type="button"
+        value="To JavaScript"
+        onclick="toCode('JavaScript')"
+      />
+      <br />
       <textarea
         id="importExport"
         style="width: 26%; height: 12em"
@@ -618,6 +725,7 @@
       Stress test: &nbsp;
       <input type="button" value="Sprinkles!" onclick="sprinkles(100)" />
       <input type="button" value="Spaghetti!" onclick="spaghetti(3)" />
+      <input type="button" value="Fake some drags!" onclick="fakeManyDrags()" />
     </p>
 
     <p>
@@ -678,12 +786,6 @@
       <br />
       Report as error:
       <input id="reportError" type="checkbox" />
-    </p>
-
-    <p>
-      Core file:
-      <input id="coreValue" type="text" value="field_checkbox" />
-      <input type="button" value="attempt reload" onclick="tryCoreReload()" />
     </p>
   </body>
 </html>

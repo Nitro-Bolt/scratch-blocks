@@ -51,7 +51,7 @@ const writeFile = (target, code, remove) => {
 };
 
 const buildCompressedCore = () => {
-  const target = "blockly_compressed_vertical.js";
+  const target = "blockly_compressed.js";
   const closureDir = path.join(CLOSURE_ROOT, CLOSURE_LIBRARY);
 
   const args = [
@@ -75,11 +75,8 @@ const buildCompressedCore = () => {
   });
 };
 
-const buildCompressedBlocks = (common) => {
-  const target =
-    (common ? "blocks_compressed" : "blocks_compressed_vertical") + ".js";
-  const dir = common ? "blocks_common" : "blocks_vertical";
-
+const buildCompressedBlocks = () => {
+  const target = "blocks_compressed.js";
   const args = [
     "--compilation_level=SIMPLE",
     "--js=build/gen_blocks.js",
@@ -87,12 +84,14 @@ const buildCompressedBlocks = (common) => {
     "--js=core/constants.js",
   ];
 
-  fs.readdirSync(dir)
-    .filter((f) => f.endsWith(".js"))
-    .sort()
-    .forEach((f) => {
-      args.push("--js=" + path.join(dir, f).replace(/\\/g, "/"));
-    });
+  ["blocks_common", "blocks"].forEach((dir) => {
+    fs.readdirSync(dir)
+      .filter((f) => f.endsWith(".js"))
+      .sort()
+      .forEach((f) => {
+        args.push("--js=" + path.join(dir, f).replace(/\\/g, "/"));
+      });
+  });
 
   return runCompiler(args).then((stdout) => {
     writeFile(target, stdout, "var Blockly={Blocks:{}};");
@@ -100,7 +99,7 @@ const buildCompressedBlocks = (common) => {
 };
 
 const buildUncompressed = () => {
-  const target = "blockly_uncompressed_vertical.js";
+  const target = "blockly_uncompressed.js";
   const closureBase = findClosureBase();
   const closureBaseDir = path.dirname(closureBase);
   const closureDir = "/node_modules";
@@ -116,7 +115,7 @@ const buildUncompressed = () => {
     "window.BLOCKLY_DIR = (function() {",
     "  if (!isNodeJS) {",
     "    var scripts = document.getElementsByTagName('script');",
-    "    var re = /(.+)[\\\\/]blockly_uncompressed_vertical\\.js$/;",
+    "    var re = /(.+)[\\\\/]blockly_uncompressed\\.js$/;",
     "    for (var i = 0, script; script = scripts[i]; i++) {",
     "      var match = re.exec(script.src);",
     "      if (match) {",
@@ -222,11 +221,7 @@ const main = () => {
       buildUncompressed();
       if (onlyUncompressed) return;
 
-      return Promise.all([
-        buildCompressedCore(),
-        buildCompressedBlocks(false),
-        buildCompressedBlocks(true),
-      ]);
+      return Promise.all([buildCompressedCore(), buildCompressedBlocks()]);
     })
     .then(() => {
       const endTime = Date.now();

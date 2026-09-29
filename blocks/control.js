@@ -24,7 +24,7 @@ goog.provide("Blockly.Blocks.control");
 
 goog.require("Blockly.Blocks");
 goog.require("Blockly.Colours");
-goog.require("Blockly.ScratchBlocks.VerticalExtensions");
+goog.require("Blockly.ScratchBlocks.Extensions");
 
 Blockly.Blocks["control_forever"] = {
   /**
