@@ -22,17 +22,17 @@
  * @fileoverview Text input field with floating "remove" button.
  * @author pkaplan@media.mit.edu (Paul Kaplan)
  */
-'use strict';
+"use strict";
 
-goog.provide('Blockly.FieldTextInputRemovable');
+goog.provide("Blockly.FieldTextInputRemovable");
 
-goog.require('Blockly.BlockSvg.render');
-goog.require('Blockly.Colours');
-goog.require('Blockly.FieldTextInput');
-goog.require('Blockly.Msg');
-goog.require('Blockly.utils');
-goog.require('goog.dom');
-goog.require('goog.dom.TagName');
+goog.require("Blockly.BlockSvg.render");
+goog.require("Blockly.Colours");
+goog.require("Blockly.FieldTextInput");
+goog.require("Blockly.Msg");
+goog.require("Blockly.utils");
+goog.require("goog.dom");
+goog.require("goog.dom.TagName");
 
 /**
  * Class for an editable text field displaying a deletion icon when selected.
@@ -47,16 +47,24 @@ goog.require('goog.dom.TagName');
  * @extends {Blockly.FieldTextInput}
  * @constructor
  */
-Blockly.FieldTextInputRemovable = function(text, opt_validator, opt_restrictor) {
-  Blockly.FieldTextInputRemovable.superClass_.constructor.call(this, text,
-      opt_validator, opt_restrictor);
+Blockly.FieldTextInputRemovable = function (
+  text,
+  opt_validator,
+  opt_restrictor
+) {
+  Blockly.FieldTextInputRemovable.superClass_.constructor.call(
+    this,
+    text,
+    opt_validator,
+    opt_restrictor
+  );
 };
 goog.inherits(Blockly.FieldTextInputRemovable, Blockly.FieldTextInput);
 
-Blockly.FieldTextInputRemovable.prototype.init = function() {
+Blockly.FieldTextInputRemovable.prototype.init = function () {
   Blockly.FieldTextInputRemovable.superClass_.init.call(this);
 
-  this.textElement_.classList.add('removableTextInput');
+  this.textElement_.classList.add("removableTextInput");
 };
 
 /**
@@ -65,9 +73,9 @@ Blockly.FieldTextInputRemovable.prototype.init = function() {
  * @param {string} text The proposed field text.
  * @return {?string} The text, or null when it is empty or whitespace-only.
  */
-Blockly.FieldTextInputRemovable.prototype.classValidator = function(text) {
-  var validated = Blockly.FieldTextInputRemovable.superClass_.classValidator.
-      call(this, text);
+Blockly.FieldTextInputRemovable.prototype.classValidator = function (text) {
+  const validated =
+    Blockly.FieldTextInputRemovable.superClass_.classValidator.call(this, text);
   if (validated === null || !validated || !validated.trim()) {
     return null;
   }
@@ -78,42 +86,58 @@ Blockly.FieldTextInputRemovable.prototype.classValidator = function(text) {
  * Show the inline free-text editor on top of the text with the remove button.
  * @private
  */
-Blockly.FieldTextInputRemovable.prototype.showEditor_ = function() {
+Blockly.FieldTextInputRemovable.prototype.showEditor_ = function () {
   Blockly.FieldTextInputRemovable.superClass_.showEditor_.call(this);
 
   // Remember the active procedure input so newly added inputs can be inserted
   // immediately after it. Argument editors are children of the declaration;
   // label editors live on the declaration itself.
   if (this.sourceBlock_) {
-    var declaration = this.sourceBlock_.parentBlock_ || this.sourceBlock_;
-    if (declaration.type == 'procedures_declaration') {
+    const declaration = this.sourceBlock_.parentBlock_ || this.sourceBlock_;
+    if (declaration.type == "procedures_declaration") {
       declaration.selectedField_ = this;
     }
   }
 
-  var div = Blockly.WidgetDiv.DIV;
-  div.className += ' removableTextInput';
-  var removeButton =
-      goog.dom.createDom(goog.dom.TagName.IMG, 'blocklyTextRemoveIcon');
-  removeButton.setAttribute('src',
-      Blockly.mainWorkspace.options.pathToMedia + 'icons/remove.svg');
-  this.removeButtonMouseWrapper_ = Blockly.bindEvent_(removeButton,
-      'mousedown', this, this.removeCallback_);
+  const div = Blockly.WidgetDiv.DIV;
+  div.className += " removableTextInput";
+  const removeButton = goog.dom.createDom(
+    goog.dom.TagName.IMG,
+    "blocklyTextRemoveIcon"
+  );
+  removeButton.setAttribute(
+    "src",
+    Blockly.mainWorkspace.options.pathToMedia + "icons/remove.svg"
+  );
+  this.removeButtonMouseWrapper_ = Blockly.bindEvent_(
+    removeButton,
+    "mousedown",
+    this,
+    this.removeCallback_
+  );
   div.appendChild(removeButton);
 
   if (this.sourceBlock_ && this.sourceBlock_.shiftFieldCallback) {
-    this.shiftButtonMouseWrappers_ = [-1, 1].map(function(direction) {
-      var arrow = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-      arrow.setAttribute('class', 'blocklyTextShiftArrow');
-      arrow.setAttribute('viewBox', '0 0 20 40');
-      arrow.style.left = direction < 0 ?
-        'calc(50% - 40px)' : 'calc(50% + 20px)';
-      var path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-      path.setAttribute('d', direction < 0 ?
-        'M 17 11 L 8 20 L 17 29' : 'M 3 11 L 12 20 L 3 29');
+    this.shiftButtonMouseWrappers_ = [-1, 1].map(function (direction) {
+      const arrow = document.createElementNS(
+        "http://www.w3.org/2000/svg",
+        "svg"
+      );
+      arrow.setAttribute("class", "blocklyTextShiftArrow");
+      arrow.setAttribute("viewBox", "0 0 20 40");
+      arrow.style.left =
+        direction < 0 ? "calc(50% - 40px)" : "calc(50% + 20px)";
+      const path = document.createElementNS(
+        "http://www.w3.org/2000/svg",
+        "path"
+      );
+      path.setAttribute(
+        "d",
+        direction < 0 ? "M 17 11 L 8 20 L 17 29" : "M 3 11 L 12 20 L 3 29"
+      );
       arrow.appendChild(path);
       div.appendChild(arrow);
-      return Blockly.bindEvent_(arrow, 'mousedown', this, function(event) {
+      return Blockly.bindEvent_(arrow, "mousedown", this, function (event) {
         event.preventDefault();
         this.sourceBlock_.shiftFieldCallback(this, direction);
       });
@@ -126,19 +150,21 @@ Blockly.FieldTextInputRemovable.prototype.showEditor_ = function() {
  * @return {!Function} Closure to call on destruction of the WidgetDiv.
  * @private
  */
-Blockly.FieldTextInputRemovable.prototype.widgetDispose_ = function() {
-  var dispose = Blockly.FieldTextInputRemovable.superClass_.widgetDispose_.
-      call(this);
-  var thisField = this;
-  return function() {
+Blockly.FieldTextInputRemovable.prototype.widgetDispose_ = function () {
+  const dispose =
+    Blockly.FieldTextInputRemovable.superClass_.widgetDispose_.call(this);
+  const thisField = this;
+  return function () {
     dispose();
     if (!thisField.sourceBlock_) {
       return;
     }
-    var declaration = thisField.sourceBlock_.parentBlock_ ||
-        thisField.sourceBlock_;
-    if (declaration.type == 'procedures_declaration' &&
-        declaration.selectedField_ == thisField) {
+    const declaration =
+      thisField.sourceBlock_.parentBlock_ || thisField.sourceBlock_;
+    if (
+      declaration.type == "procedures_declaration" &&
+      declaration.selectedField_ == thisField
+    ) {
       declaration.selectedField_ = null;
     }
   };
@@ -151,19 +177,24 @@ Blockly.FieldTextInputRemovable.prototype.widgetDispose_ = function() {
  * @return {!goog.math.Coordinate} Page coordinates for the editor.
  * @private
  */
-Blockly.FieldTextInputRemovable.prototype.getAbsoluteXY_ = function() {
-  if (this.sourceBlock_ &&
-      this.sourceBlock_.type == 'argument_editor_statement') {
-    var fieldRect = this.getSvgRoot().getBoundingClientRect();
-    var scale = this.sourceBlock_.workspace.scale;
-    var headerWidth = (this.size_.width +
-        2 * Blockly.BlockSvg.SEP_SPACE_X) * scale;
+Blockly.FieldTextInputRemovable.prototype.getAbsoluteXY_ = function () {
+  if (
+    this.sourceBlock_ &&
+    this.sourceBlock_.type == "argument_editor_statement"
+  ) {
+    const fieldRect = this.getSvgRoot().getBoundingClientRect();
+    const scale = this.sourceBlock_.workspace.scale;
+    const headerWidth =
+      (this.size_.width + 2 * Blockly.BlockSvg.SEP_SPACE_X) * scale;
     return {
-      x: fieldRect.left + window.pageXOffset +
-          (fieldRect.width - headerWidth) / 2,
-      y: fieldRect.top + window.pageYOffset +
-          (fieldRect.height -
-          Blockly.BlockSvg.FIELD_HEIGHT_MAX_EDIT * scale) / 2
+      x:
+        fieldRect.left +
+        window.pageXOffset +
+        (fieldRect.width - headerWidth) / 2,
+      y:
+        fieldRect.top +
+        window.pageYOffset +
+        (fieldRect.height - Blockly.BlockSvg.FIELD_HEIGHT_MAX_EDIT * scale) / 2,
     };
   }
   return Blockly.FieldTextInputRemovable.superClass_.getAbsoluteXY_.call(this);
@@ -174,11 +205,11 @@ Blockly.FieldTextInputRemovable.prototype.getAbsoluteXY_ = function() {
  * on sourceBlock and calls it if possible.
  * @private
  */
-Blockly.FieldTextInputRemovable.prototype.removeCallback_ = function() {
+Blockly.FieldTextInputRemovable.prototype.removeCallback_ = function () {
   if (this.sourceBlock_ && this.sourceBlock_.removeFieldCallback) {
     this.sourceBlock_.removeFieldCallback(this);
   } else {
-    console.warn('Expected a source block with removeFieldCallback');
+    console.warn("Expected a source block with removeFieldCallback");
   }
 };
 
@@ -190,14 +221,16 @@ Blockly.FieldTextInputRemovable.prototype.removeCallback_ = function() {
  * @returns {!Blockly.FieldTextInputRemovable} The new text input.
  * @public
  */
-Blockly.FieldTextInputRemovable.fromJson = function(options) {
-  var text = Blockly.utils.replaceMessageReferences(options['text']);
-  var field = new Blockly.FieldTextInputRemovable(text, options['class']);
-  if (typeof options['spellcheck'] == 'boolean') {
-    field.setSpellcheck(options['spellcheck']);
+Blockly.FieldTextInputRemovable.fromJson = function (options) {
+  const text = Blockly.utils.replaceMessageReferences(options["text"]);
+  const field = new Blockly.FieldTextInputRemovable(text, options["class"]);
+  if (typeof options["spellcheck"] == "boolean") {
+    field.setSpellcheck(options["spellcheck"]);
   }
   return field;
 };
 
 Blockly.Field.register(
-    'field_input_removable', Blockly.FieldTextInputRemovable);
+  "field_input_removable",
+  Blockly.FieldTextInputRemovable
+);

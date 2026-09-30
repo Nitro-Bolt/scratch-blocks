@@ -52,7 +52,6 @@ prompt() {
   fi
 }
 
-
 # Ask the user for confirmation, then pull from Blockly's develop branch.
 # The default is to do the pull.
 pull_from_develop_fn() {

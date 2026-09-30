@@ -22,22 +22,22 @@
  * @fileoverview Handling of local and global procedures.
  * @author Cubester@NitroBolt
  */
-'use strict';
+"use strict";
 
 /**
  * @name Blockly.ProceduresMap
  * @namespace
  **/
-goog.provide('Blockly.ProceduresMap');
+goog.provide("Blockly.ProceduresMap");
 
-goog.require('Blockly.Xml');
+goog.require("Blockly.Xml");
 
 /**
  * Map of globally scoped procedure mutations, keyed by proccode.
  * @param {!Blockly.Workspace} workspace Owning workspace.
  * @constructor
  */
-Blockly.ProceduresMap = function(workspace) {
+Blockly.ProceduresMap = function (workspace) {
   this.procedureMap_ = Object.create(null);
   this.workspace = workspace;
 };
@@ -45,7 +45,7 @@ Blockly.ProceduresMap = function(workspace) {
 /**
  * Clear all tracked procedure mutations.
  */
-Blockly.ProceduresMap.prototype.clear = function() {
+Blockly.ProceduresMap.prototype.clear = function () {
   this.procedureMap_ = Object.create(null);
 };
 
@@ -53,11 +53,11 @@ Blockly.ProceduresMap.prototype.clear = function() {
  * Add or replace a tracked procedure mutation.
  * @param {!Element} mutation Procedure mutation XML.
  */
-Blockly.ProceduresMap.prototype.createProcedureMutation = function(mutation) {
+Blockly.ProceduresMap.prototype.createProcedureMutation = function (mutation) {
   if (!mutation) {
     return;
   }
-  var proccode = mutation.getAttribute('proccode');
+  const proccode = mutation.getAttribute("proccode");
   if (!proccode) {
     return;
   }
@@ -68,7 +68,7 @@ Blockly.ProceduresMap.prototype.createProcedureMutation = function(mutation) {
  * Get all tracked procedure mutations.
  * @return {!Array<!Element>} Procedure mutation XML elements.
  */
-Blockly.ProceduresMap.prototype.getAllProcedureMutations = function() {
+Blockly.ProceduresMap.prototype.getAllProcedureMutations = function () {
   return Object.values(this.procedureMap_);
 };
 
@@ -77,28 +77,30 @@ Blockly.ProceduresMap.prototype.getAllProcedureMutations = function() {
  * @param {string} proccode Procedure identifier.
  * @return {?Element} Procedure mutation XML if found.
  */
-Blockly.ProceduresMap.prototype.getProcedureMutationByProccode = function(proccode) {
+Blockly.ProceduresMap.prototype.getProcedureMutationByProccode = function (
+  proccode
+) {
   return this.procedureMap_[proccode] || null;
 };
 
 /**
  * Refresh the map from VM runtime global procedure mutation data.
  */
-Blockly.ProceduresMap.prototype.refreshFromVM = function() {
-  var vm = this.workspace && this.workspace.vm;
-  var runtime = vm && vm.runtime;
+Blockly.ProceduresMap.prototype.refreshFromVM = function () {
+  const vm = this.workspace && this.workspace.vm;
+  const runtime = vm && vm.runtime;
   if (!runtime || !runtime.getGlobalProcedureMutationData) {
     this.clear();
     return;
   }
 
-  var editingTargetId = vm.editingTarget && vm.editingTarget.id;
-  var mutationData = runtime.getGlobalProcedureMutationData(editingTargetId);
+  const editingTargetId = vm.editingTarget && vm.editingTarget.id;
+  const mutationData = runtime.getGlobalProcedureMutationData(editingTargetId);
 
   this.clear();
-  for (var i = 0; i < mutationData.length; i++) {
+  for (let i = 0; i < mutationData.length; i++) {
     this.createProcedureMutation(
-        Blockly.ProceduresMap.mutationDataToDom_(mutationData[i])
+      Blockly.ProceduresMap.mutationDataToDom_(mutationData[i])
     );
   }
 };
@@ -109,19 +111,19 @@ Blockly.ProceduresMap.prototype.refreshFromVM = function() {
  * @return {!Element} Mutation XML element.
  * @private
  */
-Blockly.ProceduresMap.mutationDataToDom_ = function(data) {
-  var mutation = Blockly.Xml.textToDom('<xml><mutation/></xml>').firstChild;
-  var keys = Object.keys(data || {});
-  for (var i = 0; i < keys.length; i++) {
-    var key = keys[i];
-    var value = data[key];
-    if (typeof value === 'undefined' || value === null) {
+Blockly.ProceduresMap.mutationDataToDom_ = function (data) {
+  const mutation = Blockly.Xml.textToDom("<xml><mutation/></xml>").firstChild;
+  const keys = Object.keys(data || {});
+  for (let i = 0; i < keys.length; i++) {
+    const key = keys[i];
+    const value = data[key];
+    if (typeof value === "undefined" || value === null) {
       continue;
     }
     mutation.setAttribute(key, String(value));
   }
-  if (!mutation.hasAttribute('generateshadows')) {
-    mutation.setAttribute('generateshadows', 'true');
+  if (!mutation.hasAttribute("generateshadows")) {
+    mutation.setAttribute("generateshadows", "true");
   }
   return mutation;
 };

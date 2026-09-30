@@ -22,12 +22,11 @@
  * @fileoverview A dropdown whose options depend on another field on the same block.
  * @author Cubester@NitroBolt
  */
-'use strict';
+"use strict";
 
-goog.provide('Blockly.FieldDependentDropdown');
+goog.provide("Blockly.FieldDependentDropdown");
 
-goog.require('Blockly.FieldDropdown');
-
+goog.require("Blockly.FieldDropdown");
 
 /**
  * A dropdown field whose options are selected using another field's value.
@@ -45,8 +44,12 @@ goog.require('Blockly.FieldDropdown');
  * @extends {Blockly.FieldDropdown}
  * @constructor
  */
-Blockly.FieldDependentDropdown = function(parentName, optionMapping,
-    opt_defaultOptions, opt_validator) {
+Blockly.FieldDependentDropdown = function (
+  parentName,
+  optionMapping,
+  opt_defaultOptions,
+  opt_validator
+) {
   this.parentName_ = parentName;
   this.optionMapping_ = optionMapping || {};
   this.defaultOptions_ = opt_defaultOptions || [];
@@ -58,16 +61,19 @@ Blockly.FieldDependentDropdown = function(parentName, optionMapping,
   // field. If no default was supplied, use the first mapped option for that
   // initialization; the real parent value is applied in insertedInto.
   if (!this.options_.length) {
-    for (var key in this.optionMapping_) {
-      if (Object.prototype.hasOwnProperty.call(this.optionMapping_, key) &&
-          this.optionMapping_[key] && this.optionMapping_[key].length) {
+    for (const key in this.optionMapping_) {
+      if (
+        Object.prototype.hasOwnProperty.call(this.optionMapping_, key) &&
+        this.optionMapping_[key] &&
+        this.optionMapping_[key].length
+      ) {
         this.options_ = this.optionMapping_[key];
         break;
       }
     }
   }
-  var hasSelectableOption = false;
-  for (var i = 0; i < this.options_.length; i++) {
+  let hasSelectableOption = false;
+  for (let i = 0; i < this.options_.length; i++) {
     if (this.options_[i] != Blockly.FieldDropdown.SEPARATOR) {
       hasSelectableOption = true;
       break;
@@ -77,11 +83,14 @@ Blockly.FieldDependentDropdown = function(parentName, optionMapping,
     // FieldDropdown historically assumes that a menu has at least one item.
     // Keep construction safe even when a block is configured with an empty
     // mapping; callers can replace the mapping before using the field.
-    this.options_ = [['', '']];
+    this.options_ = [["", ""]];
   }
 
   Blockly.FieldDependentDropdown.superClass_.constructor.call(
-      this, this.options_, opt_validator);
+    this,
+    this.options_,
+    opt_validator
+  );
 };
 goog.inherits(Blockly.FieldDependentDropdown, Blockly.FieldDropdown);
 
@@ -93,10 +102,12 @@ goog.inherits(Blockly.FieldDependentDropdown, Blockly.FieldDropdown);
  * @package
  * @nocollapse
  */
-Blockly.FieldDependentDropdown.fromJson = function(element) {
+Blockly.FieldDependentDropdown.fromJson = function (element) {
   return new Blockly.FieldDependentDropdown(
-      element['parentName'], element['optionMapping'],
-      element['defaultOptions']);
+    element["parentName"],
+    element["optionMapping"],
+    element["defaultOptions"]
+  );
 };
 
 /**
@@ -105,12 +116,15 @@ Blockly.FieldDependentDropdown.fromJson = function(element) {
  * @return {!Array.<!Array>} Dropdown option tuples.
  * @private
  */
-Blockly.FieldDependentDropdown.prototype.getOptionsForParentValue_ = function(
-    parentValue) {
-  if (parentValue !== undefined &&
-      Object.prototype.hasOwnProperty.call(this.optionMapping_, parentValue) &&
-      this.optionMapping_[parentValue] &&
-      this.optionMapping_[parentValue].length) {
+Blockly.FieldDependentDropdown.prototype.getOptionsForParentValue_ = function (
+  parentValue
+) {
+  if (
+    parentValue !== undefined &&
+    Object.prototype.hasOwnProperty.call(this.optionMapping_, parentValue) &&
+    this.optionMapping_[parentValue] &&
+    this.optionMapping_[parentValue].length
+  ) {
     return this.optionMapping_[parentValue];
   }
   return this.defaultOptions_;
@@ -122,23 +136,24 @@ Blockly.FieldDependentDropdown.prototype.getOptionsForParentValue_ = function(
  * @param {*} parentValue The current or proposed parent value.
  * @private
  */
-Blockly.FieldDependentDropdown.prototype.updateOptions_ = function(
-    parentValue) {
+Blockly.FieldDependentDropdown.prototype.updateOptions_ = function (
+  parentValue
+) {
   if (this.parentValue_ === parentValue && this.options_) {
     return;
   }
 
-  var options = this.getOptionsForParentValue_(parentValue);
+  let options = this.getOptionsForParentValue_(parentValue);
   if (!options.length) {
-    options = [['', '']];
+    options = [["", ""]];
   }
   this.parentValue_ = parentValue;
   this.options_ = options;
 
-  var currentValue = this.getValue();
-  var currentValueIsValid = false;
-  var firstOption = null;
-  for (var i = 0; i < options.length; i++) {
+  const currentValue = this.getValue();
+  let currentValueIsValid = false;
+  let firstOption = null;
+  for (let i = 0; i < options.length; i++) {
     if (options[i] == Blockly.FieldDropdown.SEPARATOR) {
       continue;
     }
@@ -151,7 +166,7 @@ Blockly.FieldDependentDropdown.prototype.updateOptions_ = function(
     }
   }
   if (!firstOption) {
-    firstOption = ['', ''];
+    firstOption = ["", ""];
     this.options_ = [firstOption];
   }
   if (!currentValueIsValid) {
@@ -166,9 +181,9 @@ Blockly.FieldDependentDropdown.prototype.updateOptions_ = function(
  * parent's setValue work, in addition to changes made through its validator.
  * @return {!Array.<!Array>} Dropdown option tuples.
  */
-Blockly.FieldDependentDropdown.prototype.getOptions = function() {
+Blockly.FieldDependentDropdown.prototype.getOptions = function () {
   if (this.parentField_) {
-    var parentValue = this.parentField_.getValue();
+    const parentValue = this.parentField_.getValue();
     this.updateOptions_(parentValue);
   }
   return this.options_;
@@ -179,7 +194,7 @@ Blockly.FieldDependentDropdown.prototype.getOptions = function() {
  * arrays.
  * @return {boolean} True.
  */
-Blockly.FieldDependentDropdown.prototype.isOptionListDynamic = function() {
+Blockly.FieldDependentDropdown.prototype.isOptionListDynamic = function () {
   return true;
 };
 
@@ -189,43 +204,52 @@ Blockly.FieldDependentDropdown.prototype.isOptionListDynamic = function() {
  * @param {!Blockly.Input} _input The input the field was added into.
  * @param {!Blockly.Block} block The block the field was added into.
  */
-Blockly.FieldDependentDropdown.prototype.insertedInto = function(_input, block) {
-  var parentField = block.getField(this.parentName_);
+Blockly.FieldDependentDropdown.prototype.insertedInto = function (
+  _input,
+  block
+) {
+  const parentField = block.getField(this.parentName_);
   if (!parentField) {
-    throw new Error('FieldDependentDropdown parent field "' +
-        this.parentName_ + '" was not found on block "' + block.type + '". ' +
-        'The parent field must be added before the dependent field.');
+    throw new Error(
+      'FieldDependentDropdown parent field "' +
+        this.parentName_ +
+        '" was not found on block "' +
+        block.type +
+        '". ' +
+        "The parent field must be added before the dependent field."
+    );
   }
 
   this.parentField_ = parentField;
-  var state = parentField.dependentDropdownState_;
+  let state = parentField.dependentDropdownState_;
   if (!state) {
     state = {
       children: [],
       originalValidator: parentField.getValidator(),
-      originalSetValue: parentField.setValue
+      originalSetValue: parentField.setValue,
     };
-    state.validator = function(newValue) {
-      var validatedValue = state.originalValidator ?
-          state.originalValidator.call(this, newValue) : newValue;
+    state.validator = function (newValue) {
+      let validatedValue = state.originalValidator
+        ? state.originalValidator.call(this, newValue)
+        : newValue;
       if (validatedValue === undefined) {
         validatedValue = newValue;
       }
       if (validatedValue === null) {
         return null;
       }
-      var children = state.children.slice();
-      for (var i = 0; i < children.length; i++) {
+      const children = state.children.slice();
+      for (let i = 0; i < children.length; i++) {
         children[i].updateOptions_(validatedValue);
       }
       return validatedValue;
     };
-    state.setValue = function(newValue) {
-      var oldValue = this.getValue();
+    state.setValue = function (newValue) {
+      const oldValue = this.getValue();
       state.originalSetValue.call(this, newValue);
       if (oldValue != this.getValue()) {
-        var children = state.children.slice();
-        for (var i = 0; i < children.length; i++) {
+        const children = state.children.slice();
+        for (let i = 0; i < children.length; i++) {
           children[i].updateOptions_(this.getValue());
         }
       }
@@ -243,14 +267,14 @@ Blockly.FieldDependentDropdown.prototype.insertedInto = function(_input, block) 
  * Remove this field from its parent's dependent field list.
  * @private
  */
-Blockly.FieldDependentDropdown.prototype.detachFromParent_ = function() {
-  var parentField = this.parentField_;
-  var state = parentField && parentField.dependentDropdownState_;
+Blockly.FieldDependentDropdown.prototype.detachFromParent_ = function () {
+  const parentField = this.parentField_;
+  const state = parentField && parentField.dependentDropdownState_;
   if (!state) {
     return;
   }
 
-  var index = state.children.indexOf(this);
+  const index = state.children.indexOf(this);
   if (index !== -1) {
     state.children.splice(index, 1);
   }
@@ -268,11 +292,13 @@ Blockly.FieldDependentDropdown.prototype.detachFromParent_ = function() {
 /**
  * Dispose of this field.
  */
-Blockly.FieldDependentDropdown.prototype.dispose = function() {
+Blockly.FieldDependentDropdown.prototype.dispose = function () {
   this.detachFromParent_();
   this.parentField_ = null;
   Blockly.FieldDependentDropdown.superClass_.dispose.call(this);
 };
 
-Blockly.Field.register('field_dependent_dropdown',
-    Blockly.FieldDependentDropdown);
+Blockly.Field.register(
+  "field_dependent_dropdown",
+  Blockly.FieldDependentDropdown
+);

@@ -13,7 +13,7 @@ const CLOSURE_ROOT = "node_modules";
 const CLOSURE_LIBRARY = "google-closure-library";
 
 const LICENSE_RE =
-  /\/\*\n\n [\w ]+\n\n Copyright \d+ Google Inc\.\n https:\/\/developers\.google\.com\/blockly\/\n\n Licensed under the Apache License, Version 2\.0 \(the "License"\);\n you may not use this file except in compliance with the License\.\n You may obtain a copy of the License at\n\n   http:\/\/www\.apache\.org\/licenses\/LICENSE-2\.0\n\n Unless required by applicable law or agreed to in writing, software\n distributed under the License is distributed on an "AS IS" BASIS,\n WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied\.\n See the License for the specific language governing permissions and\n limitations under the License\.\n\*\//g;
+  /\/\*\n\n [\w ]+\n\n Copyright \d+ Google Inc\.\n https:\/\/developers\.google\.com\/blockly\/\n\n Licensed under the Apache License, Version 2\.0 \(the "License"\);\n you may not use this file except in compliance with the License\.\n You may obtain a copy of the License at\n\n {3}http:\/\/www\.apache\.org\/licenses\/LICENSE-2\.0\n\n Unless required by applicable law or agreed to in writing, software\n distributed under the License is distributed on an "AS IS" BASIS,\n WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied\.\n See the License for the specific language governing permissions and\n limitations under the License\.\n\*\//g;
 
 const toForward = (p) => p.replace(/\\/g, "/");
 
@@ -23,7 +23,7 @@ const findClosureBase = () => {
     CLOSURE_LIBRARY,
     "closure",
     "goog",
-    "base.js",
+    "base.js"
   );
   if (fs.existsSync(p)) return path.resolve(p);
   throw new Error("Closure base.js not found at " + p);
@@ -51,7 +51,7 @@ const writeFile = (target, code, remove) => {
 };
 
 const buildCompressedCore = () => {
-  const target = "blockly_compressed_vertical.js";
+  const target = "blockly_compressed.js";
   const closureDir = path.join(CLOSURE_ROOT, CLOSURE_LIBRARY);
 
   const args = [
@@ -63,7 +63,7 @@ const buildCompressedCore = () => {
     "--js=" + toForward(path.join(closureDir, "closure", "goog", "**.js")),
     "--js=" +
       toForward(
-        path.join(closureDir, "third_party", "closure", "goog", "**.js"),
+        path.join(closureDir, "third_party", "closure", "goog", "**.js")
       ),
     "--js=core/**.js",
     "--entry_point=Blockly",
@@ -75,11 +75,8 @@ const buildCompressedCore = () => {
   });
 };
 
-const buildCompressedBlocks = (common) => {
-  const target =
-    (common ? "blocks_compressed" : "blocks_compressed_vertical") + ".js";
-  const dir = common ? "blocks_common" : "blocks_vertical";
-
+const buildCompressedBlocks = () => {
+  const target = "blocks_compressed.js";
   const args = [
     "--compilation_level=SIMPLE",
     "--js=build/gen_blocks.js",
@@ -87,12 +84,14 @@ const buildCompressedBlocks = (common) => {
     "--js=core/constants.js",
   ];
 
-  fs.readdirSync(dir)
-    .filter((f) => f.endsWith(".js"))
-    .sort()
-    .forEach((f) => {
-      args.push("--js=" + path.join(dir, f).replace(/\\/g, "/"));
-    });
+  ["blocks_common", "blocks"].forEach((dir) => {
+    fs.readdirSync(dir)
+      .filter((f) => f.endsWith(".js"))
+      .sort()
+      .forEach((f) => {
+        args.push("--js=" + path.join(dir, f).replace(/\\/g, "/"));
+      });
+  });
 
   return runCompiler(args).then((stdout) => {
     writeFile(target, stdout, "var Blockly={Blocks:{}};");
@@ -100,7 +99,7 @@ const buildCompressedBlocks = (common) => {
 };
 
 const buildUncompressed = () => {
-  const target = "blockly_uncompressed_vertical.js";
+  const target = "blockly_uncompressed.js";
   const closureBase = findClosureBase();
   const closureBaseDir = path.dirname(closureBase);
   const closureDir = "/node_modules";
@@ -116,7 +115,7 @@ const buildUncompressed = () => {
     "window.BLOCKLY_DIR = (function() {",
     "  if (!isNodeJS) {",
     "    var scripts = document.getElementsByTagName('script');",
-    "    var re = /(.+)[\\\\/]blockly_uncompressed(_vertical|_horizontal|)\\.js$/;",
+    "    var re = /(.+)[\\\\/]blockly_uncompressed\\.js$/;",
     "    for (var i = 0, script; script = scripts[i]; i++) {",
     "      var match = re.exec(script.src);",
     "      if (match) {",
@@ -214,7 +213,7 @@ const main = () => {
             expected +
             '"\nGot: "' +
             stdout.trim() +
-            '"',
+            '"'
         );
       }
       console.log("Compiler self-test passed.\n");
@@ -222,11 +221,7 @@ const main = () => {
       buildUncompressed();
       if (onlyUncompressed) return;
 
-      return Promise.all([
-        buildCompressedCore(),
-        buildCompressedBlocks(false),
-        buildCompressedBlocks(true),
-      ]);
+      return Promise.all([buildCompressedCore(), buildCompressedBlocks()]);
     })
     .then(() => {
       const endTime = Date.now();

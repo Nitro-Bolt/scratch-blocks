@@ -1,46 +1,33 @@
-const es = require('event-stream');
-const fs = require('fs');
-const path = require('path');
-const assert = require('assert');
+const fs = require("fs");
+const path = require("path");
+const assert = require("assert");
 
-// Storage object
 const storage = {};
+const inputPath = path.resolve(__dirname, "../msg/messages.js");
+const outputPath = path.resolve(__dirname, "../msg/json/en.json");
 
-// File paths
-const PATH_INPUT = path.resolve(__dirname, '../msg/messages.js');
-const PATH_OUTPUT = path.resolve(__dirname, '../msg/json/en.json');
-
-// Match function
-const match = function (str) {
-    if (str.indexOf('Blockly.Msg.') !== 0) return false;
-    assert.notStrictEqual(str.indexOf('";'), str.length - 2, `[${str}] uses double quoted string, should use single quotes.`);
-    if (str.indexOf("';") !== str.length - 2) return false;
-    return true;
-}
-
-// Extract key and value from message definition
-const extract = function (str) {
-    str = str.split('Blockly.Msg.')[1].split(' ');
-    return {
-        key: str[0],
-        value: str
-            .splice(2, str.length)
-            .join(' ')
-            .slice(1, -2) // strip off initial ', and ending ';
-            .replace(/\\'/g, "'")
-    };
+const matchesMessage = (line) => {
+  if (!line.startsWith("Blockly.Msg.")) return false;
+  assert.notStrictEqual(
+    line.indexOf('";'),
+    line.length - 2,
+    `[${line}] uses double quoted string, should use single quotes.`
+  );
+  return line.endsWith("';");
 };
 
-// Stream input and push each match to the storage object
-const stream = fs.createReadStream(PATH_INPUT);
-stream
-    .pipe(es.split())
-    .pipe(es.mapSync(function (str) {
-        if (!match(str)) return;
-        const result = extract(str);
-        storage[result.key] = result.value;
-    }))
-    .pipe(es.wait(function (err) {
-        if (err) throw new Error(err);
-        fs.writeFileSync(PATH_OUTPUT, JSON.stringify(storage, null, 4));
-    }));
+const extractMessage = (line) => {
+  const parts = line.slice("Blockly.Msg.".length).split(" ");
+  return {
+    key: parts[0],
+    value: parts.slice(2).join(" ").slice(1, -2).replace(/\\'/g, "'"),
+  };
+};
+
+for (const line of fs.readFileSync(inputPath, "utf8").split(/\r?\n/)) {
+  if (!matchesMessage(line)) continue;
+  const message = extractMessage(line);
+  storage[message.key] = message.value;
+}
+
+fs.writeFileSync(outputPath, JSON.stringify(storage, null, 4));

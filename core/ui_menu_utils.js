@@ -22,14 +22,13 @@
  * @fileoverview Utility methods for working with the closure menu (goog.ui.menu).
  * @author fenichel@google.com (Rachel Fenichel)
  */
-'use strict';
+"use strict";
 
 /**
  * @name Blockly.utils.uiMenu
  * @namespace
  **/
-goog.provide('Blockly.utils.uiMenu');
-
+goog.provide("Blockly.utils.uiMenu");
 
 /**
  * Get the size of a rendered goog.ui.Menu.
@@ -37,9 +36,9 @@ goog.provide('Blockly.utils.uiMenu');
  * @return {!goog.math.Size} Object with width and height properties.
  * @package
  */
-Blockly.utils.uiMenu.getSize = function(menu) {
-  var menuDom = menu.getElement();
-  var menuSize = goog.style.getSize(menuDom);
+Blockly.utils.uiMenu.getSize = function (menu) {
+  const menuDom = menu.getElement();
+  const menuSize = goog.style.getSize(menuDom);
   // Recalculate height for the total content, not only box height.
   menuSize.height = menuDom.scrollHeight;
   return menuSize;
@@ -59,8 +58,11 @@ Blockly.utils.uiMenu.getSize = function(menu) {
  *     widget div, in window coordinates.
  * @package
  */
-Blockly.utils.uiMenu.adjustBBoxesForRTL = function(viewportBBox, anchorBBox,
-    menuSize) {
+Blockly.utils.uiMenu.adjustBBoxesForRTL = function (
+  viewportBBox,
+  anchorBBox,
+  menuSize
+) {
   anchorBBox.left += menuSize.width;
   anchorBBox.right += menuSize.width;
   viewportBBox.left += menuSize.width;

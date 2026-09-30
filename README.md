@@ -1,15 +1,15 @@
 ## Playgrounds
 
- - **Vertical blocks**: https://nitro-bolt.github.io/scratch-blocks/tests/vertical_playground_compressed.html
+- **Scratch Blocks playground**: https://nitro-bolt.github.io/scratch-blocks/playgrounds/tests/playground_compressed.html
 
 ## Local development
 
-Requires Node.js (16 or later), Python (2 or 3), and Java. It is known to work in these environments but should work in many others:
+Requires Node.js (16 or later) and Java. It is known to work in these environments but should work in many others:
 
- - Windows 10, Python 3.12.1 (python.org installer), Node.js 21.6.1 (nodejs.org installer), Java 8 (java.com installer)
- - Windows 10, Python 3.12.1 (Microsoft Store), Node.js 20.10.0 (nodejs.org installer), Java 11 (Temurin-11.0.21+9)
- - macOS 14.2.1, Python 3.11.6 (Apple), Node.js 20.10.0 (installed manually), Java 21 (Temurin-21.0.1+12)
- - Ubuntu 22.04, Python 3.10.12 (python3 package), Node.js 20.10.0 (installed manually), Java 11 (openjdk-11-jre package)
+ - Windows 10, Node.js 21.6.1 (nodejs.org installer), Java 8 (java.com installer)
+ - Windows 10, Node.js 20.10.0 (nodejs.org installer), Java 11 (Temurin-11.0.21+9)
+ - macOS 14.2.1, Node.js 20.10.0 (installed manually), Java 21 (Temurin-21.0.1+12)
+ - Ubuntu 22.04, Node.js 20.10.0 (installed manually), Java 11 (openjdk-11-jre package)
 
 Install dependencies:
 
@@ -17,7 +17,7 @@ Install dependencies:
 npm ci
 ```
 
-Open `tests/vertical_playground.html` in a browser for development. You don't need to rebuild compressed versions for most changes. Open `tests/vertical_playground_compressed.html` instead to test if the compressed versions built properly.
+Open `tests/playground.html` in a browser for development. You don't need to rebuild compressed versions for most changes. Open `tests/playground_compressed.html` instead to test if the compressed versions built properly.
 
 To re-build compressed versions, run:
 
@@ -39,10 +39,10 @@ Scratch Blocks is a fork of Google's [Blockly](https://github.com/google/blockly
 
 *This project is in active development and should be considered a "developer preview" at this time.*
 
-## Two Types of Blocks
+## Scratch Blocks
 ![](https://cloud.githubusercontent.com/assets/747641/15255731/dad4d028-190b-11e6-9c16-8df7445adc96.png)
 
-Scratch Blocks brings together two different programming "grammars" that the Scratch Team has designed and continued to refine over the past decade. The standard [Scratch](https://scratch.mit.edu) grammar uses blocks that snap together vertically, much like LEGO bricks. For our [ScratchJr](https://scratchjr.org) software, intended for younger children, we developed blocks that are labelled with icons rather than words, and snap together horizontally rather than vertically. We have found that the horizontal grammar is not only friendlier for beginning programmers but also better suited for devices with small screens.
+Scratch Blocks provides the standard [Scratch](https://scratch.mit.edu) grammar, with blocks that snap together vertically much like LEGO bricks.
 
 ## Documentation
 The "getting started" guide including [FAQ](https://scratch.mit.edu/developers#faq) and [design documentation](https://github.com/LLK/scratch-blocks/wiki/Design) can be found in the [wiki](https://github.com/LLK/scratch-blocks/wiki).

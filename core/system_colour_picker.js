@@ -1,6 +1,6 @@
-'use strict';
+"use strict";
 
-goog.provide('Blockly.SystemColourPicker');
+goog.provide("Blockly.SystemColourPicker");
 
 /**
  * Global brightness threshold used to decide whether a bright block
@@ -16,32 +16,31 @@ Blockly.LABEL_CONTRAST_THRESHOLD = 190;
  * @param {!Function} callback Called with the selected colour.
  * @return {!Element} The SVG foreignObject containing the native input.
  */
-Blockly.SystemColourPicker.attach = function(anchor, getColour, callback) {
-  var control = document.createElementNS('http://www.w3.org/2000/svg',
-      'foreignObject');
-  control.setAttribute('width', anchor.getAttribute('width'));
-  control.setAttribute('height', anchor.getAttribute('height'));
-  control.setAttribute('x', anchor.getAttribute('x') || 0);
-  control.setAttribute('y', anchor.getAttribute('y'));
+Blockly.SystemColourPicker.attach = function (anchor, getColour, callback) {
+  const control = document.createElementNS(
+    "http://www.w3.org/2000/svg",
+    "foreignObject"
+  );
+  control.setAttribute("width", anchor.getAttribute("width"));
+  control.setAttribute("height", anchor.getAttribute("height"));
+  control.setAttribute("x", anchor.getAttribute("x") || 0);
+  control.setAttribute("y", anchor.getAttribute("y"));
   anchor.parentNode.appendChild(control);
-  var input = document.createElementNS('http://www.w3.org/1999/xhtml', 'input');
-  input.type = 'color';
-  input.style.width = '100%';
-  input.style.height = '100%';
-  input.style.opacity = '0';
-  input.style.cursor = 'pointer';
-  input.style.margin = '0';
-  input.style.padding = '0';
-  input.style.border = '0';
+  const input = document.createElementNS(
+    "http://www.w3.org/1999/xhtml",
+    "input"
+  );
+  input.type = "color";
+  input.classList.add("blocklySystemColourInput");
   control.appendChild(input);
-  input.addEventListener('mousedown', function(e) {
-    input.value = getColour() || '#fef49c';
+  input.addEventListener("mousedown", (e) => {
+    input.value = getColour() || "#fef49c";
     e.stopPropagation();
   });
-  input.addEventListener('input', function() {
+  input.addEventListener("input", () => {
     callback(input.value);
   });
-  input.addEventListener('click', function(e) {
+  input.addEventListener("click", (e) => {
     e.stopPropagation();
   });
   return control;
@@ -53,11 +52,15 @@ Blockly.SystemColourPicker.attach = function(anchor, getColour, callback) {
  * @param {?number} limit Brightness limit.
  * @return {boolean} Whether white text should be used.
  */
-Blockly.SystemColourPicker.isDark = function(colour, limit) {
-  if (limit === null || limit === (void 0)) limit = 128;
-  var match = /^#([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})$/i.exec(colour || '');
+Blockly.SystemColourPicker.isDark = function (colour, limit = 128) {
+  const match = /^#([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})$/i.exec(
+    colour || ""
+  );
   if (!match) return false;
-  var brightness = (299 * parseInt(match[1], 16) +
-      587 * parseInt(match[2], 16) + 114 * parseInt(match[3], 16)) / 1000;
+  const brightness =
+    (299 * parseInt(match[1], 16) +
+      587 * parseInt(match[2], 16) +
+      114 * parseInt(match[3], 16)) /
+    1000;
   return brightness < limit;
 };

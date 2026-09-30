@@ -22,17 +22,16 @@
  * @fileoverview Object representing a code comment on the workspace.
  * @author fenichel@google.com (Rachel Fenichel)
  */
-'use strict';
+"use strict";
 
-goog.provide('Blockly.WorkspaceComment');
+goog.provide("Blockly.WorkspaceComment");
 
-goog.require('Blockly.Events.CommentChange');
-goog.require('Blockly.Events.CommentCreate');
-goog.require('Blockly.Events.CommentDelete');
-goog.require('Blockly.Events.CommentMove');
+goog.require("Blockly.Events.CommentChange");
+goog.require("Blockly.Events.CommentCreate");
+goog.require("Blockly.Events.CommentDelete");
+goog.require("Blockly.Events.CommentMove");
 
-goog.require('goog.math.Coordinate');
-
+goog.require("goog.math.Coordinate");
 
 /**
  * Class for a workspace comment.
@@ -47,10 +46,20 @@ goog.require('goog.math.Coordinate');
  * @param {string=} opt_colour Optional custom colour.
  * @constructor
  */
-Blockly.WorkspaceComment = function(workspace, content, height, width, minimized, opt_id, opt_colour) {
+Blockly.WorkspaceComment = function (
+  workspace,
+  content,
+  height,
+  width,
+  minimized,
+  opt_id,
+  opt_colour
+) {
   /** @type {string} */
-  this.id = (opt_id && !workspace.getCommentById(opt_id)) ?
-      opt_id : Blockly.utils.genUid();
+  this.id =
+    opt_id && !workspace.getCommentById(opt_id)
+      ? opt_id
+      : Blockly.utils.genUid();
 
   workspace.addTopComment(this);
 
@@ -138,7 +147,7 @@ Blockly.WorkspaceComment.MAX_LABEL_LENGTH = 12;
  * Dispose of this comment.
  * @package
  */
-Blockly.WorkspaceComment.prototype.dispose = function() {
+Blockly.WorkspaceComment.prototype.dispose = function () {
   if (!this.workspace) {
     // The comment has already been deleted.
     return;
@@ -161,7 +170,7 @@ Blockly.WorkspaceComment.prototype.dispose = function() {
  * @return {number} comment height.
  * @package
  */
-Blockly.WorkspaceComment.prototype.getHeight = function() {
+Blockly.WorkspaceComment.prototype.getHeight = function () {
   return this.height_;
 };
 
@@ -170,7 +179,7 @@ Blockly.WorkspaceComment.prototype.getHeight = function() {
  * @param {number} height comment height.
  * @package
  */
-Blockly.WorkspaceComment.prototype.setHeight = function(height) {
+Blockly.WorkspaceComment.prototype.setHeight = function (height) {
   this.height_ = height;
 };
 
@@ -179,7 +188,7 @@ Blockly.WorkspaceComment.prototype.setHeight = function(height) {
  * @return {number} comment width.
  * @package
  */
-Blockly.WorkspaceComment.prototype.getWidth = function() {
+Blockly.WorkspaceComment.prototype.getWidth = function () {
   return this.width_;
 };
 
@@ -188,7 +197,7 @@ Blockly.WorkspaceComment.prototype.getWidth = function() {
  * @param {number} width comment width.
  * @package
  */
-Blockly.WorkspaceComment.prototype.setWidth = function(width) {
+Blockly.WorkspaceComment.prototype.setWidth = function (width) {
   this.width_ = width;
 };
 
@@ -197,8 +206,8 @@ Blockly.WorkspaceComment.prototype.setWidth = function(width) {
  * @return {{height: number, width: number}} The height and width of this comment;
  *     these numbers do not change as the workspace scales.
  */
-Blockly.WorkspaceComment.prototype.getHeightWidth = function() {
-  return {height: this.height_, width: this.width_};
+Blockly.WorkspaceComment.prototype.getHeightWidth = function () {
+  return { height: this.height_, width: this.width_ };
 };
 
 /**
@@ -207,7 +216,7 @@ Blockly.WorkspaceComment.prototype.getHeightWidth = function() {
  *     valid if the comment is currently being dragged.
  * @package
  */
-Blockly.WorkspaceComment.prototype.getXY = function() {
+Blockly.WorkspaceComment.prototype.getXY = function () {
   return this.xy_.clone();
 };
 
@@ -217,8 +226,8 @@ Blockly.WorkspaceComment.prototype.getXY = function() {
  * @param {number} dy Vertical offset, in workspace units.
  * @package
  */
-Blockly.WorkspaceComment.prototype.moveBy = function(dx, dy) {
-  var event = new Blockly.Events.CommentMove(this);
+Blockly.WorkspaceComment.prototype.moveBy = function (dx, dy) {
+  const event = new Blockly.Events.CommentMove(this);
   this.xy_.translate(dx, dy);
   event.recordNew();
   Blockly.Events.fire(event);
@@ -229,9 +238,10 @@ Blockly.WorkspaceComment.prototype.moveBy = function(dx, dy) {
  * @return {boolean} True if deletable.
  * @package
  */
-Blockly.WorkspaceComment.prototype.isDeletable = function() {
-  return this.deletable_ &&
-      !(this.workspace && this.workspace.options.readOnly);
+Blockly.WorkspaceComment.prototype.isDeletable = function () {
+  return (
+    this.deletable_ && !(this.workspace && this.workspace.options.readOnly)
+  );
 };
 
 /**
@@ -239,7 +249,7 @@ Blockly.WorkspaceComment.prototype.isDeletable = function() {
  * @param {boolean} deletable True if deletable.
  * @package
  */
-Blockly.WorkspaceComment.prototype.setDeletable = function(deletable) {
+Blockly.WorkspaceComment.prototype.setDeletable = function (deletable) {
   this.deletable_ = deletable;
 };
 
@@ -248,9 +258,8 @@ Blockly.WorkspaceComment.prototype.setDeletable = function(deletable) {
  * @return {boolean} True if movable.
  * @package
  */
-Blockly.WorkspaceComment.prototype.isMovable = function() {
-  return this.movable_ &&
-      !(this.workspace && this.workspace.options.readOnly);
+Blockly.WorkspaceComment.prototype.isMovable = function () {
+  return this.movable_ && !(this.workspace && this.workspace.options.readOnly);
 };
 
 /**
@@ -258,7 +267,7 @@ Blockly.WorkspaceComment.prototype.isMovable = function() {
  * @param {boolean} movable True if movable.
  * @package
  */
-Blockly.WorkspaceComment.prototype.setMovable = function(movable) {
+Blockly.WorkspaceComment.prototype.setMovable = function (movable) {
   this.movable_ = movable;
 };
 
@@ -267,7 +276,7 @@ Blockly.WorkspaceComment.prototype.setMovable = function(movable) {
  * @return {string} Comment text.
  * @package
  */
-Blockly.WorkspaceComment.prototype.getText = function() {
+Blockly.WorkspaceComment.prototype.getText = function () {
   return this.content_;
 };
 
@@ -276,22 +285,32 @@ Blockly.WorkspaceComment.prototype.getText = function() {
  * @param {string} text Comment text.
  * @package
  */
-Blockly.WorkspaceComment.prototype.setText = function(text) {
+Blockly.WorkspaceComment.prototype.setText = function (text) {
   if (this.content_ != text) {
-    Blockly.Events.fire(new Blockly.Events.CommentChange(
-        this, {text: this.content_}, {text: text}));
+    Blockly.Events.fire(
+      new Blockly.Events.CommentChange(
+        this,
+        { text: this.content_ },
+        { text: text }
+      )
+    );
     this.content_ = text;
   }
 };
 
-Blockly.WorkspaceComment.prototype.getColour = function() {
-  return this.colour_ || '#fef49c';
+Blockly.WorkspaceComment.prototype.getColour = function () {
+  return this.colour_ || "#fef49c";
 };
 
-Blockly.WorkspaceComment.prototype.setColour = function(colour) {
+Blockly.WorkspaceComment.prototype.setColour = function (colour) {
   if (this.colour_ == colour) return;
-  Blockly.Events.fire(new Blockly.Events.CommentChange(
-      this, {colour: this.colour_}, {colour: colour}));
+  Blockly.Events.fire(
+    new Blockly.Events.CommentChange(
+      this,
+      { colour: this.colour_ },
+      { colour: colour }
+    )
+  );
   this.colour_ = colour;
   if (this.rendered_) this.applyColour_();
 };
@@ -301,7 +320,7 @@ Blockly.WorkspaceComment.prototype.setColour = function(colour) {
  * @return {boolean} True if minimized
  * @package
  */
-Blockly.WorkspaceComment.prototype.isMinimized = function() {
+Blockly.WorkspaceComment.prototype.isMinimized = function () {
   return this.isMinimized_;
 };
 
@@ -311,12 +330,12 @@ Blockly.WorkspaceComment.prototype.isMinimized = function() {
  * @return {!Element} Tree of XML elements.
  * @package
  */
-Blockly.WorkspaceComment.prototype.toXmlWithXY = function(opt_noId) {
-  var element = this.toXml(opt_noId);
-  element.setAttribute('x', Math.round(this.xy_.x));
-  element.setAttribute('y', Math.round(this.xy_.y));
-  element.setAttribute('h', this.height_);
-  element.setAttribute('w', this.width_);
+Blockly.WorkspaceComment.prototype.toXmlWithXY = function (opt_noId) {
+  const element = this.toXml(opt_noId);
+  element.setAttribute("x", Math.round(this.xy_.x));
+  element.setAttribute("y", Math.round(this.xy_.y));
+  element.setAttribute("h", this.height_);
+  element.setAttribute("w", this.width_);
   return element;
 };
 
@@ -326,12 +345,18 @@ Blockly.WorkspaceComment.prototype.toXmlWithXY = function(opt_noId) {
  * @return {string} The truncated comment text
  * @package
  */
-Blockly.WorkspaceComment.prototype.getLabelText = function() {
+Blockly.WorkspaceComment.prototype.getLabelText = function () {
   if (this.content_.length > Blockly.WorkspaceComment.MAX_LABEL_LENGTH) {
     if (this.RTL) {
-      return '\u2026' + this.content_.slice(0, Blockly.WorkspaceComment.MAX_LABEL_LENGTH);
+      return (
+        "\u2026" +
+        this.content_.slice(0, Blockly.WorkspaceComment.MAX_LABEL_LENGTH)
+      );
     }
-    return this.content_.slice(0, Blockly.WorkspaceComment.MAX_LABEL_LENGTH) + '\u2026';
+    return (
+      this.content_.slice(0, Blockly.WorkspaceComment.MAX_LABEL_LENGTH) +
+      "\u2026"
+    );
   } else {
     return this.content_;
   }
@@ -344,15 +369,15 @@ Blockly.WorkspaceComment.prototype.getLabelText = function() {
  * @return {!Element} Tree of XML elements.
  * @package
  */
-Blockly.WorkspaceComment.prototype.toXml = function(opt_noId) {
-  var commentElement = goog.dom.createDom('comment');
+Blockly.WorkspaceComment.prototype.toXml = function (opt_noId) {
+  const commentElement = goog.dom.createDom("comment");
   if (!opt_noId) {
-    commentElement.setAttribute('id', this.id);
+    commentElement.setAttribute("id", this.id);
   }
   if (this.isMinimized_) {
-    commentElement.setAttribute('minimized', true);
+    commentElement.setAttribute("minimized", true);
   }
-  if (this.colour_) commentElement.setAttribute('colour', this.colour_);
+  if (this.colour_) commentElement.setAttribute("colour", this.colour_);
   commentElement.textContent = this.getText();
   return commentElement;
 };
@@ -362,9 +387,9 @@ Blockly.WorkspaceComment.prototype.toXml = function(opt_noId) {
  * @param {!Blockly.WorkspaceComment} comment The comment that was just created.
  * @package
  */
-Blockly.WorkspaceComment.fireCreateEvent = function(comment) {
+Blockly.WorkspaceComment.fireCreateEvent = function (comment) {
   if (Blockly.Events.isEnabled()) {
-    var existingGroup = Blockly.Events.getGroup();
+    const existingGroup = Blockly.Events.getGroup();
     if (!existingGroup) {
       Blockly.Events.setGroup(true);
     }
@@ -385,11 +410,18 @@ Blockly.WorkspaceComment.fireCreateEvent = function(comment) {
  * @return {!Blockly.WorkspaceComment} The created workspace comment.
  * @package
  */
-Blockly.WorkspaceComment.fromXml = function(xmlComment, workspace) {
-  var info = Blockly.WorkspaceComment.parseAttributes(xmlComment);
+Blockly.WorkspaceComment.fromXml = function (xmlComment, workspace) {
+  const info = Blockly.WorkspaceComment.parseAttributes(xmlComment);
 
-  var comment = new Blockly.WorkspaceComment(
-      workspace, info.content, info.h, info.w, info.minimized, info.id, info.colour);
+  const comment = new Blockly.WorkspaceComment(
+    workspace,
+    info.content,
+    info.h,
+    info.w,
+    info.minimized,
+    info.id,
+    info.colour
+  );
 
   if (!isNaN(info.x) && !isNaN(info.y)) {
     comment.moveBy(info.x, info.y);
@@ -405,13 +437,13 @@ Blockly.WorkspaceComment.fromXml = function(xmlComment, workspace) {
  * @return {!Object} An object containing the information about the comment.
  * @package
  */
-Blockly.WorkspaceComment.parseAttributes = function(xml) {
-  var xmlH = xml.getAttribute('h');
-  var xmlW = xml.getAttribute('w');
+Blockly.WorkspaceComment.parseAttributes = function (xml) {
+  const xmlH = xml.getAttribute("h");
+  const xmlW = xml.getAttribute("w");
 
   return {
     /* @type {string} */
-    id: xml.getAttribute('id'),
+    id: xml.getAttribute("id"),
     /**
      * The height of the comment in workspace units, or 100 if not specified.
      * @type {number}
@@ -427,25 +459,25 @@ Blockly.WorkspaceComment.parseAttributes = function(xml) {
      * specified in the XML.
      * @type {number}
      */
-    x: parseInt(xml.getAttribute('x'), 10),
+    x: parseInt(xml.getAttribute("x"), 10),
     /**
      * The y position of the comment in workspace coordinates, or NaN if not
      * specified in the XML.
      * @type {number}
      */
-    y: parseInt(xml.getAttribute('y'), 10),
+    y: parseInt(xml.getAttribute("y"), 10),
     /**
      * Whether this comment is minimized. Defaults to false if not specified in
      * the XML.
      * @type {boolean}
      */
-    minimized: xml.getAttribute('minimized') == 'true' || false,
+    minimized: xml.getAttribute("minimized") == "true" || false,
     /**
      * Contains the color the comment was set to, if it was.
      * @type {string}
      */
-    colour: xml.getAttribute('colour') || null,
+    colour: xml.getAttribute("colour") || null,
     /* @type {string} */
-    content: xml.textContent
+    content: xml.textContent,
   };
 };

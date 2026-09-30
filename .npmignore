@@ -9,11 +9,9 @@
 /tests
 /webpack.config.js
 
-# Localization / I18N
-common.pyc
+# Project metadata
 .settings
 .project
-*.pyc
 *.komodoproject
 /nbproject/private/
 

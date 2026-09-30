@@ -22,15 +22,14 @@
  * @fileoverview Object representing an input (value, statement, or dummy).
  * @author fraser@google.com (Neil Fraser)
  */
-'use strict';
+"use strict";
 
-goog.provide('Blockly.Input');
+goog.provide("Blockly.Input");
 
-goog.require('Blockly.Connection');
-goog.require('Blockly.FieldCheckbox');
-goog.require('Blockly.FieldLabel');
-goog.require('goog.asserts');
-
+goog.require("Blockly.Connection");
+goog.require("Blockly.FieldCheckbox");
+goog.require("Blockly.FieldLabel");
+goog.require("goog.asserts");
 
 /**
  * Class for an input with an optional field.
@@ -41,9 +40,9 @@ goog.require('goog.asserts');
  * @param {Blockly.Connection} connection Optional connection for this input.
  * @constructor
  */
-Blockly.Input = function(type, name, block, connection) {
+Blockly.Input = function (type, name, block, connection) {
   if (type != Blockly.DUMMY_INPUT && !name) {
-    throw 'Value inputs and statement inputs must have non-empty name.';
+    throw "Value inputs and statement inputs must have non-empty name.";
   }
   /** @type {number} */
   this.type = type;
@@ -102,7 +101,7 @@ Blockly.Input.prototype.visible_ = true;
  *     this field again.  Should be unique to the host block.
  * @return {!Blockly.Input} The input being append to (to allow chaining).
  */
-Blockly.Input.prototype.appendField = function(field, opt_name) {
+Blockly.Input.prototype.appendField = function (field, opt_name) {
   this.insertFieldAt(this.fieldRow.length, field, opt_name);
   return this;
 };
@@ -116,9 +115,9 @@ Blockly.Input.prototype.appendField = function(field, opt_name) {
  *     this field again.  Should be unique to the host block.
  * @return {number} The index following the last inserted field.
  */
-Blockly.Input.prototype.insertFieldAt = function(index, field, opt_name) {
+Blockly.Input.prototype.insertFieldAt = function (index, field, opt_name) {
   if (index < 0 || index > this.fieldRow.length) {
-    throw new Error('index ' + index + ' out of bounds.');
+    throw new Error("index " + index + " out of bounds.");
   }
 
   // Empty string, Null or undefined generates no field, unless field is named.
@@ -163,8 +162,9 @@ Blockly.Input.prototype.insertFieldAt = function(index, field, opt_name) {
  * @param {string} name The name of the field.
  * @throws {goog.asserts.AssertionError} if the field is not present.
  */
-Blockly.Input.prototype.removeField = function(name) {
-  for (var i = 0, field; field = this.fieldRow[i]; i++) {
+Blockly.Input.prototype.removeField = function (name) {
+  let i, field;
+  for (i = 0; (field = this.fieldRow[i]); i++) {
     if (field.name === name) {
       this.fieldRow.splice(i, 1);
       field.dispose();
@@ -183,7 +183,7 @@ Blockly.Input.prototype.removeField = function(name) {
  * Gets whether this input is visible or not.
  * @return {boolean} True if visible.
  */
-Blockly.Input.prototype.isVisible = function() {
+Blockly.Input.prototype.isVisible = function () {
   return this.visible_;
 };
 
@@ -193,15 +193,16 @@ Blockly.Input.prototype.isVisible = function() {
  * @param {boolean} visible True if visible.
  * @return {!Array.<!Blockly.Block>} List of blocks to render.
  */
-Blockly.Input.prototype.setVisible = function(visible) {
-  var renderList = [];
+Blockly.Input.prototype.setVisible = function (visible) {
+  let y, field;
+  let renderList = [];
   if (this.visible_ == visible) {
     return renderList;
   }
   this.visible_ = visible;
 
-  var display = visible ? 'block' : 'none';
-  for (var y = 0, field; field = this.fieldRow[y]; y++) {
+  const display = visible ? "block" : "none";
+  for (y = 0; (field = this.fieldRow[y]); y++) {
     field.setVisible(visible);
   }
   if (this.connection) {
@@ -211,7 +212,7 @@ Blockly.Input.prototype.setVisible = function(visible) {
     } else {
       this.connection.hideAll();
     }
-    var child = this.connection.targetBlock();
+    const child = this.connection.targetBlock();
     if (child) {
       child.getSvgRoot().style.display = display;
       if (!visible) {
@@ -228,9 +229,9 @@ Blockly.Input.prototype.setVisible = function(visible) {
  *     list of value types.  Null if all types are compatible.
  * @return {!Blockly.Input} The input being modified (to allow chaining).
  */
-Blockly.Input.prototype.setCheck = function(check) {
+Blockly.Input.prototype.setCheck = function (check) {
   if (!this.connection) {
-    throw 'This input does not have a connection.';
+    throw "This input does not have a connection.";
   }
   this.connection.setCheck(check);
   return this;
@@ -242,7 +243,7 @@ Blockly.Input.prototype.setCheck = function(check) {
  *   In RTL mode directions are reversed, and ALIGN_RIGHT aligns to the left.
  * @return {!Blockly.Input} The input being modified (to allow chaining).
  */
-Blockly.Input.prototype.setAlign = function(align) {
+Blockly.Input.prototype.setAlign = function (align) {
   this.align = align;
   if (this.sourceBlock_.rendered) {
     this.sourceBlock_.render();
@@ -253,11 +254,11 @@ Blockly.Input.prototype.setAlign = function(align) {
 /**
  * Initialize the fields on this input.
  */
-Blockly.Input.prototype.init = function() {
+Blockly.Input.prototype.init = function () {
   if (!this.sourceBlock_.workspace.rendered) {
-    return;  // Headless blocks don't need fields initialized.
+    return; // Headless blocks don't need fields initialized.
   }
-  for (var i = 0; i < this.fieldRow.length; i++) {
+  for (let i = 0; i < this.fieldRow.length; i++) {
     this.fieldRow[i].init(this.sourceBlock_);
   }
 };
@@ -265,15 +266,16 @@ Blockly.Input.prototype.init = function() {
 /**
  * Sever all links to this input.
  */
-Blockly.Input.prototype.dispose = function() {
+Blockly.Input.prototype.dispose = function () {
+  let i, field;
   if (this.mouseDownWrapper_) {
     Blockly.unbindEvent_(this.mouseDownWrapper_);
     this.mouseDownWrapper_ = null;
   }
   if (this.outlinePath) {
-    goog.dom.removeNode(this.outlinePath);
+    if (this.outlinePath) this.outlinePath.remove();
   }
-  for (var i = 0, field; field = this.fieldRow[i]; i++) {
+  for (i = 0; (field = this.fieldRow[i]); i++) {
     field.dispose();
   }
   if (this.connection) {
@@ -287,23 +289,28 @@ Blockly.Input.prototype.dispose = function() {
  * @param {!SVGElement} svgRoot The parent on which ot append the new element.
  * @package
  */
-Blockly.Input.prototype.initOutlinePath = function(svgRoot) {
+Blockly.Input.prototype.initOutlinePath = function (svgRoot) {
   if (!this.sourceBlock_.workspace.rendered) {
-    return;  // Headless blocks don't need field outlines.
+    return; // Headless blocks don't need field outlines.
   }
   if (this.type != Blockly.INPUT_VALUE || this.outlinePath) {
     return;
   }
   this.outlinePath = Blockly.utils.createSvgElement(
-      'path',
-      {
-        'class': 'blocklyPath blocklyInputOutline',
-        'style': 'visibility: hidden', // Hide by default - shown when not connected.
-        'd': ''  // IE doesn't like paths without the data definition, set an empty default
-      },
-      svgRoot);
+    "path",
+    {
+      class: "blocklyPath blocklyInputOutline",
+      style: "visibility: hidden", // Hide by default - shown when not connected.
+      d: "", // IE doesn't like paths without the data definition, set an empty default
+    },
+    svgRoot
+  );
   this.mouseDownWrapper_ = Blockly.bindEventWithChecks_(
-      this.outlinePath, 'mousedown', this, this.onMouseDown_);
+    this.outlinePath,
+    "mousedown",
+    this,
+    this.onMouseDown_
+  );
 };
 
 /**
@@ -311,33 +318,33 @@ Blockly.Input.prototype.initOutlinePath = function(svgRoot) {
  * @param {!Event} e Mouse down event.
  * @private
  */
-Blockly.Input.prototype.onMouseDown_ = function(e) {
+Blockly.Input.prototype.onMouseDown_ = function (e) {
   if (!this.sourceBlock_ || !this.sourceBlock_.workspace) {
     return;
   }
   if (this.sourceBlock_.workspace.isDragging()) {
     return;
   }
-  var gesture = this.sourceBlock_.workspace.getGesture(e);
+  const gesture = this.sourceBlock_.workspace.getGesture(e);
   if (gesture) {
     gesture.setStartInput(this);
   }
 };
 
-Blockly.Input.prototype.isClickable = function() {
+Blockly.Input.prototype.isClickable = function () {
   if (!this.isVisible() || !this.sourceBlock_) return false;
   if (this.connection.isConnected()) return false;
 
-  var check = this.connection.check_ || [];
+  const check = this.connection.check_ || [];
 
-  if (check.indexOf('Boolean') !== -1) return true;
+  if (check.indexOf("Boolean") !== -1) return true;
   return false;
 };
 
-Blockly.Input.prototype.onClick = function() {
-  var check = this.connection.check_ || [];
+Blockly.Input.prototype.onClick = function () {
+  const check = this.connection.check_ || [];
 
-  if (check.indexOf('Boolean') !== -1) {
+  if (check.indexOf("Boolean") !== -1) {
     Blockly.FieldCheckbox.connectBoolean(this);
   }
 };

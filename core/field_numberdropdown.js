@@ -22,13 +22,11 @@
  * @fileoverview Combination number + drop-down field
  * @author tmickel@mit.edu (Tim Mickel)
  */
-'use strict';
+"use strict";
 
-goog.provide('Blockly.FieldNumberDropdown');
+goog.provide("Blockly.FieldNumberDropdown");
 
-goog.require('Blockly.FieldTextDropdown');
-goog.require('goog.userAgent');
-
+goog.require("Blockly.FieldTextDropdown");
 
 /**
  * Class for a combination number + drop-down field.
@@ -45,17 +43,30 @@ goog.require('goog.userAgent');
  * @extends {Blockly.FieldTextInput}
  * @constructor
  */
-Blockly.FieldNumberDropdown = function(value, menuGenerator, opt_min, opt_max,
-    opt_precision, opt_validator) {
+Blockly.FieldNumberDropdown = function (
+  value,
+  menuGenerator,
+  opt_min,
+  opt_max,
+  opt_precision,
+  opt_validator
+) {
   this.setConstraints_ = Blockly.FieldNumber.prototype.setConstraints_;
 
-  var numRestrictor = Blockly.FieldNumber.prototype.getNumRestrictor.call(
-      this, opt_min, opt_max, opt_precision
+  const numRestrictor = Blockly.FieldNumber.prototype.getNumRestrictor.call(
+    this,
+    opt_min,
+    opt_max,
+    opt_precision
   );
   Blockly.FieldNumberDropdown.superClass_.constructor.call(
-      this, value, menuGenerator, opt_validator, numRestrictor
+    this,
+    value,
+    menuGenerator,
+    opt_validator,
+    numRestrictor
   );
-  this.addArgType('numberdropdown');
+  this.addArgType("numberdropdown");
 };
 goog.inherits(Blockly.FieldNumberDropdown, Blockly.FieldTextDropdown);
 
@@ -67,11 +78,14 @@ goog.inherits(Blockly.FieldNumberDropdown, Blockly.FieldTextDropdown);
  * @package
  * @nocollapse
  */
-Blockly.FieldNumberDropdown.fromJson = function(element) {
+Blockly.FieldNumberDropdown.fromJson = function (element) {
   return new Blockly.FieldNumberDropdown(
-      element['value'], element['options'],
-      element['min'], element['max'], element['precision']
+    element["value"],
+    element["options"],
+    element["min"],
+    element["max"],
+    element["precision"]
   );
 };
 
-Blockly.Field.register('field_numberdropdown', Blockly.FieldNumberDropdown);
+Blockly.Field.register("field_numberdropdown", Blockly.FieldNumberDropdown);
