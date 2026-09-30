@@ -419,6 +419,10 @@ Blockly.RenderedConnection.prototype.connect_ = function (childConnection) {
       // Child block may need to square off its corners if it is in a stack.
       // Rendering a child will render its parent.
       childBlock.render();
+    } else if (childBlock.isDualBlock()) {
+      // Unlike ordinary reporters, a dual block changes its complete outline
+      // when its output is connected. Rendering it also bubbles to the parent.
+      childBlock.render();
     } else {
       // Child block does not change shape.  Rendering the parent node will
       // move its connected children into position.

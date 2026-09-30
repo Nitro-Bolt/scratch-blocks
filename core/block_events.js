@@ -528,17 +528,22 @@ Blockly.Events.Move.prototype.run = function (forward) {
       : coordinate.x;
     block.moveBy(rtlAwareX - xy.x, coordinate.y - xy.y);
   } else {
-    const blockConnection = block.outputConnection || block.previousConnection;
     let parentConnection;
+    let blockConnection;
     if (inputName) {
       const input = parentBlock.getInput(inputName);
       if (input) {
         parentConnection = input.connection;
+        blockConnection =
+          input.type == Blockly.INPUT_VALUE
+            ? block.outputConnection
+            : block.previousConnection;
       }
-    } else if (blockConnection.type == Blockly.PREVIOUS_STATEMENT) {
+    } else {
+      blockConnection = block.previousConnection;
       parentConnection = parentBlock.nextConnection;
     }
-    if (parentConnection) {
+    if (parentConnection && blockConnection) {
       blockConnection.connect(parentConnection);
     } else {
       console.warn("Can't connect to non-existent input: " + inputName);

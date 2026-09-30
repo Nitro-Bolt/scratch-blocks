@@ -860,7 +860,7 @@ Blockly.BlockSvg.prototype.render = function (opt_bubble) {
   // width that the first label needs to move over by.
 
   // If this is an extension reporter block, add a horizontal offset.
-  if (this.isScratchExtension && this.outputConnection) {
+  if (this.isScratchExtension && this.shouldRenderOutputShape()) {
     cursorX += this.RTL
       ? -Blockly.BlockSvg.GRID_UNIT
       : Blockly.BlockSvg.GRID_UNIT;
@@ -1144,7 +1144,7 @@ Blockly.BlockSvg.prototype.renderCompute_ = function (iconWidth) {
   // Dynamic padding for multi-row hexagonal and object outputs.
   const shape = this.getOutputShape();
   if (
-    this.outputConnection &&
+    this.shouldRenderOutputShape() &&
     (shape === Blockly.OUTPUT_SHAPE_HEXAGONAL ||
       shape === Blockly.OUTPUT_SHAPE_OBJECT)
   ) {
@@ -1259,14 +1259,14 @@ Blockly.BlockSvg.prototype.computeInputHeight_ = function (
 ) {
   if (
     this.inputList.length === 1 &&
-    this.outputConnection &&
+    this.shouldRenderOutputShape() &&
     !this.canDuplicateOnDrag() &&
     this.isShadow() &&
     !Blockly.scratchBlocksUtils.isShadowArgumentReporter(this)
   ) {
     // "Lone" field blocks are smaller.
     return Blockly.BlockSvg.MIN_BLOCK_Y_SINGLE_FIELD_OUTPUT;
-  } else if (this.outputConnection) {
+  } else if (this.shouldRenderOutputShape()) {
     // If this is an extension reporter block, make it taller.
     if (this.isScratchExtension) {
       return (
@@ -1284,7 +1284,11 @@ Blockly.BlockSvg.prototype.computeInputHeight_ = function (
   } else {
     // If this is an extension block, and it has a previous connection,
     // make it taller.
-    if (this.isScratchExtension && this.previousConnection) {
+    if (
+      this.isScratchExtension &&
+      this.previousConnection &&
+      this.shouldRenderStatementShape()
+    ) {
       return Blockly.BlockSvg.MIN_BLOCK_Y + 2 * Blockly.BlockSvg.GRID_UNIT;
     }
     // All other blocks.
@@ -1323,10 +1327,13 @@ Blockly.BlockSvg.prototype.computeRightEdge_ = function (
   hasStatement
 ) {
   let edge = curEdge;
-  if (this.previousConnection || this.nextConnection) {
+  if (
+    this.shouldRenderStatementShape() &&
+    (this.previousConnection || this.nextConnection)
+  ) {
     // Blocks with notches
     edge = Math.max(edge, Blockly.BlockSvg.MIN_BLOCK_X);
-  } else if (this.outputConnection) {
+  } else if (this.shouldRenderOutputShape()) {
     if (
       !this.canDuplicateOnDrag() &&
       this.isShadow() &&
@@ -1363,7 +1370,7 @@ Blockly.BlockSvg.prototype.computeOutputPadding_ = function (inputRows) {
   // Only apply to blocks with outputs and not single fields (shadows).
   if (
     !this.getOutputShape() ||
-    !this.outputConnection ||
+    !this.shouldRenderOutputShape() ||
     (!this.canDuplicateOnDrag() &&
       this.isShadow() &&
       !Blockly.scratchBlocksUtils.isShadowArgumentReporter(this))
@@ -1463,7 +1470,10 @@ Blockly.BlockSvg.prototype.renderDraw_ = function (iconWidth, inputRows) {
   // Should the top left corners be rounded or square?
   // Currently, it is squared only if it's a hat.
   this.squareTopLeftCorner_ = false;
-  if (!this.outputConnection && !this.previousConnection) {
+  if (
+    !this.shouldRenderOutputShape() &&
+    (!this.previousConnection || !this.shouldRenderStatementShape())
+  ) {
     // No output or previous connection.
     this.squareTopLeftCorner_ = true;
     this.startHat_ = true;
@@ -1474,7 +1484,7 @@ Blockly.BlockSvg.prototype.renderDraw_ = function (iconWidth, inputRows) {
   // to make room for the left and right to draw shapes (curves or angles).
   this.edgeShapeWidth_ = 0;
   this.edgeShape_ = null;
-  if (this.outputConnection) {
+  if (this.shouldRenderOutputShape()) {
     // Width of the curve/pointy-curve
     const shape = this.getOutputShape();
 
@@ -1552,7 +1562,7 @@ Blockly.BlockSvg.prototype.renderClassify_ = function () {
   let i, input;
   const shapes = [];
 
-  if (this.outputConnection) {
+  if (this.shouldRenderOutputShape()) {
     if (this.isShadow_) {
       shapes.push("argument");
     } else {
@@ -1589,7 +1599,7 @@ Blockly.BlockSvg.prototype.renderClassify_ = function () {
     } else if (!statementCount) {
       shapes.push("stack"); //only call it "stack" if it's not a c-block
     }
-    if (!this.nextConnection) {
+    if (!this.nextConnection || !this.shouldRenderStatementShape()) {
       shapes.push("end");
     }
   }
@@ -1629,14 +1639,15 @@ Blockly.BlockSvg.prototype.renderDrawTop_ = function (steps, rightEdge) {
     }
 
     // Top edge.
-    if (this.previousConnection) {
+    if (this.previousConnection && this.shouldRenderStatementShape()) {
+      const notchOffset = this.isDualBlock() ? this.edgeShapeWidth_ : 0;
       // Space before the notch
-      steps.push("H", Blockly.BlockSvg.NOTCH_START_PADDING);
+      steps.push("H", notchOffset + Blockly.BlockSvg.NOTCH_START_PADDING);
       steps.push(Blockly.BlockSvg.NOTCH_PATH_LEFT);
       // Create previous block connection.
       const connectionX = this.RTL
-        ? -Blockly.BlockSvg.NOTCH_WIDTH
-        : Blockly.BlockSvg.NOTCH_WIDTH;
+        ? -(notchOffset + Blockly.BlockSvg.NOTCH_WIDTH)
+        : notchOffset + Blockly.BlockSvg.NOTCH_WIDTH;
       this.previousConnection.setOffsetInBlock(connectionX, 0);
     }
   }
@@ -1702,7 +1713,7 @@ Blockly.BlockSvg.prototype.renderDrawRight_ = function (
           // Create inline input connection.
           // In blocks with a notch, inputs should be bumped to a min X,
           // to avoid overlapping with the notch.
-          if (this.previousConnection) {
+          if (this.previousConnection && this.shouldRenderStatementShape()) {
             cursorX = Math.max(cursorX, Blockly.BlockSvg.INPUT_AND_FIELD_MIN_X);
           }
           connectionX = this.RTL ? -cursorX : cursorX;
@@ -1811,7 +1822,7 @@ Blockly.BlockSvg.prototype.renderDrawRight_ = function (
       input = row[0];
       // Align fields vertically within the row.
       // In renderFields_, the field is further centered by its own height.
-      if (!this.outputConnection) {
+      if (!this.shouldRenderOutputShape()) {
         cursorY -= Blockly.BlockSvg.CORNER_RADIUS;
       }
 
@@ -1968,9 +1979,11 @@ Blockly.BlockSvg.prototype.renderDrawBottom_ = function (steps, cursorY) {
   ) {
     steps.push(Blockly.BlockSvg.BOTTOM_RIGHT_CORNER);
   }
-  if (this.nextConnection) {
+  if (this.nextConnection && this.shouldRenderStatementShape()) {
+    const notchOffset = this.isDualBlock() ? this.edgeShapeWidth_ : 0;
     // Move to the right-side of the notch.
     const notchStart =
+      notchOffset +
       Blockly.BlockSvg.NOTCH_WIDTH +
       Blockly.BlockSvg.NOTCH_START_PADDING +
       Blockly.BlockSvg.CORNER_RADIUS;
@@ -1978,8 +1991,8 @@ Blockly.BlockSvg.prototype.renderDrawBottom_ = function (steps, cursorY) {
     steps.push(Blockly.BlockSvg.NOTCH_PATH_RIGHT);
     // Create next block connection.
     const connectionX = this.RTL
-      ? -Blockly.BlockSvg.NOTCH_WIDTH
-      : Blockly.BlockSvg.NOTCH_WIDTH;
+      ? -(notchOffset + Blockly.BlockSvg.NOTCH_WIDTH)
+      : notchOffset + Blockly.BlockSvg.NOTCH_WIDTH;
     this.nextConnection.setOffsetInBlock(connectionX, cursorY);
     // Include height of notch in block height.
     this.height += Blockly.BlockSvg.NOTCH_HEIGHT;
@@ -2001,13 +2014,18 @@ Blockly.BlockSvg.prototype.renderDrawBottom_ = function (steps, cursorY) {
  * @private
  */
 Blockly.BlockSvg.prototype.renderDrawLeft_ = function (steps) {
-  if (this.outputConnection) {
+  const hasRenderedNextConnection =
+    this.nextConnection && this.shouldRenderStatementShape();
+  const bodyHeight =
+    this.height -
+    (hasRenderedNextConnection ? Blockly.BlockSvg.NOTCH_HEIGHT : 0);
+  if (this.shouldRenderOutputShape()) {
     // Scratch-style reporters have output connection y at half block height.
-    this.outputConnection.setOffsetInBlock(0, this.height / 2);
+    this.outputConnection.setOffsetInBlock(0, bodyHeight / 2);
   }
   if (this.edgeShape_) {
     const edgeHeight = this.edgeShapeWidth_ * 2;
-    const straightHeight = this.height - edgeHeight;
+    const straightHeight = bodyHeight - edgeHeight;
     const halfStraight = Math.max(0, straightHeight / 2);
 
     // Draw the left-side edge shape.
