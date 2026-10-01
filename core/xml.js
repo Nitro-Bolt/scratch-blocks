@@ -883,21 +883,25 @@ Blockly.Xml.domToBlockHeadless_ = function (xmlBlock, workspace) {
             childBlockElement,
             workspace
           );
-          if (blockChild.outputConnection) {
+          const childConnection =
+            input.type == Blockly.NEXT_STATEMENT
+              ? blockChild.previousConnection
+              : blockChild.outputConnection;
+          if (childConnection) {
             if (
               childBlockElement == childShadowElement &&
-              !input.connection.checkType_(blockChild.outputConnection)
+              !input.connection.checkType_(childConnection)
             ) {
               input.connection.setShadowDom(null);
               blockChild.dispose(false);
               break;
             }
-            input.connection.connect(blockChild.outputConnection);
-          } else if (blockChild.previousConnection) {
-            input.connection.connect(blockChild.previousConnection);
+            input.connection.connect(childConnection);
           } else {
             goog.asserts.fail(
-              "Child block does not have output or previous statement."
+              input.type == Blockly.NEXT_STATEMENT
+                ? "Statement block does not have a previous connection."
+                : "Value block does not have an output connection."
             );
           }
         }
