@@ -1575,6 +1575,7 @@ Blockly.Blocks["procedures_call"] = {
   createAllInputs_: Blockly.ScratchBlocks.ProcedureUtils.createAllInputs_,
   updateDisplay_: Blockly.ScratchBlocks.ProcedureUtils.updateDisplay_,
   getReturn: Blockly.ScratchBlocks.ProcedureUtils.getReturn,
+  getOutputMode: Blockly.ScratchBlocks.ProcedureUtils.getOutputMode,
 
   // Exist on all three blocks, but have different implementations.
   mutationToDom: Blockly.ScratchBlocks.ProcedureUtils.callerMutationToDom,
@@ -1624,7 +1625,6 @@ Blockly.Blocks["procedures_prototype"] = {
   createAllInputs_: Blockly.ScratchBlocks.ProcedureUtils.createAllInputs_,
   updateDisplay_: Blockly.ScratchBlocks.ProcedureUtils.updateDisplay_,
   getReturn: Blockly.ScratchBlocks.ProcedureUtils.getReturn,
-  getOutputMode: Blockly.ScratchBlocks.ProcedureUtils.getOutputMode,
   getOutputMode: Blockly.ScratchBlocks.ProcedureUtils.getOutputMode,
 
   // Exist on all three blocks, but have different implementations.
