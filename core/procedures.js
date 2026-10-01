@@ -538,15 +538,36 @@ Blockly.Procedures.mutateCallersAndPrototype = function (name, ws, mutation) {
     Blockly.Events.setGroup(true);
     for (i = 0; (caller = callers[i]); i++) {
       const oldMutationDom = caller.mutationToDom();
-      const oldMutation =
-        oldMutationDom && Blockly.Xml.domToText(oldMutationDom);
-
-      // Preserve the block's existing shape
       const mutationToReplaceWith = mutation.cloneNode(false);
-      mutationToReplaceWith.setAttribute(
-        "return",
-        oldMutationDom.getAttribute("return")
-      );
+      if ((mutation.getAttribute("output") || "auto") === "auto") {
+        const oldReturn = oldMutationDom.getAttribute("return");
+        if (oldReturn === null) {
+          mutationToReplaceWith.removeAttribute("return");
+        } else {
+          mutationToReplaceWith.setAttribute("return", oldReturn);
+        }
+      }
+
+      const outputModeChanged =
+        (oldMutationDom.getAttribute("output") || "auto") !==
+        (mutation.getAttribute("output") || "auto");
+      const dualChanged =
+        (oldMutationDom.getAttribute("dual") === "true") !==
+        (mutation.getAttribute("dual") === "true");
+      const connectionModeChanged =
+        caller.type === Blockly.PROCEDURES_CALL_BLOCK_TYPE &&
+        (outputModeChanged || dualChanged);
+
+      // Auto output preserves each call's manually selected shape. A forced
+      // output applies the selected reporter shape to every call.
+      if (connectionModeChanged) {
+        Blockly.Procedures.recreateCallWithMutation_(
+          caller,
+          mutationToReplaceWith
+        );
+        continue;
+      }
+      const oldMutation = Blockly.Xml.domToText(oldMutationDom);
       caller.domToMutation(mutationToReplaceWith);
 
       const newMutationDom = caller.mutationToDom();
@@ -628,7 +649,9 @@ Blockly.Procedures.newProcedureMutation = function () {
     ' argumentdefaults="[]"' +
     ' argumentdropdowns="[]"' +
     ' warp="false"' +
-    ' global="false">' +
+    ' global="false"' +
+    ' output="auto"' +
+    ' dual="false">' +
     "</mutation>" +
     "</xml>";
   return Blockly.Xml.textToDom(mutationText).firstChild;
@@ -821,7 +844,7 @@ Blockly.Procedures.makeChangeTypeOption = function (block) {
   const isStatement =
     block.getReturn() === Blockly.PROCEDURES_CALL_TYPE_STATEMENT;
   const option = {
-    enabled: true,
+    enabled: block.getOutputMode() === "auto",
     text: isStatement
       ? Blockly.Msg.PROCEDURES_TO_REPORTER
       : Blockly.Msg.PROCEDURES_TO_STATEMENT,
@@ -860,18 +883,31 @@ Blockly.Procedures.makeChangeTypeOption = function (block) {
   return option;
 };
 
-Blockly.Procedures.changeReturnType = function (block, returnType) {
+/**
+ * Recreate a procedure call with a replacement mutation so its connections
+ * are initialized from that mutation.
+ * @param {!Blockly.Block} block Procedure call block to recreate.
+ * @param {!Element} mutation Replacement mutation.
+ * @private
+ */
+Blockly.Procedures.recreateCallWithMutation_ = function (block, mutation) {
   block.unplug(true);
   const workspace = block.workspace;
   const xml = Blockly.Xml.blockToDom(block);
   const xy = block.getRelativeToSurfaceXY();
   block.dispose();
 
-  const mutation = xml.querySelector("mutation");
-  mutation.setAttribute("return", returnType);
+  const oldMutation = xml.querySelector("mutation");
+  oldMutation.parentNode.replaceChild(mutation.cloneNode(false), oldMutation);
 
   const newBlock = Blockly.Xml.domToBlock(xml, workspace);
   newBlock.moveBy(xy.x, xy.y);
+};
+
+Blockly.Procedures.changeReturnType = function (block, returnType) {
+  const mutation = block.mutationToDom();
+  mutation.setAttribute("return", returnType);
+  Blockly.Procedures.recreateCallWithMutation_(block, mutation);
 };
 
 /**
@@ -1007,6 +1043,10 @@ Blockly.Procedures.getAllProcedureReturnTypes = function (workspace) {
  * @returns {number} The type of the return block
  */
 Blockly.Procedures.getBlockReturnType = function (block) {
+  const prototype = block.getInput("custom_block").connection.targetBlock();
+  if (prototype && prototype.getOutputMode() !== "auto") {
+    return prototype.getReturn();
+  }
   let hasSeenBooleanReturn = false;
   let hasSeenObjectReturn = false;
   let hasSeenArrayReturn = false;

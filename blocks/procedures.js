@@ -67,6 +67,8 @@ Blockly.ScratchBlocks.ProcedureUtils.callerMutationToDom = function () {
   container.setAttribute("warp", JSON.stringify(this.warp_));
   container.setAttribute("global", JSON.stringify(this.global_));
   container.setAttribute("colour", this.procedureColour_ || this.colour_);
+  container.setAttribute("output", this.outputMode_);
+  container.setAttribute("dual", JSON.stringify(this.dual_));
   if (this.return_ !== Blockly.PROCEDURES_CALL_TYPE_STATEMENT) {
     container.setAttribute("return", this.return_);
   }
@@ -100,6 +102,8 @@ Blockly.ScratchBlocks.ProcedureUtils.callerDomToMutation = function (
   }
   this.return_ =
     Blockly.ScratchBlocks.ProcedureUtils.parseReturnMutation(xmlElement);
+  this.outputMode_ = xmlElement.getAttribute("output") || "auto";
+  this.dual_ = xmlElement.getAttribute("dual") === "true";
   this.updateDisplay_();
 };
 
@@ -133,6 +137,8 @@ Blockly.ScratchBlocks.ProcedureUtils.definitionMutationToDom = function (
   container.setAttribute("warp", JSON.stringify(this.warp_));
   container.setAttribute("global", JSON.stringify(this.global_));
   container.setAttribute("colour", this.procedureColour_ || this.colour_);
+  container.setAttribute("output", this.outputMode_);
+  container.setAttribute("dual", JSON.stringify(this.dual_));
   if (this.return_ !== Blockly.PROCEDURES_CALL_TYPE_STATEMENT) {
     container.setAttribute("return", this.return_);
   }
@@ -214,6 +220,8 @@ Blockly.ScratchBlocks.ProcedureUtils.definitionDomToMutation = function (
   this.global_ = JSON.parse(xmlElement.getAttribute("global"));
   this.return_ =
     Blockly.ScratchBlocks.ProcedureUtils.parseReturnMutation(xmlElement);
+  this.outputMode_ = xmlElement.getAttribute("output") || "auto";
+  this.dual_ = xmlElement.getAttribute("dual") === "true";
 
   if (xmlElement.getAttribute("colour")) {
     this.procedureColour_ = xmlElement.getAttribute("colour");
@@ -317,6 +325,10 @@ Blockly.ScratchBlocks.ProcedureUtils.updateDisplay_ = function () {
           Blockly.Procedures.ENFORCE_TYPES ? "Number" : null
         );
         this.setOutputShape(Blockly.OUTPUT_SHAPE_ROUND);
+      }
+      if (this.dual_) {
+        this.setPreviousStatement(true, "normal");
+        this.setNextStatement(true, "normal");
       }
     }
   }
@@ -1361,6 +1373,43 @@ Blockly.ScratchBlocks.ProcedureUtils.getReturn = function () {
   return this.return_;
 };
 
+/** @return {string} The configured output mode. */
+Blockly.ScratchBlocks.ProcedureUtils.getOutputMode = function () {
+  return this.outputMode_;
+};
+
+/** @param {string} mode The configured output mode. */
+Blockly.ScratchBlocks.ProcedureUtils.setOutputMode = function (mode) {
+  this.outputMode_ = mode;
+  if (mode === "auto") {
+    this.dual_ = false;
+  }
+  switch (mode) {
+    case "reporter":
+      this.return_ = Blockly.PROCEDURES_CALL_TYPE_REPORTER;
+      break;
+    case "boolean":
+      this.return_ = Blockly.PROCEDURES_CALL_TYPE_BOOLEAN;
+      break;
+    case "object":
+      this.return_ = Blockly.PROCEDURES_CALL_TYPE_OBJECT;
+      break;
+    case "array":
+      this.return_ = Blockly.PROCEDURES_CALL_TYPE_ARRAY;
+      break;
+  }
+};
+
+/** @return {boolean} Whether the procedure call is a dual block. */
+Blockly.ScratchBlocks.ProcedureUtils.getDual = function () {
+  return !!this.dual_;
+};
+
+/** @param {boolean} dual Whether the procedure call is a dual block. */
+Blockly.ScratchBlocks.ProcedureUtils.setDual = function (dual) {
+  this.dual_ = this.outputMode_ !== "auto" && dual;
+};
+
 /**
  * Callback to remove a field, only for the declaration block.
  * @param {Blockly.Field} field The field being removed.
@@ -1512,6 +1561,8 @@ Blockly.Blocks["procedures_call"] = {
     this.warp_ = false;
     this.global_ = false;
     this.return_ = Blockly.PROCEDURES_CALL_TYPE_STATEMENT;
+    this.outputMode_ = "auto";
+    this.dual_ = false;
   },
   // Shared.
   getProcCode: Blockly.ScratchBlocks.ProcedureUtils.getProcCode,
@@ -1559,6 +1610,8 @@ Blockly.Blocks["procedures_prototype"] = {
     this.warp_ = false;
     this.global_ = false;
     this.return_ = Blockly.PROCEDURES_CALL_TYPE_STATEMENT;
+    this.outputMode_ = "auto";
+    this.dual_ = false;
   },
   // Shared.
   getProcCode: Blockly.ScratchBlocks.ProcedureUtils.getProcCode,
@@ -1570,6 +1623,9 @@ Blockly.Blocks["procedures_prototype"] = {
   deleteShadows_: Blockly.ScratchBlocks.ProcedureUtils.deleteShadows_,
   createAllInputs_: Blockly.ScratchBlocks.ProcedureUtils.createAllInputs_,
   updateDisplay_: Blockly.ScratchBlocks.ProcedureUtils.updateDisplay_,
+  getReturn: Blockly.ScratchBlocks.ProcedureUtils.getReturn,
+  getOutputMode: Blockly.ScratchBlocks.ProcedureUtils.getOutputMode,
+  getOutputMode: Blockly.ScratchBlocks.ProcedureUtils.getOutputMode,
 
   // Exist on all three blocks, but have different implementations.
   mutationToDom: Blockly.ScratchBlocks.ProcedureUtils.definitionMutationToDom,
@@ -1603,6 +1659,8 @@ Blockly.Blocks["procedures_declaration"] = {
     this.warp_ = false;
     this.global_ = false;
     this.return_ = Blockly.PROCEDURES_CALL_TYPE_STATEMENT;
+    this.outputMode_ = "auto";
+    this.dual_ = false;
   },
   // Shared.
   getProcCode: Blockly.ScratchBlocks.ProcedureUtils.getProcCode,
@@ -1639,6 +1697,10 @@ Blockly.Blocks["procedures_declaration"] = {
   setWarp: Blockly.ScratchBlocks.ProcedureUtils.setWarp,
   getGlobal: Blockly.ScratchBlocks.ProcedureUtils.getGlobal,
   setGlobal: Blockly.ScratchBlocks.ProcedureUtils.setGlobal,
+  getOutputMode: Blockly.ScratchBlocks.ProcedureUtils.getOutputMode,
+  setOutputMode: Blockly.ScratchBlocks.ProcedureUtils.setOutputMode,
+  getDual: Blockly.ScratchBlocks.ProcedureUtils.getDual,
+  setDual: Blockly.ScratchBlocks.ProcedureUtils.setDual,
   addLabelExternal: Blockly.ScratchBlocks.ProcedureUtils.addLabelExternal,
   addBooleanExternal: Blockly.ScratchBlocks.ProcedureUtils.addBooleanExternal,
   addObjectExternal: Blockly.ScratchBlocks.ProcedureUtils.addObjectExternal,
