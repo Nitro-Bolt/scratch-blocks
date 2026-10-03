@@ -81,6 +81,14 @@ Blockly.Connection.prototype.targetConnection = null;
 Blockly.Connection.prototype.check_ = null;
 
 /**
+ * Explicit output orinput shape override, or null to derive the shape from the
+ * connection's check types.
+ * @type {?number|?string}
+ * @private
+ */
+Blockly.Connection.prototype.outputShape_ = null;
+
+/**
  * DOM representation of a shadow block, or null if none.
  * @type {Element}
  * @private
@@ -765,7 +773,7 @@ Blockly.Connection.prototype.setCheck = function (check) {
 /**
  * Returns a shape enum for this connection.
  * Used in scratch-blocks to draw unoccupied inputs.
- * @return {number} Enum representing shape.
+ * @return {number|string} Enum or name representing shape.
  */
 Blockly.Connection.prototype.getOutputShape = function () {
   if (this.outputShapeOverride_ !== undefined) {

@@ -1894,7 +1894,7 @@ Blockly.Block.prototype.appendArgsList = function (elements, options) {
         if (element["check"]) {
           input.setCheck(element["check"]);
         }
-        if (element["outputShape"] !== undefined) {
+        if (element["outputShape"] !== undefined && input.connection) {
           input.connection.setOutputShape(element["outputShape"]);
         }
         if (element["align"]) {
