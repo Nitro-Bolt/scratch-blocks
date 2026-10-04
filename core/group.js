@@ -259,6 +259,7 @@ Blockly.Group.prototype.render = function () {
   this.background_.style.stroke = this.colour || "";
   this.header_.style.fill = this.colour || "";
   this.header_.style.stroke = this.colour || "";
+  this.resize_.style.stroke = this.colour || "";
   this.titleText_.style.fill = Blockly.SystemColourPicker.isDark(this.colour)
     ? "#ffffff"
     : "";
