@@ -1851,11 +1851,18 @@ Blockly.Block.prototype.appendArgsList = function (elements, options) {
               );
             }
             emptyFieldStack();
-            input = this.appendDummyInput(name, opt_position);
+            input =
+              element["acceptArray"] === true
+                ? this.appendValueInput(name, opt_position).setCheck("Array")
+                : this.appendDummyInput(name, opt_position);
             if (element["isNewRow"] != undefined)
               input.isNewRow = element["isNewRow"];
             if (opt_position !== undefined) opt_position++;
             field = Blockly.Field.fromJson(element);
+            if (element["acceptArray"] === true) {
+              input.extendableArrayField = field;
+              input.connection.extendableArrayField_ = field;
+            }
             break;
           default:
             // Place isNewRow fields in a new input, always

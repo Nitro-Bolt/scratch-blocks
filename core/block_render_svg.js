@@ -794,6 +794,9 @@ Blockly.BlockSvg.prototype.highlightShapeForInput = function (conn, add) {
     return;
   }
   if (add) {
+    if (input.extendableArrayField) {
+      input.outlinePath.setAttribute("style", "visibility: visible");
+    }
     const replacementGlowFilterId =
       this.workspace.options.replacementGlowFilterId ||
       "blocklyReplacementGlowFilter";
@@ -807,6 +810,9 @@ Blockly.BlockSvg.prototype.highlightShapeForInput = function (conn, add) {
     );
   } else {
     input.outlinePath.removeAttribute("filter");
+    if (input.extendableArrayField) {
+      input.outlinePath.setAttribute("style", "visibility: hidden");
+    }
     Blockly.utils.removeClass(
       /** @type {!Element} */ (this.svgGroup_),
       "blocklyReplaceable"
@@ -1094,6 +1100,9 @@ Blockly.BlockSvg.prototype.renderCompute_ = function (iconWidth) {
       }
       input.renderHeight = Math.max(input.renderHeight, paddedHeight);
       input.renderWidth = Math.max(input.renderWidth, paddedWidth);
+      if (input.extendableArrayField && !linkedBlock) {
+        input.renderWidth = 0;
+      }
     }
     row.height = Math.max(row.height, input.renderHeight);
     input.fieldWidth = 0;
@@ -1744,10 +1753,10 @@ Blockly.BlockSvg.prototype.renderDrawRight_ = function (
   inputRows,
   iconWidth
 ) {
-  let y, row, x, input, fieldY, fieldX, connectionYOffset;
+  let y, row, x, input, fieldY, fieldX;
   let cursorX = 0;
   let cursorY = 0;
-  let connectionX, connectionY;
+  let connectionX;
   let prevRowWidth = 0;
   const hasStatementInputs =
     this.edgeShape_ &&
@@ -1791,13 +1800,13 @@ Blockly.BlockSvg.prototype.renderDrawRight_ = function (
           if (this.previousConnection && this.shouldRenderStatementShape()) {
             cursorX = Math.max(cursorX, Blockly.BlockSvg.INPUT_AND_FIELD_MIN_X);
           }
-          connectionX = this.RTL ? -cursorX : cursorX;
-          // Attempt to center the connection vertically.
-          connectionYOffset = row.height / 2;
-          connectionY = cursorY + connectionYOffset;
-          input.connection.setOffsetInBlock(connectionX, connectionY);
-          this.renderInputShape_(input, cursorX, cursorY + connectionYOffset);
-          cursorX += input.renderWidth + Blockly.BlockSvg.SEP_SPACE_X;
+          cursorX = this.renderValueInput_(
+            input,
+            fieldX,
+            cursorX,
+            cursorY,
+            row.height
+          );
         }
       }
       // Remove final separator and replace it with right-padding.
@@ -1915,13 +1924,13 @@ Blockly.BlockSvg.prototype.renderDrawRight_ = function (
 
         cursorX = this.renderFields_(input.fieldRow, fieldX, fieldY);
         if (input.type == Blockly.INPUT_VALUE) {
-          connectionX = this.RTL ? -cursorX : cursorX;
-          // Attempt to center the connection vertically.
-          connectionYOffset = row.height / 2;
-          connectionY = cursorY + connectionYOffset;
-          input.connection.setOffsetInBlock(connectionX, connectionY);
-          this.renderInputShape_(input, cursorX, cursorY + connectionYOffset);
-          cursorX += input.renderWidth + Blockly.BlockSvg.SEP_SPACE_X;
+          cursorX = this.renderValueInput_(
+            input,
+            fieldX,
+            cursorX,
+            cursorY,
+            row.height
+          );
         }
       }
       // Remove final separator and replace it with right-padding.
@@ -1978,6 +1987,34 @@ Blockly.BlockSvg.prototype.renderDrawRight_ = function (
 };
 
 /**
+ * Position and render a value input connection.
+ * @param {!Blockly.Input} input Input to render.
+ * @param {number} fieldX Start of the input's fields.
+ * @param {number} cursorX Cursor position after rendering the fields.
+ * @param {number} cursorY Top of the input row.
+ * @param {number} rowHeight Height of the input row.
+ * @return {number} Updated horizontal cursor position.
+ * @private
+ */
+Blockly.BlockSvg.prototype.renderValueInput_ = function (
+  input,
+  fieldX,
+  cursorX,
+  cursorY,
+  rowHeight
+) {
+  const inputX = input.extendableArrayField ? fieldX : cursorX;
+  const connectionX = this.RTL ? -inputX : inputX;
+  const connectionY = cursorY + rowHeight / 2;
+  input.connection.setOffsetInBlock(connectionX, connectionY);
+  this.renderInputShape_(input, inputX, connectionY);
+  if (!input.extendableArrayField || input.connection.targetConnection) {
+    return cursorX + input.renderWidth + Blockly.BlockSvg.SEP_SPACE_X;
+  }
+  return cursorX;
+};
+
+/**
  * Negate every numeric token in a set of relative SVG path step strings.
  * @param {!Array.<string>} steps Path step strings to mirror.
  * @return {!Array.<string>} A new array of mirrored path step strings.
@@ -2004,6 +2041,40 @@ Blockly.BlockSvg.prototype.renderInputShape_ = function (input, x, y) {
   const inputShape = input.outlinePath;
   if (!inputShape) {
     // No input shape for this input - e.g., the block is an insertion marker.
+    return;
+  }
+  if (input.extendableArrayField) {
+    const padding = 2;
+    const fieldSize = input.extendableArrayField.getSize();
+    const width = fieldSize.width + padding * 2;
+    const height = fieldSize.height + padding * 2;
+    const inputShapeX = this.RTL ? -x - width + padding : x - padding;
+    const inputShapeY = y - height / 2;
+    const scaleX = width / Blockly.BlockSvg.INPUT_SHAPE_SQUARE_WIDTH;
+    const scaleY = height / Blockly.BlockSvg.INPUT_SHAPE_HEIGHT;
+    inputShape.setAttribute("d", Blockly.BlockSvg.INPUT_SHAPE_SQUARE);
+    inputShape.setAttribute(
+      "transform",
+      "translate(" +
+        inputShapeX +
+        "," +
+        inputShapeY +
+        ") scale(" +
+        scaleX +
+        "," +
+        scaleY +
+        ")"
+    );
+    inputShape.setAttribute("data-argument-type", "square");
+    const fieldRoot = input.extendableArrayField.getSvgRoot();
+    if (
+      fieldRoot &&
+      fieldRoot.parentNode &&
+      inputShape.parentNode == fieldRoot.parentNode
+    ) {
+      fieldRoot.parentNode.insertBefore(inputShape, fieldRoot);
+    }
+    inputShape.setAttribute("style", "visibility: hidden");
     return;
   }
   // Input shapes are only visibly rendered on non-connected slots.

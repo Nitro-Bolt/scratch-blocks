@@ -246,6 +246,9 @@ Blockly.Connection.prototype.connect_ = function (childConnection) {
   Blockly.Connection.connectReciprocally_(parentConnection, childConnection);
   // Demote the inferior block so that one is a child of the superior one.
   childBlock.setParent(parentBlock);
+  if (parentConnection.extendableArrayField_) {
+    parentConnection.extendableArrayField_.onArrayConnectionChanged();
+  }
   if (event) {
     event.recordNew();
     Blockly.Events.fire(event);
@@ -679,6 +682,10 @@ Blockly.Connection.prototype.disconnectInternal_ = function (
   otherConnection.targetConnection = null;
   this.targetConnection = null;
   childBlock.setParent(null);
+  const parentConnection = this.isSuperior() ? this : otherConnection;
+  if (parentConnection.extendableArrayField_) {
+    parentConnection.extendableArrayField_.onArrayConnectionChanged();
+  }
   if (event) {
     event.recordNew();
     Blockly.Events.fire(event);
