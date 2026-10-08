@@ -16,6 +16,7 @@ goog.require("Blockly.Field");
  * @param {!number} maxInputs Maximum inputs
  * @param {!Array} separator Array of arguments to use as a separator
  * @param {!Array} collapser Array of arguments to use with 0 inputs
+ * @param {boolean} acceptArray Whether this extendable accepts an Array block
  * @extends {Blockly.Field}
  * @constructor
  */
@@ -25,7 +26,8 @@ Blockly.FieldExtendable = function (
   minInputs,
   maxInputs,
   separator,
-  collapser
+  collapser,
+  acceptArray
 ) {
   this.size_ = new goog.math.Size(
     Blockly.FieldExtendable.ARROW_HEIGHT,
@@ -37,6 +39,8 @@ Blockly.FieldExtendable = function (
   this.maxInputs = maxInputs;
   this.separator = separator;
   this.collapser = collapser;
+  this.acceptArray = acceptArray;
+  this.arrayConnected_ = false;
 
   this.lastInputRow = undefined;
 
@@ -80,13 +84,15 @@ Blockly.FieldExtendable.fromJson = function (options) {
   let collapser = options.collapser;
   if (collapser === undefined) collapser = [];
   if (!Array.isArray(collapser)) collapser = [collapser];
+  const acceptArray = options.acceptArray === true;
   return new Blockly.FieldExtendable(
     args,
     defaultInputs,
     minInputs,
     maxInputs,
     separator,
-    collapser
+    collapser,
+    acceptArray
   );
 };
 
@@ -105,11 +111,18 @@ Blockly.FieldExtendable.ARROW_WIDTH = 16;
 Blockly.FieldExtendable.ARROW_HEIGHT = 32;
 Blockly.FieldExtendable.ARROW_LEFT_PATH = "icons/extendable_arrow_left.svg";
 Blockly.FieldExtendable.ARROW_RIGHT_PATH = "icons/extendable_arrow_right.svg";
+Blockly.FieldExtendable.ARROW_SEPARATOR_PATH =
+  "icons/extendable_arrow_separator.svg";
 
 /**
  * Should the arrows be placed before the extendable inputs?
  */
 Blockly.FieldExtendable.ARROWS_LEFT = false;
+
+/**
+ * Whether to hide the separator between extendable arrows that accept Arrays.
+ */
+Blockly.FieldExtendable.HIDE_ARROW_SEPARATOR = false;
 
 /**
  * Get the input index at which new extendable inputs should be inserted.
@@ -155,6 +168,23 @@ Blockly.FieldExtendable.prototype.init = function () {
     },
     this.fieldGroup_
   );
+  if (this.acceptArray) {
+    this.arrowSeparator = Blockly.utils.createSvgElement(
+      "image",
+      {
+        height: Blockly.FieldExtendable.ARROW_HEIGHT + "px",
+        width: Blockly.FieldExtendable.ARROW_WIDTH + "px",
+        style: "pointer-events: none",
+      },
+      this.fieldGroup_
+    );
+    this.arrowSeparator.setAttributeNS(
+      "http://www.w3.org/1999/xlink",
+      "xlink:href",
+      Blockly.mainWorkspace.options.pathToMedia +
+        Blockly.FieldExtendable.ARROW_SEPARATOR_PATH
+    );
+  }
   this.arrowLeft.setAttributeNS(
     "http://www.w3.org/1999/xlink",
     "xlink:href",
@@ -413,25 +443,158 @@ Blockly.FieldExtendable.prototype.addInputs = function (inputs) {
   this.setValue(this.inputs + inputs);
 };
 
+/**
+ * Get the names of this extendable and all extendables nested inside it.
+ * @return {!Array.<string>} Owned extendable field names.
+ * @private
+ */
+Blockly.FieldExtendable.prototype.getOwnedExtendableNames_ = function () {
+  const names = [this.name];
+  for (let nameIndex = 0; nameIndex < names.length; nameIndex++) {
+    const name = names[nameIndex];
+    for (let i = 0; i < this.sourceBlock_.inputList.length; i++) {
+      const input = this.sourceBlock_.inputList[i];
+      if (input.extendableName != name) continue;
+      for (let j = 0; j < input.fieldRow.length; j++) {
+        const field = input.fieldRow[j];
+        if (
+          field instanceof Blockly.FieldExtendable &&
+          names.indexOf(field.name) === -1
+        ) {
+          names.push(field.name);
+        }
+      }
+    }
+  }
+  return names;
+};
+
+/**
+ * Disconnect the block in an extendable input before an Array replaces it.
+ * Shadow blocks are removed and restored when the Array is disconnected.
+ * @param {!Blockly.Input} input Extendable input being replaced.
+ * @private
+ */
+Blockly.FieldExtendable.prototype.disconnectInputBlock_ = function (input) {
+  const connection = input.connection;
+  if (!connection || !connection.isConnected()) return;
+
+  const displacedBlock = connection.targetBlock();
+  let shadowDom = connection.getShadowDom();
+  connection.setShadowDom(null);
+  if (displacedBlock.isShadow()) {
+    shadowDom = Blockly.Xml.blockToDom(displacedBlock);
+    displacedBlock.dispose();
+  } else {
+    connection.disconnect();
+    if (Blockly.Events.recordUndo && displacedBlock.rendered) {
+      const group = Blockly.Events.getGroup();
+      setTimeout(function () {
+        if (displacedBlock.workspace && !displacedBlock.getParent()) {
+          Blockly.Events.setGroup(group);
+          const displacedConnection =
+            displacedBlock.outputConnection ||
+            displacedBlock.previousConnection;
+          if (displacedConnection) {
+            displacedConnection.bumpAwayFrom_(connection);
+          }
+          Blockly.Events.setGroup(false);
+        }
+      }, Blockly.BUMP_DELAY);
+    }
+  }
+  connection.setShadowDom(shadowDom);
+};
+
+/**
+ * Collapse or restore this extendable when its Array connection changes.
+ */
+Blockly.FieldExtendable.prototype.onArrayConnectionChanged = function () {
+  if (
+    !this.acceptArray ||
+    !this.sourceBlock_ ||
+    !this.sourceBlock_.workspace ||
+    !this.sourceInput_ ||
+    !this.sourceInput_.connection
+  ) {
+    return;
+  }
+  const workspace = this.sourceBlock_.workspace;
+  const connected = this.sourceInput_.connection.isConnected();
+  if (connected === this.arrayConnected_) return;
+
+  this.arrayConnected_ = connected;
+  const blocksToRender = [];
+  const ownedNames = this.getOwnedExtendableNames_();
+  for (let i = 0; i < this.sourceBlock_.inputList.length; i++) {
+    const input = this.sourceBlock_.inputList[i];
+    if (ownedNames.indexOf(input.extendableName) !== -1) {
+      if (connected) {
+        this.disconnectInputBlock_(input);
+      }
+      if (workspace.rendered) {
+        const blocks = input.setVisible(!connected);
+        blocksToRender.push.apply(blocksToRender, blocks);
+        if (connected && input.outlinePath) {
+          input.outlinePath.style.visibility = "hidden";
+        }
+      } else {
+        input.visible_ = !connected;
+      }
+      if (
+        !connected &&
+        input.connection &&
+        !input.connection.isConnected() &&
+        input.connection.getShadowDom()
+      ) {
+        input.connection.respawnShadow_();
+      }
+    }
+  }
+  for (let i = 0; i < blocksToRender.length; i++) {
+    if (blocksToRender[i].workspace && blocksToRender[i].workspace.rendered) {
+      blocksToRender[i].render(false);
+    }
+  }
+
+  this.render_();
+};
+
 Blockly.FieldExtendable.prototype.render_ = function () {
   this.updateWidth();
   if (!this.arrowLeft) return;
-  this.arrowLeft.style.display = this.inputs <= this.minInputs ? "none" : "";
-  this.arrowRight.style.display = this.inputs >= this.maxInputs ? "none" : "";
-  this.arrowRight.setAttribute(
-    "x",
-    this.inputs <= this.minInputs
-      ? "0px"
-      : Blockly.FieldExtendable.ARROW_WIDTH + "px"
-  );
+  this.fieldGroup_.style.display = this.arrayConnected_ ? "none" : "block";
+  if (this.arrayConnected_) return;
+  const showLeft = this.inputs > this.minInputs;
+  const showRight = this.inputs < this.maxInputs;
+  const showSeparator =
+    this.arrowSeparator && !Blockly.FieldExtendable.HIDE_ARROW_SEPARATOR;
+  let x = 0;
+  this.arrowLeft.style.display = showLeft ? "" : "none";
+  if (showLeft) x += Blockly.FieldExtendable.ARROW_WIDTH;
+  if (this.arrowSeparator) {
+    this.arrowSeparator.style.display = showSeparator ? "" : "none";
+  }
+  if (showSeparator) {
+    this.arrowSeparator.setAttribute("x", x + "px");
+    x += Blockly.FieldExtendable.ARROW_WIDTH;
+  }
+  this.arrowRight.style.display = showRight ? "" : "none";
+  this.arrowRight.setAttribute("x", x + "px");
 };
 
 Blockly.FieldExtendable.prototype.updateWidth = function () {
-  if (this.inputs <= this.minInputs || this.inputs >= this.maxInputs) {
-    this.size_.width = Blockly.FieldExtendable.ARROW_WIDTH;
-  } else {
-    this.size_.width = Blockly.FieldExtendable.ARROW_WIDTH * 2;
+  if (this.arrayConnected_) {
+    this.size_.width = 0;
+    return;
   }
+  const arrowCount =
+    Number(this.inputs > this.minInputs) + Number(this.inputs < this.maxInputs);
+  const separatorCount = Number(
+    this.acceptArray && !Blockly.FieldExtendable.HIDE_ARROW_SEPARATOR
+  );
+  this.size_.width =
+    Blockly.FieldExtendable.ARROW_WIDTH * (arrowCount + separatorCount);
 };
 
 Blockly.FieldExtendable.prototype.dispose = function () {
