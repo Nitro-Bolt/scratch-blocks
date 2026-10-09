@@ -684,19 +684,20 @@ Blockly.BlockSvg.prototype.updateColour = function () {
   if (this.isGlowingBlock_ || renderShadowed) {
     let ownLook = false;
     if (renderShadowed) {
-      for (x = 0; (input = this.inputList[x]) && !ownLook; x++) {
-        for (y = 0; (field = input.fieldRow[y]); y++) {
-          if (
-            typeof field.onHtmlInputChange_ === "function" ||
-            field instanceof Blockly.FieldColour ||
-            field instanceof Blockly.FieldColourSlider
-          ) {
-            ownLook = true;
-            break;
-          }
-        }
+      let fieldCount = 0;
+      let onlyField = null;
+      for (const input of this.inputList) {
+        fieldCount += input.fieldRow.length;
+        if (input.fieldRow.length > 0) onlyField = input.fieldRow[0];
+      }
+  
+      if (fieldCount === 1) {
+        ownLook = !(onlyField instanceof Blockly.FieldDropdown);
+      } else {
+        ownLook = false;
       }
     }
+  
     if (renderShadowed && this.parentBlock_ && !ownLook) {
       fillColour = this.parentBlock_.getColourSecondary();
     } else if (this.getShadowColour()) {
