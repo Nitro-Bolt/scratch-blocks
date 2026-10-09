@@ -682,8 +682,24 @@ Blockly.BlockSvg.prototype.updateColour = function () {
 
   // Render block fill
   if (this.isGlowingBlock_ || renderShadowed) {
-    // Use the block's shadow colour if possible.
-    if (this.getShadowColour()) {
+    let ownLook = false;
+    if (renderShadowed) {
+      for (x = 0; (input = this.inputList[x]) && !ownLook; x++) {
+        for (y = 0; (field = input.fieldRow[y]); y++) {
+          if (
+            typeof field.onHtmlInputChange_ === "function" ||
+            field instanceof Blockly.FieldColour ||
+            field instanceof Blockly.FieldColourSlider
+          ) {
+            ownLook = true;
+            break;
+          }
+        }
+      }
+    }
+    if (renderShadowed && this.parentBlock_ && !ownLook) {
+      fillColour = this.parentBlock_.getColourSecondary();
+    } else if (this.getShadowColour()) {
       fillColour = this.getShadowColour();
     } else {
       fillColour = this.getColourSecondary();
