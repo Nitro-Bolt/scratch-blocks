@@ -244,6 +244,7 @@ Blockly.Xml.blockToDom = function (block, opt_noId) {
           shadowClone.removeAttribute("id");
         }
         container.appendChild(shadowClone);
+        empty = false;
       }
       if (childBlock) {
         container.appendChild(Blockly.Xml.blockToDom(childBlock, opt_noId));
