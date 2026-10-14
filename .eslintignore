@@ -12,7 +12,8 @@
 /shim/*
 /dist/*
 /gh-pages/*
-/webpack.config.js
+/rspack.config.js
+/loaders
 /build/*
 
 /github-pages/*

@@ -262,8 +262,8 @@ Blockly.Blocks.defaultToolbox =
   "</block>" +
   '<block type="assets_all">' +
   '<value name="SPRITE">' +
-    '<shadow type="control_create_clone_of_menu"></shadow>' +
-  '</value>' +
+  '<shadow type="control_create_clone_of_menu"></shadow>' +
+  "</value>" +
   "</block>" +
   '<block type="assets_metadata" id="assets_metadata">' +
   '<value name="ASSET_MENU">' +

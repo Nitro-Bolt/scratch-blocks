@@ -14,7 +14,7 @@ Requires Node.js (16 or later) and Java. It is known to work in these environmen
 Install dependencies:
 
 ```sh
-npm ci
+pnpm install --frozen-lockfile
 ```
 
 Open `tests/playground.html` in a browser for development. You don't need to rebuild compressed versions for most changes. Open `tests/playground_compressed.html` instead to test if the compressed versions built properly.
@@ -22,7 +22,7 @@ Open `tests/playground.html` in a browser for development. You don't need to reb
 To re-build compressed versions, run:
 
 ```sh
-npm run prepublish
+pnpm build
 ```
 
 `scratch-gui` development server must be restarted to update linked `scratch-blocks`.

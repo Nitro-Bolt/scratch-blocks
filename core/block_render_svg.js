@@ -690,14 +690,14 @@ Blockly.BlockSvg.prototype.updateColour = function () {
         fieldCount += input.fieldRow.length;
         if (input.fieldRow.length > 0) onlyField = input.fieldRow[0];
       }
-  
+
       if (fieldCount === 1) {
         ownLook = !(onlyField instanceof Blockly.FieldDropdown);
       } else {
         ownLook = false;
       }
     }
-  
+
     if (renderShadowed && this.parentBlock_ && !ownLook) {
       fillColour = this.parentBlock_.getColourSecondary();
     } else if (this.getShadowColour()) {

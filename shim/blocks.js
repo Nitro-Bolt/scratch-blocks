@@ -1,1 +1,1 @@
-module.exports = require("imports-loader?goog=./shim/blockly.goog,Blockly=./shim/blockly.Blockly!exports-loader?Blockly!../blocks_compressed");
+module.exports = require("../blocks_compressed");

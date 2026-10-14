@@ -18,6 +18,9 @@
     "strict": ["off"],
     "no-cond-assign": ["off"],
     "no-redeclare": ["off"],
+    "no-prototype-builtins": ["off"],
+    "no-self-assign": ["off"],
+    "valid-typeof": ["off"],
     "no-console": ["off"],
     "no-constant-condition": ["off"]
   },
@@ -33,7 +36,8 @@
     {
       "files": [
         "build.js",
-        "webpack.config.js",
+        "rspack.config.js",
+        "loaders/*.js",
         "i18n/*.js",
         "tests/jsunit/test_runner.js"
       ],
