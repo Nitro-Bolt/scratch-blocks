@@ -203,11 +203,17 @@ Blockly.onKeyDown_ = function (e) {
     return;
   }
   const key = e.key.toLowerCase();
+  let selectedBlocks = Blockly.mainWorkspace.getSelectedBlocks
+    ? Blockly.mainWorkspace.getSelectedBlocks()
+    : [];
   let deleteBlock = false;
   if (key === "escape") {
     // Pressing esc closes the context menu and any drop-down
     Blockly.hideChaff();
     Blockly.DropDownDiv.hide();
+    if (Blockly.mainWorkspace.clearMultiSelection) {
+      Blockly.mainWorkspace.clearMultiSelection();
+    }
   } else if (key === "backspace" || key === "delete") {
     // Delete or backspace.
     // Stop the browser from going back to the previous page.
@@ -219,6 +225,8 @@ Blockly.onKeyDown_ = function (e) {
       return;
     }
     if (Blockly.selected && Blockly.selected.isDeletable()) {
+      deleteBlock = true;
+    } else if (selectedBlocks.length) {
       deleteBlock = true;
     }
   } else if (e.altKey || e.ctrlKey || e.metaKey) {
@@ -267,7 +275,21 @@ Blockly.onKeyDown_ = function (e) {
   }
   // Common code for delete and cut.
   // Don't delete in the flyout.
-  if (deleteBlock && !Blockly.selected.workspace.isFlyout) {
+  if (deleteBlock && selectedBlocks.length) {
+    Blockly.Events.setGroup(true);
+    if (Blockly.mainWorkspace.prepareMultiSelectionForDrag) {
+      Blockly.mainWorkspace.prepareMultiSelectionForDrag();
+      selectedBlocks = Blockly.mainWorkspace.getSelectedBlocks();
+    }
+    Blockly.hideChaff();
+    Blockly.mainWorkspace.clearMultiSelection();
+    for (let i = 0; i < selectedBlocks.length; i++) {
+      if (selectedBlocks[i].workspace && selectedBlocks[i].isDeletable()) {
+        selectedBlocks[i].dispose(false, true);
+      }
+    }
+    Blockly.Events.setGroup(false);
+  } else if (deleteBlock && !Blockly.selected.workspace.isFlyout) {
     Blockly.Events.setGroup(true);
     Blockly.hideChaff();
     Blockly.selected.dispose(/* heal */ true, true);

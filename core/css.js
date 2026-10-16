@@ -435,6 +435,27 @@ Blockly.Css.CONTENT = [
   "display: none;",
   "}",
 
+  ".blocklyMultiSelectionOutline {",
+  "pointer-events: none;",
+  "}",
+
+  ".blocklyMultiSelectionOutlinePath {",
+  "fill: none !important;",
+  "stroke: #4c97ff !important;",
+  "stroke-width: 8px !important;",
+  "stroke-linecap: round !important;",
+  "stroke-linejoin: round !important;",
+  "}",
+
+  ".blocklySelectionBox {",
+  "fill: rgba(76, 151, 255, 0.12);",
+  "stroke: #4c97ff;",
+  "stroke-width: 2px;",
+  "stroke-dasharray: 7 5;",
+  "vector-effect: non-scaling-stroke;",
+  "pointer-events: none;",
+  "}",
+
   ".blocklyDraggable {",
   /* backup for browsers (e.g. IE11) that don't support grab */
   'cursor: url("<<<PATH>>>/handopen.cur"), auto;',
