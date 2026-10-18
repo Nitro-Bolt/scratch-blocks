@@ -68,6 +68,9 @@ Blockly.Variables.getValueTypeShape = function (valueType) {
   if (valueType === "Any") {
     return Blockly.OUTPUT_SHAPE_ROUND;
   }
+  if (valueType === "Boolean") {
+    return Blockly.OUTPUT_SHAPE_HEXAGONAL;
+  }
   if (valueType === "Array") {
     return Blockly.OUTPUT_SHAPE_SQUARE;
   }
