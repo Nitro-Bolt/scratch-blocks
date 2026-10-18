@@ -710,18 +710,19 @@ Blockly.Field.prototype.updateTextNode_ = function () {
     // Not rendered yet.
     return;
   }
+  const isDark = this.textElement_.classList.contains("blocklyTextDark");
   let text = this.text_;
+  let className = this.className_;
   if (text.length > this.maxDisplayLength) {
     // Truncate displayed string and add an ellipsis ('...').
     text = text.substring(0, this.maxDisplayLength - 2) + "\u2026";
     // Add special class for sizing font when truncated
-    this.textElement_.setAttribute(
-      "class",
-      this.className_ + " blocklyTextTruncated"
-    );
-  } else {
-    this.textElement_.setAttribute("class", this.className_);
+    className += " blocklyTextTruncated";
   }
+  if (isDark) {
+    className += " blocklyTextDark";
+  }
+  this.textElement_.setAttribute("class", className);
   // Empty the text element.
   this.textElement_.replaceChildren();
   // Replace whitespace with non-breaking spaces so the text doesn't collapse.
