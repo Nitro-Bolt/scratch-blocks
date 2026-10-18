@@ -188,6 +188,7 @@ Blockly.VariableMap.prototype.renameVariableWithConflict_ = function (
  *     a UUID.
  * @param {boolean=} opt_isLocal Whether the variable is locally scoped.
  * @param {boolean=} opt_isCloud Whether the variable is a cloud variable.
+ * @param {string=} opt_valueType The declared value type of a scalar variable.
  * @return {?Blockly.VariableModel} The newly created variable.
  */
 Blockly.VariableMap.prototype.createVariable = function (
@@ -195,7 +196,8 @@ Blockly.VariableMap.prototype.createVariable = function (
   opt_type,
   opt_id,
   opt_isLocal,
-  opt_isCloud
+  opt_isCloud,
+  opt_valueType
 ) {
   let variable = this.getVariable(name, opt_type);
   if (variable) {
@@ -233,7 +235,8 @@ Blockly.VariableMap.prototype.createVariable = function (
     opt_type,
     opt_id,
     opt_isLocal,
-    opt_isCloud
+    opt_isCloud,
+    opt_valueType
   );
   // If opt_type is not a key, create a new list.
   if (!this.variableMap_[opt_type]) {

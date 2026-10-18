@@ -28,7 +28,52 @@ goog.require("Blockly.Colours");
 goog.require("Blockly.constants");
 goog.require("Blockly.ScratchBlocks.Extensions");
 
+/**
+ * Update a scalar variable's reporter or assignment input.
+ * @this Blockly.Block
+ */
+Blockly.Constants.Data.updateVariableType = function () {
+  const variable = this.getField("VARIABLE").getVariable();
+  const valueType = (variable && variable.valueType) || "Any";
+  const check = valueType === "Any" ? null : valueType;
+  const shape = Blockly.Variables.getValueTypeShape(valueType);
+
+  if (this.outputConnection) {
+    this.setOutputShape(shape);
+    this.outputConnection.setCheck(check);
+  } else {
+    const connection = this.getInput("VALUE").connection;
+    connection.setShadowDom(null);
+    const child = connection.targetBlock();
+    if (child && child.isShadow()) {
+      const childCheck = child.outputConnection.check_;
+      if (check && childCheck && childCheck.indexOf(check) === -1) {
+        child.dispose(false);
+      }
+    }
+    connection.setOutputShape(shape);
+    connection.setCheck(check);
+
+    if (this.rendered && valueType === "Any") {
+      const shadow = goog.dom.createDom("shadow");
+      const field = goog.dom.createDom("field");
+      shadow.setAttribute("type", "text");
+      field.setAttribute("name", "TEXT");
+      field.textContent = "0";
+      shadow.appendChild(field);
+      connection.setShadowDom(shadow);
+      if (!connection.isConnected()) {
+        connection.respawnShadow_();
+      }
+    }
+  }
+  if (this.rendered) {
+    this.render();
+  }
+};
+
 Blockly.Blocks["data_variable"] = {
+  updateVariableType_: Blockly.Constants.Data.updateVariableType,
   /**
    * Block of Variables
    * @this Blockly.Block
@@ -55,6 +100,7 @@ Blockly.Blocks["data_variable"] = {
 };
 
 Blockly.Blocks["data_setvariableto"] = {
+  updateVariableType_: Blockly.Constants.Data.updateVariableType,
   /**
    * Block to set variable to a certain value
    * @this Blockly.Block

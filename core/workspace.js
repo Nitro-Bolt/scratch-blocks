@@ -473,6 +473,7 @@ Blockly.Workspace.prototype.renameVariableById = function (id, newName) {
  *     a UUID.
  * @param {boolean=} opt_isLocal Whether the variable to create is locally scoped.
  * @param {boolean=} opt_isCloud Whether the variable to create is locally scoped.
+ * @param {string=} opt_valueType The declared value type of a scalar variable.
  * @return {?Blockly.VariableModel} The newly created variable.
  */
 Blockly.Workspace.prototype.createVariable = function (
@@ -480,14 +481,16 @@ Blockly.Workspace.prototype.createVariable = function (
   opt_type,
   opt_id,
   opt_isLocal,
-  opt_isCloud
+  opt_isCloud,
+  opt_valueType
 ) {
   return this.variableMap_.createVariable(
     name,
     opt_type,
     opt_id,
     opt_isLocal,
-    opt_isCloud
+    opt_isCloud,
+    opt_valueType
   );
 };
 

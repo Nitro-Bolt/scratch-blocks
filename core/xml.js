@@ -77,6 +77,7 @@ Blockly.Xml.variablesToDom = function (variableList) {
     element.setAttribute("id", variable.getId());
     element.setAttribute("islocal", variable.isLocal);
     element.setAttribute("isCloud", variable.isCloud);
+    element.setAttribute("valuetype", variable.valueType || "Any");
     variables.appendChild(element);
   }
   return variables;
@@ -744,7 +745,14 @@ Blockly.Xml.domToVariables = function (xmlVariables, workspace) {
     if (typeof type === undefined || type === null) {
       throw Error("Variable with id, " + id + " is without a type");
     }
-    workspace.createVariable(name, type, id, isLocal, isCloud);
+    workspace.createVariable(
+      name,
+      type,
+      id,
+      isLocal,
+      isCloud,
+      xmlChild.getAttribute("valuetype")
+    );
   }
 };
 

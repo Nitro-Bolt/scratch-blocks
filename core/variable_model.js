@@ -41,6 +41,7 @@ goog.require("Blockly.Events.VarCreate");
  *     a UUID.
  * @param {boolean=} opt_isLocal Whether the variable is locally scoped.
  * @param {boolean=} opt_isCloud Whether the variable is a cloud variable.
+ * @param {string=} opt_valueType The declared value type of a scalar variable.
  * @see {Blockly.FieldVariable}
  * @constructor
  */
@@ -50,7 +51,8 @@ Blockly.VariableModel = function (
   opt_type,
   opt_id,
   opt_isLocal,
-  opt_isCloud
+  opt_isCloud,
+  opt_valueType
 ) {
   /**
    * The workspace the variable is in.
@@ -95,6 +97,9 @@ Blockly.VariableModel = function (
    * @package
    */
   this.isCloud = opt_isCloud || false;
+
+  /** The declared value type, separate from scalar/list/table storage. */
+  this.valueType = opt_valueType || "Any";
 
   Blockly.Events.fire(new Blockly.Events.VarCreate(this));
 };

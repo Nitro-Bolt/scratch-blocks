@@ -1411,6 +1411,7 @@ Blockly.WorkspaceSvg.prototype.replaceVariableById = function (oldId, newId) {
  *     a UUID.
  * @param {boolean=} opt_isLocal Whether the variable is locally scoped.
  * @param {boolean=} opt_isCloud Whether the variable is a cloud variable.
+ * @param {string=} opt_valueType The declared value type of a scalar variable.
  * @return {?Blockly.VariableModel} The newly created variable.
  * @package
  */
@@ -1419,7 +1420,8 @@ Blockly.WorkspaceSvg.prototype.createVariable = function (
   opt_type,
   opt_id,
   opt_isLocal,
-  opt_isCloud
+  opt_isCloud,
+  opt_valueType
 ) {
   const variableInMap = this.getVariable(name, opt_type) != null;
   const newVar = Blockly.WorkspaceSvg.superClass_.createVariable.call(
@@ -1428,7 +1430,8 @@ Blockly.WorkspaceSvg.prototype.createVariable = function (
     opt_type,
     opt_id,
     opt_isLocal,
-    opt_isCloud
+    opt_isCloud,
+    opt_valueType
   );
   // For performance reasons, only refresh the the toolbox for new variables.
   // Variables that already exist should already be there.
