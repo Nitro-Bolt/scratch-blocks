@@ -3455,15 +3455,3 @@ Blockly.WorkspaceSvg.prototype.getGrid = function () {
 // Export symbols that would otherwise be renamed by Closure compiler.
 Blockly.WorkspaceSvg.prototype["setVisible"] =
   Blockly.WorkspaceSvg.prototype.setVisible;
-Blockly.WorkspaceSvg.prototype["getSelectedBlocks"] =
-  Blockly.WorkspaceSvg.prototype.getSelectedBlocks;
-Blockly.WorkspaceSvg.prototype["isBlockSelected"] =
-  Blockly.WorkspaceSvg.prototype.isBlockSelected;
-Blockly.WorkspaceSvg.prototype["setBlockSelected"] =
-  Blockly.WorkspaceSvg.prototype.setBlockSelected;
-Blockly.WorkspaceSvg.prototype["toggleBlockSelection"] =
-  Blockly.WorkspaceSvg.prototype.toggleBlockSelection;
-Blockly.WorkspaceSvg.prototype["clearMultiSelection"] =
-  Blockly.WorkspaceSvg.prototype.clearMultiSelection;
-Blockly.WorkspaceSvg.prototype["clearMultiSelectionAfterAction"] =
-  Blockly.WorkspaceSvg.prototype.clearMultiSelectionAfterAction;
