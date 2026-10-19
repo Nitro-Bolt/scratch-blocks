@@ -69,6 +69,9 @@ Blockly.BlockSvg = function (workspace, prototypeName, opt_id) {
   );
   this.svgPath_.tooltip = this;
 
+  /** @type {SVGElement} @private */
+  this.multiSelectionOutline_ = null;
+
   /** @type {boolean} */
   this.rendered = false;
 
@@ -196,6 +199,9 @@ Blockly.BlockSvg.prototype.select = function () {
   }
   if (Blockly.selected == this) {
     return;
+  }
+  if (this.workspace.clearMultiSelection) {
+    this.workspace.clearMultiSelection();
   }
   let oldId = null;
   if (Blockly.selected) {
@@ -943,6 +949,18 @@ Blockly.BlockSvg.prototype.dispose = function (healStack, animate) {
   // Save the block's workspace temporarily so we can resize the
   // contents once the block is disposed.
   const blockWorkspace = this.workspace;
+  if (
+    blockWorkspace.isIndividualBlockSelected &&
+    blockWorkspace.isIndividualBlockSelected(this)
+  ) {
+    blockWorkspace.setBlockSelected(this, false);
+  } else if (
+    this.getRootBlock() === this &&
+    blockWorkspace.isStackSelected &&
+    blockWorkspace.isStackSelected(this)
+  ) {
+    blockWorkspace.setBlockSelected(this, false);
+  }
   // If this block is being dragged, unlink the mouse events.
   if (Blockly.selected == this) {
     this.unselect();

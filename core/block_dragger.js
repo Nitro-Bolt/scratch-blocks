@@ -32,6 +32,8 @@ goog.require("Blockly.Events.DragBlockOutside");
 goog.require("Blockly.Events.EndBlockDrag");
 goog.require("Blockly.Group");
 goog.require("Blockly.InsertionMarkerManager");
+goog.require("Blockly.utils");
+goog.require("Blockly.Xml");
 
 goog.require("goog.math.Coordinate");
 goog.require("goog.asserts");
@@ -100,6 +102,31 @@ Blockly.BlockDragger = function (block, workspace) {
   this.startXY_ = this.draggingBlock_.getRelativeToSurfaceXY();
 
   /**
+   * Other selected stacks which move with the primary dragged stack.
+   * @type {!Array.<!Blockly.BlockSvg>}
+   * @private
+   */
+  this.additionalDraggingBlocks_ = workspace.getSelectedBlocks
+    ? workspace.getSelectedBlocks().filter(function (selectedBlock) {
+        return selectedBlock !== block && selectedBlock.isMovable();
+      })
+    : [];
+
+  /** @type {!Array.<!goog.math.Coordinate>} @private */
+  this.additionalStartXY_ = this.additionalDraggingBlocks_.map(
+    function (selectedBlock) {
+      return selectedBlock.getRelativeToSurfaceXY();
+    }
+  );
+
+  /**
+   * Wrapper holding all selected scripts on the drag surface.
+   * @type {SVGElement}
+   * @private
+   */
+  this.multiDragSurfaceGroup_ = null;
+
+  /**
    * A list of all of the icons (comment, warning, and mutator) that are
    * on this block and its descendants.  Moving an icon moves the bubble that
    * extends from it if that bubble is open.
@@ -107,6 +134,12 @@ Blockly.BlockDragger = function (block, workspace) {
    * @private
    */
   this.dragIconData_ = Blockly.BlockDragger.initIconData_(block);
+  for (let i = 0; i < this.additionalDraggingBlocks_.length; i++) {
+    this.dragIconData_.push.apply(
+      this.dragIconData_,
+      Blockly.BlockDragger.initIconData_(this.additionalDraggingBlocks_[i])
+    );
+  }
 };
 
 /**
@@ -118,6 +151,9 @@ Blockly.BlockDragger.prototype.dispose = function () {
   this.workspace_ = null;
   this.startWorkspace_ = null;
   this.dragIconData_.length = 0;
+  this.additionalDraggingBlocks_.length = 0;
+  this.additionalStartXY_.length = 0;
+  this.multiDragSurfaceGroup_ = null;
 
   if (this.draggedConnectionManager_) {
     this.draggedConnectionManager_.dispose();
@@ -176,10 +212,30 @@ Blockly.BlockDragger.prototype.startBlockDrag = function (currentDragDeltaXY) {
     Blockly.BlockAnimations.disconnectUiEffect(this.draggingBlock_);
   }
   this.draggingBlock_.setDragging(true);
+  for (let i = 0; i < this.additionalDraggingBlocks_.length; i++) {
+    this.additionalDraggingBlocks_[i].setDragging(true);
+  }
   // For future consideration: we may be able to put moveToDragSurface inside
   // the block dragger, which would also let the block not track the block drag
   // surface.
-  this.draggingBlock_.moveToDragSurface_();
+  if (
+    this.additionalDraggingBlocks_.length &&
+    this.draggingBlock_.useDragSurface_
+  ) {
+    this.moveSelectionToDragSurface_();
+  } else {
+    this.draggingBlock_.moveToDragSurface_();
+    const canvas = this.workspace_.getCanvas();
+    if (
+      this.additionalDraggingBlocks_.length &&
+      !this.draggingBlock_.useDragSurface_
+    ) {
+      canvas.appendChild(this.draggingBlock_.getSvgRoot());
+    }
+    for (let i = 0; i < this.additionalDraggingBlocks_.length; i++) {
+      canvas.appendChild(this.additionalDraggingBlocks_[i].getSvgRoot());
+    }
+  }
 
   const toolbox = this.workspace_.getToolbox();
   if (toolbox) {
@@ -188,6 +244,48 @@ Blockly.BlockDragger.prototype.startBlockDrag = function (currentDragDeltaXY) {
       : "blocklyToolboxGrab";
     toolbox.addStyle(style);
   }
+};
+
+/** Move every selected script onto one shared drag-surface layer. @private */
+Blockly.BlockDragger.prototype.moveSelectionToDragSurface_ = function () {
+  const surface = this.workspace_.blockDragSurface_;
+  const group = Blockly.utils.createSvgElement("g", {}, null);
+  this.multiDragSurfaceGroup_ = group;
+
+  this.draggingBlock_.clearTransformAttributes_();
+  group.appendChild(this.draggingBlock_.getSvgRoot());
+  for (let i = 0; i < this.additionalDraggingBlocks_.length; i++) {
+    const block = this.additionalDraggingBlocks_[i];
+    const start = this.additionalStartXY_[i];
+    block.translate(start.x - this.startXY_.x, start.y - this.startXY_.y);
+    group.appendChild(block.getSvgRoot());
+  }
+
+  surface.translateSurface(this.startXY_.x, this.startXY_.y);
+  surface.setBlocksAndShow(group);
+};
+
+/**
+ * Return every selected script from the shared drag surface to the workspace.
+ * Additional scripts return to their start coordinates so their normal move
+ * events can place them at their final coordinates.
+ * @param {!goog.math.Coordinate} primaryXY Final primary-script coordinate.
+ * @private
+ */
+Blockly.BlockDragger.prototype.moveSelectionOffDragSurface_ = function (
+  primaryXY
+) {
+  const canvas = this.workspace_.getCanvas();
+  this.draggingBlock_.translate(primaryXY.x, primaryXY.y);
+  canvas.appendChild(this.draggingBlock_.getSvgRoot());
+  for (let i = 0; i < this.additionalDraggingBlocks_.length; i++) {
+    const block = this.additionalDraggingBlocks_[i];
+    const start = this.additionalStartXY_[i];
+    block.translate(start.x, start.y);
+    canvas.appendChild(block.getSvgRoot());
+  }
+  this.workspace_.blockDragSurface_.clearAndHide();
+  this.multiDragSurfaceGroup_ = null;
 };
 
 /**
@@ -204,6 +302,15 @@ Blockly.BlockDragger.prototype.dragBlock = function (e, currentDragDeltaXY) {
   const newLoc = goog.math.Coordinate.sum(this.startXY_, delta);
 
   this.draggingBlock_.moveDuringDrag(newLoc);
+  if (!this.multiDragSurfaceGroup_) {
+    for (let i = 0; i < this.additionalDraggingBlocks_.length; i++) {
+      const start = this.additionalStartXY_[i];
+      this.additionalDraggingBlocks_[i].translate(
+        start.x + delta.x,
+        start.y + delta.y
+      );
+    }
+  }
   this.dragIcons_(delta);
 
   this.deleteArea_ = this.workspace_.isDeleteArea(e);
@@ -238,7 +345,11 @@ Blockly.BlockDragger.prototype.endBlockDrag = function (e, currentDragDeltaXY) {
 
   const delta = this.pixelsToWorkspaceUnits_(currentDragDeltaXY);
   const newLoc = goog.math.Coordinate.sum(this.startXY_, delta);
-  this.draggingBlock_.moveOffDragSurface_(newLoc);
+  if (this.multiDragSurfaceGroup_) {
+    this.moveSelectionOffDragSurface_(newLoc);
+  } else {
+    this.draggingBlock_.moveOffDragSurface_(newLoc);
+  }
 
   // Scratch-specific: note possible illegal definition deletion for rollback below.
   const isDeletingProcDef =
@@ -263,8 +374,28 @@ Blockly.BlockDragger.prototype.endBlockDrag = function (e, currentDragDeltaXY) {
     } else {
       this.draggingBlock_.render();
     }
-    this.fitGroupAroundBlock_();
     this.draggingBlock_.scheduleSnapAndBump();
+    for (let i = 0; i < this.additionalDraggingBlocks_.length; i++) {
+      const additionalBlock = this.additionalDraggingBlocks_[i];
+      const start = this.additionalStartXY_[i];
+      additionalBlock.translate(start.x, start.y);
+      additionalBlock.setDragging(false);
+      additionalBlock.moveBy(delta.x, delta.y);
+    }
+    this.fitGroupAroundBlocks_(
+      [this.draggingBlock_].concat(this.additionalDraggingBlocks_)
+    );
+  } else {
+    for (let i = 0; i < this.additionalDraggingBlocks_.length; i++) {
+      const additionalBlock = this.additionalDraggingBlocks_[i];
+      if (additionalBlock.workspace && additionalBlock.isDeletable()) {
+        additionalBlock.dispose(false, true);
+      } else if (additionalBlock.workspace) {
+        const start = this.additionalStartXY_[i];
+        additionalBlock.translate(start.x, start.y);
+        additionalBlock.setDragging(false);
+      }
+    }
   }
   this.workspace_.setResizesEnabled(true);
 
@@ -274,6 +405,12 @@ Blockly.BlockDragger.prototype.endBlockDrag = function (e, currentDragDeltaXY) {
       ? "blocklyToolboxDelete"
       : "blocklyToolboxGrab";
     toolbox.removeStyle(style);
+  }
+  if (this.workspace_.refreshMultiSelection) {
+    this.workspace_.refreshMultiSelection();
+  }
+  if (this.workspace_.clearMultiSelectionAfterAction) {
+    this.workspace_.clearMultiSelectionAfterAction();
   }
   Blockly.Events.setGroup(false);
 
@@ -311,26 +448,25 @@ Blockly.BlockDragger.prototype.endBlockDrag = function (e, currentDragDeltaXY) {
 };
 
 /**
- * Adopt the dropped stack into the group under its top-left corner.
+ * Adopt all moved stacks into the group under the primary stack's top-left
+ * corner, expanding it around their combined bounds.
+ * @param {!Array.<!Blockly.BlockSvg>} blocks Moved top-level stacks.
  * @private
  */
-Blockly.BlockDragger.prototype.fitGroupAroundBlock_ = function () {
-  const block = this.draggingBlock_.getRootBlock();
-  if (block !== this.draggingBlock_) return;
-  const bounds = block.getBoundingRectangle();
-  const x = bounds.topLeft.x;
-  const y = bounds.topLeft.y;
+Blockly.BlockDragger.prototype.fitGroupAroundBlocks_ = function (blocks) {
+  const primary = blocks[0].getRootBlock();
+  if (primary !== blocks[0]) return;
+  const bounds = primary.getBoundingRectangle();
   const groups = this.workspace_.getGroups().slice().reverse();
   let destination = null;
   for (let i = 0; i < groups.length; i++) {
     const group = groups[i];
-    if (
-      !group.collapsed &&
-      x >= group.x &&
-      x <= group.x + group.width &&
-      y >= group.y + 32 &&
-      y <= group.y + group.height
-    ) {
+    const overlapsBody =
+      bounds.bottomRight.x >= group.x &&
+      bounds.topLeft.x <= group.x + group.width &&
+      bounds.bottomRight.y >= group.y + 32 &&
+      bounds.topLeft.y <= group.y + group.height;
+    if (!group.collapsed && overlapsBody) {
       destination = group;
       break;
     }
@@ -338,11 +474,22 @@ Blockly.BlockDragger.prototype.fitGroupAroundBlock_ = function () {
   if (!destination) {
     // This lookup removes stale ownership when a stack was dragged out of its
     // previous expanded group and dropped onto empty workspace.
-    this.workspace_.getGroupForBlock(block.id);
+    for (let i = 0; i < blocks.length; i++) {
+      this.workspace_.getGroupForBlock(blocks[i].id);
+    }
     return;
   }
-  const owner = this.workspace_.getGroupForBlock(block.id, destination);
-  if (!owner) destination.fitBlock(block);
+  const adopted = [];
+  for (let i = 0; i < blocks.length; i++) {
+    const block = blocks[i].getRootBlock();
+    if (
+      block === blocks[i] &&
+      !this.workspace_.getGroupForBlock(block.id, destination)
+    ) {
+      adopted.push(block);
+    }
+  }
+  destination.fitBlocks(adopted);
 };
 
 /**
@@ -363,6 +510,13 @@ Blockly.BlockDragger.prototype.fireDragOutsideEvent_ = function (isOutside) {
  */
 Blockly.BlockDragger.prototype.fireEndDragEvent_ = function (isOutside) {
   const event = new Blockly.Events.EndBlockDrag(this.draggingBlock_, isOutside);
+  if (isOutside && this.additionalDraggingBlocks_.length) {
+    event.xmls = [this.draggingBlock_]
+      .concat(this.additionalDraggingBlocks_)
+      .map(function (block) {
+        return Blockly.Xml.blockToDomWithXY(block, true);
+      });
+  }
   Blockly.Events.fire(event);
 };
 

@@ -690,14 +690,14 @@ Blockly.BlockSvg.prototype.updateColour = function () {
         fieldCount += input.fieldRow.length;
         if (input.fieldRow.length > 0) onlyField = input.fieldRow[0];
       }
-  
+
       if (fieldCount === 1) {
         ownLook = !(onlyField instanceof Blockly.FieldDropdown);
       } else {
         ownLook = false;
       }
     }
-  
+
     if (renderShadowed && this.parentBlock_ && !ownLook) {
       fillColour = this.parentBlock_.getColourSecondary();
     } else if (this.getShadowColour()) {
@@ -921,6 +921,21 @@ Blockly.BlockSvg.prototype.render = function (opt_bubble) {
   Blockly.Field.stopCache();
 
   this.updateIntersectionObserver();
+  if (
+    (opt_bubble === false || !this.getParent()) &&
+    this.workspace.isStackSelected &&
+    this.workspace.isStackSelected(this)
+  ) {
+    const root = this.getRootBlock();
+    this.workspace.setStackSelectionStyle_(root, true);
+  }
+  if (
+    (opt_bubble === false || !this.getParent()) &&
+    this.workspace.hasIndividualSelectionInStack &&
+    this.workspace.hasIndividualSelectionInStack(this)
+  ) {
+    this.workspace.updateIndividualSelectionOutlines_();
+  }
 };
 
 /**

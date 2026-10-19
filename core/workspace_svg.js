@@ -143,6 +143,28 @@ Blockly.WorkspaceSvg = function (
    * @private
    */
   this.lastMouseClientXY_ = null;
+
+  /**
+   * Top-level block stacks in the current multi-selection.
+   * @type {!Array.<!Blockly.BlockSvg>}
+   * @private
+   */
+  this.selectedBlocks_ = [];
+
+  /** @type {!Array.<!Blockly.BlockSvg>} @private */
+  this.selectedIndividualBlocks_ = [];
+
+  /** @type {!Array.<!SVGElement>} @private */
+  this.individualSelectionOutlines_ = [];
+
+  /** @type {boolean} @private */
+  this.selectingIndividualBlocks_ = false;
+
+  /** @type {SVGElement} @private */
+  this.selectionRect_ = null;
+
+  /** @type {SVGPoint} @private */
+  this.selectionTestPoint_ = null;
 };
 goog.inherits(Blockly.WorkspaceSvg, Blockly.Workspace);
 
@@ -529,6 +551,9 @@ Blockly.WorkspaceSvg.prototype.createDom = function (opt_backgroundClass) {
     // even if the mouse hasn't moved over the workspace recently.
     this.onMouseMoveTrackDocHandler_ = this.onMouseMoveTrackDoc_.bind(this);
     document.addEventListener("mousemove", this.onMouseMoveTrackDocHandler_);
+    this.clearSelectionDocHandler_ =
+      this.clearSelectionFromDocument_.bind(this);
+    document.addEventListener("mousedown", this.clearSelectionDocHandler_);
   }
 
   this.intersectionObserver = new Blockly.IntersectionObserver(this);
@@ -559,6 +584,7 @@ Blockly.WorkspaceSvg.prototype.dispose = function () {
   if (this.currentGesture_) {
     this.currentGesture_.cancel();
   }
+  this.clearMultiSelection();
   if (this.intersectionObserver) {
     this.intersectionObserver.dispose();
     this.intersectionObserver = null;
@@ -619,6 +645,10 @@ Blockly.WorkspaceSvg.prototype.dispose = function () {
   if (this.onMouseMoveTrackDocHandler_) {
     document.removeEventListener("mousemove", this.onMouseMoveTrackDocHandler_);
     this.onMouseMoveTrackDocHandler_ = null;
+  }
+  if (this.clearSelectionDocHandler_) {
+    document.removeEventListener("mousedown", this.clearSelectionDocHandler_);
+    this.clearSelectionDocHandler_ = null;
   }
   if (this.procedureReturnChangeTimeout_) {
     clearTimeout(this.procedureReturnChangeTimeout_);
@@ -1051,6 +1081,7 @@ Blockly.WorkspaceSvg.prototype.getWidth = function () {
  * @param {boolean} isVisible True if workspace should be visible.
  */
 Blockly.WorkspaceSvg.prototype.setVisible = function (isVisible) {
+  if (!isVisible) this.clearMultiSelection();
   // Tell the scrollbar whether its container is visible so it can
   // tell when to hide itself.
   if (this.scrollbar) {
@@ -1539,6 +1570,561 @@ Blockly.WorkspaceSvg.prototype.onMouseDown_ = function (e) {
     (point.y - canvasTranslation.y) / this.scale
   );
   this.lastMouseClientXY_ = new goog.math.Coordinate(e.clientX, e.clientY);
+};
+
+/**
+ * Return a copy of the selected top-level block stacks.
+ * @return {!Array.<!Blockly.BlockSvg>} Selected block stacks.
+ */
+Blockly.WorkspaceSvg.prototype.getSelectedBlocks = function () {
+  const selected = this.selectedBlocks_.slice();
+  for (let i = 0; i < this.selectedIndividualBlocks_.length; i++) {
+    const block = this.selectedIndividualBlocks_[i];
+    const parent = block.getParent();
+    if (
+      this.selectedBlocks_.indexOf(block.getRootBlock()) === -1 &&
+      (!parent || this.selectedIndividualBlocks_.indexOf(parent) === -1)
+    ) {
+      selected.push(block);
+    }
+  }
+  return selected;
+};
+
+/**
+ * Test whether a block or its stack is part of the multi-selection.
+ * @param {!Blockly.BlockSvg} block Block to test.
+ * @return {boolean} Whether the block is selected.
+ */
+Blockly.WorkspaceSvg.prototype.isBlockSelected = function (block) {
+  if (this.selectedIndividualBlocks_.indexOf(block) !== -1) return true;
+  const root = block.getRootBlock();
+  return this.selectedBlocks_.indexOf(root) !== -1;
+};
+
+/** Test whether one exact block is individually selected. */
+Blockly.WorkspaceSvg.prototype.isIndividualBlockSelected = function (block) {
+  return this.selectedIndividualBlocks_.indexOf(block) !== -1;
+};
+
+/** Test whether a block belongs to a whole-script selection. */
+Blockly.WorkspaceSvg.prototype.isStackSelected = function (block) {
+  return this.selectedBlocks_.indexOf(block.getRootBlock()) !== -1;
+};
+
+/** Test whether a script contains any individually selected block. */
+Blockly.WorkspaceSvg.prototype.hasIndividualSelectionInStack = function (
+  block
+) {
+  const root = block.getRootBlock();
+  for (let i = 0; i < this.selectedIndividualBlocks_.length; i++) {
+    if (this.selectedIndividualBlocks_[i].getRootBlock() === root) return true;
+  }
+  return false;
+};
+
+/** Remove individually selected blocks belonging to one script. @private */
+Blockly.WorkspaceSvg.prototype.removeIndividualSelectionInStack_ = function (
+  root
+) {
+  let changed = false;
+  for (let i = this.selectedIndividualBlocks_.length - 1; i >= 0; i--) {
+    if (this.selectedIndividualBlocks_[i].getRootBlock() === root) {
+      this.selectedIndividualBlocks_.splice(i, 1);
+      changed = true;
+    }
+  }
+  if (changed) this.updateIndividualSelectionOutlines_();
+};
+
+/**
+ * Create an outline group whose child paths are combined into a silhouette.
+ * @param {!SVGElement} rootSvg Root block SVG that owns the outline.
+ * @return {!SVGElement} Outline group.
+ * @private
+ */
+Blockly.WorkspaceSvg.prototype.createMultiSelectionOutline_ = function (
+  rootSvg
+) {
+  const outline = Blockly.utils.createSvgElement(
+    "g",
+    { class: "blocklyMultiSelectionOutline" },
+    null
+  );
+  rootSvg.insertBefore(outline, rootSvg.firstChild);
+  return outline;
+};
+
+/**
+ * Test whether a block and each of its logical ancestors are visible.
+ * Connected block SVG roots are workspace siblings, so checking only the
+ * block itself misses descendants hidden by a collapsed input or group.
+ * @param {!Blockly.BlockSvg} block Block to test.
+ * @return {boolean} Whether the block is visible.
+ * @private
+ */
+Blockly.WorkspaceSvg.prototype.isBlockVisibleForSelection_ = function (block) {
+  for (let current = block; current; current = current.getParent()) {
+    const root = current.getSvgRoot();
+    if (
+      !root ||
+      root.style.display === "none" ||
+      root.getAttribute("display") === "none"
+    ) {
+      return false;
+    }
+  }
+  return true;
+};
+
+/** Add one block shape to a combined selection silhouette. @private */
+Blockly.WorkspaceSvg.prototype.appendBlockToSelectionOutline_ = function (
+  paths,
+  block,
+  rootXY
+) {
+  if (!this.isBlockVisibleForSelection_(block)) return;
+  const xy = block.getRelativeToSurfaceXY();
+  const wrapper = Blockly.utils.createSvgElement(
+    "g",
+    {
+      transform:
+        "translate(" + (xy.x - rootXY.x) + "," + (xy.y - rootXY.y) + ")",
+    },
+    paths
+  );
+  const shape = block.svgPath_.cloneNode(false);
+  wrapper.appendChild(shape);
+  shape.setAttribute("class", "blocklyMultiSelectionOutlinePath");
+  shape.removeAttribute("fill");
+  shape.removeAttribute("fill-opacity");
+  shape.removeAttribute("filter");
+  shape.removeAttribute("stroke");
+};
+
+/** Rebuild combined outlines for all individually selected blocks. @private */
+Blockly.WorkspaceSvg.prototype.updateIndividualSelectionOutlines_ =
+  function () {
+    for (let i = 0; i < this.individualSelectionOutlines_.length; i++) {
+      this.individualSelectionOutlines_[i].remove();
+    }
+    this.individualSelectionOutlines_.length = 0;
+
+    const roots = [];
+    const outlines = [];
+    for (let i = 0; i < this.selectedIndividualBlocks_.length; i++) {
+      const block = this.selectedIndividualBlocks_[i];
+      if (!block.workspace || block.workspace !== this || !block.svgPath_)
+        continue;
+      const root = block.getRootBlock();
+      let rootIndex = roots.indexOf(root);
+      if (rootIndex === -1) {
+        const rootSvg = root.getSvgRoot();
+        if (!rootSvg) continue;
+        const outline = this.createMultiSelectionOutline_(rootSvg);
+        roots.push(root);
+        outlines.push(outline);
+        this.individualSelectionOutlines_.push(outline);
+        rootIndex = outlines.length - 1;
+      }
+      this.appendBlockToSelectionOutline_(
+        outlines[rootIndex],
+        block,
+        root.getRelativeToSurfaceXY()
+      );
+    }
+  };
+
+/** Return the highest connected, individually selected ancestor of a block. */
+Blockly.WorkspaceSvg.prototype.getSelectedDragBlock = function (block) {
+  if (this.selectedIndividualBlocks_.indexOf(block) === -1) {
+    return block.getRootBlock();
+  }
+  let parent = block.getParent();
+  while (parent && this.selectedIndividualBlocks_.indexOf(parent) !== -1) {
+    block = parent;
+    parent = block.getParent();
+  }
+  return block;
+};
+
+/** Select or deselect one exact block without including its stack. */
+Blockly.WorkspaceSvg.prototype.toggleIndividualBlockSelection = function (
+  block
+) {
+  if (
+    !block ||
+    block.workspace !== this ||
+    block.isInFlyout ||
+    block.isShadow()
+  )
+    return;
+  const root = block.getRootBlock();
+  if (this.selectedBlocks_.indexOf(root) !== -1) {
+    this.setBlockSelected(root, false);
+    this.removeIndividualSelectionInStack_(root);
+  }
+  const index = this.selectedIndividualBlocks_.indexOf(block);
+  if (index === -1) {
+    if (Blockly.selected) Blockly.selected.unselect();
+    this.selectedIndividualBlocks_.push(block);
+  } else {
+    this.selectedIndividualBlocks_.splice(index, 1);
+  }
+  this.updateIndividualSelectionOutlines_();
+};
+
+/** Disconnect edges between individually selected and unselected blocks. */
+Blockly.WorkspaceSvg.prototype.prepareMultiSelectionForDrag = function () {
+  const selected = this.selectedIndividualBlocks_;
+  if (!selected.length) return;
+  for (let i = 0; i < selected.length; i++) {
+    const connections = selected[i].getConnections_();
+    for (let j = 0; j < connections.length; j++) {
+      const connection = connections[j];
+      const otherBlock = connection.targetBlock();
+      if (
+        otherBlock &&
+        !otherBlock.isShadow() &&
+        connection.type !== Blockly.INPUT_VALUE &&
+        selected.indexOf(otherBlock) === -1
+      ) {
+        connection.disconnect();
+      }
+    }
+  }
+  this.updateIndividualSelectionOutlines_();
+};
+
+/**
+ * Apply or remove the multi-selection appearance from an entire stack.
+ * @param {!Blockly.BlockSvg} root Top-level block.
+ * @param {boolean} selected Whether to show the selection.
+ * @private
+ */
+Blockly.WorkspaceSvg.prototype.setStackSelectionStyle_ = function (
+  root,
+  selected
+) {
+  if (root.multiSelectionOutline_) {
+    root.multiSelectionOutline_.remove();
+    root.multiSelectionOutline_ = null;
+  }
+  if (!selected || !root.workspace || root.workspace !== this) return;
+
+  const rootSvg = root.getSvgRoot();
+  if (!rootSvg) return;
+  const outline = this.createMultiSelectionOutline_(rootSvg);
+  root.multiSelectionOutline_ = outline;
+
+  const rootXY = root.getRelativeToSurfaceXY();
+  const descendants = root.getDescendants(false);
+  for (let i = 0; i < descendants.length; i++) {
+    const block = descendants[i];
+    if (block.isShadow() || !block.svgPath_) continue;
+    this.appendBlockToSelectionOutline_(outline, block, rootXY);
+  }
+};
+
+/**
+ * Select or deselect a top-level block stack.
+ * @param {!Blockly.BlockSvg} block A block in the stack.
+ * @param {boolean} selected Whether the stack should be selected.
+ */
+Blockly.WorkspaceSvg.prototype.setBlockSelected = function (block, selected) {
+  if (!block || block.workspace !== this || block.isInFlyout) return;
+  const individualIndex = this.selectedIndividualBlocks_.indexOf(block);
+  if (!selected && individualIndex !== -1) {
+    this.selectedIndividualBlocks_.splice(individualIndex, 1);
+    this.updateIndividualSelectionOutlines_();
+    return;
+  }
+  const root = block.getRootBlock();
+  const index = this.selectedBlocks_.indexOf(root);
+  if (selected && index === -1) {
+    if (Blockly.selected) Blockly.selected.unselect();
+    this.removeIndividualSelectionInStack_(root);
+    this.selectedBlocks_.push(root);
+    this.setStackSelectionStyle_(root, true);
+  } else if (!selected && index !== -1) {
+    this.selectedBlocks_.splice(index, 1);
+    this.setStackSelectionStyle_(root, false);
+  }
+};
+
+/**
+ * Toggle a top-level block stack in the multi-selection.
+ * @param {!Blockly.BlockSvg} block A block in the stack.
+ */
+Blockly.WorkspaceSvg.prototype.toggleBlockSelection = function (block) {
+  this.setBlockSelected(block, !this.isStackSelected(block));
+};
+
+/** Clear all selected block stacks and remove their appearance. */
+Blockly.WorkspaceSvg.prototype.clearMultiSelection = function () {
+  if (
+    Blockly.selected &&
+    Blockly.selected.workspace === this &&
+    this.isBlockSelected(Blockly.selected)
+  ) {
+    Blockly.selected.unselect();
+  }
+  for (let i = 0; i < this.selectedBlocks_.length; i++) {
+    const block = this.selectedBlocks_[i];
+    if (block.workspace === this) this.setStackSelectionStyle_(block, false);
+  }
+  this.selectedBlocks_.length = 0;
+  for (let i = 0; i < this.individualSelectionOutlines_.length; i++) {
+    this.individualSelectionOutlines_[i].remove();
+  }
+  this.individualSelectionOutlines_.length = 0;
+  this.selectedIndividualBlocks_.length = 0;
+  if (this.selectionRect_) {
+    this.selectionRect_.remove();
+    this.selectionRect_ = null;
+  }
+};
+
+/** Clear selected stacks after an action when that behavior is enabled. */
+Blockly.WorkspaceSvg.prototype.clearMultiSelectionAfterAction = function () {
+  if (this.options.deselectMultiSelectionAfterAction) {
+    this.clearMultiSelection();
+  }
+};
+
+/** Reconcile selected stacks after blocks have connected or disconnected. */
+Blockly.WorkspaceSvg.prototype.refreshMultiSelection = function () {
+  const oldSelection = this.selectedBlocks_.slice();
+  this.selectedBlocks_.length = 0;
+  for (let i = 0; i < oldSelection.length; i++) {
+    const block = oldSelection[i];
+    if (!block.workspace) continue;
+    this.setStackSelectionStyle_(block, false);
+    const root = block.getRootBlock();
+    if (this.selectedBlocks_.indexOf(root) === -1) {
+      this.selectedBlocks_.push(root);
+      this.setStackSelectionStyle_(root, true);
+    }
+  }
+};
+
+/**
+ * Clear selection when clicking outside this workspace.
+ * @param {!Event} e Mouse event.
+ * @private
+ */
+Blockly.WorkspaceSvg.prototype.clearSelectionFromDocument_ = function (e) {
+  if (
+    (this.selectedBlocks_.length || this.selectedIndividualBlocks_.length) &&
+    this.isVisible() &&
+    !this.getParentSvg().contains(/** @type {!Node} */ (e.target))
+  ) {
+    this.clearMultiSelection();
+  }
+};
+
+/**
+ * Begin drawing a selection rectangle.
+ * @param {!goog.math.Coordinate} start Workspace coordinate.
+ * @param {boolean=} opt_individual Select exact blocks rather than scripts.
+ */
+Blockly.WorkspaceSvg.prototype.startSelectionBox = function (
+  start,
+  opt_individual
+) {
+  this.clearMultiSelection();
+  this.selectingIndividualBlocks_ = !!opt_individual;
+  if (Blockly.selected) Blockly.selected.unselect();
+  this.selectionRect_ = Blockly.utils.createSvgElement(
+    "rect",
+    {
+      class: "blocklySelectionBox",
+      x: start.x,
+      y: start.y,
+      width: 0,
+      height: 0,
+    },
+    this.svgBlockCanvas_
+  );
+};
+
+/**
+ * Update the selection rectangle.
+ * @param {!goog.math.Coordinate} start Start coordinate.
+ * @param {!goog.math.Coordinate} end Current coordinate.
+ */
+Blockly.WorkspaceSvg.prototype.updateSelectionBox = function (start, end) {
+  if (!this.selectionRect_) return;
+  this.selectionRect_.setAttribute("x", Math.min(start.x, end.x));
+  this.selectionRect_.setAttribute("y", Math.min(start.y, end.y));
+  this.selectionRect_.setAttribute("width", Math.abs(end.x - start.x));
+  this.selectionRect_.setAttribute("height", Math.abs(end.y - start.y));
+  this.updateBlocksInSelectionBox_(start, end);
+};
+
+/**
+ * Test a selection rectangle against the visible fill of one block.
+ * @param {!Blockly.BlockSvg} block Block to test.
+ * @param {number} left Rectangle left.
+ * @param {number} top Rectangle top.
+ * @param {number} right Rectangle right.
+ * @param {number} bottom Rectangle bottom.
+ * @return {boolean} Whether visible block geometry is touched.
+ * @private
+ */
+Blockly.WorkspaceSvg.prototype.selectionBoxTouchesBlock_ = function (
+  block,
+  left,
+  top,
+  right,
+  bottom
+) {
+  const xy = block.getRelativeToSurfaceXY();
+  const blockLeft = block.RTL ? xy.x - block.width : xy.x;
+  const blockRight = block.RTL ? xy.x : xy.x + block.width;
+  const overlapLeft = Math.max(left, blockLeft);
+  const overlapTop = Math.max(top, xy.y);
+  const overlapRight = Math.min(right, blockRight);
+  const overlapBottom = Math.min(bottom, xy.y + block.height);
+  if (overlapLeft > overlapRight || overlapTop > overlapBottom) return false;
+
+  const path = block.svgPath_;
+  if (!path || typeof path.isPointInFill !== "function") return true;
+  const point =
+    this.selectionTestPoint_ ||
+    (this.selectionTestPoint_ = this.getParentSvg().createSVGPoint());
+  const testPoint = function (x, y) {
+    point.x = block.RTL ? -(x - xy.x) : x - xy.x;
+    point.y = y - xy.y;
+    return path.isPointInFill(point);
+  };
+  const step = 4;
+  for (let y = overlapTop; y <= overlapBottom; y += step) {
+    for (let x = overlapLeft; x <= overlapRight; x += step) {
+      if (testPoint(x, y)) return true;
+    }
+    if (testPoint(overlapRight, y)) return true;
+  }
+  for (let x = overlapLeft; x <= overlapRight; x += step) {
+    if (testPoint(x, overlapBottom)) return true;
+  }
+  return testPoint(
+    (overlapLeft + overlapRight) / 2,
+    (overlapTop + overlapBottom) / 2
+  );
+};
+
+/**
+ * Test whether one visible block is fully enclosed by a selection rectangle.
+ * @param {!Blockly.BlockSvg} block Block to test.
+ * @param {number} left Rectangle left.
+ * @param {number} top Rectangle top.
+ * @param {number} right Rectangle right.
+ * @param {number} bottom Rectangle bottom.
+ * @return {boolean} Whether the block is enclosed.
+ * @private
+ */
+Blockly.WorkspaceSvg.prototype.selectionBoxContainsBlock_ = function (
+  block,
+  left,
+  top,
+  right,
+  bottom
+) {
+  const xy = block.getRelativeToSurfaceXY();
+  const blockLeft = block.RTL ? xy.x - block.width : xy.x;
+  const blockRight = block.RTL ? xy.x : xy.x + block.width;
+  return (
+    left <= blockLeft &&
+    top <= xy.y &&
+    right >= blockRight &&
+    bottom >= xy.y + block.height
+  );
+};
+
+/**
+ * Synchronize the selection highlight with the stacks touched by a rectangle.
+ * @param {!goog.math.Coordinate} start Start coordinate.
+ * @param {!goog.math.Coordinate} end End coordinate.
+ * @private
+ */
+Blockly.WorkspaceSvg.prototype.updateBlocksInSelectionBox_ = function (
+  start,
+  end
+) {
+  const left = Math.min(start.x, end.x);
+  const top = Math.min(start.y, end.y);
+  const right = Math.max(start.x, end.x);
+  const bottom = Math.max(start.y, end.y);
+  const blocks = this.selectingIndividualBlocks_
+    ? this.getAllBlocks()
+    : this.getTopBlocks(false);
+  const inwardSelection = !!this.options.inwardSelection;
+  const touchedBlocks = [];
+  for (let i = 0; i < blocks.length; i++) {
+    const descendants = this.selectingIndividualBlocks_
+      ? [blocks[i]]
+      : blocks[i].getDescendants(false);
+    let matches = inwardSelection;
+    let hasVisibleBlock = false;
+    for (let j = 0; j < descendants.length; j++) {
+      const block = descendants[j];
+      if (block.isShadow() || !this.isBlockVisibleForSelection_(block)) {
+        continue;
+      }
+      hasVisibleBlock = true;
+      if (inwardSelection) {
+        if (!this.selectionBoxContainsBlock_(block, left, top, right, bottom)) {
+          matches = false;
+          break;
+        }
+      } else if (
+        this.selectionBoxTouchesBlock_(block, left, top, right, bottom)
+      ) {
+        matches = true;
+        break;
+      }
+    }
+    if (matches && hasVisibleBlock) touchedBlocks.push(blocks[i]);
+  }
+  if (this.selectingIndividualBlocks_) {
+    const selectedBlocks = this.selectedIndividualBlocks_.slice();
+    for (let i = 0; i < selectedBlocks.length; i++) {
+      if (touchedBlocks.indexOf(selectedBlocks[i]) === -1) {
+        this.selectedIndividualBlocks_.splice(
+          this.selectedIndividualBlocks_.indexOf(selectedBlocks[i]),
+          1
+        );
+      }
+    }
+    for (let i = 0; i < touchedBlocks.length; i++) {
+      if (this.selectedIndividualBlocks_.indexOf(touchedBlocks[i]) === -1) {
+        this.selectedIndividualBlocks_.push(touchedBlocks[i]);
+      }
+    }
+    this.updateIndividualSelectionOutlines_();
+    return;
+  }
+  const selectedBlocks = this.selectedBlocks_.slice();
+  for (let i = 0; i < selectedBlocks.length; i++) {
+    if (touchedBlocks.indexOf(selectedBlocks[i]) === -1) {
+      this.setBlockSelected(selectedBlocks[i], false);
+    }
+  }
+  for (let i = 0; i < touchedBlocks.length; i++) {
+    this.setBlockSelected(touchedBlocks[i], true);
+  }
+};
+
+/**
+ * Finish the selection rectangle and retain its current highlighted stacks.
+ * @param {!goog.math.Coordinate} start Start coordinate.
+ * @param {!goog.math.Coordinate} end End coordinate.
+ */
+Blockly.WorkspaceSvg.prototype.finishSelectionBox = function (start, end) {
+  this.updateBlocksInSelectionBox_(start, end);
+  if (this.selectionRect_) this.selectionRect_.remove();
+  this.selectionRect_ = null;
 };
 
 /**

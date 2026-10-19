@@ -116,6 +116,9 @@ Blockly.Events.EndBlockDrag.prototype.toJson = function () {
   if (this.xml) {
     json["xml"] = this.xml;
   }
+  if (this.xmls) {
+    json["xmls"] = this.xmls;
+  }
   return json;
 };
 
@@ -127,4 +130,5 @@ Blockly.Events.EndBlockDrag.prototype.fromJson = function (json) {
   Blockly.Events.EndBlockDrag.superClass_.fromJson.call(this, json);
   this.isOutside = json["isOutside"];
   this.xml = json["xml"];
+  this.xmls = json["xmls"];
 };

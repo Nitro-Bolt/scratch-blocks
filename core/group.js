@@ -684,19 +684,36 @@ Blockly.Group.prototype.setColour_ = function (colour) {
  * @param {!Blockly.BlockSvg} block Top-level stack.
  */
 Blockly.Group.prototype.fitBlock = function (block) {
-  const bounds = block.getBoundingRectangle();
+  this.fitBlocks([block]);
+};
+
+/**
+ * Adopt stacks and expand this group once to contain their combined bounds.
+ * @param {!Array.<!Blockly.BlockSvg>} blocks Top-level stacks.
+ */
+Blockly.Group.prototype.fitBlocks = function (blocks) {
+  if (!blocks.length) return;
   const padding = 16;
-  const left = Math.min(this.x, bounds.topLeft.x - padding);
-  const top = Math.min(this.y, bounds.topLeft.y - 32 - padding);
-  const right = Math.max(this.x + this.width, bounds.bottomRight.x + padding);
-  const bottom = Math.max(this.y + this.height, bounds.bottomRight.y + padding);
-  const ownsBlock = this.blockIds.indexOf(block.id) !== -1;
+  let left = this.x;
+  let top = this.y;
+  let right = this.x + this.width;
+  let bottom = this.y + this.height;
+  let ownsAllBlocks = true;
+  for (let i = 0; i < blocks.length; i++) {
+    const block = blocks[i];
+    const bounds = block.getBoundingRectangle();
+    left = Math.min(left, bounds.topLeft.x - padding);
+    top = Math.min(top, bounds.topLeft.y - 32 - padding);
+    right = Math.max(right, bounds.bottomRight.x + padding);
+    bottom = Math.max(bottom, bounds.bottomRight.y + padding);
+    if (this.blockIds.indexOf(block.id) === -1) ownsAllBlocks = false;
+  }
   if (
     left === this.x &&
     top === this.y &&
     right === this.x + this.width &&
     bottom === this.y + this.height &&
-    ownsBlock
+    ownsAllBlocks
   ) {
     return;
   }
@@ -708,7 +725,11 @@ Blockly.Group.prototype.fitBlock = function (block) {
   this.height = bottom - top;
   this.expandedWidth = this.width;
   this.expandedHeight = this.height;
-  if (this.blockIds.indexOf(block.id) === -1) this.blockIds.push(block.id);
+  for (let i = 0; i < blocks.length; i++) {
+    if (this.blockIds.indexOf(blocks[i].id) === -1) {
+      this.blockIds.push(blocks[i].id);
+    }
+  }
   this.render();
   event.recordNew(this);
   Blockly.Events.fire(event);

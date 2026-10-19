@@ -241,6 +241,18 @@ Blockly.Gesture = function (e, creatorWorkspace) {
    * @private
    */
   this.shouldDuplicateOnDrag_ = false;
+
+  /** @type {boolean} @private */
+  this.isSelectingBlocks_ = false;
+
+  /** @type {boolean} @private */
+  this.isTogglingBlockSelection_ = false;
+
+  /** @type {boolean} @private */
+  this.isSelectingIndividualBlocks_ = false;
+
+  /** @type {goog.math.Coordinate} @private */
+  this.selectionStartXY_ = null;
 };
 
 /**
@@ -449,6 +461,19 @@ Blockly.Gesture.prototype.updateIsDragging_ = function () {
   );
   this.calledUpdateIsDragging_ = true;
 
+  if (this.isTogglingBlockSelection_ && this.isSelectingIndividualBlocks_) {
+    this.isTogglingBlockSelection_ = false;
+    this.isSelectingIndividualBlocks_ = false;
+    if (this.startWorkspace_.clearMultiSelection) {
+      this.startWorkspace_.clearMultiSelection();
+    }
+    this.targetBlock_.select();
+  }
+
+  if (this.isSelectingBlocks_ || this.isTogglingBlockSelection_) {
+    return;
+  }
+
   // First check if it was a bubble drag.  Bubbles always sit on top of blocks.
   if (this.updateIsDraggingBubble_()) {
     return;
@@ -468,6 +493,12 @@ Blockly.Gesture.prototype.updateIsDragging_ = function () {
 Blockly.Gesture.prototype.startDraggingBlock_ = function () {
   if (this.shouldDuplicateOnDrag_) {
     this.duplicateOnDrag_();
+  }
+  if (!Blockly.Events.getGroup()) {
+    Blockly.Events.setGroup(true);
+  }
+  if (this.startWorkspace_.prepareMultiSelectionForDrag) {
+    this.startWorkspace_.prepareMultiSelectionForDrag();
   }
   this.blockDragger_ = new Blockly.BlockDragger(
     this.targetBlock_,
@@ -506,6 +537,14 @@ Blockly.Gesture.prototype.doStart = function (e) {
   }
   this.hasStarted_ = true;
 
+  if (
+    this.flyout_ &&
+    this.flyout_.targetWorkspace_ &&
+    this.flyout_.targetWorkspace_.clearMultiSelection
+  ) {
+    this.flyout_.targetWorkspace_.clearMultiSelection();
+  }
+
   Blockly.BlockAnimations.disconnectUiStop();
   this.startWorkspace_.updateScreenCalculationsIfScrolled();
   if (this.startWorkspace_.isMutator) {
@@ -520,8 +559,17 @@ Blockly.Gesture.prototype.doStart = function (e) {
   Blockly.hideChaff(!!this.flyout_);
   Blockly.Tooltip.block();
 
-  if (this.targetBlock_) {
-    this.targetBlock_.select();
+  if (this.targetBlock_ && !this.isTogglingBlockSelection_) {
+    if (
+      this.startWorkspace_.isBlockSelected &&
+      this.startWorkspace_.isBlockSelected(this.targetBlock_)
+    ) {
+      Blockly.selected = this.startWorkspace_.getSelectedDragBlock
+        ? this.startWorkspace_.getSelectedDragBlock(this.targetBlock_)
+        : this.targetBlock_.getRootBlock();
+    } else {
+      this.targetBlock_.select();
+    }
   }
 
   if (Blockly.utils.isRightButton(e)) {
@@ -535,6 +583,25 @@ Blockly.Gesture.prototype.doStart = function (e) {
 
   this.mouseDownXY_ = new goog.math.Coordinate(e.clientX, e.clientY);
   this.currentDragDeltaXY_ = new goog.math.Coordinate(0, 0);
+
+  if (this.isSelectingBlocks_) {
+    const point = Blockly.utils.mouseToSvg(
+      e,
+      this.startWorkspace_.getParentSvg(),
+      this.startWorkspace_.getInverseScreenCTM()
+    );
+    const canvas = Blockly.utils.getRelativeXY(
+      this.startWorkspace_.getCanvas()
+    );
+    this.selectionStartXY_ = new goog.math.Coordinate(
+      (point.x - canvas.x) / this.startWorkspace_.scale,
+      (point.y - canvas.y) / this.startWorkspace_.scale
+    );
+    this.startWorkspace_.startSelectionBox(
+      this.selectionStartXY_,
+      this.isSelectingIndividualBlocks_
+    );
+  }
 
   this.bindMouseEvents(e);
 };
@@ -570,7 +637,16 @@ Blockly.Gesture.prototype.bindMouseEvents = function (e) {
 Blockly.Gesture.prototype.handleMove = function (e) {
   let stopPropagation = true;
   this.updateFromEvent_(e);
-  if (this.isDraggingWorkspace_) {
+  if (this.isSelectingBlocks_) {
+    const delta = new goog.math.Coordinate(
+      this.currentDragDeltaXY_.x / this.startWorkspace_.scale,
+      this.currentDragDeltaXY_.y / this.startWorkspace_.scale
+    );
+    this.startWorkspace_.updateSelectionBox(
+      this.selectionStartXY_,
+      goog.math.Coordinate.sum(this.selectionStartXY_, delta)
+    );
+  } else if (this.isDraggingWorkspace_) {
     this.workspaceDragger_.drag(this.currentDragDeltaXY_);
   } else if (this.isDraggingBlock_) {
     if (
@@ -612,7 +688,28 @@ Blockly.Gesture.prototype.handleUp = function (e) {
   // priority than workspaces.
   // The ordering within drags does not matter, because the three types of
   // dragging are exclusive.
-  if (this.isDraggingBubble_) {
+  if (this.isSelectingBlocks_ && this.hasExceededDragRadius_) {
+    const delta = new goog.math.Coordinate(
+      this.currentDragDeltaXY_.x / this.startWorkspace_.scale,
+      this.currentDragDeltaXY_.y / this.startWorkspace_.scale
+    );
+    this.startWorkspace_.finishSelectionBox(
+      this.selectionStartXY_,
+      goog.math.Coordinate.sum(this.selectionStartXY_, delta)
+    );
+  } else if (this.isSelectingBlocks_) {
+    this.startWorkspace_.finishSelectionBox(
+      this.selectionStartXY_,
+      this.selectionStartXY_
+    );
+    this.doWorkspaceClick_();
+  } else if (this.isTogglingBlockSelection_ && !this.hasExceededDragRadius_) {
+    if (this.isSelectingIndividualBlocks_) {
+      this.startWorkspace_.toggleIndividualBlockSelection(this.startBlock_);
+    } else {
+      this.startWorkspace_.toggleBlockSelection(this.startBlock_);
+    }
+  } else if (this.isDraggingBubble_) {
     this.bubbleDragger_.endBubbleDrag(e, this.currentDragDeltaXY_);
   } else if (this.isDraggingBlock_) {
     this.blockDragger_.endBlockDrag(e, this.currentDragDeltaXY_);
@@ -650,6 +747,9 @@ Blockly.Gesture.prototype.cancel = function () {
   }
   this.isEnding_ = true;
   Blockly.longStop_();
+  if (this.isSelectingBlocks_ && this.startWorkspace_.clearMultiSelection) {
+    this.startWorkspace_.clearMultiSelection();
+  }
   if (this.isDraggingBubble_) {
     this.bubbleDragger_.endBubbleDrag(
       this.mostRecentEvent_,
@@ -703,6 +803,37 @@ Blockly.Gesture.prototype.handleWsStart = function (e, ws) {
       "started."
   );
   this.setStartWorkspace_(ws);
+  const isShiftSelection =
+    e.button === 0 && e.shiftKey && !e.ctrlKey && !e.metaKey;
+  const isControlSelection =
+    e.button === 0 && e.ctrlKey && !e.shiftKey && !e.metaKey;
+  const swapSelectionModifiers = !!ws.options.swapMultiSelectModifiers;
+  const isStackSelection = swapSelectionModifiers
+    ? isControlSelection
+    : isShiftSelection;
+  const isIndividualSelection = swapSelectionModifiers
+    ? isShiftSelection
+    : isControlSelection;
+  this.isSelectingBlocks_ =
+    !this.startBlock_ &&
+    !this.flyout_ &&
+    (isStackSelection || isIndividualSelection);
+  this.isSelectingIndividualBlocks_ = isIndividualSelection;
+  this.isTogglingBlockSelection_ =
+    !!this.startBlock_ &&
+    !this.startField_ &&
+    !this.startInput_ &&
+    !this.flyout_ &&
+    (isStackSelection || isIndividualSelection);
+  if (
+    this.targetBlock_ &&
+    ws.isBlockSelected &&
+    ws.isBlockSelected(this.targetBlock_)
+  ) {
+    this.targetBlock_ = ws.getSelectedDragBlock
+      ? ws.getSelectedDragBlock(this.targetBlock_)
+      : this.targetBlock_.getRootBlock();
+  }
   this.mostRecentEvent_ = e;
   this.doStart(e);
 };
@@ -768,6 +899,9 @@ Blockly.Gesture.prototype.doBubbleClick_ = function () {
   // clicks.
   this.startBubble_.setFocus && this.startBubble_.setFocus();
   this.startBubble_.select && this.startBubble_.select();
+  if (this.startWorkspace_.clearMultiSelectionAfterAction) {
+    this.startWorkspace_.clearMultiSelectionAfterAction();
+  }
 };
 
 /**
@@ -777,6 +911,9 @@ Blockly.Gesture.prototype.doBubbleClick_ = function () {
 Blockly.Gesture.prototype.doFieldClick_ = function () {
   this.startField_.showEditor_();
   this.bringBlockToFront_();
+  if (this.startWorkspace_.clearMultiSelectionAfterAction) {
+    this.startWorkspace_.clearMultiSelectionAfterAction();
+  }
 };
 
 /**
@@ -786,6 +923,9 @@ Blockly.Gesture.prototype.doFieldClick_ = function () {
 Blockly.Gesture.prototype.doInputClick_ = function () {
   this.startInput_.onClick();
   this.bringBlockToFront_();
+  if (this.startWorkspace_.clearMultiSelectionAfterAction) {
+    this.startWorkspace_.clearMultiSelectionAfterAction();
+  }
 };
 
 /**
@@ -793,10 +933,14 @@ Blockly.Gesture.prototype.doInputClick_ = function () {
  * @private
  */
 Blockly.Gesture.prototype.doBlockClick_ = function () {
-  // For jumping to custom block definition if middle mouse button is used or if shift is held
+  // Jump to a custom block definition when the middle mouse button is used.
   // Below code is a slight modification of:
   // https://github.com/TurboWarp/scratch-gui/blob/552dc5584164989d9752e847c23833bf057430f4/src/addons/addons/jump-to-def/userscript.js#L14
-  if (this.mostRecentEvent_.button === 1 || this.mostRecentEvent_.shiftKey) {
+  if (
+    this.mostRecentEvent_.button === 1 ||
+    (this.mostRecentEvent_.shiftKey &&
+      (this.mostRecentEvent_.ctrlKey || this.mostRecentEvent_.metaKey))
+  ) {
     let block = this.startBlock_;
     for (; block; block = block.getSurroundParent()) {
       if (block.type !== "procedures_call") continue;
@@ -844,6 +988,9 @@ Blockly.Gesture.prototype.doBlockClick_ = function () {
     }
   }
   this.bringBlockToFront_();
+  if (this.startWorkspace_.clearMultiSelectionAfterAction) {
+    this.startWorkspace_.clearMultiSelectionAfterAction();
+  }
   Blockly.Events.setGroup(false);
 };
 
@@ -852,6 +999,9 @@ Blockly.Gesture.prototype.doBlockClick_ = function () {
  * @private
  */
 Blockly.Gesture.prototype.doWorkspaceClick_ = function () {
+  if (this.startWorkspace_.clearMultiSelection) {
+    this.startWorkspace_.clearMultiSelection();
+  }
   if (Blockly.selected) {
     Blockly.selected.unselect();
   }
