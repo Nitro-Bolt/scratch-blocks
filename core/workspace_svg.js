@@ -1979,7 +1979,6 @@ Blockly.WorkspaceSvg.prototype.selectionBoxTouchesBlock_ = function (
   right,
   bottom
 ) {
-  if (!this.isBlockVisibleForSelection_(block)) return false;
   const xy = block.getRelativeToSurfaceXY();
   const blockLeft = block.RTL ? xy.x - block.width : xy.x;
   const blockRight = block.RTL ? xy.x : xy.x + block.width;
@@ -2016,6 +2015,34 @@ Blockly.WorkspaceSvg.prototype.selectionBoxTouchesBlock_ = function (
 };
 
 /**
+ * Test whether one visible block is fully enclosed by a selection rectangle.
+ * @param {!Blockly.BlockSvg} block Block to test.
+ * @param {number} left Rectangle left.
+ * @param {number} top Rectangle top.
+ * @param {number} right Rectangle right.
+ * @param {number} bottom Rectangle bottom.
+ * @return {boolean} Whether the block is enclosed.
+ * @private
+ */
+Blockly.WorkspaceSvg.prototype.selectionBoxContainsBlock_ = function (
+  block,
+  left,
+  top,
+  right,
+  bottom
+) {
+  const xy = block.getRelativeToSurfaceXY();
+  const blockLeft = block.RTL ? xy.x - block.width : xy.x;
+  const blockRight = block.RTL ? xy.x : xy.x + block.width;
+  return (
+    left <= blockLeft &&
+    top <= xy.y &&
+    right >= blockRight &&
+    bottom >= xy.y + block.height
+  );
+};
+
+/**
  * Synchronize the selection highlight with the stacks touched by a rectangle.
  * @param {!goog.math.Coordinate} start Start coordinate.
  * @param {!goog.math.Coordinate} end End coordinate.
@@ -2032,18 +2059,33 @@ Blockly.WorkspaceSvg.prototype.updateBlocksInSelectionBox_ = function (
   const blocks = this.selectingIndividualBlocks_
     ? this.getAllBlocks()
     : this.getTopBlocks(false);
+  const inwardSelection = !!this.options.inwardSelection;
   const touchedBlocks = [];
   for (let i = 0; i < blocks.length; i++) {
     const descendants = this.selectingIndividualBlocks_
       ? [blocks[i]]
       : blocks[i].getDescendants(false);
-    let touches = false;
-    for (let j = 0; j < descendants.length && !touches; j++) {
+    let matches = inwardSelection;
+    let hasVisibleBlock = false;
+    for (let j = 0; j < descendants.length; j++) {
       const block = descendants[j];
-      if (block.isShadow()) continue;
-      touches = this.selectionBoxTouchesBlock_(block, left, top, right, bottom);
+      if (block.isShadow() || !this.isBlockVisibleForSelection_(block)) {
+        continue;
+      }
+      hasVisibleBlock = true;
+      if (inwardSelection) {
+        if (!this.selectionBoxContainsBlock_(block, left, top, right, bottom)) {
+          matches = false;
+          break;
+        }
+      } else if (
+        this.selectionBoxTouchesBlock_(block, left, top, right, bottom)
+      ) {
+        matches = true;
+        break;
+      }
     }
-    if (touches) touchedBlocks.push(blocks[i]);
+    if (matches && hasVisibleBlock) touchedBlocks.push(blocks[i]);
   }
   if (this.selectingIndividualBlocks_) {
     const selectedBlocks = this.selectedIndividualBlocks_.slice();
