@@ -343,6 +343,20 @@ Blockly.FieldDropdown.prototype.onHide = function () {
 };
 
 /**
+ * Update the field fill after its source block changes colour.
+ */
+Blockly.FieldDropdown.prototype.updateColour = function () {
+  if (!this.disableColourChange_ && this.box_ && this.sourceBlock_) {
+    this.box_.setAttribute(
+      "fill",
+      this.dropDownOpen_
+        ? this.sourceBlock_.getColourQuaternary()
+        : this.sourceBlock_.getColour()
+    );
+  }
+};
+
+/**
  * Handle the selection of an item in the dropdown menu.
  * @param {!goog.ui.Menu} menu The Menu component clicked.
  * @param {!goog.ui.MenuItem} menuItem The MenuItem selected within menu.

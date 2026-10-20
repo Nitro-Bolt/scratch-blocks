@@ -773,6 +773,9 @@ Blockly.BlockSvg.prototype.updateColour = function () {
       if (field.box_) {
         field.box_.setAttribute("stroke", this.getColourTertiary());
       }
+      if (field.updateColour) {
+        field.updateColour();
+      }
       field.setText(null);
     }
   }
