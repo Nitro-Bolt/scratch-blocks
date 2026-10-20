@@ -463,6 +463,24 @@ Blockly.Workspace.prototype.renameVariableById = function (id, newName) {
 };
 
 /**
+ * Update a variable's scope, cloud state, declared value type, and colour.
+ * @param {string} id ID of the variable to update.
+ * @param {boolean} isLocal Whether the variable is locally scoped.
+ * @param {boolean} isCloud Whether the variable is stored in the cloud.
+ * @param {string} valueType The variable's declared value type.
+ * @param {?string} colour The variable's custom colour.
+ */
+Blockly.Workspace.prototype.updateVariableById = function (
+  id,
+  isLocal,
+  isCloud,
+  valueType,
+  colour
+) {
+  this.variableMap_.updateVariableById(id, isLocal, isCloud, valueType, colour);
+};
+
+/**
  * Create a variable with a given name, optional type, and optional ID.
  * @param {!string} name The name of the variable. This must be unique across
  *     each variable type.
@@ -474,6 +492,7 @@ Blockly.Workspace.prototype.renameVariableById = function (id, newName) {
  * @param {boolean=} opt_isLocal Whether the variable to create is locally scoped.
  * @param {boolean=} opt_isCloud Whether the variable to create is locally scoped.
  * @param {string=} opt_valueType The declared value type of a scalar variable.
+ * @param {string=} opt_colour The display colour for blocks using the variable.
  * @return {?Blockly.VariableModel} The newly created variable.
  */
 Blockly.Workspace.prototype.createVariable = function (
@@ -482,7 +501,8 @@ Blockly.Workspace.prototype.createVariable = function (
   opt_id,
   opt_isLocal,
   opt_isCloud,
-  opt_valueType
+  opt_valueType,
+  opt_colour
 ) {
   return this.variableMap_.createVariable(
     name,
@@ -490,7 +510,8 @@ Blockly.Workspace.prototype.createVariable = function (
     opt_id,
     opt_isLocal,
     opt_isCloud,
-    opt_valueType
+    opt_valueType,
+    opt_colour
   );
 };
 

@@ -96,9 +96,7 @@ Blockly.ScratchBlocks.ProcedureUtils.callerDomToMutation = function (
   this.global_ = JSON.parse(xmlElement.getAttribute("global"));
   if (xmlElement.getAttribute("colour")) {
     this.procedureColour_ = xmlElement.getAttribute("colour");
-    this.colours_ = Blockly.ScratchBlocks.ProcedureUtils.matchColours(
-      this.procedureColour_
-    );
+    this.colours_ = Blockly.Colours.getBlockColours(this.procedureColour_);
   }
   this.return_ =
     Blockly.ScratchBlocks.ProcedureUtils.parseReturnMutation(xmlElement);
@@ -146,55 +144,13 @@ Blockly.ScratchBlocks.ProcedureUtils.definitionMutationToDom = function (
 };
 
 /**
- * Generate colours 2 - 4.
- * @param {string} colour1 The first colour.
- * @param {!number} ld Lighten / Darken percent as a value from 0 - 1.
- * @returns {string[]} Colours 2 - 4.
- * @this Blockly.Block
- */
-Blockly.ScratchBlocks.ProcedureUtils.matchColours = function (colour1, ld) {
-  ld = ld == null ? 0.75 : ld; // 25 percent
-  colour1 = colour1.toLowerCase();
-  const categorys = Object.values(Blockly.Categories);
-  const maybeColours = Object.entries(Blockly.Colours).find(
-    (v) => categorys.includes(v[0]) && v[1].primary.toLowerCase() === colour1
-  );
-  if (maybeColours && maybeColours[1]) {
-    return [
-      maybeColours[1].primary,
-      maybeColours[1].secondary,
-      maybeColours[1].tertiary,
-      maybeColours[1].quaternary || maybeColours[1].tertiary,
-    ];
-  }
-  if (Blockly.CustomProcedureColourTransform) {
-    return Blockly.CustomProcedureColourTransform(colour1);
-  }
-  const c = parseInt(colour1.slice(1, 7), 16);
-  const rgb = [c >> 16, (c >> 8) & 0x00ff, c & 0x0000ff];
-  rgb[0] = Math.floor(rgb[0] * ld) % 256;
-  rgb[1] = Math.floor(rgb[1] * ld) % 256;
-  rgb[2] = Math.floor(rgb[2] * ld) % 256;
-  const colour2 =
-    "#" +
-    (rgb[0].toString(16).padStart(2, "0") +
-      rgb[1].toString(16).padStart(2, "0") +
-      rgb[2].toString(16).padStart(2, "0") +
-      colour1.slice(8));
-  return [colour1, colour2, colour2 /*3*/, colour2 /*4*/];
-};
-
-/**
  * Store a procedure's source colour and apply its current themed palette.
  * @param {string} colour The source colour selected by the user.
  * @this Blockly.Block
  */
 Blockly.ScratchBlocks.ProcedureUtils.setProcedureColour = function (colour) {
   this.procedureColour_ = colour;
-  this.setColour.apply(
-    this,
-    Blockly.ScratchBlocks.ProcedureUtils.matchColours(colour)
-  );
+  this.setColour(...Blockly.Colours.getBlockColours(colour));
 };
 
 /**
@@ -225,9 +181,7 @@ Blockly.ScratchBlocks.ProcedureUtils.definitionDomToMutation = function (
 
   if (xmlElement.getAttribute("colour")) {
     this.procedureColour_ = xmlElement.getAttribute("colour");
-    this.colours_ = Blockly.ScratchBlocks.ProcedureUtils.matchColours(
-      this.procedureColour_
-    );
+    this.colours_ = Blockly.Colours.getBlockColours(this.procedureColour_);
   }
 
   const prevArgIds = this.argumentIds_;

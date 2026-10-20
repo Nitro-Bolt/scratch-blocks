@@ -131,6 +131,12 @@ Blockly.Events.VAR_DELETE = "var_delete";
 Blockly.Events.VAR_RENAME = "var_rename";
 
 /**
+ * Name of event that updates variable metadata.
+ * @const
+ */
+Blockly.Events.VAR_UPDATE = "var_update";
+
+/**
  * Name of event that creates a comment.
  * @const
  */
@@ -376,6 +382,9 @@ Blockly.Events.fromJson = function (json, workspace) {
       break;
     case Blockly.Events.VAR_RENAME:
       event = new Blockly.Events.VarRename(null);
+      break;
+    case Blockly.Events.VAR_UPDATE:
+      event = new Blockly.Events.VarUpdate(null);
       break;
     case Blockly.Events.COMMENT_CREATE:
       event = new Blockly.Events.CommentCreate(null);

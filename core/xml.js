@@ -78,6 +78,7 @@ Blockly.Xml.variablesToDom = function (variableList) {
     element.setAttribute("islocal", variable.isLocal);
     element.setAttribute("isCloud", variable.isCloud);
     element.setAttribute("valuetype", variable.valueType || "Any");
+    element.setAttribute("colour", variable.colour || "");
     variables.appendChild(element);
   }
   return variables;
@@ -751,7 +752,8 @@ Blockly.Xml.domToVariables = function (xmlVariables, workspace) {
       id,
       isLocal,
       isCloud,
-      xmlChild.getAttribute("valuetype")
+      xmlChild.getAttribute("valuetype"),
+      xmlChild.getAttribute("colour")
     );
   }
 };

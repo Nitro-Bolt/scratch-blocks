@@ -308,7 +308,8 @@ Blockly.Variables.realizePotentialVar = function (
     id,
     potentialVar.isLocal,
     potentialVar.isCloud,
-    potentialVar.valueType
+    potentialVar.valueType,
+    potentialVar.colour
   );
 };
 
@@ -396,7 +397,8 @@ Blockly.Variables.createVariable = function (
             null,
             isLocal,
             isCloud,
-            variableOptions.valueType
+            variableOptions.valueType,
+            variableOptions.colour
           );
         }
 
@@ -424,7 +426,7 @@ Blockly.Variables.createVariable = function (
 /**
  * This function provides a common interface for variable name validation agnostic
  * of type. This is so that functions like Blockly.Variables.createVariable and
- * Blockly.Variables.renameVariable can call a single function (with a single
+ * Blockly.Variables.editVariable can call a single function (with a single
  * type signature) to validate the user-provided name for a variable.
  * @param {string} type The type of the variable for which the provided name
  *     should be validated.
@@ -582,19 +584,14 @@ Blockly.Variables.validateScalarVarListOrTableName_ = function (
 };
 
 /**
- * Rename a variable with the given workspace, variableType, and oldName.
- * @param {!Blockly.Workspace} workspace The workspace on which to rename the
- *     variable.
- * @param {Blockly.VariableModel} variable Variable to rename.
+ * Edit a variable, list, or table, or rename a broadcast message.
+ * @param {!Blockly.Workspace} workspace The workspace containing the variable.
+ * @param {Blockly.VariableModel} variable Variable to edit.
  * @param {function(?string=)=} opt_callback A callback. It will
  *     be passed an acceptable new variable name, or null if change is to be
  *     aborted (cancel button), or undefined if an existing variable was chosen.
  */
-Blockly.Variables.renameVariable = function (
-  workspace,
-  variable,
-  opt_callback
-) {
+Blockly.Variables.editVariable = function (workspace, variable, opt_callback) {
   // Validation and modal message/title depends on the variable type
   let promptMsg, modalTitle;
   const varType = variable.type;
@@ -602,15 +599,15 @@ Blockly.Variables.renameVariable = function (
     promptMsg = Blockly.Msg.RENAME_BROADCAST_TITLE;
     modalTitle = Blockly.Msg.RENAME_BROADCAST_MODAL_TITLE;
   } else if (varType == Blockly.TABLE_VARIABLE_TYPE) {
-    promptMsg = Blockly.Msg.RENAME_TABLE_TITLE;
-    modalTitle = Blockly.Msg.RENAME_TABLE_MODAL_TITLE;
+    promptMsg = Blockly.Msg.EDIT_TABLE_TITLE;
+    modalTitle = Blockly.Msg.EDIT_TABLE_MODAL_TITLE;
   } else if (varType == Blockly.LIST_VARIABLE_TYPE) {
-    promptMsg = Blockly.Msg.RENAME_LIST_TITLE;
-    modalTitle = Blockly.Msg.RENAME_LIST_MODAL_TITLE;
+    promptMsg = Blockly.Msg.EDIT_LIST_TITLE;
+    modalTitle = Blockly.Msg.EDIT_LIST_MODAL_TITLE;
   } else {
     // Default for all other types of variables
-    promptMsg = Blockly.Msg.RENAME_VARIABLE_TITLE;
-    modalTitle = Blockly.Msg.RENAME_VARIABLE_MODAL_TITLE;
+    promptMsg = Blockly.Msg.EDIT_VARIABLE_TITLE;
+    modalTitle = Blockly.Msg.EDIT_VARIABLE_MODAL_TITLE;
   }
   const validate = Blockly.Variables.nameValidator_.bind(null, varType);
 
@@ -628,37 +625,55 @@ Blockly.Variables.renameVariable = function (
   Blockly.prompt(
     promptText,
     promptDefaultText,
-    function (newName, additionalVars) {
+    function (newName, additionalVars, variableOptions) {
+      const isCloud = variableOptions
+        ? variableOptions.isCloud
+        : variable.isCloud;
       if (
-        variable.isCloud &&
+        isCloud &&
         newName.length > 0 &&
         newName.indexOf(Blockly.Variables.CLOUD_PREFIX) == 0
       ) {
         newName = newName.substring(Blockly.Variables.CLOUD_PREFIX.length);
         // The name validator will add the prefix back
+      } else if (
+        variable.isCloud &&
+        !isCloud &&
+        newName.indexOf(Blockly.Variables.CLOUD_PREFIX) == 0
+      ) {
+        newName = newName.substring(Blockly.Variables.CLOUD_PREFIX.length);
       }
       additionalVars = additionalVars || [];
-      const additionalVarNames = variable.isLocal ? [] : additionalVars;
-      const validatedText = validate(
-        newName,
-        workspace,
-        additionalVarNames,
-        variable.isCloud
-      );
+      const isLocal = variableOptions
+        ? variableOptions.scope === "local"
+        : variable.isLocal;
+      const additionalVarNames = isLocal ? [] : additionalVars;
+      const requestedName =
+        (isCloud ? Blockly.Variables.CLOUD_PREFIX : "") +
+        Blockly.Variables.trimName_(newName);
+      const validatedText =
+        requestedName === variable.name
+          ? variable.name
+          : validate(newName, workspace, additionalVarNames, isCloud);
       if (validatedText) {
-        workspace.renameVariableById(variable.getId(), validatedText);
+        if (validatedText !== variable.name) {
+          workspace.renameVariableById(variable.getId(), validatedText);
+        }
         if (opt_callback) {
           opt_callback(newName);
         }
+        return true;
       } else {
         // User canceled prompt without a value.
         if (opt_callback) {
           opt_callback(null);
         }
+        return false;
       }
     },
     modalTitle,
-    varType
+    varType,
+    variable
   );
 };
 

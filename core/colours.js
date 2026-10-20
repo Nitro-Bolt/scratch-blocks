@@ -22,6 +22,8 @@
 
 goog.provide("Blockly.Colours");
 
+goog.require("Blockly.constants");
+
 Blockly.Colours = {
   // SVG colours: these must be specificed in #RRGGBB style
   // To add an opacity, this must be specified as a separate property (for SVG fill-opacity)
@@ -200,4 +202,46 @@ Blockly.Colours.overrideColours = function (colours) {
       }
     }
   }
+};
+
+/**
+ * Generate a complete block palette from a primary colour.
+ * @param {string} primary The primary colour.
+ * @returns {string[]} Primary, secondary, tertiary, and quaternary colours.
+ */
+Blockly.Colours.getBlockColours = function (primary) {
+  primary = primary.toLowerCase();
+  const categories = Object.values(Blockly.Categories);
+  const categoryColours = Object.entries(Blockly.Colours).find(
+    (entry) =>
+      categories.includes(entry[0]) &&
+      entry[1].primary.toLowerCase() === primary
+  );
+  if (categoryColours) {
+    return [
+      categoryColours[1].primary,
+      categoryColours[1].secondary,
+      categoryColours[1].tertiary,
+      categoryColours[1].quaternary || categoryColours[1].tertiary,
+    ];
+  }
+  if (Blockly.CustomBlockColourTransform) {
+    return Blockly.CustomBlockColourTransform(primary);
+  }
+  const colourValue = parseInt(primary.slice(1, 7), 16);
+  const rgb = [
+    colourValue >> 16,
+    (colourValue >> 8) & 0x00ff,
+    colourValue & 0x0000ff,
+  ];
+  rgb[0] = Math.floor(rgb[0] * 0.75) % 256;
+  rgb[1] = Math.floor(rgb[1] * 0.75) % 256;
+  rgb[2] = Math.floor(rgb[2] * 0.75) % 256;
+  const darker =
+    "#" +
+    (rgb[0].toString(16).padStart(2, "0") +
+      rgb[1].toString(16).padStart(2, "0") +
+      rgb[2].toString(16).padStart(2, "0") +
+      primary.slice(8));
+  return [primary, darker, darker, darker];
 };

@@ -310,7 +310,7 @@ Blockly.PROCEDURE_CATEGORY_NAME = "PROCEDURE";
  * variable...' and if selected, should trigger the prompt to rename a variable.
  * @const {string}
  */
-Blockly.RENAME_VARIABLE_ID = "RENAME_VARIABLE_ID";
+Blockly.EDIT_VARIABLE_ID = "EDIT_VARIABLE_ID";
 
 /**
  * String for use in the dropdown created in field_variable.

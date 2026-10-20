@@ -28,6 +28,7 @@ goog.provide("Blockly.VariableMap");
 
 goog.require("Blockly.Events.VarDelete");
 goog.require("Blockly.Events.VarRename");
+goog.require("Blockly.Events.VarUpdate");
 goog.require("Blockly.VariableModel");
 
 /**
@@ -114,6 +115,68 @@ Blockly.VariableMap.prototype.renameVariableById = function (id, newName) {
 };
 
 /**
+ * Update a variable's scope, cloud state, declared value type, and colour.
+ * @param {string} id ID of the variable to update.
+ * @param {boolean} isLocal Whether the variable is locally scoped.
+ * @param {boolean} isCloud Whether the variable is stored in the cloud.
+ * @param {string} valueType The variable's declared value type.
+ * @param {?string} colour The variable's custom colour.
+ */
+Blockly.VariableMap.prototype.updateVariableById = function (
+  id,
+  isLocal,
+  isCloud,
+  valueType,
+  colour
+) {
+  const variable = this.getVariableById(id);
+  if (!variable) {
+    throw new Error("Tried to update a variable that didn't exist. ID: " + id);
+  }
+
+  isLocal = Boolean(isLocal);
+  isCloud = Boolean(isCloud);
+  valueType = valueType || "Any";
+  colour = goog.isString(colour) && colour ? colour : null;
+  if (
+    variable.isLocal === isLocal &&
+    variable.isCloud === isCloud &&
+    variable.valueType === valueType &&
+    variable.colour === colour
+  ) {
+    return;
+  }
+
+  Blockly.Events.fire(
+    new Blockly.Events.VarUpdate(variable, isLocal, isCloud, valueType, colour)
+  );
+  variable.isLocal = isLocal;
+  variable.isCloud = isCloud;
+  variable.valueType = valueType;
+  variable.colour = colour;
+
+  const eventsWereEnabled = Blockly.Events.isEnabled();
+  Blockly.Events.disable();
+  try {
+    const blocks = this.workspace.getAllBlocks();
+    for (let i = 0; i < blocks.length; i++) {
+      const inputs = blocks[i].inputList;
+      for (let j = 0; j < inputs.length; j++) {
+        const fields = inputs[j].fieldRow;
+        for (let k = 0; k < fields.length; k++) {
+          if (fields[k].referencesVariables() && fields[k].getValue() === id) {
+            fields[k].setValue(id);
+          }
+        }
+      }
+    }
+  } finally {
+    if (eventsWereEnabled) Blockly.Events.enable();
+  }
+  this.workspace.refreshToolboxSelection_();
+};
+
+/**
  * Update the name of the given variable and refresh all references to it.
  * The new name must not conflict with any existing variable names.
  * @param {!Blockly.VariableModel} variable Variable to rename.
@@ -189,6 +252,7 @@ Blockly.VariableMap.prototype.renameVariableWithConflict_ = function (
  * @param {boolean=} opt_isLocal Whether the variable is locally scoped.
  * @param {boolean=} opt_isCloud Whether the variable is a cloud variable.
  * @param {string=} opt_valueType The declared value type of a scalar variable.
+ * @param {string=} opt_colour The display colour for blocks using the variable.
  * @return {?Blockly.VariableModel} The newly created variable.
  */
 Blockly.VariableMap.prototype.createVariable = function (
@@ -197,7 +261,8 @@ Blockly.VariableMap.prototype.createVariable = function (
   opt_id,
   opt_isLocal,
   opt_isCloud,
-  opt_valueType
+  opt_valueType,
+  opt_colour
 ) {
   let variable = this.getVariable(name, opt_type);
   if (variable) {
@@ -236,7 +301,8 @@ Blockly.VariableMap.prototype.createVariable = function (
     opt_id,
     opt_isLocal,
     opt_isCloud,
-    opt_valueType
+    opt_valueType,
+    opt_colour
   );
   // If opt_type is not a key, create a new list.
   if (!this.variableMap_[opt_type]) {

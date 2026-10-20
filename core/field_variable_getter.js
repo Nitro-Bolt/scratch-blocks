@@ -169,8 +169,8 @@ Blockly.FieldVariableGetter.prototype.setValue = function (id) {
   this.variable_ = variable;
   this.value_ = id;
   this.setText(variable.name);
-  if (this.sourceBlock_.updateVariableType_) {
-    this.sourceBlock_.updateVariableType_();
+  if (this.sourceBlock_.updateVariable_) {
+    this.sourceBlock_.updateVariable_();
   }
 };
 

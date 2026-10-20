@@ -40,6 +40,9 @@ goog.require("goog.asserts");
  *     option is selected.  Its sole argument is the new option value.
  * @param {Array.<string>} opt_variableTypes A list of the types of variables to
  *     include in the dropdown.
+ * @param {boolean=} opt_allowEmpty Whether the field may have no variable.
+ * @param {Array.<string>=} opt_valueTypes A list of declared value types to
+ *     include in the dropdown.
  * @extends {Blockly.FieldDropdown}
  * @constructor
  */
@@ -47,7 +50,8 @@ Blockly.FieldVariable = function (
   varname,
   opt_validator,
   opt_variableTypes,
-  opt_allowEmpty
+  opt_allowEmpty,
+  opt_valueTypes
 ) {
   // The FieldDropdown constructor would call setValue, which might create a
   // spurious variable.  Just do the relevant parts of the constructor.
@@ -63,6 +67,7 @@ Blockly.FieldVariable = function (
   const hasSingleVarType = opt_variableTypes && opt_variableTypes.length == 1;
   this.defaultType_ = hasSingleVarType ? opt_variableTypes[0] : "";
   this.variableTypes = opt_variableTypes;
+  this.valueTypes = opt_valueTypes;
   this.allowEmpty_ = !!opt_allowEmpty;
   this.addArgType("variable");
 
@@ -86,7 +91,8 @@ Blockly.FieldVariable.fromJson = function (options) {
     varname,
     null,
     variableTypes,
-    options["allowEmpty"]
+    options["allowEmpty"],
+    options["valueTypes"]
   );
 };
 
@@ -162,6 +168,7 @@ Blockly.FieldVariable.prototype.getFirstVariable_ = function () {
       this.workspace_.getVariablesOfType(variableTypes[i])
     );
   }
+  variables = variables.filter(this.valueTypeIsAllowed_.bind(this));
   variables.sort(Blockly.VariableModel.compareByName);
   return variables.length ? variables[0] : null;
 };
@@ -244,6 +251,19 @@ Blockly.FieldVariable.prototype.getVariable = function () {
 };
 
 /**
+ * Check whether a variable's declared value type should appear in this field.
+ * @param {!Blockly.VariableModel} variable Variable to check.
+ * @return {boolean} Whether the variable should appear.
+ * @private
+ */
+Blockly.FieldVariable.prototype.valueTypeIsAllowed_ = function (variable) {
+  return (
+    !this.valueTypes ||
+    this.valueTypes.indexOf(variable.valueType || "Any") !== -1
+  );
+};
+
+/**
  * Set the variable ID.
  * @param {string} id New variable ID, which must reference an existing
  *     variable.
@@ -278,8 +298,8 @@ Blockly.FieldVariable.prototype.setValue = function (id) {
   this.variable_ = variable;
   this.value_ = id;
   this.setText(variable.name);
-  if (this.sourceBlock_.updateVariableType_) {
-    this.sourceBlock_.updateVariableType_();
+  if (this.sourceBlock_.updateVariable_) {
+    this.sourceBlock_.updateVariable_();
   }
 };
 
@@ -336,7 +356,7 @@ Blockly.FieldVariable.prototype.getVariableTypes_ = function () {
  * @this {Blockly.FieldVariable}
  */
 Blockly.FieldVariable.dropdownCreate = function () {
-  let variableModelList, i, renameText, deleteText;
+  let variableModelList, i, editText, deleteText;
   const newVariableOptionId = Blockly.NEW_VARIABLE_OPTION_ID;
   variableModelList = [];
   const name = this.getText();
@@ -351,12 +371,16 @@ Blockly.FieldVariable.dropdownCreate = function () {
     // doesn't modify the workspace's list.
     for (i = 0; i < variableTypes.length; i++) {
       const variableType = variableTypes[i];
-      const variables = workspace.getVariablesOfType(variableType);
+      let variables = workspace.getVariablesOfType(variableType);
+      variables = variables.filter(this.valueTypeIsAllowed_.bind(this));
       variableModelList = variableModelList.concat(variables);
 
       const potentialVarMap = workspace.getPotentialVariableMap();
       if (potentialVarMap) {
-        const potentialVars = potentialVarMap.getVariablesOfType(variableType);
+        let potentialVars = potentialVarMap.getVariablesOfType(variableType);
+        potentialVars = potentialVars.filter(
+          this.valueTypeIsAllowed_.bind(this)
+        );
         variableModelList = variableModelList.concat(potentialVars);
       }
     }
@@ -429,32 +453,24 @@ Blockly.FieldVariable.dropdownCreate = function () {
 
   // When there is no selected variable yet, still offer creation action.
   if (!this.variable_) {
-    if (options.length) {
-      this.newVariableType_ = createNewType;
-      return options;
-    }
-    return [["", ""]];
-  } else {
-    // Scalar variables, lists, and tables have the same backing action, but the option
-    // text is different.
-    if (this.defaultType_ == Blockly.TABLE_VARIABLE_TYPE) {
-      renameText = Blockly.Msg.RENAME_TABLE;
-      deleteText = Blockly.Msg.DELETE_TABLE;
-    } else if (this.defaultType_ == Blockly.LIST_VARIABLE_TYPE) {
-      renameText = Blockly.Msg.RENAME_LIST;
-      deleteText = Blockly.Msg.DELETE_LIST;
-    } else {
-      renameText = Blockly.Msg.RENAME_VARIABLE;
-      deleteText = Blockly.Msg.DELETE_VARIABLE;
-    }
-    options.push([renameText, Blockly.RENAME_VARIABLE_ID]);
-    if (deleteText) {
-      options.push([
-        deleteText.replace("%1", name),
-        Blockly.DELETE_VARIABLE_ID,
-      ]);
-    }
+    this.newVariableType_ = createNewType;
+    return options;
   }
+
+  // Scalar variables, lists, and tables have the same backing action, but the option
+  // text is different.
+  if (this.defaultType_ == Blockly.TABLE_VARIABLE_TYPE) {
+    editText = Blockly.Msg.EDIT_TABLE;
+    deleteText = Blockly.Msg.DELETE_TABLE;
+  } else if (this.defaultType_ == Blockly.LIST_VARIABLE_TYPE) {
+    editText = Blockly.Msg.EDIT_LIST;
+    deleteText = Blockly.Msg.DELETE_LIST;
+  } else {
+    editText = Blockly.Msg.EDIT_VARIABLE;
+    deleteText = Blockly.Msg.DELETE_VARIABLE;
+  }
+  options.push([editText, Blockly.EDIT_VARIABLE_ID]);
+  options.push([deleteText.replace("%1", name), Blockly.DELETE_VARIABLE_ID]);
 
   this.newVariableType_ = createNewType;
   return options;
@@ -462,9 +478,9 @@ Blockly.FieldVariable.dropdownCreate = function () {
 
 /**
  * Handle the selection of an item in the variable dropdown menu.
- * Special case the 'Rename variable...', 'Delete variable...',
+ * Special case the 'Edit variable...', 'Delete variable...',
  * 'New message...', 'Rename broadcast...', and 'Delete broadcast...' options.
- * In the rename case, prompt the user for a new name.
+ * In the edit case, prompt the user for its updated properties.
  * @param {!goog.ui.Menu} menu The Menu component clicked.
  * @param {!goog.ui.MenuItem} menuItem The MenuItem selected within menu.
  */
@@ -473,9 +489,9 @@ Blockly.FieldVariable.prototype.onItemSelected = function (menu, menuItem) {
   const id = menuItem.getValue();
   if (this.sourceBlock_ && this.sourceBlock_.workspace) {
     const workspace = this.sourceBlock_.workspace;
-    if (id == Blockly.RENAME_VARIABLE_ID) {
-      // Rename variable.
-      Blockly.Variables.renameVariable(workspace, this.variable_);
+    if (id == Blockly.EDIT_VARIABLE_ID) {
+      // Edit variable.
+      Blockly.Variables.editVariable(workspace, this.variable_);
       return;
     } else if (id == Blockly.DELETE_VARIABLE_ID) {
       // Delete variable.
@@ -483,7 +499,7 @@ Blockly.FieldVariable.prototype.onItemSelected = function (menu, menuItem) {
       return;
     } else if (id == Blockly.RENAME_BROADCAST_ID) {
       // Rename broadcast.
-      Blockly.Variables.renameVariable(workspace, this.variable_);
+      Blockly.Variables.editVariable(workspace, this.variable_);
       return;
     } else if (id == Blockly.DELETE_BROADCAST_ID) {
       // Delete broadcast.

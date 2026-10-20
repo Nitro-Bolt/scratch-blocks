@@ -966,6 +966,7 @@ Blockly.ContextMenu.blockSwitchOption = function (block) {
     const targetType = opcodeData.opcode || opcodeData.id;
 
     if (targetType === block.type) return;
+    if (opcodeData.condition && !opcodeData.condition(block)) return;
 
     let remapInputName = opcodeData.remapInputName || {};
     if (Array.isArray(opcodeData.inputs)) {

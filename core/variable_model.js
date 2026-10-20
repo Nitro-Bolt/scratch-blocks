@@ -42,6 +42,7 @@ goog.require("Blockly.Events.VarCreate");
  * @param {boolean=} opt_isLocal Whether the variable is locally scoped.
  * @param {boolean=} opt_isCloud Whether the variable is a cloud variable.
  * @param {string=} opt_valueType The declared value type of a scalar variable.
+ * @param {string=} opt_colour The display colour for blocks using the variable.
  * @see {Blockly.FieldVariable}
  * @constructor
  */
@@ -52,7 +53,8 @@ Blockly.VariableModel = function (
   opt_id,
   opt_isLocal,
   opt_isCloud,
-  opt_valueType
+  opt_valueType,
+  opt_colour
 ) {
   /**
    * The workspace the variable is in.
@@ -100,6 +102,9 @@ Blockly.VariableModel = function (
 
   /** The declared value type, separate from scalar/list/table storage. */
   this.valueType = opt_valueType || "Any";
+
+  /** The custom display colour, or null to use the Variables category colour. */
+  this.colour = goog.isString(opt_colour) ? opt_colour : null;
 
   Blockly.Events.fire(new Blockly.Events.VarCreate(this));
 };

@@ -718,6 +718,12 @@ Blockly.BlockSvg.prototype.updateColour = function () {
     if (input.outlinePath) {
       input.outlinePath.setAttribute("fill", this.getColourTertiary());
     }
+    if (input.connection) {
+      const childBlock = input.connection.targetBlock();
+      if (childBlock && childBlock.isShadow() && childBlock.rendered) {
+        childBlock.updateColour();
+      }
+    }
   }
 
   // Render icon(s) if applicable
@@ -763,6 +769,9 @@ Blockly.BlockSvg.prototype.updateColour = function () {
         } else {
           Blockly.utils.removeClass(field.textElement_, "blocklyTextDark");
         }
+      }
+      if (field.box_) {
+        field.box_.setAttribute("stroke", this.getColourTertiary());
       }
       field.setText(null);
     }

@@ -28,6 +28,7 @@ goog.provide("Blockly.Events.VarBase");
 goog.provide("Blockly.Events.VarCreate");
 goog.provide("Blockly.Events.VarDelete");
 goog.provide("Blockly.Events.VarRename");
+goog.provide("Blockly.Events.VarUpdate");
 
 goog.require("Blockly.Events");
 goog.require("Blockly.Events.Abstract");
@@ -68,7 +69,7 @@ Blockly.Events.VarBase.prototype.toJson = function () {
  * @param {!Object} json JSON representation.
  */
 Blockly.Events.VarBase.prototype.fromJson = function (json) {
-  Blockly.Events.VarBase.superClass_.toJson.call(this);
+  Blockly.Events.VarBase.superClass_.fromJson.call(this, json);
   this.varId = json["varId"];
 };
 
@@ -89,6 +90,7 @@ Blockly.Events.VarCreate = function (variable) {
   this.isLocal = variable.isLocal;
   this.isCloud = variable.isCloud;
   this.valueType = variable.valueType;
+  this.colour = variable.colour;
 };
 goog.inherits(Blockly.Events.VarCreate, Blockly.Events.VarBase);
 
@@ -111,6 +113,7 @@ Blockly.Events.VarCreate.prototype.toJson = function () {
   if (this.valueType && this.valueType !== "Any") {
     json["valueType"] = this.valueType;
   }
+  if (this.colour) json["colour"] = this.colour;
   return json;
 };
 
@@ -125,6 +128,7 @@ Blockly.Events.VarCreate.prototype.fromJson = function (json) {
   this.isLocal = json["isLocal"];
   this.isCloud = json["isCloud"];
   this.valueType = json["valueType"] || "Any";
+  this.colour = json["colour"] || null;
 };
 
 /**
@@ -140,7 +144,8 @@ Blockly.Events.VarCreate.prototype.run = function (forward) {
       this.varId,
       this.isLocal,
       this.isCloud,
-      this.valueType
+      this.valueType,
+      this.colour
     );
   } else {
     workspace.deleteVariableById(this.varId);
@@ -164,6 +169,7 @@ Blockly.Events.VarDelete = function (variable) {
   this.isLocal = variable.isLocal;
   this.isCloud = variable.isCloud;
   this.valueType = variable.valueType;
+  this.colour = variable.colour;
 };
 goog.inherits(Blockly.Events.VarDelete, Blockly.Events.VarBase);
 
@@ -186,6 +192,7 @@ Blockly.Events.VarDelete.prototype.toJson = function () {
   if (this.valueType && this.valueType !== "Any") {
     json["valueType"] = this.valueType;
   }
+  if (this.colour) json["colour"] = this.colour;
   return json;
 };
 
@@ -200,6 +207,7 @@ Blockly.Events.VarDelete.prototype.fromJson = function (json) {
   this.isLocal = json["isLocal"];
   this.isCloud = json["isCloud"];
   this.valueType = json["valueType"] || "Any";
+  this.colour = json["colour"] || null;
 };
 
 /**
@@ -217,7 +225,8 @@ Blockly.Events.VarDelete.prototype.run = function (forward) {
       this.varId,
       this.isLocal,
       this.isCloud,
-      this.valueType
+      this.valueType,
+      this.colour
     );
   }
 };
@@ -278,4 +287,78 @@ Blockly.Events.VarRename.prototype.run = function (forward) {
   } else {
     workspace.renameVariableById(this.varId, this.oldName);
   }
+};
+
+/**
+ * Class for a variable metadata update event.
+ * @param {Blockly.VariableModel} variable The updated variable.
+ *     Null for a blank event.
+ * @param {boolean} newIsLocal Whether the variable is locally scoped.
+ * @param {boolean} newIsCloud Whether the variable is stored in the cloud.
+ * @param {string} newValueType The variable's declared value type.
+ * @param {?string} newColour The variable's custom colour.
+ * @extends {Blockly.Events.VarBase}
+ * @constructor
+ */
+Blockly.Events.VarUpdate = function (
+  variable,
+  newIsLocal,
+  newIsCloud,
+  newValueType,
+  newColour
+) {
+  if (!variable) {
+    return; // Blank event to be populated by fromJson.
+  }
+  Blockly.Events.VarUpdate.superClass_.constructor.call(this, variable);
+  this.oldIsLocal = variable.isLocal;
+  this.newIsLocal = newIsLocal;
+  this.oldIsCloud = variable.isCloud;
+  this.newIsCloud = newIsCloud;
+  this.oldValueType = variable.valueType;
+  this.newValueType = newValueType;
+  this.oldColour = variable.colour;
+  this.newColour = newColour;
+};
+goog.inherits(Blockly.Events.VarUpdate, Blockly.Events.VarBase);
+
+/** @type {string} */
+Blockly.Events.VarUpdate.prototype.type = Blockly.Events.VAR_UPDATE;
+
+/** @return {!Object} JSON representation. */
+Blockly.Events.VarUpdate.prototype.toJson = function () {
+  const json = Blockly.Events.VarUpdate.superClass_.toJson.call(this);
+  json["oldIsLocal"] = this.oldIsLocal;
+  json["newIsLocal"] = this.newIsLocal;
+  json["oldIsCloud"] = this.oldIsCloud;
+  json["newIsCloud"] = this.newIsCloud;
+  json["oldValueType"] = this.oldValueType;
+  json["newValueType"] = this.newValueType;
+  json["oldColour"] = this.oldColour;
+  json["newColour"] = this.newColour;
+  return json;
+};
+
+/** @param {!Object} json JSON representation. */
+Blockly.Events.VarUpdate.prototype.fromJson = function (json) {
+  Blockly.Events.VarUpdate.superClass_.fromJson.call(this, json);
+  this.oldIsLocal = json["oldIsLocal"];
+  this.newIsLocal = json["newIsLocal"];
+  this.oldIsCloud = json["oldIsCloud"];
+  this.newIsCloud = json["newIsCloud"];
+  this.oldValueType = json["oldValueType"];
+  this.newValueType = json["newValueType"];
+  this.oldColour = json["oldColour"] || null;
+  this.newColour = json["newColour"] || null;
+};
+
+/** @param {boolean} forward True if run forward, false if run backward. */
+Blockly.Events.VarUpdate.prototype.run = function (forward) {
+  this.getEventWorkspace_().updateVariableById(
+    this.varId,
+    forward ? this.newIsLocal : this.oldIsLocal,
+    forward ? this.newIsCloud : this.oldIsCloud,
+    forward ? this.newValueType : this.oldValueType,
+    forward ? this.newColour : this.oldColour
+  );
 };

@@ -29,10 +29,30 @@ goog.require("Blockly.constants");
 goog.require("Blockly.ScratchBlocks.Extensions");
 
 /**
+ * Update a scalar variable block's colour.
+ * @this Blockly.Block
+ */
+Blockly.Constants.Data.updateVariableColour = function () {
+  const variable = this.getField("VARIABLE").getVariable();
+  if (variable && variable.colour) {
+    this.setColour(...Blockly.Colours.getBlockColours(variable.colour));
+  } else {
+    const colours = Blockly.Colours.data;
+    this.setColour(
+      colours.primary,
+      colours.secondary,
+      colours.tertiary,
+      colours.quaternary
+    );
+  }
+};
+
+/**
  * Update a scalar variable's reporter or assignment input.
  * @this Blockly.Block
  */
-Blockly.Constants.Data.updateVariableType = function () {
+Blockly.Constants.Data.updateVariableValue = function () {
+  Blockly.Constants.Data.updateVariableColour.call(this);
   const variable = this.getField("VARIABLE").getVariable();
   const valueType = (variable && variable.valueType) || "Any";
   const check = valueType === "Any" ? null : valueType;
@@ -73,7 +93,7 @@ Blockly.Constants.Data.updateVariableType = function () {
 };
 
 Blockly.Blocks["data_variable"] = {
-  updateVariableType_: Blockly.Constants.Data.updateVariableType,
+  updateVariable_: Blockly.Constants.Data.updateVariableValue,
   /**
    * Block of Variables
    * @this Blockly.Block
@@ -100,7 +120,7 @@ Blockly.Blocks["data_variable"] = {
 };
 
 Blockly.Blocks["data_setvariableto"] = {
-  updateVariableType_: Blockly.Constants.Data.updateVariableType,
+  updateVariable_: Blockly.Constants.Data.updateVariableValue,
   /**
    * Block to set variable to a certain value
    * @this Blockly.Block
@@ -119,13 +139,22 @@ Blockly.Blocks["data_setvariableto"] = {
         },
       ],
       category: Blockly.Categories.data,
-      switches: ["data_changevariableby"],
+      switches: [
+        {
+          id: "data_changevariableby",
+          condition: function (block) {
+            const variable = block.getField("VARIABLE").getVariable();
+            return !variable || (variable.valueType || "Any") === "Any";
+          },
+        },
+      ],
       extensions: ["colours_data", "shape_statement"],
     });
   },
 };
 
 Blockly.Blocks["data_changevariableby"] = {
+  updateVariable_: Blockly.Constants.Data.updateVariableColour,
   /**
    * Block to change variable by a certain value
    * @this Blockly.Block
@@ -137,6 +166,7 @@ Blockly.Blocks["data_changevariableby"] = {
         {
           type: "field_variable",
           name: "VARIABLE",
+          valueTypes: ["Any"],
         },
         {
           type: "input_value",
@@ -151,6 +181,7 @@ Blockly.Blocks["data_changevariableby"] = {
 };
 
 Blockly.Blocks["data_showvariable"] = {
+  updateVariable_: Blockly.Constants.Data.updateVariableColour,
   /**
    * Block to show a variable
    * @this Blockly.Block
@@ -174,6 +205,7 @@ Blockly.Blocks["data_showvariable"] = {
 };
 
 Blockly.Blocks["data_hidevariable"] = {
+  updateVariable_: Blockly.Constants.Data.updateVariableColour,
   /**
    * Block to hide a variable
    * @this Blockly.Block
@@ -1133,10 +1165,10 @@ Blockly.Constants.Data.CUSTOM_CONTEXT_MENU_GET_VARIABLE_MIXIN = {
         separator: true,
       });
     } else {
-      const renameOption = {
-        text: Blockly.Msg.RENAME_VARIABLE,
+      const editOption = {
+        text: Blockly.Msg.EDIT_VARIABLE,
         enabled: true,
-        callback: Blockly.Constants.Data.RENAME_OPTION_CALLBACK_FACTORY(
+        callback: Blockly.Constants.Data.EDIT_OPTION_CALLBACK_FACTORY(
           this,
           fieldName
         ),
@@ -1149,7 +1181,7 @@ Blockly.Constants.Data.CUSTOM_CONTEXT_MENU_GET_VARIABLE_MIXIN = {
           fieldName
         ),
       };
-      options.push(renameOption);
+      options.push(editOption);
       options.push(deleteOption);
     }
   },
@@ -1210,10 +1242,10 @@ Blockly.Constants.Data.CUSTOM_CONTEXT_MENU_GET_LIST_MIXIN = {
         separator: true,
       });
     } else {
-      const renameOption = {
-        text: Blockly.Msg.RENAME_LIST,
+      const editOption = {
+        text: Blockly.Msg.EDIT_LIST,
         enabled: true,
-        callback: Blockly.Constants.Data.RENAME_OPTION_CALLBACK_FACTORY(
+        callback: Blockly.Constants.Data.EDIT_OPTION_CALLBACK_FACTORY(
           this,
           fieldName
         ),
@@ -1226,7 +1258,7 @@ Blockly.Constants.Data.CUSTOM_CONTEXT_MENU_GET_LIST_MIXIN = {
           fieldName
         ),
       };
-      options.push(renameOption);
+      options.push(editOption);
       options.push(deleteOption);
     }
   },
@@ -1287,10 +1319,10 @@ Blockly.Constants.Data.CUSTOM_CONTEXT_MENU_GET_TABLE_MIXIN = {
         separator: true,
       });
     } else {
-      const renameOption = {
-        text: Blockly.Msg.RENAME_TABLE,
+      const editOption = {
+        text: Blockly.Msg.EDIT_TABLE,
         enabled: true,
-        callback: Blockly.Constants.Data.RENAME_OPTION_CALLBACK_FACTORY(
+        callback: Blockly.Constants.Data.EDIT_OPTION_CALLBACK_FACTORY(
           this,
           fieldName
         ),
@@ -1303,7 +1335,7 @@ Blockly.Constants.Data.CUSTOM_CONTEXT_MENU_GET_TABLE_MIXIN = {
           fieldName
         ),
       };
-      options.push(renameOption);
+      options.push(editOption);
       options.push(deleteOption);
     }
   },
@@ -1338,20 +1370,20 @@ Blockly.Constants.Data.VARIABLE_OPTION_CALLBACK_FACTORY = function (
 };
 
 /**
- * Callback for rename variable dropdown menu option associated with a
+ * Callback for the edit variable dropdown menu option associated with a
  * variable getter block.
- * @param {!Blockly.Block} block The block with the variable to rename.
+ * @param {!Blockly.Block} block The block with the variable to edit.
  * @param {string} fieldName The name of the field to inspect on the block.
- * @return {!function()} A function that renames the variable.
+ * @return {!function()} A function that edits the variable.
  */
-Blockly.Constants.Data.RENAME_OPTION_CALLBACK_FACTORY = function (
+Blockly.Constants.Data.EDIT_OPTION_CALLBACK_FACTORY = function (
   block,
   fieldName
 ) {
   return function () {
     const workspace = block.workspace;
     const variable = block.getField(fieldName).getVariable();
-    Blockly.Variables.renameVariable(workspace, variable);
+    Blockly.Variables.editVariable(workspace, variable);
   };
 };
 

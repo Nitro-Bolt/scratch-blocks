@@ -456,9 +456,9 @@ Blockly.Msg.FOR_THIS_SPRITE_ONLY = 'For this sprite only:';
 // Variables
 // @todo Remove these once fully managed by Scratch VM / Scratch GUI
 Blockly.Msg.CHANGE_VALUE_TITLE = 'Change value:';
-Blockly.Msg.RENAME_VARIABLE = 'Rename variable';
-Blockly.Msg.RENAME_VARIABLE_TITLE = 'Rename all "%1" variables to:';
-Blockly.Msg.RENAME_VARIABLE_MODAL_TITLE = 'Rename Variable';
+Blockly.Msg.EDIT_VARIABLE = 'Edit variable';
+Blockly.Msg.EDIT_VARIABLE_TITLE = 'Variable name:';
+Blockly.Msg.EDIT_VARIABLE_MODAL_TITLE = 'Edit Variable';
 Blockly.Msg.NEW_VARIABLE = 'Make a Variable';
 Blockly.Msg.NEW_VARIABLE_OPTION = 'New variable';
 Blockly.Msg.NEW_VARIABLE_TITLE = 'New variable name:';
@@ -486,13 +486,13 @@ Blockly.Msg.NEW_LIST_OPTION = 'New list';
 Blockly.Msg.NEW_LIST_TITLE = 'New list name:';
 Blockly.Msg.LIST_MODAL_TITLE = 'New List';
 Blockly.Msg.LIST_ALREADY_EXISTS = 'A list named "%1" already exists.';
-Blockly.Msg.RENAME_LIST_TITLE = 'Rename all "%1" lists to:';
-Blockly.Msg.RENAME_LIST_MODAL_TITLE = 'Rename List';
+Blockly.Msg.EDIT_LIST = 'Edit list';
+Blockly.Msg.EDIT_LIST_TITLE = 'List name:';
+Blockly.Msg.EDIT_LIST_MODAL_TITLE = 'Edit List';
 Blockly.Msg.REPLACE_LIST = 'Replace list';
 Blockly.Msg.REPLACE_LIST_TITLE = 'Replace all "%1" lists with:';
 Blockly.Msg.DEFAULT_LIST_ITEM = 'thing';
 Blockly.Msg.DELETE_LIST = 'Delete the "%1" list';
-Blockly.Msg.RENAME_LIST = 'Rename list';
 
 // Tables
 // @todo Remove these once fully managed by Scratch VM / Scratch GUI
@@ -501,13 +501,13 @@ Blockly.Msg.NEW_TABLE_OPTION = 'New table';
 Blockly.Msg.NEW_TABLE_TITLE = 'New table name:';
 Blockly.Msg.TABLE_MODAL_TITLE = 'New Table';
 Blockly.Msg.TABLE_ALREADY_EXISTS = 'A table named "%1" already exists.';
-Blockly.Msg.RENAME_TABLE_TITLE = 'Rename all "%1" tables to:';
-Blockly.Msg.RENAME_TABLE_MODAL_TITLE = 'Rename Table';
+Blockly.Msg.EDIT_TABLE = 'Edit table';
+Blockly.Msg.EDIT_TABLE_TITLE = 'Table name:';
+Blockly.Msg.EDIT_TABLE_MODAL_TITLE = 'Edit Table';
 Blockly.Msg.REPLACE_TABLE = 'Replace table';
 Blockly.Msg.REPLACE_TABLE_TITLE = 'Replace all "%1" tables with:';
 Blockly.Msg.DEFAULT_TABLE_ITEM = 'thing';
 Blockly.Msg.DELETE_TABLE = 'Delete the "%1" table';
-Blockly.Msg.RENAME_TABLE = 'Rename table';
 
 // Broadcast Messages
 // @todo Remove these once fully managed by Scratch VM / Scratch GUI
