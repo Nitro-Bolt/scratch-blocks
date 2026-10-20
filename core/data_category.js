@@ -163,12 +163,18 @@ Blockly.DataCategory.addSetVariableTo = function (xmlList, variable) {
   //     </shadow>
   //   </value>
   // </block>
+  const valueType = (variable && variable.valueType) || "Any";
+  let defaults = [];
+  if (valueType === "Any") {
+    defaults = [["VALUE", "text", 0]];
+  }
+
   Blockly.DataCategory.addBlock(
     xmlList,
     variable,
     "data_setvariableto",
     "VARIABLE",
-    [["VALUE", "text", 0]]
+    defaults
   );
 };
 

@@ -53,6 +53,38 @@ Blockly.Variables.NAME_TYPE = Blockly.VARIABLE_CATEGORY_NAME;
 Blockly.Variables.CLOUD_PREFIX = "☁ ";
 
 /**
+ * Resolve an extension's custom value type shape, when available.
+ * @param {string} _valueType The custom type ID.
+ * @return {number|string|undefined} The registered shape.
+ */
+Blockly.Variables.getCustomTypeShape = function (_valueType) {};
+
+/**
+ * Get the reporter and input shape for a declared variable value type.
+ * @param {string} valueType The declared value type.
+ * @return {number|string} The output shape.
+ */
+Blockly.Variables.getValueTypeShape = function (valueType) {
+  if (valueType === "Any") {
+    return Blockly.OUTPUT_SHAPE_ROUND;
+  }
+  if (valueType === "Boolean") {
+    return Blockly.OUTPUT_SHAPE_HEXAGONAL;
+  }
+  if (valueType === "Array") {
+    return Blockly.OUTPUT_SHAPE_SQUARE;
+  }
+  if (valueType === "Object") {
+    return Blockly.OUTPUT_SHAPE_OBJECT;
+  }
+  const customShape = Blockly.Variables.getCustomTypeShape(valueType);
+  if (typeof customShape === "number" || typeof customShape === "string") {
+    return customShape;
+  }
+  return Blockly.OUTPUT_SHAPE_ROUND;
+};
+
+/**
  * Find all user-created variables that are in use in the workspace.
  * For use by generators.
  * @param {!Blockly.Block|!Blockly.Workspace} root Root block or workspace.
@@ -270,7 +302,14 @@ Blockly.Variables.realizePotentialVar = function (
   if (realVar) {
     return realVar;
   }
-  return realWs.createVariable(varName, varType, id);
+  return realWs.createVariable(
+    varName,
+    varType,
+    id,
+    potentialVar.isLocal,
+    potentialVar.isCloud,
+    potentialVar.valueType
+  );
 };
 
 /**
@@ -356,7 +395,8 @@ Blockly.Variables.createVariable = function (
             opt_type,
             null,
             isLocal,
-            isCloud
+            isCloud,
+            variableOptions.valueType
           );
         }
 

@@ -88,6 +88,7 @@ Blockly.Events.VarCreate = function (variable) {
   this.varName = variable.name;
   this.isLocal = variable.isLocal;
   this.isCloud = variable.isCloud;
+  this.valueType = variable.valueType;
 };
 goog.inherits(Blockly.Events.VarCreate, Blockly.Events.VarBase);
 
@@ -107,6 +108,9 @@ Blockly.Events.VarCreate.prototype.toJson = function () {
   json["varName"] = this.varName;
   json["isLocal"] = this.isLocal;
   json["isCloud"] = this.isCloud;
+  if (this.valueType && this.valueType !== "Any") {
+    json["valueType"] = this.valueType;
+  }
   return json;
 };
 
@@ -120,6 +124,7 @@ Blockly.Events.VarCreate.prototype.fromJson = function (json) {
   this.varName = json["varName"];
   this.isLocal = json["isLocal"];
   this.isCloud = json["isCloud"];
+  this.valueType = json["valueType"] || "Any";
 };
 
 /**
@@ -134,7 +139,8 @@ Blockly.Events.VarCreate.prototype.run = function (forward) {
       this.varType,
       this.varId,
       this.isLocal,
-      this.isCloud
+      this.isCloud,
+      this.valueType
     );
   } else {
     workspace.deleteVariableById(this.varId);
@@ -157,6 +163,7 @@ Blockly.Events.VarDelete = function (variable) {
   this.varName = variable.name;
   this.isLocal = variable.isLocal;
   this.isCloud = variable.isCloud;
+  this.valueType = variable.valueType;
 };
 goog.inherits(Blockly.Events.VarDelete, Blockly.Events.VarBase);
 
@@ -176,6 +183,9 @@ Blockly.Events.VarDelete.prototype.toJson = function () {
   json["varName"] = this.varName;
   json["isLocal"] = this.isLocal;
   json["isCloud"] = this.isCloud;
+  if (this.valueType && this.valueType !== "Any") {
+    json["valueType"] = this.valueType;
+  }
   return json;
 };
 
@@ -189,6 +199,7 @@ Blockly.Events.VarDelete.prototype.fromJson = function (json) {
   this.varName = json["varName"];
   this.isLocal = json["isLocal"];
   this.isCloud = json["isCloud"];
+  this.valueType = json["valueType"] || "Any";
 };
 
 /**
@@ -205,7 +216,8 @@ Blockly.Events.VarDelete.prototype.run = function (forward) {
       this.varType,
       this.varId,
       this.isLocal,
-      this.isCloud
+      this.isCloud,
+      this.valueType
     );
   }
 };
