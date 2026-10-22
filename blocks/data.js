@@ -59,8 +59,15 @@ Blockly.Constants.Data.updateVariableValue = function () {
   const shape = Blockly.Variables.getValueTypeShape(valueType);
 
   if (this.outputConnection) {
-    this.setOutputShape(shape);
-    this.outputConnection.setCheck(check);
+    const parentConnection = this.outputConnection.targetConnection;
+    if (
+      !parentConnection ||
+      !parentConnection.check_ ||
+      (!!check && parentConnection.check_.indexOf(check) !== -1)
+    ) {
+      this.setOutputShape(shape);
+      this.outputConnection.setCheck(check);
+    }
   } else {
     const connection = this.getInput("VALUE").connection;
     connection.setShadowDom(null);
@@ -94,6 +101,22 @@ Blockly.Constants.Data.updateVariableValue = function () {
 
 Blockly.Blocks["data_variable"] = {
   updateVariable_: Blockly.Constants.Data.updateVariableValue,
+  /**
+   * Keep a variable reporter compatible with the input containing it when a
+   * workspace is reconstructed after its declared type has changed.
+   * @param {!Blockly.Connection} parentConnection The containing input.
+   * @private
+   */
+  adaptOutputToParentConnection_: function (parentConnection) {
+    this.setOutputShape(parentConnection.getOutputShape());
+    this.outputConnection.setCheck(parentConnection.check_);
+  },
+  /**
+   * Restore the variable's declared type after removing it from a containing
+   * input whose type it had preserved.
+   * @private
+   */
+  onParentDisconnected_: Blockly.Constants.Data.updateVariableValue,
   /**
    * Block of Variables
    * @this Blockly.Block

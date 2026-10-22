@@ -682,6 +682,9 @@ Blockly.Connection.prototype.disconnectInternal_ = function (
   otherConnection.targetConnection = null;
   this.targetConnection = null;
   childBlock.setParent(null);
+  if (childBlock.onParentDisconnected_) {
+    childBlock.onParentDisconnected_();
+  }
   const parentConnection = this.isSuperior() ? this : otherConnection;
   if (parentConnection.extendableArrayField_) {
     parentConnection.extendableArrayField_.onArrayConnectionChanged();
