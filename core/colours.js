@@ -168,6 +168,17 @@ Blockly.Colours = {
 };
 
 /**
+ * Accept only colours in the format used by project data and colour inputs.
+ * @param {*} colour Potential colour value.
+ * @return {?string} A safe colour or null.
+ */
+Blockly.Colours.normalizeHex = function (colour) {
+  return typeof colour === "string" && /^#[0-9a-f]{6}$/i.test(colour)
+    ? colour
+    : null;
+};
+
+/**
  * Override the colours in Blockly.Colours with new values basded on the
  * given dictionary.
  * @param {!Object} colours Dictionary of colour properties and new values.
@@ -210,6 +221,8 @@ Blockly.Colours.overrideColours = function (colours) {
  * @returns {string[]} Primary, secondary, tertiary, and quaternary colours.
  */
 Blockly.Colours.getBlockColours = function (primary) {
+  primary =
+    Blockly.Colours.normalizeHex(primary) || Blockly.Colours.more.primary;
   primary = primary.toLowerCase();
   const categories = Object.values(Blockly.Categories);
   const categoryColours = Object.entries(Blockly.Colours).find(

@@ -30,6 +30,7 @@ goog.require("Blockly.Events.CommentChange");
 goog.require("Blockly.Events.CommentCreate");
 goog.require("Blockly.Events.CommentDelete");
 goog.require("Blockly.Events.CommentMove");
+goog.require("Blockly.Colours");
 
 goog.require("goog.math.Coordinate");
 
@@ -96,7 +97,7 @@ Blockly.WorkspaceComment = function (
    * @type {string}
    * @private
    */
-  this.colour_ = opt_colour || null;
+  this.colour_ = Blockly.Colours.normalizeHex(opt_colour);
 
   /**
    * @type {!Blockly.Workspace}
@@ -303,6 +304,7 @@ Blockly.WorkspaceComment.prototype.getColour = function () {
 };
 
 Blockly.WorkspaceComment.prototype.setColour = function (colour) {
+  colour = Blockly.Colours.normalizeHex(colour);
   if (this.colour_ == colour) return;
   Blockly.Events.fire(
     new Blockly.Events.CommentChange(

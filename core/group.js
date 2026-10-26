@@ -27,6 +27,7 @@
 goog.provide("Blockly.Group");
 
 goog.require("Blockly.ContextMenu");
+goog.require("Blockly.Colours");
 goog.require("Blockly.Events.GroupChange");
 goog.require("Blockly.Events.GroupDragOutside");
 goog.require("Blockly.Events.GroupEndDrag");
@@ -48,7 +49,7 @@ Blockly.Group = function (workspace, options) {
       ? options.id
       : Blockly.utils.genUid();
   this.title = options.title || "Group";
-  this.colour = options.colour || null;
+  this.colour = Blockly.Colours.normalizeHex(options.colour);
   this.x = Number(options.x) || 0;
   this.y = Number(options.y) || 0;
   this.width = Math.max(Number(options.width) || 360, 160);
@@ -297,7 +298,7 @@ Blockly.Group.prototype.toJSON = function () {
  */
 Blockly.Group.prototype.applyState = function (state) {
   this.title = state.title;
-  this.colour = state.colour || null;
+  this.colour = Blockly.Colours.normalizeHex(state.colour);
   this.x = Number(state.x);
   this.y = Number(state.y);
   this.width = Number(state.width);
@@ -670,6 +671,7 @@ Blockly.Group.prototype.renderTitle_ = function () {
 /** @param {string} colour Selected colour. @private */
 Blockly.Group.prototype.setColour_ = function (colour) {
   const group = this;
+  colour = Blockly.Colours.normalizeHex(colour);
   if (colour === group.colour) return;
   const event = new Blockly.Events.GroupChange(group);
   event.recordOld(group);

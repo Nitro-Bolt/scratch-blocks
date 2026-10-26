@@ -30,6 +30,27 @@ goog.require("Blockly.Colours");
 goog.require("Blockly.constants");
 goog.require("Blockly.ScratchBlocks.Extensions");
 
+/**
+ * Remove structured values which FieldDropdown would interpret as image descriptors.
+ * @param {*} dropdowns Parsed custom procedure dropdowns.
+ * @return {!Array<!Array<string>>} Safe dropdown values.
+ * @private
+ */
+Blockly.ScratchBlocks.ProcedureUtils.sanitizeDropdowns_ = function (dropdowns) {
+  if (!Array.isArray(dropdowns)) return [];
+  return dropdowns.map((options) => {
+    if (!Array.isArray(options)) return [];
+    return options
+      .filter(
+        (option) =>
+          typeof option === "string" ||
+          typeof option === "number" ||
+          typeof option === "boolean"
+      )
+      .map(String);
+  });
+};
+
 // Serialization and deserialization.
 
 Blockly.ScratchBlocks.ProcedureUtils.parseReturnMutation = function (
@@ -89,13 +110,17 @@ Blockly.ScratchBlocks.ProcedureUtils.callerDomToMutation = function (
     xmlElement.getAttribute("generateshadows")
   );
   this.argumentIds_ = JSON.parse(xmlElement.getAttribute("argumentids"));
-  this.argumentDropdowns_ = JSON.parse(
-    xmlElement.getAttribute("argumentdropdowns")
-  );
+  this.argumentDropdowns_ =
+    Blockly.ScratchBlocks.ProcedureUtils.sanitizeDropdowns_(
+      JSON.parse(xmlElement.getAttribute("argumentdropdowns"))
+    );
   this.warp_ = JSON.parse(xmlElement.getAttribute("warp"));
   this.global_ = JSON.parse(xmlElement.getAttribute("global"));
-  if (xmlElement.getAttribute("colour")) {
-    this.procedureColour_ = xmlElement.getAttribute("colour");
+  const procedureColour = Blockly.Colours.normalizeHex(
+    xmlElement.getAttribute("colour")
+  );
+  if (procedureColour) {
+    this.procedureColour_ = procedureColour;
     this.colours_ = Blockly.Colours.getBlockColours(this.procedureColour_);
   }
   this.return_ =
@@ -149,8 +174,10 @@ Blockly.ScratchBlocks.ProcedureUtils.definitionMutationToDom = function (
  * @this Blockly.Block
  */
 Blockly.ScratchBlocks.ProcedureUtils.setProcedureColour = function (colour) {
-  this.procedureColour_ = colour;
-  this.setColour(...Blockly.Colours.getBlockColours(colour));
+  const safeColour = Blockly.Colours.normalizeHex(colour);
+  if (!safeColour) return;
+  this.procedureColour_ = safeColour;
+  this.setColour(...Blockly.Colours.getBlockColours(safeColour));
 };
 
 /**
@@ -179,8 +206,11 @@ Blockly.ScratchBlocks.ProcedureUtils.definitionDomToMutation = function (
   this.outputMode_ = xmlElement.getAttribute("output") || "auto";
   this.dual_ = xmlElement.getAttribute("dual") === "true";
 
-  if (xmlElement.getAttribute("colour")) {
-    this.procedureColour_ = xmlElement.getAttribute("colour");
+  const procedureColour = Blockly.Colours.normalizeHex(
+    xmlElement.getAttribute("colour")
+  );
+  if (procedureColour) {
+    this.procedureColour_ = procedureColour;
     this.colours_ = Blockly.Colours.getBlockColours(this.procedureColour_);
   }
 
@@ -192,9 +222,10 @@ Blockly.ScratchBlocks.ProcedureUtils.definitionDomToMutation = function (
   this.argumentDefaults_ = JSON.parse(
     xmlElement.getAttribute("argumentdefaults")
   );
-  this.argumentDropdowns_ = JSON.parse(
-    xmlElement.getAttribute("argumentdropdowns")
-  );
+  this.argumentDropdowns_ =
+    Blockly.ScratchBlocks.ProcedureUtils.sanitizeDropdowns_(
+      JSON.parse(xmlElement.getAttribute("argumentdropdowns"))
+    );
   this.updateDisplay_();
   if (this.updateArgumentReporterNames_) {
     this.updateArgumentReporterNames_(prevArgIds, prevDisplayNames);

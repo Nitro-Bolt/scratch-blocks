@@ -31,6 +31,7 @@ goog.require("Blockly.Events.BlockChange");
 goog.require("Blockly.Events.Ui");
 goog.require("Blockly.Icon");
 goog.require("Blockly.ScratchBubble");
+goog.require("Blockly.Colours");
 
 goog.require("goog.math.Coordinate");
 
@@ -102,7 +103,7 @@ Blockly.ScratchBlockComment = function (
    * @type {string}
    * @private
    */
-  this.colour_ = colour || null;
+  this.colour_ = Blockly.Colours.normalizeHex(colour);
 
   /**
    * The workspace this comment belongs to.
@@ -342,6 +343,7 @@ Blockly.ScratchBlockComment.prototype.getColour = function () {
 };
 
 Blockly.ScratchBlockComment.prototype.setColour = function (colour) {
+  colour = Blockly.Colours.normalizeHex(colour);
   if (this.colour_ == colour) return;
   Blockly.Events.fire(
     new Blockly.Events.CommentChange(
