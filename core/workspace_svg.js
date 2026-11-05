@@ -2693,6 +2693,8 @@ Blockly.WorkspaceSvg.prototype.showContextMenu_ = function (e) {
     )
   );
 
+  menuOptions.push(Blockly.ContextMenu.wsPasteOption(ws));
+
   Blockly.ContextMenu.show(e, menuOptions, this.RTL);
 };
 

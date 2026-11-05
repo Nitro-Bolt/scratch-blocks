@@ -301,14 +301,22 @@ Blockly.onKeyDown_ = function (e) {
  * Copy a block or workspace comment onto the local clipboard.
  * @param {!Blockly.Block | !Blockly.WorkspaceComment} toCopy Block or Workspace Comment
  *    to be copied.
+ * @param {boolean=} opt_blockOnly Whether to exclude blocks after this block.
  * @private
  */
-Blockly.copy_ = function (toCopy) {
+Blockly.copy_ = function (toCopy, opt_blockOnly) {
   let xml;
   if (toCopy.isComment) {
     xml = toCopy.toXmlWithXY();
   } else {
     xml = Blockly.Xml.blockToDom(toCopy);
+    if (opt_blockOnly) {
+      for (let i = xml.childNodes.length - 1; i >= 0; i--) {
+        if (xml.childNodes[i].nodeName.toLowerCase() === "next") {
+          xml.removeChild(xml.childNodes[i]);
+        }
+      }
+    }
     // Encode start position in XML.
     const xy = toCopy.getRelativeToSurfaceXY();
     xml.setAttribute("x", toCopy.RTL ? -xy.x : xy.x);

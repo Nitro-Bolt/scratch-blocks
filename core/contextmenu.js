@@ -408,6 +408,59 @@ Blockly.ContextMenu.blockMakeSpaceOption = function (block) {
 };
 
 /**
+ * Make a context menu option for copying the current block and the blocks
+ * below it.
+ * @param {!Blockly.BlockSvg} block The block where the right-click originated.
+ * @return {!Object} A menu option, containing text, enabled, and a callback.
+ * @package
+ */
+Blockly.ContextMenu.blockCopyAllOption = function (block) {
+  return {
+    text: Blockly.Msg.COPY_ALL,
+    enabled: true,
+    separator: true,
+    callback: function () {
+      Blockly.copy_(block);
+    },
+  };
+};
+
+/**
+ * Make a context menu option for copying only the current block.
+ * @param {!Blockly.BlockSvg} block The block where the right-click originated.
+ * @return {!Object} A menu option, containing text, enabled, and a callback.
+ * @package
+ */
+Blockly.ContextMenu.blockCopyOption = function (block) {
+  return {
+    text: Blockly.Msg.COPY_BLOCK,
+    enabled: true,
+    callback: function () {
+      Blockly.copy_(block, true);
+    },
+  };
+};
+
+/**
+ * Make a context menu option for cutting only the current block.
+ * @param {!Blockly.BlockSvg} block The block where the right-click originated.
+ * @return {!Object} A menu option, containing text, enabled, and a callback.
+ * @package
+ */
+Blockly.ContextMenu.blockCutOption = function (block) {
+  return {
+    text: Blockly.Msg.CUT_BLOCK,
+    enabled: true,
+    callback: function () {
+      Blockly.copy_(block, true);
+      Blockly.Events.setGroup(true);
+      block.dispose(true, true);
+      Blockly.Events.setGroup(false);
+    },
+  };
+};
+
+/**
  * Make a context menu option for inspecting the current block.
  * @param {!Blockly.BlockSvg} block The block where the right-click originated.
  * @return {!Object} A menu option, containing text, enabled, and a callback.
@@ -491,6 +544,26 @@ Blockly.ContextMenu.wsRedoOption = function (ws) {
     text: Blockly.Msg.REDO,
     enabled: ws.hasRedoStack(),
     callback: ws.undo.bind(ws, true),
+  };
+};
+
+/**
+ * Make a context menu option for pasting the clipboard into the workspace.
+ * @param {!Blockly.WorkspaceSvg} ws The workspace where the right-click
+ *     originated.
+ * @return {!Object} A menu option, containing text, enabled, and a callback.
+ * @package
+ */
+Blockly.ContextMenu.wsPasteOption = function (ws) {
+  return {
+    text: Blockly.Msg.PASTE,
+    enabled: !!Blockly.clipboardXml_,
+    separator: true,
+    callback: function () {
+      Blockly.Events.setGroup(true);
+      ws.paste(Blockly.clipboardXml_);
+      Blockly.Events.setGroup(false);
+    },
   };
 };
 
