@@ -87,6 +87,7 @@ Blockly.ScratchBlocks.ProcedureUtils.callerMutationToDom = function () {
   );
   container.setAttribute("warp", JSON.stringify(this.warp_));
   container.setAttribute("global", JSON.stringify(this.global_));
+  container.setAttribute("runinparent", JSON.stringify(this.runInParent_));
   container.setAttribute("colour", this.procedureColour_ || this.colour_);
   container.setAttribute("output", this.outputMode_);
   container.setAttribute("dual", JSON.stringify(this.dual_));
@@ -116,6 +117,7 @@ Blockly.ScratchBlocks.ProcedureUtils.callerDomToMutation = function (
     );
   this.warp_ = JSON.parse(xmlElement.getAttribute("warp"));
   this.global_ = JSON.parse(xmlElement.getAttribute("global"));
+  this.runInParent_ = JSON.parse(xmlElement.getAttribute("runinparent"));
   const procedureColour = Blockly.Colours.normalizeHex(
     xmlElement.getAttribute("colour")
   );
@@ -159,6 +161,7 @@ Blockly.ScratchBlocks.ProcedureUtils.definitionMutationToDom = function (
   );
   container.setAttribute("warp", JSON.stringify(this.warp_));
   container.setAttribute("global", JSON.stringify(this.global_));
+  container.setAttribute("runinparent", JSON.stringify(this.runInParent_));
   container.setAttribute("colour", this.procedureColour_ || this.colour_);
   container.setAttribute("output", this.outputMode_);
   container.setAttribute("dual", JSON.stringify(this.dual_));
@@ -201,6 +204,7 @@ Blockly.ScratchBlocks.ProcedureUtils.definitionDomToMutation = function (
   this.procCode_ = xmlElement.getAttribute("proccode");
   this.warp_ = JSON.parse(xmlElement.getAttribute("warp"));
   this.global_ = JSON.parse(xmlElement.getAttribute("global"));
+  this.runInParent_ = JSON.parse(xmlElement.getAttribute("runinparent"));
   this.return_ =
     Blockly.ScratchBlocks.ProcedureUtils.parseReturnMutation(xmlElement);
   this.outputMode_ = xmlElement.getAttribute("output") || "auto";
@@ -1357,6 +1361,19 @@ Blockly.ScratchBlocks.ProcedureUtils.getGlobal = function () {
  */
 Blockly.ScratchBlocks.ProcedureUtils.setGlobal = function (global) {
   this.global_ = global;
+  if (!global) {
+    this.runInParent_ = false;
+  }
+};
+
+/** @return {boolean} Whether the procedure runs in its owner sprite. */
+Blockly.ScratchBlocks.ProcedureUtils.getRunInParent = function () {
+  return this.runInParent_;
+};
+
+/** @param {boolean} runInParent Whether the procedure runs in its owner sprite. */
+Blockly.ScratchBlocks.ProcedureUtils.setRunInParent = function (runInParent) {
+  this.runInParent_ = runInParent;
 };
 
 /**
@@ -1554,6 +1571,7 @@ Blockly.Blocks["procedures_call"] = {
     this.argumentDropdowns_ = [];
     this.warp_ = false;
     this.global_ = false;
+    this.runInParent_ = false;
     this.return_ = Blockly.PROCEDURES_CALL_TYPE_STATEMENT;
     this.outputMode_ = "auto";
     this.dual_ = false;
@@ -1604,6 +1622,7 @@ Blockly.Blocks["procedures_prototype"] = {
     this.argumentDropdowns_ = [];
     this.warp_ = false;
     this.global_ = false;
+    this.runInParent_ = false;
     this.return_ = Blockly.PROCEDURES_CALL_TYPE_STATEMENT;
     this.outputMode_ = "auto";
     this.dual_ = false;
@@ -1652,6 +1671,7 @@ Blockly.Blocks["procedures_declaration"] = {
     this.argumentDropdowns_ = [];
     this.warp_ = false;
     this.global_ = false;
+    this.runInParent_ = false;
     this.return_ = Blockly.PROCEDURES_CALL_TYPE_STATEMENT;
     this.outputMode_ = "auto";
     this.dual_ = false;
@@ -1691,6 +1711,8 @@ Blockly.Blocks["procedures_declaration"] = {
   setWarp: Blockly.ScratchBlocks.ProcedureUtils.setWarp,
   getGlobal: Blockly.ScratchBlocks.ProcedureUtils.getGlobal,
   setGlobal: Blockly.ScratchBlocks.ProcedureUtils.setGlobal,
+  getRunInParent: Blockly.ScratchBlocks.ProcedureUtils.getRunInParent,
+  setRunInParent: Blockly.ScratchBlocks.ProcedureUtils.setRunInParent,
   getOutputMode: Blockly.ScratchBlocks.ProcedureUtils.getOutputMode,
   setOutputMode: Blockly.ScratchBlocks.ProcedureUtils.setOutputMode,
   getDual: Blockly.ScratchBlocks.ProcedureUtils.getDual,
