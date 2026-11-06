@@ -395,7 +395,7 @@ Blockly.ScratchBlocks.ProcedureUtils.createAllInputs_ = function (
   // Split the proc into components, by arguments and the internal %l label
   // delimiter (ignoring escaped percent signs). The delimiter keeps adjacent
   // labels separate while inputs are being rearranged in the declaration UI.
-  let procComponents = this.procCode_.split(/(?=[^\\]%[nbdoasclr])/);
+  let procComponents = this.procCode_.split(/(?=[^\\]%[nbdoasclmr])/);
   procComponents = procComponents.map(function (c) {
     return c.trim(); // Strip whitespace.
   });
@@ -406,7 +406,7 @@ Blockly.ScratchBlocks.ProcedureUtils.createAllInputs_ = function (
   for (i = 0; (component = procComponents[i]); i++) {
     if (component.substring(0, 1) == "%" && component.substring(1, 2) != "l") {
       const argumentType = component.substring(1, 2);
-      if (!["n", "b", "d", "o", "a", "s", "c", "r"].includes(argumentType)) {
+      if (!["n", "b", "d", "o", "a", "s", "c", "m", "r"].includes(argumentType)) {
         throw new Error(
           "Found an custom procedure with an invalid type: " + argumentType
         );
@@ -539,7 +539,7 @@ Blockly.ScratchBlocks.ProcedureUtils.addLabelEditor_ = function (text) {
 
 /**
  * Build a DOM node representing a shadow block of the given type.
- * @param {string} type One of 's' (string) or 'n' (number).
+ * @param {string} type A procedure argument type with a default shadow.
  * @return {!Element} The DOM node representing the new shadow block.
  * @private
  * @this Blockly.Block
@@ -558,6 +558,11 @@ Blockly.ScratchBlocks.ProcedureUtils.buildShadowDom_ = function (type) {
       break;
     case "s":
       shadowType = "text";
+      fieldName = "TEXT";
+      fieldValue = "";
+      break;
+    case "m":
+      shadowType = "text_multiline";
       fieldName = "TEXT";
       fieldValue = "";
       break;
@@ -582,8 +587,8 @@ Blockly.ScratchBlocks.ProcedureUtils.buildShadowDom_ = function (type) {
 /**
  * Create a new shadow block and attach it to the given input.
  * @param {!Blockly.Input} input The value input to attach a block to.
- * @param {string} argumentType One of 'o' (object), 'a' (array),
- *     's' (string) or 'n' (number).
+ * @param {string} argumentType One of 'd' (dropdown), 'm' (multiline text),
+ *     'n' (number), 'r' (color), or 's' (string).
  * @private
  * @this Blockly.Block
  */
@@ -593,10 +598,11 @@ Blockly.ScratchBlocks.ProcedureUtils.attachShadow_ = function (
   _dropdownOptions
 ) {
   let newBlock;
-  if (["n", "d", "s", "r"].includes(argumentType)) {
+  if (["n", "d", "s", "m", "r"].includes(argumentType)) {
     const blockType = {
       n: "math_number",
       s: "text",
+      m: "text_multiline",
       d: "procedures_dropdown",
       r: "colour_picker",
     }[argumentType];
@@ -611,6 +617,7 @@ Blockly.ScratchBlocks.ProcedureUtils.attachShadow_ = function (
           // ???
           break;
         case "s":
+        case "m":
           newBlock.setFieldValue("", "TEXT");
           break;
         case "r":
@@ -635,7 +642,7 @@ Blockly.ScratchBlocks.ProcedureUtils.attachShadow_ = function (
 /**
  * Create a new argument reporter block.
  * @param {string} argumentType One of 'b' (boolean), 'o' (object), 'a' (array),
- *     's' (string), 'n' (number) or 'r' (color).
+ *     's' (string), 'm' (multiline text), 'n' (number) or 'r' (color).
  * @param {string} displayName The name of the argument as provided by the
  *     user, which becomes the text of the label on the argument reporter block.
  * @return {!Blockly.BlockSvg} The newly created argument reporter block.
@@ -647,7 +654,12 @@ Blockly.ScratchBlocks.ProcedureUtils.createArgumentReporter_ = function (
   displayName
 ) {
   let blockType, newBlock;
-  if (argumentType == "n" || argumentType == "s" || argumentType == "d") {
+  if (
+    argumentType == "n" ||
+    argumentType == "s" ||
+    argumentType == "m" ||
+    argumentType == "d"
+  ) {
     blockType = "argument_reporter_string_number";
   } else if (argumentType == "b") {
     blockType = "argument_reporter_boolean";
@@ -722,7 +734,7 @@ Blockly.ScratchBlocks.ProcedureUtils.updateDropdowns_ = function () {
 /**
  * Populate the argument by attaching the correct child block or shadow to the
  * given input.
- * @param {string} type One of 'b' (boolean), 'o' (object), 'a' (array), 's' (string) 'n' (number) or 'd' (dropdown).
+ * @param {string} type A procedure argument type.
  * @param {number} index The index of this argument into the argument id array.
  * @param {!Object.<string, {shadow: Element, block: Blockly.Block}>}
  *     connectionMap An object mapping argument IDs to blocks and shadow DOMs.
@@ -752,7 +764,7 @@ Blockly.ScratchBlocks.ProcedureUtils.populateArgumentOnCaller_ = function (
     connectionMap[input.name] = null;
     if (type == "c") oldBlock.previousConnection.connect(input.connection);
     else oldBlock.outputConnection.connect(input.connection);
-    if (["s", "n", "b", "d", "r"].includes(type) && this.generateShadows_) {
+    if (["s", "m", "n", "b", "d", "r"].includes(type) && this.generateShadows_) {
       const shadowDom = oldShadow || this.buildShadowDom_(type);
       input.connection.setShadowDom(shadowDom);
     }
@@ -764,7 +776,7 @@ Blockly.ScratchBlocks.ProcedureUtils.populateArgumentOnCaller_ = function (
 /**
  * Populate the argument by attaching the correct argument reporter to the given
  * input.
- * @param {string} type One of 'b' (boolean), 'o' (object), 'a' (array), 's' (string), 'n' (number) or 'r' (color).
+ * @param {string} type A procedure argument type.
  * @param {number} index The index of this argument into the argument ID and
  *     argument display name arrays.
  * @param {!Object.<string, {shadow: Element, block: Blockly.Block}>}
@@ -812,7 +824,7 @@ Blockly.ScratchBlocks.ProcedureUtils.populateArgumentOnPrototype_ = function (
 /**
  * Populate the argument by attaching the correct argument editor to the given
  * input.
- * @param {string} type One of 'b' (boolean), 'o' (object), 'a' (array), 's' (string) or 'n' (number).
+ * @param {string} type A procedure argument type.
  * @param {number} index The index of this argument into the argument id and
  *     argument display name arrays.
  * @param {!Object.<string, {shadow: Element, block: Blockly.Block}>}
@@ -870,7 +882,7 @@ Blockly.ScratchBlocks.ProcedureUtils.populateArgumentOnDeclaration_ = function (
  * Check whether the type of the old block corresponds to the given argument
  * type.
  * @param {Blockly.BlockSvg} oldBlock The old block to check.
- * @param {string} type The argument type.  One of 'b', 'o', 'a', 'n', or 's'.
+ * @param {string} type The procedure argument type.
  * @return {boolean} True if the type matches, false otherwise.
  */
 Blockly.ScratchBlocks.ProcedureUtils.checkOldTypeMatches_ = function (
@@ -881,7 +893,7 @@ Blockly.ScratchBlocks.ProcedureUtils.checkOldTypeMatches_ = function (
     return false;
   }
   if (
-    (type == "n" || type == "s" || type == "d") &&
+    (type == "n" || type == "s" || type == "m" || type == "d") &&
     oldBlock.type == "argument_reporter_string_number"
   ) {
     return true;
@@ -908,8 +920,7 @@ Blockly.ScratchBlocks.ProcedureUtils.checkOldTypeMatches_ = function (
  * Create an argument editor.
  * An argument editor is a shadow block with a single text field, which is used
  * to set the display name of the argument.
- * @param {string} argumentType One of 'b' (boolean), 'o' (object), 'a' (array),
- *     's' (string) or 'n' (number).
+ * @param {string} argumentType A procedure argument type.
  * @param {string} displayName The display name  of this argument, which is the
  *     text of the field on the shadow block.
  * @return {!Blockly.BlockSvg} The newly created argument editor block.
@@ -925,6 +936,8 @@ Blockly.ScratchBlocks.ProcedureUtils.createArgumentEditor_ = function (
   try {
     if (argumentType == "n" || argumentType == "s") {
       newBlock = this.workspace.newBlock("argument_editor_string_number");
+    } else if (argumentType == "m") {
+      newBlock = this.workspace.newBlock("argument_editor_multiline");
     } else if (argumentType == "b") {
       newBlock = this.workspace.newBlock("argument_editor_boolean");
     } else if (argumentType == "o") {
@@ -992,6 +1005,8 @@ Blockly.ScratchBlocks.ProcedureUtils.updateDeclarationProcCode_ = function (
         this.procCode_ += "%d";
         const options = target.inputList[0].fieldRow[0].getOptions();
         this.argumentDropdowns_.push(options.filter(Boolean).map((o) => o[0]));
+      } else if (target.type == "argument_editor_multiline") {
+        this.procCode_ += "%m";
       } else {
         this.procCode_ += "%s";
       }
@@ -1321,6 +1336,22 @@ Blockly.ScratchBlocks.ProcedureUtils.addStringNumberExternal = function () {
   Blockly.WidgetDiv.hide(true);
   this.procCode_ = this.procCode_ + " %s";
   this.displayNames_.push(this.getUniqueArgumentName_("number or text"));
+  this.argumentIds_.push(Blockly.utils.genUid());
+  this.argumentDefaults_.push("");
+  this.updateDisplay_();
+  this.finishAddingInput_(selectedIndex);
+};
+
+/**
+ * Externally-visible function to add a multiline text argument to the
+ * procedure declaration.
+ * @public
+ */
+Blockly.ScratchBlocks.ProcedureUtils.addMultilineExternal = function () {
+  const selectedIndex = this.getSelectedInputIndex_();
+  Blockly.WidgetDiv.hide(true);
+  this.procCode_ = this.procCode_ + " %m";
+  this.displayNames_.push(this.getUniqueArgumentName_("multiline text"));
   this.argumentIds_.push(Blockly.utils.genUid());
   this.argumentDefaults_.push("");
   this.updateDisplay_();
@@ -1726,6 +1757,8 @@ Blockly.Blocks["procedures_declaration"] = {
     Blockly.ScratchBlocks.ProcedureUtils.addStatementExternal,
   addStringNumberExternal:
     Blockly.ScratchBlocks.ProcedureUtils.addStringNumberExternal,
+  addMultilineExternal:
+    Blockly.ScratchBlocks.ProcedureUtils.addMultilineExternal,
   addDropdownExternal: Blockly.ScratchBlocks.ProcedureUtils.addDropdownExternal,
   onChangeFn: Blockly.ScratchBlocks.ProcedureUtils.updateDeclarationProcCode_,
   // For colour fixing of the fields when on the GUI side look at the GUI!!!.
@@ -1991,6 +2024,9 @@ Blockly.Blocks["argument_editor_string_number"] = {
     Blockly.ScratchBlocks.ProcedureUtils.removeArgumentCallback_,
   shiftFieldCallback: Blockly.ScratchBlocks.ProcedureUtils.shiftFieldCallback,
 };
+
+Blockly.Blocks["argument_editor_multiline"] =
+  Blockly.Blocks["argument_editor_string_number"];
 
 Blockly.Blocks["argument_editor_dropdown"] = {
   init: function () {
