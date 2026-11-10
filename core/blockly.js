@@ -104,6 +104,13 @@ Blockly.draggingConnections_ = [];
 Blockly.clipboardXml_ = null;
 
 /**
+ * XML trees for a copied multi-selection, or null for a normal clipboard item.
+ * @type {?Array.<!Element>}
+ * @private
+ */
+Blockly.clipboardXmls_ = null;
+
+/**
  * Source of the local clipboard.
  * @type {Blockly.WorkspaceSvg}
  * @private
@@ -234,7 +241,15 @@ Blockly.onKeyDown_ = function (e) {
     if (Blockly.mainWorkspace.isDragging()) {
       return;
     }
-    if (
+    const hasActiveMultiSelection =
+      selectedBlocks.length &&
+      (!Blockly.selected ||
+        Blockly.mainWorkspace.isBlockSelected(Blockly.selected));
+    if (hasActiveMultiSelection && (key === "c" || key === "x")) {
+      Blockly.hideChaff();
+      Blockly.copyMultiSelection_(Blockly.mainWorkspace);
+      if (key === "x") deleteBlock = true;
+    } else if (
       Blockly.selected &&
       Blockly.selected.isDeletable() &&
       Blockly.selected.isMovable()
@@ -263,7 +278,7 @@ Blockly.onKeyDown_ = function (e) {
         if (workspace.isFlyout) {
           workspace = workspace.targetWorkspace;
         }
-        workspace.paste(Blockly.clipboardXml_);
+        Blockly.pasteClipboard_(workspace);
         Blockly.Events.setGroup(false);
       }
     } else if (key === "z" || key === "y") {
@@ -323,7 +338,92 @@ Blockly.copy_ = function (toCopy, opt_blockOnly) {
     xml.setAttribute("y", xy.y);
   }
   Blockly.clipboardXml_ = xml;
+  Blockly.clipboardXmls_ = null;
   Blockly.clipboardSource_ = toCopy.workspace;
+};
+
+/**
+ * Copy the current multi-selection while preserving its relative positions.
+ * @param {!Blockly.WorkspaceSvg} workspace Source workspace.
+ * @private
+ */
+Blockly.copyMultiSelection_ = function (workspace) {
+  const blocks = workspace.getSelectedBlocks();
+  const xmls = [];
+  for (let i = 0; i < blocks.length; i++) {
+    const block = blocks[i];
+    const xml = Blockly.Xml.blockToDom(block);
+    const xy = block.getRelativeToSurfaceXY();
+    xml.setAttribute("x", block.RTL ? -xy.x : xy.x);
+    xml.setAttribute("y", xy.y);
+    if (!workspace.isStackSelected(block)) {
+      Blockly.pruneUnselectedStatements_(workspace, block, xml);
+    }
+    xmls.push(xml);
+  }
+  Blockly.clipboardXmls_ = xmls;
+  Blockly.clipboardXml_ = xmls[0] || null;
+  Blockly.clipboardSource_ = workspace;
+};
+
+/**
+ * Remove unselected statement and next blocks from an individually selected
+ * block tree. Value-input reporters intentionally remain attached.
+ * @param {!Blockly.WorkspaceSvg} workspace Source workspace.
+ * @param {!Blockly.BlockSvg} block Current source block.
+ * @param {!Element} xml Current serialized block.
+ * @private
+ */
+Blockly.pruneUnselectedStatements_ = function (workspace, block, xml) {
+  const pruneConnection = function (containerName, inputName, childBlock) {
+    let container = null;
+    for (let i = 0; i < xml.children.length; i++) {
+      const child = xml.children[i];
+      if (
+        child.nodeName.toLowerCase() === containerName &&
+        (!inputName || child.getAttribute("name") === inputName)
+      ) {
+        container = child;
+        break;
+      }
+    }
+    if (!container || !childBlock) return;
+    let childXml = null;
+    for (let i = 0; i < container.children.length; i++) {
+      if (container.children[i].nodeName.toLowerCase() === "block") {
+        childXml = container.children[i];
+        break;
+      }
+    }
+    if (!childXml) return;
+    if (!workspace.isIndividualBlockSelected(childBlock)) {
+      container.removeChild(childXml);
+      if (!container.children.length) xml.removeChild(container);
+      return;
+    }
+    Blockly.pruneUnselectedStatements_(workspace, childBlock, childXml);
+  };
+
+  for (let i = 0; i < block.inputList.length; i++) {
+    const input = block.inputList[i];
+    if (input.type === Blockly.NEXT_STATEMENT) {
+      pruneConnection("statement", input.name, input.connection.targetBlock());
+    }
+  }
+  pruneConnection("next", null, block.getNextBlock());
+};
+
+/** Paste the current single or multi-block clipboard into a workspace. */
+Blockly.pasteClipboard_ = function (workspace) {
+  if (
+    Blockly.clipboardXmls_ &&
+    Blockly.clipboardXmls_.length &&
+    Blockly.clipboardXmls_[0] === Blockly.clipboardXml_
+  ) {
+    workspace.pasteMultiSelection(Blockly.clipboardXmls_);
+  } else if (Blockly.clipboardXml_) {
+    workspace.paste(Blockly.clipboardXml_);
+  }
 };
 
 /**
@@ -335,6 +435,7 @@ Blockly.copy_ = function (toCopy, opt_blockOnly) {
 Blockly.duplicate_ = function (toDuplicate) {
   // Save the clipboard.
   const clipboardXml = Blockly.clipboardXml_;
+  const clipboardXmls = Blockly.clipboardXmls_;
   const clipboardSource = Blockly.clipboardSource_;
 
   // Create a duplicate via a copy/paste operation.
@@ -343,6 +444,7 @@ Blockly.duplicate_ = function (toDuplicate) {
 
   // Restore the clipboard.
   Blockly.clipboardXml_ = clipboardXml;
+  Blockly.clipboardXmls_ = clipboardXmls;
   Blockly.clipboardSource_ = clipboardSource;
 };
 

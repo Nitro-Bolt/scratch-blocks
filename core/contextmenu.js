@@ -253,6 +253,9 @@ Blockly.ContextMenu.callbackFactory = function (block, xml) {
  * @package
  */
 Blockly.ContextMenu.blockDeleteOption = function (block) {
+  if (block.workspace.isBlockSelected(block)) {
+    return Blockly.ContextMenu.multiDeleteOption(block.workspace);
+  }
   // Option to delete this block but not blocks lower in the stack.
   // Count the number of blocks that are nested in this block,
   // ignoring shadows and without ordering.
@@ -278,6 +281,9 @@ Blockly.ContextMenu.blockDeleteOption = function (block) {
 };
 
 Blockly.ContextMenu.blockCollapseOption = function (block) {
+  if (block.workspace.isBlockSelected(block)) {
+    return Blockly.ContextMenu.multiCollapseOption(block.workspace);
+  }
   let descendantCount = block.getDescendants(false, true).length;
   const nextBlock = block.getNextBlock();
   if (nextBlock) {
@@ -352,6 +358,9 @@ Blockly.ContextMenu.blockHelpOption = function (block) {
  * @package
  */
 Blockly.ContextMenu.blockDuplicateOption = function (block, event) {
+  if (block.workspace.isBlockSelected(block)) {
+    return Blockly.ContextMenu.multiDuplicateOption(block.workspace);
+  }
   const duplicateOption = {
     text: Blockly.Msg.DUPLICATE,
     enabled: true,
@@ -420,7 +429,11 @@ Blockly.ContextMenu.blockCopyAllOption = function (block) {
     enabled: true,
     separator: true,
     callback: function () {
-      Blockly.copy_(block);
+      if (block.workspace.isBlockSelected(block)) {
+        Blockly.copyMultiSelection_(block.workspace);
+      } else {
+        Blockly.copy_(block);
+      }
     },
   };
 };
@@ -433,10 +446,16 @@ Blockly.ContextMenu.blockCopyAllOption = function (block) {
  */
 Blockly.ContextMenu.blockCopyOption = function (block) {
   return {
-    text: Blockly.Msg.COPY_BLOCK,
+    text: block.workspace.isBlockSelected(block)
+      ? "Copy selected blocks"
+      : Blockly.Msg.COPY_BLOCK,
     enabled: true,
     callback: function () {
-      Blockly.copy_(block, true);
+      if (block.workspace.isBlockSelected(block)) {
+        Blockly.copyMultiSelection_(block.workspace);
+      } else {
+        Blockly.copy_(block, true);
+      }
     },
   };
 };
@@ -449,13 +468,20 @@ Blockly.ContextMenu.blockCopyOption = function (block) {
  */
 Blockly.ContextMenu.blockCutOption = function (block) {
   return {
-    text: Blockly.Msg.CUT_BLOCK,
+    text: block.workspace.isBlockSelected(block)
+      ? "Cut selected blocks"
+      : Blockly.Msg.CUT_BLOCK,
     enabled: true,
     callback: function () {
-      Blockly.copy_(block, true);
-      Blockly.Events.setGroup(true);
-      block.dispose(true, true);
-      Blockly.Events.setGroup(false);
+      if (block.workspace.isBlockSelected(block)) {
+        Blockly.copyMultiSelection_(block.workspace);
+        Blockly.ContextMenu.multiDeleteOption(block.workspace).callback();
+      } else {
+        Blockly.copy_(block, true);
+        Blockly.Events.setGroup(true);
+        block.dispose(true, true);
+        Blockly.Events.setGroup(false);
+      }
     },
   };
 };
@@ -486,6 +512,9 @@ Blockly.ContextMenu.blockInspectOption = function (block) {
  * @return {!Object} Context-menu option.
  */
 Blockly.ContextMenu.blockGroupOption = function (block) {
+  if (block.workspace.isBlockSelected(block)) {
+    return Blockly.ContextMenu.multiGroupOption(block.workspace);
+  }
   const root = block.getRootBlock();
   const workspace = block.workspace;
   return {
@@ -511,6 +540,129 @@ Blockly.ContextMenu.blockGroupOption = function (block) {
         },
         true
       );
+    },
+  };
+};
+
+/** Return selected blocks which can be acted on as independent units. */
+Blockly.ContextMenu.getMultiSelectedBlocks_ = function (workspace) {
+  return workspace.getSelectedBlocks().filter(function (block) {
+    return block.workspace === workspace;
+  });
+};
+
+/** Make a context-menu option which duplicates the multi-selection. */
+Blockly.ContextMenu.multiDuplicateOption = function (workspace) {
+  return {
+    text: "Duplicate selected blocks",
+    enabled: true,
+    callback: function () {
+      const oldXml = Blockly.clipboardXml_;
+      const oldXmls = Blockly.clipboardXmls_;
+      const oldSource = Blockly.clipboardSource_;
+      try {
+        Blockly.copyMultiSelection_(workspace);
+        Blockly.pasteClipboard_(workspace);
+      } finally {
+        Blockly.clipboardXml_ = oldXml;
+        Blockly.clipboardXmls_ = oldXmls;
+        Blockly.clipboardSource_ = oldSource;
+      }
+    },
+  };
+};
+
+/** Make a context-menu option which deletes the multi-selection. */
+Blockly.ContextMenu.multiDeleteOption = function (workspace) {
+  const blocks = Blockly.ContextMenu.getMultiSelectedBlocks_(workspace);
+  return {
+    text: "Delete selected blocks",
+    enabled: blocks.some(function (block) {
+      return block.isDeletable();
+    }),
+    callback: function () {
+      Blockly.Events.setGroup(true);
+      workspace.prepareMultiSelectionForDrag();
+      const selected = workspace.getSelectedBlocks();
+      workspace.clearMultiSelection();
+      for (let i = 0; i < selected.length; i++) {
+        if (selected[i].workspace && selected[i].isDeletable()) {
+          selected[i].dispose(false, true);
+        }
+      }
+      Blockly.Events.setGroup(false);
+    },
+  };
+};
+
+/** Make a context-menu option which collapses or expands the selection. */
+Blockly.ContextMenu.multiCollapseOption = function (workspace) {
+  const blocks = Blockly.ContextMenu.getMultiSelectedBlocks_(workspace);
+  const collapsible = blocks.filter(function (block) {
+    return block.type !== Blockly.PROCEDURES_DEFINITION_BLOCK_TYPE;
+  });
+  const expand =
+    collapsible.length > 0 &&
+    collapsible.every(function (block) {
+      return block.isCollapsed();
+    });
+  return {
+    text: expand ? "Expand selected blocks" : "Collapse selected blocks",
+    enabled: collapsible.length > 0,
+    callback: function () {
+      Blockly.Events.setGroup(true);
+      for (let i = 0; i < collapsible.length; i++) {
+        collapsible[i].setCollapsed(!expand);
+      }
+      workspace.refreshMultiSelection();
+      workspace.clearMultiSelectionAfterAction();
+      Blockly.Events.setGroup(false);
+    },
+  };
+};
+
+/** Make a context-menu option which groups selected top-level scripts. */
+Blockly.ContextMenu.multiGroupOption = function (workspace) {
+  const blocks = Blockly.ContextMenu.getMultiSelectedBlocks_(workspace);
+  const enabled =
+    blocks.length > 0 &&
+    blocks.every(function (block) {
+      return (
+        block === block.getRootBlock() && !workspace.getGroupForBlock(block.id)
+      );
+    });
+  return {
+    text: "Add Group Around Selection",
+    enabled,
+    callback: function () {
+      let left = Infinity;
+      let top = Infinity;
+      let right = -Infinity;
+      let bottom = -Infinity;
+      const ids = [];
+      for (let i = 0; i < blocks.length; i++) {
+        const bounds = blocks[i].getBoundingRectangle();
+        left = Math.min(left, bounds.topLeft.x);
+        top = Math.min(top, bounds.topLeft.y);
+        right = Math.max(right, bounds.bottomRight.x);
+        bottom = Math.max(bottom, bounds.bottomRight.y);
+        ids.push(blocks[i].id);
+      }
+      const padding = 16;
+      const headerHeight = 32;
+      Blockly.Group.fromJSON(
+        workspace,
+        {
+          title: "Group",
+          x: left - padding,
+          y: top - headerHeight - padding,
+          width: right - left + padding * 2,
+          height: bottom - top + headerHeight + padding * 2,
+          blocks: ids,
+        },
+        true
+      );
+      workspace.clearMultiSelectionAfterAction();
     },
   };
 };
@@ -561,7 +713,7 @@ Blockly.ContextMenu.wsPasteOption = function (ws) {
     separator: true,
     callback: function () {
       Blockly.Events.setGroup(true);
-      ws.paste(Blockly.clipboardXml_);
+      Blockly.pasteClipboard_(ws);
       Blockly.Events.setGroup(false);
     },
   };
