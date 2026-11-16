@@ -1603,9 +1603,10 @@ Blockly.WorkspaceSvg.prototype.getSelectedBlocks = function () {
  * @return {boolean} Whether the block is selected.
  */
 Blockly.WorkspaceSvg.prototype.isBlockSelected = function (block) {
+  if (typeof block.getRootBlock !== "function") return false;
   if (this.selectedIndividualBlocks_.indexOf(block) !== -1) return true;
   const root = block.getRootBlock();
-  return this.selectedBlocks_.indexOf(root) !== -1;
+  return root && this.selectedBlocks_.indexOf(root) !== -1;
 };
 
 /** Test whether one exact block is individually selected. */
