@@ -1290,6 +1290,41 @@ Blockly.WorkspaceSvg.prototype.paste = function (xmlBlock) {
 };
 
 /**
+ * Paste copied blocks together while retaining their relative positions.
+ * @param {!Array.<!Element>} xmlBlocks Copied block trees.
+ */
+Blockly.WorkspaceSvg.prototype.pasteMultiSelection = function (xmlBlocks) {
+  if (!this.rendered || !xmlBlocks.length) return;
+  if (this.currentGesture_) this.currentGesture_.cancel();
+  this.updateLastMouseXYFromClient_();
+  const cursor = this.lastMouseXY_;
+  const previousMouse = this.lastMouseXY_;
+  const pasted = [];
+  const alreadyGrouped = !!Blockly.Events.getGroup();
+  if (!alreadyGrouped) Blockly.Events.setGroup(true);
+  this.lastMouseXY_ = null;
+  try {
+    for (let i = 0; i < xmlBlocks.length; i++) {
+      pasted.push(this.pasteBlock_(xmlBlocks[i].cloneNode(true)));
+    }
+    if (cursor && pasted.length) {
+      const firstXY = pasted[0].getRelativeToSurfaceXY();
+      const firstHW = pasted[0].getHeightWidth();
+      const dx = cursor.x - firstHW.width / 2 - firstXY.x;
+      const dy = cursor.y - firstHW.height / 2 - firstXY.y;
+      for (let i = 0; i < pasted.length; i++) pasted[i].moveBy(dx, dy);
+    }
+    this.clearMultiSelection();
+    for (let i = 0; i < pasted.length; i++) {
+      this.setBlockSelected(pasted[i], true);
+    }
+  } finally {
+    this.lastMouseXY_ = previousMouse;
+    if (!alreadyGrouped) Blockly.Events.setGroup(false);
+  }
+};
+
+/**
  * Paste the provided block onto the workspace.
  * @param {!Element} xmlBlock XML block element.
  * @returns {!Blockly.BlockSvg} The pasted block.
