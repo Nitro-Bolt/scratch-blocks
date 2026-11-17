@@ -96,6 +96,9 @@ Blockly.FieldTextInputRemovable.prototype.showEditor_ = function () {
     const declaration = this.sourceBlock_.parentBlock_ || this.sourceBlock_;
     if (declaration.type == "procedures_declaration") {
       declaration.selectedField_ = this;
+      if (declaration.onSelectedFieldChange) {
+        declaration.onSelectedFieldChange(this);
+      }
     }
   }
 
@@ -155,12 +158,18 @@ Blockly.FieldTextInputRemovable.prototype.widgetDispose_ = function () {
     Blockly.FieldTextInputRemovable.superClass_.widgetDispose_.call(this);
   const thisField = this;
   return function () {
+    const block = thisField.sourceBlock_;
+    const declaration = block && (block.parentBlock_ || block);
+    if (
+      declaration && declaration.selectedField_ == thisField &&
+      declaration.onSelectedFieldChange
+    ) {
+      declaration.onSelectedFieldChange(null);
+    }
     dispose();
     if (!thisField.sourceBlock_) {
       return;
     }
-    const declaration =
-      thisField.sourceBlock_.parentBlock_ || thisField.sourceBlock_;
     if (
       declaration.type == "procedures_declaration" &&
       declaration.selectedField_ == thisField
@@ -171,16 +180,16 @@ Blockly.FieldTextInputRemovable.prototype.widgetDispose_ = function () {
 };
 
 /**
- * Return the editor anchor position. A statement argument uses the statement
- * block's horizontal bounds but the field row's vertical bounds, keeping the
- * editor centered over the header instead of the C-shaped block body.
+ * Center argument name editors over their field, excluding statement bodies
+ * and the extendable argument's indicator.
  * @return {!goog.math.Coordinate} Page coordinates for the editor.
  * @private
  */
 Blockly.FieldTextInputRemovable.prototype.getAbsoluteXY_ = function () {
   if (
     this.sourceBlock_ &&
-    this.sourceBlock_.type == "argument_editor_statement"
+    (this.sourceBlock_.type == "argument_editor_statement" ||
+      this.sourceBlock_.type == "argument_editor_extendable")
   ) {
     const fieldRect = this.getSvgRoot().getBoundingClientRect();
     const scale = this.sourceBlock_.workspace.scale;

@@ -666,7 +666,10 @@ Blockly.FieldTextInput.prototype.resizeEditor_ = function () {
 
   let initialWidth;
   if (this.sourceBlock_.isShadow()) {
-    if (this.sourceBlock_.type == "argument_editor_statement") {
+    if (
+      this.sourceBlock_.type == "argument_editor_statement" ||
+      this.sourceBlock_.type == "argument_editor_extendable"
+    ) {
       initialWidth =
         (this.size_.width + 2 * Blockly.BlockSvg.SEP_SPACE_X) * scale;
     } else {

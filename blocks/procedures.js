@@ -51,6 +51,44 @@ Blockly.ScratchBlocks.ProcedureUtils.sanitizeDropdowns_ = function (dropdowns) {
   });
 };
 
+/**
+ * Normalize saved or user-entered limits.
+ * @param {*} options Extendable input settings.
+ * @return {!Object} Valid settings.
+ * @private
+ */
+Blockly.ScratchBlocks.ProcedureUtils.normalizeExtendableOptions_ = function (
+  options
+) {
+  options = options || {};
+  const types = ["s", "n", "m", "b", "o", "a", "r"];
+  const min =
+    Number.isSafeInteger(options.min) && options.min >= 0 ? options.min : 0;
+  let max = null;
+  if (Number.isSafeInteger(options.max) && options.max >= 0) {
+    max = Math.max(min, options.max);
+  }
+  return {
+    type: types.includes(options.type) ? options.type : "s",
+    min: min,
+    max: max,
+  };
+};
+
+/** @param {string} id Parameter ID. @return {!Object} Extendable settings. */
+Blockly.ScratchBlocks.ProcedureUtils.getExtendableOptions = function (id) {
+  return (
+    this.argumentExtendableOptions_[id] ||
+    Blockly.ScratchBlocks.ProcedureUtils.normalizeExtendableOptions_({})
+  );
+};
+
+/** @param {string} id Parameter ID. @param {!Object} options New settings. */
+Blockly.ScratchBlocks.ProcedureUtils.setExtendableOptions = function (id, options) {
+  this.argumentExtendableOptions_[id] =
+    Blockly.ScratchBlocks.ProcedureUtils.normalizeExtendableOptions_(options);
+};
+
 // Serialization and deserialization.
 
 Blockly.ScratchBlocks.ProcedureUtils.parseReturnMutation = function (
@@ -85,6 +123,14 @@ Blockly.ScratchBlocks.ProcedureUtils.callerMutationToDom = function () {
     "argumentdropdowns",
     JSON.stringify(this.argumentDropdowns_)
   );
+  container.setAttribute(
+    "argumentextendables",
+    JSON.stringify(this.argumentExtendables_)
+  );
+  container.setAttribute(
+    "argumentextendableoptions",
+    JSON.stringify(this.argumentExtendableOptions_)
+  );
   container.setAttribute("warp", JSON.stringify(this.warp_));
   container.setAttribute("global", JSON.stringify(this.global_));
   container.setAttribute("runinparent", JSON.stringify(this.runInParent_));
@@ -107,6 +153,17 @@ Blockly.ScratchBlocks.ProcedureUtils.callerDomToMutation = function (
   xmlElement
 ) {
   this.procCode_ = xmlElement.getAttribute("proccode");
+  const extendables = JSON.parse(xmlElement.getAttribute("argumentextendables"));
+  this.argumentExtendables_ = Array.isArray(extendables)
+    ? extendables.filter((id) => typeof id === "string")
+    : [];
+  const options =
+    JSON.parse(xmlElement.getAttribute("argumentextendableoptions")) || {};
+  this.argumentExtendableOptions_ = {};
+  for (const id of this.argumentExtendables_) {
+    this.argumentExtendableOptions_[id] =
+      Blockly.ScratchBlocks.ProcedureUtils.normalizeExtendableOptions_(options[id]);
+  }
   this.generateShadows_ = JSON.parse(
     xmlElement.getAttribute("generateshadows")
   );
@@ -117,7 +174,7 @@ Blockly.ScratchBlocks.ProcedureUtils.callerDomToMutation = function (
     );
   this.warp_ = JSON.parse(xmlElement.getAttribute("warp"));
   this.global_ = JSON.parse(xmlElement.getAttribute("global"));
-  this.runInParent_ = JSON.parse(xmlElement.getAttribute("runinparent"));
+  this.runInParent_ = xmlElement.getAttribute("runinparent") === "true";
   const procedureColour = Blockly.Colours.normalizeHex(
     xmlElement.getAttribute("colour")
   );
@@ -158,6 +215,14 @@ Blockly.ScratchBlocks.ProcedureUtils.definitionMutationToDom = function (
   container.setAttribute(
     "argumentdropdowns",
     JSON.stringify(this.argumentDropdowns_)
+  );
+  container.setAttribute(
+    "argumentextendables",
+    JSON.stringify(this.argumentExtendables_)
+  );
+  container.setAttribute(
+    "argumentextendableoptions",
+    JSON.stringify(this.argumentExtendableOptions_)
   );
   container.setAttribute("warp", JSON.stringify(this.warp_));
   container.setAttribute("global", JSON.stringify(this.global_));
@@ -202,9 +267,20 @@ Blockly.ScratchBlocks.ProcedureUtils.definitionDomToMutation = function (
   xmlElement
 ) {
   this.procCode_ = xmlElement.getAttribute("proccode");
+  const extendables = JSON.parse(xmlElement.getAttribute("argumentextendables"));
+  this.argumentExtendables_ = Array.isArray(extendables)
+    ? extendables.filter((id) => typeof id === "string")
+    : [];
+  const options =
+    JSON.parse(xmlElement.getAttribute("argumentextendableoptions")) || {};
+  this.argumentExtendableOptions_ = {};
+  for (const id of this.argumentExtendables_) {
+    this.argumentExtendableOptions_[id] =
+      Blockly.ScratchBlocks.ProcedureUtils.normalizeExtendableOptions_(options[id]);
+  }
   this.warp_ = JSON.parse(xmlElement.getAttribute("warp"));
   this.global_ = JSON.parse(xmlElement.getAttribute("global"));
-  this.runInParent_ = JSON.parse(xmlElement.getAttribute("runinparent"));
+  this.runInParent_ = xmlElement.getAttribute("runinparent") === "true";
   this.return_ =
     Blockly.ScratchBlocks.ProcedureUtils.parseReturnMutation(xmlElement);
   this.outputMode_ = xmlElement.getAttribute("output") || "auto";
@@ -344,6 +420,12 @@ Blockly.ScratchBlocks.ProcedureUtils.disconnectOldBlocks_ = function () {
   // Remove old stuff
   const connectionMap = {};
   for (i = 0; (input = this.inputList[i]); i++) {
+    for (let j = 0; j < input.fieldRow.length; j++) {
+      const field = input.fieldRow[j];
+      if (field instanceof Blockly.FieldExtendable) {
+        connectionMap[field.name] = {count: Number(field.getValue())};
+      }
+    }
     if (input.connection) {
       const target = input.connection.targetBlock();
       const saveInfo = {
@@ -371,13 +453,9 @@ Blockly.ScratchBlocks.ProcedureUtils.disconnectOldBlocks_ = function () {
  * @this Blockly.Block
  */
 Blockly.ScratchBlocks.ProcedureUtils.removeAllInputs_ = function () {
-  let i, input;
-  // Delete inputs directly instead of with block.removeInput to avoid splicing
-  // out of the input list at every index.
-  for (i = 0; (input = this.inputList[i]); i++) {
-    input.dispose();
+  while (this.inputList.length) {
+    this.removeNumberedInput(this.inputList.length - 1);
   }
-  this.inputList = [];
 };
 
 /**
@@ -414,6 +492,19 @@ Blockly.ScratchBlocks.ProcedureUtils.createAllInputs_ = function (
       labelText = component.substring(2).trim();
 
       const id = this.argumentIds_[argumentCount];
+
+      if (
+        this.type == "procedures_call" &&
+        this.argumentExtendables_.includes(id)
+      ) {
+        this.addExtendableInput_(id, connectionMap);
+        hasAnyField = true;
+        argumentCount++;
+        if (labelText) {
+          this.addProcedureLabel_(labelText.replace(/\\%/, "%"));
+        }
+        continue;
+      }
 
       if (argumentType === "c") {
         input = this.appendStatementInput(id).setCheck(
@@ -469,6 +560,76 @@ Blockly.ScratchBlocks.ProcedureUtils.createAllInputs_ = function (
   // %l is only an editor delimiter; it must never become part of a saved
   // procedure code.
   this.procCode_ = this.procCode_.replace(/%l /g, "");
+};
+
+/**
+ * Add native repeatable inputs and restore their count and connected reporters.
+ * @param {string} id The parameter ID used as the extendable field name.
+ * @param {!Object} connectionMap Saved input connections and extendable counts.
+ * @private
+ */
+Blockly.ScratchBlocks.ProcedureUtils.addExtendableInput_ = function (
+  id,
+  connectionMap
+) {
+  const options = this.getExtendableOptions(id);
+  const saved = connectionMap[id];
+  const count = saved ? saved.count : 2;
+  const element = {
+    type: "input_value",
+    name: "VALUE",
+    check: {
+      n: "Number",
+      b: "Boolean",
+      o: "Object",
+      a: "Array",
+      r: "Colour",
+    }[options.type],
+  };
+  let maximum = Infinity;
+  if (options.max !== null) {
+    maximum = options.max;
+  }
+  const field = Blockly.FieldExtendable.fromJson({
+    args: [element],
+    minInputs: options.min,
+    maxInputs: maximum,
+  });
+  // The procedure mutation must create this field before its count is restored.
+  field.REVERSE_SERIALIZE = false;
+  this.appendDummyInput().appendField(field, id);
+  field.setValue(count);
+  const shadow = {
+    s: ["text", "TEXT", ""],
+    n: ["math_number", "NUM", "1"],
+    m: ["text_multiline", "TEXT", ""],
+    b: ["checkbox", "CHECKBOX", "FALSE"],
+    r: ["colour_picker", "COLOUR", "#ff0000"],
+  }[options.type];
+  if (shadow) {
+    element.shadowOpcode = shadow[0];
+    element.shadowFieldName = shadow[1];
+    element.shadowFieldValue = shadow[2];
+  }
+  for (let i = 0; i < Number(field.getValue()); i++) {
+    const name = field.getInputName(i) + "_VALUE";
+    const input = this.getInput(name);
+    const previous = connectionMap[name];
+    if (
+      previous && previous.block &&
+      !input.connection.checkType_(previous.block.outputConnection)
+    ) {
+      connectionMap[name] = null;
+      if (previous.block.isShadow()) {
+        previous.block.dispose();
+      }
+    }
+    this.populateArgument_(options.type, i, connectionMap, name, input);
+    if (shadow && this.generateShadows_ && !input.connection.isConnected()) {
+      input.connection.setShadowDom(this.buildShadowDom_(options.type));
+      input.connection.respawnShadow_();
+    }
+  }
 };
 
 /**
@@ -864,7 +1025,8 @@ Blockly.ScratchBlocks.ProcedureUtils.populateArgumentOnDeclaration_ = function (
     oldBlock.setFieldValue(displayName, "TEXT");
     connectionMap[input.name] = null;
   } else {
-    argumentEditor = this.createArgumentEditor_(type, displayName);
+    const editorType = this.argumentExtendables_.includes(id) ? "e" : type;
+    argumentEditor = this.createArgumentEditor_(editorType, displayName);
   }
 
   // Set dropdown options if this is a dropdown argument
@@ -942,6 +1104,8 @@ Blockly.ScratchBlocks.ProcedureUtils.createArgumentEditor_ = function (
       newBlock = this.workspace.newBlock("argument_editor_boolean");
     } else if (argumentType == "o") {
       newBlock = this.workspace.newBlock("argument_editor_object");
+    } else if (argumentType == "e") {
+      newBlock = this.workspace.newBlock("argument_editor_extendable");
     } else if (argumentType == "a") {
       newBlock = this.workspace.newBlock("argument_editor_array");
     } else if (argumentType == "r") {
@@ -997,7 +1161,10 @@ Blockly.ScratchBlocks.ProcedureUtils.updateDeclarationProcCode_ = function (
         this.procCode_ += "%b";
       } else if (target.type == "argument_editor_object") {
         this.procCode_ += "%o";
-      } else if (target.type == "argument_editor_array") {
+      } else if (
+        target.type == "argument_editor_array" ||
+        target.type == "argument_editor_extendable"
+      ) {
         this.procCode_ += "%a";
       } else if (target.type == "argument_editor_color") {
         this.procCode_ += "%r";
@@ -1019,6 +1186,14 @@ Blockly.ScratchBlocks.ProcedureUtils.updateDeclarationProcCode_ = function (
       throw new Error(
         "Unexpected input type on a procedure mutator root: " + input.type
       );
+    }
+  }
+  this.argumentExtendables_ = this.argumentExtendables_.filter((id) =>
+    this.argumentIds_.includes(id)
+  );
+  for (const id of Object.keys(this.argumentExtendableOptions_)) {
+    if (!this.argumentExtendables_.includes(id)) {
+      delete this.argumentExtendableOptions_[id];
     }
   }
 };
@@ -1291,6 +1466,24 @@ Blockly.ScratchBlocks.ProcedureUtils.addArrayExternal = function () {
   this.displayNames_.push(this.getUniqueArgumentName_("array"));
   this.argumentIds_.push(Blockly.utils.genUid());
   this.argumentDefaults_.push(new Array());
+  this.updateDisplay_();
+  this.finishAddingInput_(selectedIndex);
+};
+
+/**
+ * Add a named parameter for extendable inputs on callers.
+ * @public
+ */
+Blockly.ScratchBlocks.ProcedureUtils.addExtendableExternal = function () {
+  const selectedIndex = this.getSelectedInputIndex_();
+  Blockly.WidgetDiv.hide(true);
+  const id = Blockly.utils.genUid();
+  this.procCode_ += " %a";
+  this.displayNames_.push(this.getUniqueArgumentName_("inputs"));
+  this.argumentIds_.push(id);
+  this.argumentDefaults_.push([]);
+  this.argumentExtendables_.push(id);
+  this.setExtendableOptions(id, {});
   this.updateDisplay_();
   this.finishAddingInput_(selectedIndex);
 };
@@ -1600,6 +1793,8 @@ Blockly.Blocks["procedures_call"] = {
     this.procCode_ = "";
     this.argumentIds_ = [];
     this.argumentDropdowns_ = [];
+    this.argumentExtendables_ = [];
+    this.argumentExtendableOptions_ = {};
     this.warp_ = false;
     this.global_ = false;
     this.runInParent_ = false;
@@ -1609,6 +1804,7 @@ Blockly.Blocks["procedures_call"] = {
   },
   // Shared.
   getProcCode: Blockly.ScratchBlocks.ProcedureUtils.getProcCode,
+  getExtendableOptions: Blockly.ScratchBlocks.ProcedureUtils.getExtendableOptions,
   getProcedureColour: Blockly.ScratchBlocks.ProcedureUtils.getProcedureColour,
   setProcedureColour: Blockly.ScratchBlocks.ProcedureUtils.setProcedureColour,
   removeAllInputs_: Blockly.ScratchBlocks.ProcedureUtils.removeAllInputs_,
@@ -1628,6 +1824,7 @@ Blockly.Blocks["procedures_call"] = {
   addProcedureLabel_: Blockly.ScratchBlocks.ProcedureUtils.addLabelField_,
 
   // Only exists on the external caller.
+  addExtendableInput_: Blockly.ScratchBlocks.ProcedureUtils.addExtendableInput_,
   attachShadow_: Blockly.ScratchBlocks.ProcedureUtils.attachShadow_,
   buildShadowDom_: Blockly.ScratchBlocks.ProcedureUtils.buildShadowDom_,
   updateDropdowns_: Blockly.ScratchBlocks.ProcedureUtils.updateDropdowns_,
@@ -1651,6 +1848,8 @@ Blockly.Blocks["procedures_prototype"] = {
     this.argumentIds_ = [];
     this.argumentDefaults_ = [];
     this.argumentDropdowns_ = [];
+    this.argumentExtendables_ = [];
+    this.argumentExtendableOptions_ = {};
     this.warp_ = false;
     this.global_ = false;
     this.runInParent_ = false;
@@ -1660,6 +1859,7 @@ Blockly.Blocks["procedures_prototype"] = {
   },
   // Shared.
   getProcCode: Blockly.ScratchBlocks.ProcedureUtils.getProcCode,
+  getExtendableOptions: Blockly.ScratchBlocks.ProcedureUtils.getExtendableOptions,
   getProcedureColour: Blockly.ScratchBlocks.ProcedureUtils.getProcedureColour,
   setProcedureColour: Blockly.ScratchBlocks.ProcedureUtils.setProcedureColour,
   removeAllInputs_: Blockly.ScratchBlocks.ProcedureUtils.removeAllInputs_,
@@ -1700,6 +1900,8 @@ Blockly.Blocks["procedures_declaration"] = {
     this.argumentIds_ = [];
     this.argumentDefaults_ = [];
     this.argumentDropdowns_ = [];
+    this.argumentExtendables_ = [];
+    this.argumentExtendableOptions_ = {};
     this.warp_ = false;
     this.global_ = false;
     this.runInParent_ = false;
@@ -1709,6 +1911,7 @@ Blockly.Blocks["procedures_declaration"] = {
   },
   // Shared.
   getProcCode: Blockly.ScratchBlocks.ProcedureUtils.getProcCode,
+  getExtendableOptions: Blockly.ScratchBlocks.ProcedureUtils.getExtendableOptions,
   getProcedureColour: Blockly.ScratchBlocks.ProcedureUtils.getProcedureColour,
   setProcedureColour: Blockly.ScratchBlocks.ProcedureUtils.setProcedureColour,
   removeAllInputs_: Blockly.ScratchBlocks.ProcedureUtils.removeAllInputs_,
@@ -1752,6 +1955,9 @@ Blockly.Blocks["procedures_declaration"] = {
   addBooleanExternal: Blockly.ScratchBlocks.ProcedureUtils.addBooleanExternal,
   addObjectExternal: Blockly.ScratchBlocks.ProcedureUtils.addObjectExternal,
   addArrayExternal: Blockly.ScratchBlocks.ProcedureUtils.addArrayExternal,
+  addExtendableExternal:
+    Blockly.ScratchBlocks.ProcedureUtils.addExtendableExternal,
+  setExtendableOptions: Blockly.ScratchBlocks.ProcedureUtils.setExtendableOptions,
   addColorExternal: Blockly.ScratchBlocks.ProcedureUtils.addColorExternal,
   addStatementExternal:
     Blockly.ScratchBlocks.ProcedureUtils.addStatementExternal,
@@ -1951,6 +2157,38 @@ Blockly.Blocks["argument_editor_array"] = {
     );
   },
   // Exist on declaration and arguments editors, with different implementations.
+  removeFieldCallback:
+    Blockly.ScratchBlocks.ProcedureUtils.removeArgumentCallback_,
+  shiftFieldCallback: Blockly.ScratchBlocks.ProcedureUtils.shiftFieldCallback,
+};
+
+Blockly.Blocks["argument_editor_extendable"] = {
+  init: function () {
+    Blockly.Blocks["argument_editor_array"].init.call(this);
+    const media = Blockly.mainWorkspace.options.pathToMedia;
+    this.inputList[0]
+      .appendField(
+        new Blockly.FieldImage(
+          media + Blockly.FieldExtendable.ARROW_LEFT_PATH,
+          10,
+          16,
+          "Extendable inputs",
+          true
+        )
+      )
+      .appendField(
+        new Blockly.FieldImage(
+          media + Blockly.FieldExtendable.ARROW_RIGHT_PATH,
+          10,
+          16,
+          "Extendable inputs",
+          true
+        )
+      );
+    this.setTooltip(
+      "Extendable inputs: add or remove values using the arrows on calls to this block."
+    );
+  },
   removeFieldCallback:
     Blockly.ScratchBlocks.ProcedureUtils.removeArgumentCallback_,
   shiftFieldCallback: Blockly.ScratchBlocks.ProcedureUtils.shiftFieldCallback,
