@@ -34,7 +34,6 @@ goog.require("Blockly.Events.GroupEndDrag");
 goog.require("Blockly.SystemColourPicker");
 goog.require("Blockly.Touch");
 goog.require("goog.dom");
-goog.require("goog.math.Coordinate");
 
 /**
  * @param {!Blockly.WorkspaceSvg} workspace Owning workspace.
@@ -48,32 +47,10 @@ Blockly.Group = function (workspace, options) {
     options.id && !workspace.getGroupById(options.id)
       ? options.id
       : Blockly.utils.genUid();
-  this.title = options.title || "Group";
-  this.colour = Blockly.Colours.normalizeHex(options.colour);
-  this.x = Number(options.x) || 0;
-  this.y = Number(options.y) || 0;
-  this.width = Math.max(Number(options.width) || 360, 160);
-  this.height = Math.max(Number(options.height) || 240, 96);
-  this.expandedWidth = Math.max(
-    Number(options.expandedWidth) || this.width,
-    160
-  );
-  this.expandedHeight = Math.max(
-    Number(options.expandedHeight) || this.height,
-    96
-  );
-  this.collapsed = options.collapsed === true || options.collapsed === "true";
-  this.blockIds = Array.isArray(options.blocks)
-    ? options.blocks.slice()
-    : typeof options.blocks === "string" && options.blocks
-      ? options.blocks.split(" ")
-      : [];
-  if (this.collapsed) {
-    this.width = 200;
-    this.height = 32;
-  }
+  this.setState_(options);
   this.svgGroup_ = null;
   this.dragState_ = null;
+  this.pointerCleanup_ = null;
   this.pressedButton_ = null;
   this.buttonReleaseWrapper_ = null;
   this.fitTimer_ = null;
@@ -297,23 +274,38 @@ Blockly.Group.prototype.toJSON = function () {
  * @param {!Object} state New state.
  */
 Blockly.Group.prototype.applyState = function (state) {
-  this.title = state.title;
-  this.colour = Blockly.Colours.normalizeHex(state.colour);
-  this.x = Number(state.x);
-  this.y = Number(state.y);
-  this.width = Number(state.width);
-  this.height = Number(state.height);
-  this.expandedWidth = Number(state.expandedWidth) || this.width;
-  this.expandedHeight = Number(state.expandedHeight) || this.height;
-  this.collapsed = state.collapsed === true || state.collapsed === "true";
-  this.blockIds = Array.isArray(state.blocks)
-    ? state.blocks.slice()
-    : typeof state.blocks === "string" && state.blocks
-      ? state.blocks.split(" ")
-      : [];
+  // Undo can replace the membership of a collapsed group. Release its previous
+  // stacks before hiding the restored membership so removed stacks stay usable.
+  if (this.collapsed) this.updateCollapsedBlocks_(false);
+  this.setState_(state);
   this.render();
   this.updateCollapsedBlocks_();
   this.workspace.resizeContents();
+};
+
+/** Apply saved fields consistently during creation and undo. @private */
+Blockly.Group.prototype.setState_ = function (state) {
+  this.title = typeof state.title === "string" ? state.title : "Group";
+  this.colour = Blockly.Colours.normalizeHex(state.colour);
+  this.x = Number(state.x) || 0;
+  this.y = Number(state.y) || 0;
+  this.width = Math.max(Number(state.width) || 360, 160);
+  this.height = Math.max(Number(state.height) || 240, 96);
+  this.expandedWidth = Math.max(Number(state.expandedWidth) || this.width, 160);
+  this.expandedHeight = Math.max(
+    Number(state.expandedHeight) || this.height,
+    96
+  );
+  this.collapsed = state.collapsed === true || state.collapsed === "true";
+  this.blockIds = Array.isArray(state.blocks)
+    ? state.blocks.slice()
+    : typeof state.blocks === "string" && state.blocks.trim()
+      ? state.blocks.trim().split(/\s+/)
+      : [];
+  if (this.collapsed) {
+    this.width = 200;
+    this.height = 32;
+  }
 };
 
 /**
@@ -336,23 +328,16 @@ Blockly.Group.prototype.toXml = function () {
  * @return {!Array<!Blockly.BlockSvg>} Contained top-level stacks.
  */
 Blockly.Group.prototype.getContainedBlocks = function () {
-  if (this.collapsed && this.blockIds.length) {
-    const workspace = this.workspace;
-    return this.blockIds
-      .map(function (id) {
-        return workspace.getBlockById(id);
-      })
-      .filter(function (block) {
-        return !!block;
-      });
-  }
+  if (this.collapsed) return this.getOwnedTopBlocks_();
   const group = this;
   return this.workspace.getTopBlocks(false).filter(function (block) {
     // Membership is exclusive. In particular, a collapsed group's hidden
     // blocks must remain its own even when another group overlaps their last
     // visible coordinates.
     if (group.workspace.getGroupForBlock(block.id, group)) return false;
-    return group.containsBlock(block);
+    return (
+      group.blockIds.indexOf(block.id) !== -1 || group.containsBlock(block)
+    );
   });
 };
 
@@ -388,19 +373,16 @@ Blockly.Group.prototype.containsBlock = function (block) {
 };
 
 Blockly.Group.prototype.startDrag_ = function (e) {
-  if (e.button !== 0) return;
+  if (e.button !== 0 || this.dragState_) return;
   Blockly.ContextMenu.hide();
   e.stopPropagation();
   Blockly.utils.addClass(this.svgGroup_, "blocklyDragging");
   const blocks = this.getContainedBlocks();
-  this.blockIds = blocks.map(function (block) {
-    return block.id;
-  });
   this.startPointer_(e, false, blocks);
 };
 
 Blockly.Group.prototype.startResize_ = function (e) {
-  if (e.button !== 0) return;
+  if (e.button !== 0 || this.dragState_) return;
   Blockly.ContextMenu.hide();
   e.stopPropagation();
   this.startPointer_(e, true, []);
@@ -428,10 +410,11 @@ Blockly.Group.prototype.startPointer_ = function (e, resizing, blocks) {
   };
   if (!resizing) this.moveToDragSurface_();
   const move = (moveEvent) => group.pointerMove_(moveEvent);
-  const up = (upEvent) => {
+  const up = (upEvent) => group.finishPointer_(upEvent);
+  this.pointerCleanup_ = function () {
     document.removeEventListener("mousemove", move);
     document.removeEventListener("mouseup", up);
-    group.finishPointer_(upEvent);
+    group.pointerCleanup_ = null;
   };
   document.addEventListener("mousemove", move);
   document.addEventListener("mouseup", up);
@@ -503,20 +486,32 @@ Blockly.Group.prototype.pointerMove_ = function (e) {
 Blockly.Group.prototype.finishPointer_ = function (e) {
   const state = this.dragState_;
   if (!state) return;
+  if (this.pointerCleanup_) this.pointerCleanup_();
   this.moveOffDragSurface_();
   Blockly.utils.removeClass(this.svgGroup_, "blocklyDragging");
   const isOutside =
     !state.resizing && e && !this.workspace.isInsideBlocksArea(e);
   if (!state.resizing) {
+    // Preview transforms do not change the block models. Restore them before
+    // committing a move or exporting the source scripts to another target.
+    state.blocks.forEach(function (block, index) {
+      block.translate(state.blockXY[index].x, state.blockXY[index].y);
+    });
     Blockly.Events.fire(new Blockly.Events.GroupDragOutside(this, false));
-    const endEvent = new Blockly.Events.GroupEndDrag(this, isOutside);
-    // The block models still have their pre-drag coordinates at this point.
-    // Use the matching frame coordinates so their relative layout is retained.
-    endEvent["groupState"].x = state.x;
-    endEvent["groupState"].y = state.y;
-    Blockly.Events.fire(endEvent);
+  }
+  if (isOutside) {
+    // An outside drop copies scripts to another target. Cancel the source
+    // preview directly, preserving its undo and redo history.
+    this.x = state.x;
+    this.y = state.y;
+    this.render();
+    Blockly.Events.fire(new Blockly.Events.GroupEndDrag(this, true));
+    this.dragState_ = null;
+    this.workspace.resizeContents();
+    return;
   }
   if (!state.resizing && e && this.workspace.isDeleteArea(e)) {
+    Blockly.Events.fire(new Blockly.Events.GroupEndDrag(this, false));
     const procedureCodes = state.blocks
       .filter(function (block) {
         return block.type == Blockly.PROCEDURES_DEFINITION_BLOCK_TYPE;
@@ -531,77 +526,66 @@ Blockly.Group.prototype.finishPointer_ = function (e) {
         return !!procCode;
       });
     const deleteWorkspace = this.workspace;
-    state.blocks.forEach(function (block, index) {
-      block.translate(state.blockXY[index].x, state.blockXY[index].y);
-    });
     this.x = state.x;
     this.y = state.y;
     this.render();
     this.dragState_ = null;
-    Blockly.Events.setGroup(true);
+    // Validate before deleting so a rejected deletion never touches history.
+    const hasOrphanedCall =
+      procedureCodes.length &&
+      deleteWorkspace.getAllBlocks().some(function (block) {
+        return (
+          block.type == Blockly.PROCEDURES_CALL_BLOCK_TYPE &&
+          procedureCodes.indexOf(block.getProcCode()) !== -1 &&
+          state.blocks.indexOf(block.getRootBlock()) === -1
+        );
+      });
+    if (hasOrphanedCall) {
+      alert(Blockly.Msg.PROCEDURE_USED);
+      deleteWorkspace.resizeContents();
+      return;
+    }
+    const previousGroup = Blockly.Events.getGroup();
+    if (!previousGroup) Blockly.Events.setGroup(true);
     try {
       state.blocks.forEach(function (block) {
         if (block.workspace) block.dispose(false, true);
       });
       this.dispose(true);
     } finally {
-      Blockly.Events.setGroup(false);
+      Blockly.Events.setGroup(previousGroup);
     }
     if (procedureCodes.length) {
-      setTimeout(function () {
-        const hasOrphanedCall = deleteWorkspace
-          .getAllBlocks()
-          .some(function (block) {
-            return (
-              block.type == Blockly.PROCEDURES_CALL_BLOCK_TYPE &&
-              procedureCodes.indexOf(block.getProcCode()) !== -1
-            );
-          });
-        if (hasOrphanedCall) {
-          alert(Blockly.Msg.PROCEDURE_USED);
-          deleteWorkspace.undo();
-          return;
-        }
-        deleteWorkspace.refreshToolboxSelection_();
-      });
+      deleteWorkspace.refreshToolboxSelection_();
     }
     return;
   }
-  if (!state.resizing) {
-    const dx = this.x - state.x;
-    const dy = this.y - state.y;
-    Blockly.Events.setGroup(true);
-    state.blocks.forEach(function (block, index) {
-      // pointerMove_ previews the final position by changing the SVG transform.
-      // Restore the recorded position before committing so moveBy measures from
-      // the real origin instead of applying the drag delta a second time.
-      block.translate(state.blockXY[index].x, state.blockXY[index].y);
-      block.moveBy(dx, dy);
-    });
-  } else {
-    Blockly.Events.setGroup(true);
+  const previousGroup = Blockly.Events.getGroup();
+  if (!previousGroup) Blockly.Events.setGroup(true);
+  try {
+    if (!state.resizing) {
+      const dx = this.x - state.x;
+      const dy = this.y - state.y;
+      state.blocks.forEach(function (block) {
+        block.moveBy(dx, dy);
+      });
+    }
+    if (!this.collapsed) {
+      this.blockIds = this.getContainedBlocks().map(function (block) {
+        return block.id;
+      });
+      if (!state.resizing) this.bringToFront_();
+    }
+    state.event.recordNew(this);
+    state.event.group = Blockly.Events.getGroup();
+    Blockly.Events.fire(state.event);
+  } finally {
+    Blockly.Events.setGroup(previousGroup);
   }
-  if (!this.collapsed) {
-    this.blockIds = this.getContainedBlocks().map(function (block) {
-      return block.id;
-    });
-    if (!state.resizing) this.bringToFront_();
-  }
-  state.event.recordNew(this);
-  state.event.group = Blockly.Events.getGroup();
-  Blockly.Events.fire(state.event);
-  Blockly.Events.setGroup(false);
   this.dragState_ = null;
   this.workspace.resizeContents();
-  if (isOutside) {
-    const workspace = this.workspace;
-    const groupId = this.id;
-    setTimeout(function () {
-      workspace.undo();
-      const group = workspace.getGroupById(groupId);
-      if (group && group.collapsed) group.updateCollapsedBlocks_();
-    }, 0);
-  }
+  if (!state.resizing)
+    Blockly.Events.fire(new Blockly.Events.GroupEndDrag(this, false));
 };
 
 /**
@@ -609,6 +593,7 @@ Blockly.Group.prototype.finishPointer_ = function (e) {
  * @param {!Event} e Mouse-down event.
  */
 Blockly.Group.prototype.buttonMouseDown_ = function (e) {
+  if (e.button !== 0) return;
   e.preventDefault();
   e.stopPropagation();
   this.pressedButton_ = e.currentTarget;
@@ -621,6 +606,7 @@ Blockly.Group.prototype.buttonMouseDown_ = function (e) {
     this,
     function () {
       this.pressedButton_ = null;
+      Blockly.unbindEvent_(this.buttonReleaseWrapper_);
       this.buttonReleaseWrapper_ = null;
     }
   );
@@ -633,7 +619,7 @@ Blockly.Group.prototype.buttonMouseDown_ = function (e) {
  * @private
  */
 Blockly.Group.prototype.isButtonClick_ = function (e) {
-  if (this.pressedButton_ !== e.currentTarget) return false;
+  if (e.button !== 0 || this.pressedButton_ !== e.currentTarget) return false;
   this.pressedButton_ = null;
   if (this.buttonReleaseWrapper_) {
     Blockly.unbindEvent_(this.buttonReleaseWrapper_);
@@ -682,19 +668,11 @@ Blockly.Group.prototype.setColour_ = function (colour) {
 };
 
 /**
- * Adopt a stack and expand this group just enough to contain it.
- * @param {!Blockly.BlockSvg} block Top-level stack.
- */
-Blockly.Group.prototype.fitBlock = function (block) {
-  this.fitBlocks([block]);
-};
-
-/**
  * Adopt stacks and expand this group once to contain their combined bounds.
  * @param {!Array.<!Blockly.BlockSvg>} blocks Top-level stacks.
  */
 Blockly.Group.prototype.fitBlocks = function (blocks) {
-  if (!blocks.length) return;
+  if (!blocks.length || this.collapsed) return;
   const padding = 16;
   let left = this.x;
   let top = this.y;
@@ -745,22 +723,32 @@ Blockly.Group.prototype.fitBlocks = function (blocks) {
 Blockly.Group.prototype.onWorkspaceChange_ = function (event) {
   if (
     event &&
-    ["dragOutside", "endDrag", "group_drag_outside", "group_end_drag"].indexOf(
-      event.type
-    ) !== -1
+    [
+      Blockly.Events.BLOCK_CREATE,
+      Blockly.Events.BLOCK_CHANGE,
+      Blockly.Events.BLOCK_MOVE,
+      Blockly.Events.BLOCK_DELETE,
+    ].indexOf(event.type) === -1
   )
     return;
-  if (event && event.type.indexOf("comment_") === 0) return;
   if (this.collapsed || this.dragState_) return;
   if (this.fitTimer_) clearTimeout(this.fitTimer_);
   const group = this;
+  const eventGroup = event ? event.group : Blockly.Events.getGroup();
+  const recordUndo = event ? event.recordUndo : Blockly.Events.recordUndo;
   this.fitTimer_ = setTimeout(function () {
     group.fitTimer_ = null;
-    if (!group.workspace || group.collapsed) return;
-    group.blockIds.slice().forEach(function (id) {
-      const block = group.workspace.getBlockById(id);
-      if (block && !block.getParent()) group.fitBlock(block);
-    });
+    if (!group.workspace || group.collapsed || group.dragState_) return;
+    const previousGroup = Blockly.Events.getGroup();
+    const previousRecordUndo = Blockly.Events.recordUndo;
+    Blockly.Events.setGroup(eventGroup);
+    Blockly.Events.recordUndo = recordUndo;
+    try {
+      group.fitBlocks(group.getOwnedTopBlocks_());
+    } finally {
+      Blockly.Events.setGroup(previousGroup);
+      Blockly.Events.recordUndo = previousRecordUndo;
+    }
   }, 0);
 };
 
@@ -773,10 +761,8 @@ Blockly.Group.prototype.moveBy = function (dx, dy) {
   if (!dx && !dy) return;
   const event = new Blockly.Events.GroupChange(this);
   event.recordOld(this);
-  const workspace = this.workspace;
-  this.blockIds.forEach(function (id) {
-    const block = workspace.getBlockById(id);
-    if (block && !block.getParent()) block.moveBy(dx, dy);
+  this.getOwnedTopBlocks_().forEach(function (block) {
+    block.moveBy(dx, dy);
   });
   this.x += dx;
   this.y += dy;
@@ -808,13 +794,9 @@ Blockly.Group.prototype.toggleCollapsed_ = function (e) {
     this.width = this.expandedWidth;
     this.height = this.expandedHeight;
   } else {
-    const ids = this.blockIds.filter(function (id) {
-      return !!this.workspace.getBlockById(id);
-    }, this);
-    this.getContainedBlocks().forEach(function (block) {
-      if (ids.indexOf(block.id) === -1) ids.push(block.id);
+    this.blockIds = this.getContainedBlocks().map(function (block) {
+      return block.id;
     });
-    this.blockIds = ids;
     this.expandedWidth = this.width;
     this.expandedHeight = this.height;
     this.collapsed = true;
@@ -828,29 +810,29 @@ Blockly.Group.prototype.toggleCollapsed_ = function (e) {
   this.workspace.resizeContents();
 };
 
-Blockly.Group.prototype.updateCollapsedBlocks_ = function () {
-  const workspace = this.workspace;
-  this.blockIds.forEach(function (id) {
-    const block = workspace.getBlockById(id);
-    if (block && block.getSvgRoot()) {
+/** @param {boolean=} opt_collapsed Visibility override when releasing stacks. */
+Blockly.Group.prototype.updateCollapsedBlocks_ = function (opt_collapsed) {
+  const collapsed =
+    opt_collapsed === undefined ? this.collapsed : opt_collapsed;
+  this.getOwnedTopBlocks_().forEach(function (block) {
+    if (block.getSvgRoot()) {
       block.getSvgRoot().style.display =
-        this.collapsed || block.intersects_ === false ? "none" : "";
+        collapsed || block.intersects_ === false ? "none" : "";
       // Hide connections of blocks inside collapsed groups so other blocks
       // cannot connect to them.
-      block.setConnectionsHidden(this.collapsed);
+      block.setConnectionsHidden(collapsed);
     }
-  }, this);
+  });
 };
 
 /**
- * Recover membership for collapsed groups saved without usable block IDs.
+ * Recover membership for imported groups saved without usable block IDs.
  * Uses the group's saved expanded bounds, which still surround the scripts.
  */
-Blockly.Group.prototype.restoreCollapsedBlocks_ = function () {
-  if (!this.collapsed) return;
+Blockly.Group.prototype.restoreBlocks_ = function () {
   const workspace = this.workspace;
-  let validIds = this.blockIds.filter(function (id) {
-    return !!workspace.getBlockById(id);
+  let validIds = this.getOwnedTopBlocks_().map(function (block) {
+    return block.id;
   });
   if (!validIds.length) {
     const group = this;
@@ -863,8 +845,10 @@ Blockly.Group.prototype.restoreCollapsedBlocks_ = function () {
         return (
           xy.x >= group.x &&
           xy.y >= group.y + 32 &&
-          xy.x + size.width <= group.x + group.expandedWidth &&
-          xy.y + size.height <= group.y + group.expandedHeight
+          xy.x + size.width <=
+            group.x + (group.collapsed ? group.expandedWidth : group.width) &&
+          xy.y + size.height <=
+            group.y + (group.collapsed ? group.expandedHeight : group.height)
         );
       })
       .map(function (block) {
@@ -877,6 +861,7 @@ Blockly.Group.prototype.restoreCollapsedBlocks_ = function () {
     event.recordOld(this);
     this.blockIds = validIds;
     event.recordNew(this);
+    event.recordUndo = false;
     Blockly.Events.fire(event);
   }
   this.updateCollapsedBlocks_();
@@ -893,7 +878,8 @@ Blockly.Group.prototype.duplicateGroup_ = function (e, pointerEvent) {
   state.x += offset;
   state.y += offset;
 
-  Blockly.Events.setGroup(true);
+  const previousGroup = Blockly.Events.getGroup();
+  if (!previousGroup) Blockly.Events.setGroup(true);
   try {
     const copies = blocks.map(function (block) {
       let copy;
@@ -916,9 +902,8 @@ Blockly.Group.prototype.duplicateGroup_ = function (e, pointerEvent) {
       return block.id;
     });
     duplicate = Blockly.Group.fromJSON(workspace, state, true);
-    if (duplicate.collapsed) duplicate.updateCollapsedBlocks_();
   } finally {
-    Blockly.Events.setGroup(false);
+    Blockly.Events.setGroup(previousGroup);
   }
   if (
     pointerEvent &&
@@ -959,6 +944,19 @@ Blockly.Group.prototype.showContextMenu_ = function (e) {
 Blockly.Group.prototype.dispose = function (fireEvent) {
   if (!this.workspace) return;
   clearTimeout(this.fitTimer_);
+  if (this.pointerCleanup_) this.pointerCleanup_();
+  if (this.dragState_) {
+    this.moveOffDragSurface_();
+    this.dragState_.blocks.forEach(function (block, index) {
+      const xy = this.dragState_.blockXY[index];
+      block.translate(xy.x, xy.y);
+    }, this);
+    this.x = this.dragState_.x;
+    this.y = this.dragState_.y;
+    this.width = this.dragState_.width;
+    this.height = this.dragState_.height;
+    this.dragState_ = null;
+  }
   if (this.buttonReleaseWrapper_) {
     Blockly.unbindEvent_(this.buttonReleaseWrapper_);
     this.buttonReleaseWrapper_ = null;
@@ -970,10 +968,7 @@ Blockly.Group.prototype.dispose = function (fireEvent) {
     event["newState"] = null;
     Blockly.Events.fire(event);
   }
-  this.blockIds.forEach(function (id) {
-    const block = this.workspace.getBlockById(id);
-    if (block && block.getSvgRoot()) block.getSvgRoot().style.display = "";
-  }, this);
+  this.updateCollapsedBlocks_(false);
   if (this.svgGroup_) this.svgGroup_.remove();
   this.workspace.removeGroup(this);
   this.workspace = null;
@@ -988,15 +983,12 @@ Blockly.Group.prototype.dispose = function (fireEvent) {
 Blockly.Group.fromJSON = function (workspace, state, fireEvent) {
   const group = new Blockly.Group(workspace, state);
   group.initSvg();
-  setTimeout(function () {
-    if (!group.workspace) return;
-    if (!group.blockIds.length && !group.collapsed) {
-      group.blockIds = group.getContainedBlocks().map(function (block) {
-        return block.id;
-      });
-    }
-    if (group.collapsed) group.updateCollapsedBlocks_();
-  }, 0);
+  if (fireEvent && !group.blockIds.length && !group.collapsed) {
+    group.blockIds = group.getContainedBlocks().map(function (block) {
+      return block.id;
+    });
+  }
+  group.updateCollapsedBlocks_();
   if (fireEvent && Blockly.Events.isEnabled()) {
     const event = new Blockly.Events.GroupChange(group);
     event["oldState"] = null;

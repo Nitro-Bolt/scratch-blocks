@@ -162,6 +162,24 @@ Blockly.Events.COMMENT_CHANGE = "comment_change";
 Blockly.Events.COMMENT_DELETE = "comment_delete";
 
 /**
+ * Name of event that changes a script group's saved state.
+ * @const
+ */
+Blockly.Events.GROUP_CHANGE = "group_change";
+
+/**
+ * Name of event that drags a group into or out of the blocks UI.
+ * @const
+ */
+Blockly.Events.GROUP_DRAG_OUTSIDE = "group_drag_outside";
+
+/**
+ * Name of event that ends a group drag.
+ * @const
+ */
+Blockly.Events.GROUP_END_DRAG = "group_end_drag";
+
+/**
  * Name of event that records a UI change.
  * @const
  */
@@ -222,7 +240,12 @@ Blockly.Events.filter = function (queueIn, forward) {
   // Merge duplicates.
   for (i = 0; (event = queue[i]); i++) {
     if (!event.isNull()) {
-      const key = [event.type, event.blockId, event.workspaceId].join(" ");
+      const key = [
+        event.type,
+        event.blockId,
+        event["groupId"],
+        event.workspaceId,
+      ].join(" ");
 
       const lastEntry = hash[key];
       const lastEvent = lastEntry ? lastEntry.event : null;
@@ -397,6 +420,15 @@ Blockly.Events.fromJson = function (json, workspace) {
       break;
     case Blockly.Events.COMMENT_DELETE:
       event = new Blockly.Events.CommentDelete(null);
+      break;
+    case Blockly.Events.GROUP_CHANGE:
+      event = new Blockly.Events.GroupChange(null);
+      break;
+    case Blockly.Events.GROUP_DRAG_OUTSIDE:
+      event = new Blockly.Events.GroupDragOutside(null);
+      break;
+    case Blockly.Events.GROUP_END_DRAG:
+      event = new Blockly.Events.GroupEndDrag(null, false);
       break;
     case Blockly.Events.UI:
       event = new Blockly.Events.Ui(null);

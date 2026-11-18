@@ -490,6 +490,7 @@ Blockly.Xml.domToWorkspace = function (xml, workspace) {
     width = workspace.getWidth();
   }
   const newBlockIds = []; // A list of block IDs added by this call.
+  const newGroups = [];
   Blockly.Field.startCache();
   // Safari 7.1.3 is known to provide node lists with extra references to
   // children beyond the lists' length.  Trust the length, do not use the
@@ -526,7 +527,7 @@ Blockly.Xml.domToWorkspace = function (xml, workspace) {
         ].forEach(function (key) {
           state[key] = xmlChild.getAttribute(key);
         });
-        Blockly.Group.fromJSON(workspace, state, false);
+        newGroups.push(Blockly.Group.fromJSON(workspace, state, false));
       } else if (
         name == "block" ||
         (name == "shadow" && !Blockly.Events.recordUndo)
@@ -588,10 +589,14 @@ Blockly.Xml.domToWorkspace = function (xml, workspace) {
   if (workspace.setResizesEnabled) {
     workspace.setResizesEnabled(true);
   }
-  // Groups are decoded before their blocks. Reapply collapsed visibility only
-  // after every referenced block has been created and positioned.
+  // Repair only groups imported by this call. Existing groups may still be
+  // waiting for more of their blocks to be restored by subsequent undo events.
+  newGroups.forEach(function (group) {
+    group.restoreBlocks_();
+  });
+  // Groups are decoded before their blocks. Apply visibility after positioning.
   workspace.getGroups().forEach(function (group) {
-    if (group.collapsed) group.restoreCollapsedBlocks_();
+    if (group.collapsed) group.updateCollapsedBlocks_();
   });
   return newBlockIds;
 };

@@ -30,6 +30,7 @@ goog.require("Blockly.BlockAnimations");
 goog.require("Blockly.Events.BlockMove");
 goog.require("Blockly.Events.DragBlockOutside");
 goog.require("Blockly.Events.EndBlockDrag");
+goog.require("Blockly.Events.GroupChange");
 goog.require("Blockly.Group");
 goog.require("Blockly.InsertionMarkerManager");
 goog.require("Blockly.utils");
@@ -454,6 +455,22 @@ Blockly.BlockDragger.prototype.endBlockDrag = function (e, currentDragDeltaXY) {
  * @private
  */
 Blockly.BlockDragger.prototype.fitGroupAroundBlocks_ = function (blocks) {
+  // Ownership changes only after an explicit drag, never during a lookup or
+  // while block rendering and group bounds are temporarily out of sync.
+  for (let i = 0; i < blocks.length; i++) {
+    const owner = this.workspace_.getGroupForBlock(blocks[i].id);
+    if (
+      owner &&
+      !owner.collapsed &&
+      (blocks[i].getParent() || !owner.containsBlock(blocks[i]))
+    ) {
+      const event = new Blockly.Events.GroupChange(owner);
+      event.recordOld(owner);
+      owner.blockIds.splice(owner.blockIds.indexOf(blocks[i].id), 1);
+      event.recordNew(owner);
+      Blockly.Events.fire(event);
+    }
+  }
   const primary = blocks[0].getRootBlock();
   if (primary !== blocks[0]) return;
   const bounds = primary.getBoundingRectangle();
@@ -472,11 +489,6 @@ Blockly.BlockDragger.prototype.fitGroupAroundBlocks_ = function (blocks) {
     }
   }
   if (!destination) {
-    // This lookup removes stale ownership when a stack was dragged out of its
-    // previous expanded group and dropped onto empty workspace.
-    for (let i = 0; i < blocks.length; i++) {
-      this.workspace_.getGroupForBlock(blocks[i].id);
-    }
     return;
   }
   const adopted = [];
