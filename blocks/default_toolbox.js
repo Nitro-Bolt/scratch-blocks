@@ -510,6 +510,8 @@ Blockly.Blocks.defaultToolbox =
   "</shadow>" +
   "</value>" +
   "</block>" +
+  '<block type="operator_constant_text" id="operator_constant_text">' +
+  "</block>" +
   '<block type="operator_mod" id="operator_mod">' +
   '<value name="NUM1">' +
   '<shadow type="math_number">' +

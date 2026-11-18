@@ -56,7 +56,7 @@ Blockly.Blocks["json_object"] = {
             {
               type: "input_value",
               name: "KEY",
-              shadowOpcode: "text",
+              shadowOpcode: "text_multiline",
               shadowFieldName: "TEXT",
               shadowFieldValue: "",
             },
@@ -67,7 +67,7 @@ Blockly.Blocks["json_object"] = {
             {
               type: "input_value",
               name: "VALUE",
-              shadowOpcode: "text",
+              shadowOpcode: "text_multiline",
               shadowFieldName: "TEXT",
               shadowFieldValue: "",
             },
@@ -152,7 +152,7 @@ Blockly.Blocks["json_set_key"] = {
         {
           type: "input_value",
           name: "KEY",
-          shadowOpcode: "text",
+          shadowOpcode: "text_multiline",
           shadowFieldName: "TEXT",
           shadowFieldValue: "",
         },
@@ -164,7 +164,7 @@ Blockly.Blocks["json_set_key"] = {
         {
           type: "input_value",
           name: "VALUE",
-          shadowOpcode: "text",
+          shadowOpcode: "text_multiline",
           shadowFieldName: "TEXT",
           shadowFieldValue: "",
         },
@@ -288,7 +288,7 @@ Blockly.Blocks["json_array"] = {
             {
               type: "input_value",
               name: "ITEM",
-              shadowOpcode: "text",
+              shadowOpcode: "text_multiline",
               shadowFieldName: "TEXT",
               shadowFieldValue: "",
             },
@@ -400,7 +400,7 @@ Blockly.Blocks["json_add_item"] = {
             {
               type: "input_value",
               name: "ITEM",
-              shadowOpcode: "text",
+              shadowOpcode: "text_multiline",
               shadowFieldName: "TEXT",
               shadowFieldValue: Blockly.Msg.JSON_BAR,
             },

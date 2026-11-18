@@ -557,6 +557,34 @@ Blockly.Blocks["operator_constant"] = {
   },
 };
 
+Blockly.Blocks["operator_constant_text"] = {
+  /**
+   * Block for a text constant (newline, tab character, etc.).
+   * @this Blockly.Block
+   */
+  init: function () {
+    this.jsonInit({
+      message0: "%1",
+      args0: [
+        {
+          type: "field_dropdown",
+          name: "CONSTANT",
+          options: [
+            ["newline", "\n"],
+            ["tab character", "\t"],
+            ["null character", "\0"],
+            ["escape character", "\x1B"],
+            ["non-breaking space", "\u00A0"],
+            ["zero-width space", "\u200B"],
+          ]
+        },
+      ],
+      category: Blockly.Categories.operators,
+      extensions: ["colours_operators", "output_string"],
+    });
+  },
+};
+
 Blockly.Blocks["operator_cast"] = {
   /**
    * Block for casting a value to a specific type.
@@ -648,7 +676,7 @@ Blockly.Blocks["operator_join_extendable"] = {
             {
               type: "input_value",
               name: "STRING",
-              shadowOpcode: "text",
+              shadowOpcode: "text_multiline",
               shadowFieldName: "TEXT",
               shadowFieldValue: Blockly.Msg.OPERATORS_JOIN_EXTENDABLE_APPLE,
             },
@@ -943,8 +971,8 @@ Blockly.Blocks["operator_lt_extendable"] = {
             {
               type: "input_value",
               name: "OPERAND",
-              shadowOpcode: "text",
-              shadowFieldName: "TEXT",
+              shadowOpcode: "math_number",
+              shadowFieldName: "NUM",
               shadowFieldValue: "",
             },
           ],
@@ -980,7 +1008,7 @@ Blockly.Blocks["operator_equals_extendable"] = {
             {
               type: "input_value",
               name: "OPERAND",
-              shadowOpcode: "text",
+              shadowOpcode: "text_multiline",
               shadowFieldName: "TEXT",
               shadowFieldValue: "",
             },
@@ -1017,8 +1045,8 @@ Blockly.Blocks["operator_gt_extendable"] = {
             {
               type: "input_value",
               name: "OPERAND",
-              shadowOpcode: "text",
-              shadowFieldName: "TEXT",
+              shadowOpcode: "math_number",
+              shadowFieldName: "NUM",
               shadowFieldValue: "",
             },
           ],
@@ -1054,8 +1082,8 @@ Blockly.Blocks["operator_lte"] = {
             {
               type: "input_value",
               name: "OPERAND",
-              shadowOpcode: "text",
-              shadowFieldName: "TEXT",
+              shadowOpcode: "math_number",
+              shadowFieldName: "NUM",
               shadowFieldValue: "",
             },
           ],
@@ -1091,8 +1119,8 @@ Blockly.Blocks["operator_gte"] = {
             {
               type: "input_value",
               name: "OPERAND",
-              shadowOpcode: "text",
-              shadowFieldName: "TEXT",
+              shadowOpcode: "math_number",
+              shadowFieldName: "NUM",
               shadowFieldValue: "",
             },
           ],

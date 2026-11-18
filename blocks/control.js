@@ -716,7 +716,7 @@ Blockly.Blocks["control_switch"] = {
         {
           type: "input_value",
           name: "SWITCH",
-          shadowOpcode: "text",
+          shadowOpcode: "text_multiline",
           shadowFieldName: "TEXT",
           shadowFieldValue: Blockly.Msg.OPERATORS_JOIN_APPLE,
         },
@@ -732,7 +732,7 @@ Blockly.Blocks["control_switch"] = {
             {
               type: "input_value",
               name: "CASE",
-              shadowOpcode: "text",
+              shadowOpcode: "text_multiline",
               shadowFieldName: "TEXT",
               shadowFieldValue: "",
             },
