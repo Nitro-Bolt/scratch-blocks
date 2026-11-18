@@ -389,6 +389,8 @@
     "COLOUR_BRIGHTNESS_LABEL": "Brightness",
     "FOR_ALL_SPRITES": "For all sprites:",
     "FOR_THIS_SPRITE_ONLY": "For this sprite only:",
+    "RENAME_GROUP_TITLE": "Group name:",
+    "RENAME_GROUP_MODAL_TITLE": "Rename Group",
     "CHANGE_VALUE_TITLE": "Change value:",
     "EDIT_VARIABLE": "Edit variable",
     "EDIT_VARIABLE_TITLE": "Variable name:",
