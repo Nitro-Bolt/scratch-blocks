@@ -572,8 +572,8 @@ Blockly.Blocks["operator_constant_text"] = {
           options: [
             ["newline", "\n"],
             ["tab character", "\t"],
-            ["null character", "\0"],
-            ["escape character", "\x1B"],
+            //["null character", "\0"],
+            //["escape character", "\x1B"],
             ["non-breaking space", "\u00A0"],
             ["zero-width space", "\u200B"],
           ]
