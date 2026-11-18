@@ -31,7 +31,7 @@ window.BLOCKLY_BOOT = function() {
 goog.addDependency("../../../../core/block.js", ["Blockly.Block"], ["Blockly.Blocks","Blockly.Colours","Blockly.Comment","Blockly.ScratchBlockComment","Blockly.Connection","Blockly.Events.BlockChange","Blockly.Events.BlockCreate","Blockly.Events.BlockDelete","Blockly.Events.BlockMove","Blockly.Extensions","Blockly.FieldLabelSerializable","Blockly.FieldVariableGetter","Blockly.Input","Blockly.Mutator","Blockly.Warning","Blockly.Workspace","Blockly.Xml","goog.asserts","goog.math.Coordinate","goog.string"]);
 goog.addDependency("../../../../core/block_animations.js", ["Blockly.BlockAnimations"], []);
 goog.addDependency("../../../../core/block_drag_surface.js", ["Blockly.BlockDragSurfaceSvg"], ["Blockly.utils","goog.asserts","goog.math.Coordinate"]);
-goog.addDependency("../../../../core/block_dragger.js", ["Blockly.BlockDragger"], ["Blockly.BlockAnimations","Blockly.Events.BlockMove","Blockly.Events.DragBlockOutside","Blockly.Events.EndBlockDrag","Blockly.Group","Blockly.InsertionMarkerManager","Blockly.utils","Blockly.Xml","goog.math.Coordinate","goog.asserts"]);
+goog.addDependency("../../../../core/block_dragger.js", ["Blockly.BlockDragger"], ["Blockly.BlockAnimations","Blockly.Events.BlockMove","Blockly.Events.DragBlockOutside","Blockly.Events.EndBlockDrag","Blockly.Events.GroupChange","Blockly.Group","Blockly.InsertionMarkerManager","Blockly.utils","Blockly.Xml","goog.math.Coordinate","goog.asserts"]);
 goog.addDependency("../../../../core/block_events.js", ["Blockly.Events.BlockBase","Blockly.Events.BlockChange","Blockly.Events.BlockCreate","Blockly.Events.BlockDelete","Blockly.Events.BlockMove","Blockly.Events.Change","Blockly.Events.Create","Blockly.Events.Delete","Blockly.Events.Move"], ["Blockly.Events","Blockly.Events.Abstract","goog.math.Coordinate"]);
 goog.addDependency("../../../../core/block_render_svg.js", ["Blockly.BlockSvg.render"], ["Blockly.BlockSvg","Blockly.FieldLabel","Blockly.SystemColourPicker","Blockly.scratchBlocksUtils","Blockly.utils"]);
 goog.addDependency("../../../../core/block_shapes.js", ["Blockly.BlockShapes"], []);
@@ -88,8 +88,8 @@ goog.addDependency("../../../../core/flyout_vertical.js", ["Blockly.VerticalFlyo
 goog.addDependency("../../../../core/generator.js", ["Blockly.Generator"], ["Blockly.Block","goog.asserts"]);
 goog.addDependency("../../../../core/gesture.js", ["Blockly.Gesture"], ["Blockly.BlockAnimations","Blockly.BlockDragger","Blockly.BubbleDragger","Blockly.constants","Blockly.Events.Ui","Blockly.FlyoutDragger","Blockly.scratchBlocksUtils","Blockly.Tooltip","Blockly.Touch","Blockly.WorkspaceDragger","goog.asserts","goog.math.Coordinate"]);
 goog.addDependency("../../../../core/grid.js", ["Blockly.Grid"], ["Blockly.utils"]);
-goog.addDependency("../../../../core/group.js", ["Blockly.Group"], ["Blockly.ContextMenu","Blockly.Colours","Blockly.Events.GroupChange","Blockly.Events.GroupDragOutside","Blockly.Events.GroupEndDrag","Blockly.SystemColourPicker","Blockly.Touch","goog.dom","goog.math.Coordinate"]);
-goog.addDependency("../../../../core/group_events.js", ["Blockly.Events.GroupChange","Blockly.Events.GroupDragOutside","Blockly.Events.GroupEndDrag"], ["Blockly.Events","Blockly.Events.Abstract","Blockly.Xml"]);
+goog.addDependency("../../../../core/group.js", ["Blockly.Group"], ["Blockly.ContextMenu","Blockly.Colours","Blockly.Events.GroupChange","Blockly.Events.GroupDragOutside","Blockly.Events.GroupEndDrag","Blockly.SystemColourPicker","Blockly.Touch","goog.dom"]);
+goog.addDependency("../../../../core/group_events.js", ["Blockly.Events.GroupBase","Blockly.Events.GroupChange","Blockly.Events.GroupDragOutside","Blockly.Events.GroupEndDrag"], ["Blockly.Events","Blockly.Events.Abstract","Blockly.Xml"]);
 goog.addDependency("../../../../core/icon.js", ["Blockly.Icon"], ["goog.math.Coordinate"]);
 goog.addDependency("../../../../core/inject.js", ["Blockly.inject"], ["Blockly.BlockDragSurfaceSvg","Blockly.Css","Blockly.constants","Blockly.DropDownDiv","Blockly.Grid","Blockly.Options","Blockly.WorkspaceSvg","Blockly.WorkspaceDragSurfaceSvg","goog.dom","goog.ui.Component"]);
 goog.addDependency("../../../../core/input.js", ["Blockly.Input"], ["Blockly.Connection","Blockly.FieldCheckbox","Blockly.FieldLabel","goog.asserts"]);
@@ -207,6 +207,7 @@ goog.require('Blockly.Generator');
 goog.require('Blockly.Gesture');
 goog.require('Blockly.Grid');
 goog.require('Blockly.Group');
+goog.require('Blockly.Events.GroupBase');
 goog.require('Blockly.Events.GroupChange');
 goog.require('Blockly.Events.GroupDragOutside');
 goog.require('Blockly.Events.GroupEndDrag');
