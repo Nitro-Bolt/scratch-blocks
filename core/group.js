@@ -774,14 +774,23 @@ Blockly.Group.prototype.moveBy = function (dx, dy) {
 
 Blockly.Group.prototype.rename_ = function (e) {
   e.stopPropagation();
-  const title = window.prompt("Group name", this.title);
-  if (title === null || !title.trim() || title === this.title) return;
-  const event = new Blockly.Events.GroupChange(this);
-  event.recordOld(this);
-  this.title = title.trim();
-  this.render();
-  event.recordNew(this);
-  Blockly.Events.fire(event);
+  const group = this;
+  Blockly.prompt(
+    Blockly.Msg.RENAME_GROUP_TITLE,
+    this.title,
+    function (title) {
+      if (!group.workspace || typeof title !== "string") return;
+      title = title.trim();
+      if (!title || title === group.title) return;
+      const event = new Blockly.Events.GroupChange(group);
+      event.recordOld(group);
+      group.title = title;
+      group.render();
+      event.recordNew(group);
+      Blockly.Events.fire(event);
+    },
+    Blockly.Msg.RENAME_GROUP_MODAL_TITLE
+  );
 };
 
 Blockly.Group.prototype.toggleCollapsed_ = function (e) {

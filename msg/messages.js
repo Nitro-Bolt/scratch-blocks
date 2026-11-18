@@ -457,6 +457,10 @@ Blockly.Msg.COLOUR_BRIGHTNESS_LABEL = 'Brightness';
 Blockly.Msg.FOR_ALL_SPRITES = 'For all sprites:';
 Blockly.Msg.FOR_THIS_SPRITE_ONLY = 'For this sprite only:';
 
+// Groups
+Blockly.Msg.RENAME_GROUP_TITLE = 'Group name:';
+Blockly.Msg.RENAME_GROUP_MODAL_TITLE = 'Rename Group';
+
 // Variables
 // @todo Remove these once fully managed by Scratch VM / Scratch GUI
 Blockly.Msg.CHANGE_VALUE_TITLE = 'Change value:';
