@@ -835,15 +835,15 @@ Blockly.Group.prototype.updateCollapsedBlocks_ = function (opt_collapsed) {
 };
 
 /**
- * Recover membership for imported groups saved without usable block IDs.
- * Uses the group's saved expanded bounds, which still surround the scripts.
+ * Restore saved membership, recovering expanded groups from visible bounds.
+ * Collapsed groups must never adopt scripts from their hidden expanded area.
  */
 Blockly.Group.prototype.restoreBlocks_ = function () {
   const workspace = this.workspace;
   let validIds = this.getOwnedTopBlocks_().map(function (block) {
     return block.id;
   });
-  if (!validIds.length) {
+  if (!this.collapsed && !validIds.length) {
     const group = this;
     validIds = workspace
       .getTopBlocks(false)
@@ -854,10 +854,8 @@ Blockly.Group.prototype.restoreBlocks_ = function () {
         return (
           xy.x >= group.x &&
           xy.y >= group.y + 32 &&
-          xy.x + size.width <=
-            group.x + (group.collapsed ? group.expandedWidth : group.width) &&
-          xy.y + size.height <=
-            group.y + (group.collapsed ? group.expandedHeight : group.height)
+          xy.x + size.width <= group.x + group.width &&
+          xy.y + size.height <= group.y + group.height
         );
       })
       .map(function (block) {
