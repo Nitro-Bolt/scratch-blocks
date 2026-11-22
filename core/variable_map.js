@@ -147,17 +147,21 @@ Blockly.VariableMap.prototype.updateVariableById = function (
     return;
   }
 
-  Blockly.Events.fire(
-    new Blockly.Events.VarUpdate(variable, isLocal, isCloud, valueType, colour)
-  );
-  variable.isLocal = isLocal;
-  variable.isCloud = isCloud;
-  variable.valueType = valueType;
-  variable.colour = colour;
-
-  const eventsWereEnabled = Blockly.Events.isEnabled();
-  Blockly.Events.disable();
+  const previousGroup = Blockly.Events.getGroup();
+  if (!previousGroup) Blockly.Events.setGroup(true);
   try {
+    const updateEvent = new Blockly.Events.VarUpdate(
+      variable,
+      isLocal,
+      isCloud,
+      valueType,
+      colour
+    );
+    variable.isLocal = isLocal;
+    variable.isCloud = isCloud;
+    variable.valueType = valueType;
+    variable.colour = colour;
+
     const blocks = this.workspace.getAllBlocks();
     for (let i = 0; i < blocks.length; i++) {
       const inputs = blocks[i].inputList;
@@ -170,8 +174,10 @@ Blockly.VariableMap.prototype.updateVariableById = function (
         }
       }
     }
+    // Undo must restore the old type before reconnecting incompatible children.
+    Blockly.Events.fire(updateEvent);
   } finally {
-    if (eventsWereEnabled) Blockly.Events.enable();
+    Blockly.Events.setGroup(previousGroup);
   }
   this.workspace.refreshToolboxSelection_();
 };

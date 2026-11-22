@@ -145,6 +145,19 @@ Blockly.Blocks["data_variable"] = {
 Blockly.Blocks["data_setvariableto"] = {
   updateVariable_: Blockly.Constants.Data.updateVariableValue,
   /**
+   * Defer a stale VALUE check until XML loading has rendered the whole stack.
+   * @param {!Blockly.Input} input The input being reconstructed.
+   * @private
+   */
+  deferInputCheck_: function (input) {
+    if (input.name !== "VALUE") return;
+    input.connection.setCheck(null);
+    this.restoreInputChecks_ = function () {
+      delete this.restoreInputChecks_;
+      this.updateVariable_();
+    };
+  },
+  /**
    * Block to set variable to a certain value
    * @this Blockly.Block
    */

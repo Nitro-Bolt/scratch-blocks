@@ -730,6 +730,15 @@ Blockly.Xml.domToBlock = function (xmlBlock, workspace) {
     // variables.
     Blockly.Events.fire(new Blockly.Events.BlockCreate(topBlock));
   }
+  // A variable's type may have changed while this sprite was inactive. Restore
+  // deferred checks after rendering and re-enabling events so detached blocks
+  // stay visible and the VM receives their move events.
+  const loadedBlocks = topBlock.getDescendants(false);
+  for (i = 0; i < loadedBlocks.length; i++) {
+    if (loadedBlocks[i].restoreInputChecks_) {
+      loadedBlocks[i].restoreInputChecks_();
+    }
+  }
   return topBlock;
 };
 
@@ -917,6 +926,12 @@ Blockly.Xml.domToBlockHeadless_ = function (xmlBlock, workspace) {
               input.connection.setShadowDom(null);
               blockChild.dispose(false);
               break;
+            }
+            if (
+              !input.connection.checkType_(childConnection) &&
+              block.deferInputCheck_
+            ) {
+              block.deferInputCheck_(input);
             }
             input.connection.connect(childConnection);
           } else {
