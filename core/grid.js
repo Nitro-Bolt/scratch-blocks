@@ -185,8 +185,9 @@ Blockly.Grid.prototype.setLineAttributes_ = function (
  * @package
  */
 Blockly.Grid.prototype.moveTo = function (x, y) {
-  this.gridPattern_.setAttribute("x", x);
-  this.gridPattern_.setAttribute("y", y);
+  // Match the rounding in Blockly.WorkspaceSvg.prototype.translate.
+  this.gridPattern_.setAttribute("x", Math.round(x));
+  this.gridPattern_.setAttribute("y", Math.round(y));
 };
 
 /**

@@ -175,7 +175,9 @@ Blockly.Variables.allDeveloperVariables = function (workspace) {
   // Flatten the hash into a list.
   const list = [];
   for (const name in hash) {
-    list.push(hash[name]);
+    if (Object.prototype.hasOwnProperty.call(hash, name)) {
+      list.push(hash[name]);
+    }
   }
   return list;
 };

@@ -367,8 +367,10 @@ Blockly.Extensions.buildTooltipForDropdown = function (
     // Relies on document.readyState
     Blockly.utils.runAfterPageLoad(function () {
       for (const key in lookupTable) {
-        // Will print warnings is reference is missing.
-        Blockly.utils.checkMessageReferences(lookupTable[key]);
+        if (Object.prototype.hasOwnProperty.call(lookupTable, key)) {
+          // Will print warnings is reference is missing.
+          Blockly.utils.checkMessageReferences(lookupTable[key]);
+        }
       }
     });
   }

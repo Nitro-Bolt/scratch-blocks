@@ -557,7 +557,7 @@ Blockly.Field.getCachedWidth = function (textElement) {
 
   // Attempt to compute fetch the width of the SVG text element.
   try {
-    width = textElement.getComputedTextLength();
+    width = Blockly.Field.measureText_(textElement);
   } catch (e) {
     // In other cases where we fail to geth the computed text. Instead, use an
     // approximation and do not cache the result. At some later point in time
@@ -571,6 +571,50 @@ Blockly.Field.getCachedWidth = function (textElement) {
     Blockly.Field.cacheWidths_[key] = width;
   }
   return width;
+};
+
+/**
+ * Canvas fonts for text measuring, keyed by class name.
+ * @private
+ */
+Blockly.Field.measureFonts_ = Object.create(null);
+
+/**
+ * Measure text with a canvas so that no layout is needed.
+ * @param {!Element} textElement An SVG 'text' element.
+ * @return {number} Width of element.
+ * @private
+ */
+Blockly.Field.measureText_ = function (textElement) {
+  const className = textElement.className.baseVal;
+  let font = Blockly.Field.measureFonts_[className];
+  if (!font) {
+    const svg = Blockly.utils.createSvgElement("svg", {}, document.body);
+    const probe = Blockly.utils.createSvgElement(
+      "text",
+      { class: className },
+      svg
+    );
+    const style = window.getComputedStyle(probe);
+    font =
+      style.fontStyle +
+      " " +
+      style.fontWeight +
+      " " +
+      style.fontSize +
+      " " +
+      style.fontFamily;
+    document.body.removeChild(svg);
+    Blockly.Field.measureFonts_[className] = font;
+  }
+  if (!Blockly.Field.measureContext_) {
+    Blockly.Field.measureContext_ = document
+      .createElement("canvas")
+      .getContext("2d");
+  }
+  Blockly.Field.measureContext_.font = font;
+  return Blockly.Field.measureContext_.measureText(textElement.textContent)
+    .width;
 };
 
 /**

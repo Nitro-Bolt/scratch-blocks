@@ -796,11 +796,7 @@ Blockly.Xml.domToBlockHeadless_ = function (xmlBlock, workspace) {
     child;
   let block = null;
   const prototypeName = xmlBlock.getAttribute("type");
-  goog.asserts.assert(
-    prototypeName,
-    "Block type unspecified: %s",
-    xmlBlock.outerHTML
-  );
+  goog.asserts.assert(prototypeName, "Block type unspecified");
   const id = xmlBlock.getAttribute("id");
   block = workspace.newBlock(prototypeName, id);
 

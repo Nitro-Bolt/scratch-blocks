@@ -882,6 +882,7 @@ Blockly.WorkspaceSvg.prototype.processProcedureReturnsChanged_ = function () {
     // If a current procedure existed but its type has changed, the toolbox must be updated.
     // If a new procedure was created, the toolbox is already updated elsewhere.
     if (
+      Object.prototype.hasOwnProperty.call(finalTypes, procCode) &&
       Object.prototype.hasOwnProperty.call(initialTypes, procCode) &&
       initialTypes[procCode] !== finalTypes[procCode]
     ) {
@@ -979,6 +980,9 @@ Blockly.WorkspaceSvg.prototype.getParentSvg = function () {
  * @param {number} y Vertical translation.
  */
 Blockly.WorkspaceSvg.prototype.translate = function (x, y) {
+  // Whole pixels so that the composited canvases are not rasterized again.
+  x = Math.round(x);
+  y = Math.round(y);
   if (this.useWorkspaceDragSurface_ && this.isDragSurfaceActive_) {
     this.workspaceDragSurface_.translateSurface(x, y);
   } else {
@@ -1711,6 +1715,7 @@ Blockly.WorkspaceSvg.prototype.isBlockVisibleForSelection_ = function (block) {
     if (
       !root ||
       root.style.display === "none" ||
+      Blockly.utils.hasClass(root, "blocklyCulled") ||
       root.getAttribute("display") === "none"
     ) {
       return false;

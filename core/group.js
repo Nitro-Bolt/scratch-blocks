@@ -825,8 +825,7 @@ Blockly.Group.prototype.updateCollapsedBlocks_ = function (opt_collapsed) {
     opt_collapsed === undefined ? this.collapsed : opt_collapsed;
   this.getOwnedTopBlocks_().forEach(function (block) {
     if (block.getSvgRoot()) {
-      block.getSvgRoot().style.display =
-        collapsed || block.intersects_ === false ? "none" : "";
+      block.getSvgRoot().style.display = collapsed ? "none" : "";
       // Hide connections of blocks inside collapsed groups so other blocks
       // cannot connect to them.
       block.setConnectionsHidden(collapsed);

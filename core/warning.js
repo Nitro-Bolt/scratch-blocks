@@ -203,7 +203,9 @@ Blockly.Warning.prototype.setText = function (text, id) {
 Blockly.Warning.prototype.getText = function () {
   const allWarnings = [];
   for (const id in this.text_) {
-    allWarnings.push(this.text_[id]);
+    if (Object.prototype.hasOwnProperty.call(this.text_, id)) {
+      allWarnings.push(this.text_[id]);
+    }
   }
   return allWarnings.join("\n");
 };

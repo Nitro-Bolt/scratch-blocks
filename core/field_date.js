@@ -187,6 +187,9 @@ Blockly.FieldDate.widgetDispose_ = function () {
 Blockly.FieldDate.loadLanguage_ = function () {
   const reg = /^DateTimeSymbols_(.+)$/;
   for (const prop in goog.i18n) {
+    if (!Object.prototype.hasOwnProperty.call(goog.i18n, prop)) {
+      continue;
+    }
     const m = prop.match(reg);
     if (m) {
       const lang = m[1].toLowerCase().replace("_", "."); // E.g. 'pt.br'

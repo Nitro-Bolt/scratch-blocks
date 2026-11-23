@@ -314,8 +314,9 @@ Blockly.BlockSvg.prototype.setIntersects = function (intersects) {
       return group.collapsed && group.blockIds.indexOf(this.id) !== -1;
     }, this);
     root.style.display = hiddenByGroup ? "none" : "";
+    Blockly.utils.removeClass(root, "blocklyCulled");
   } else {
-    root.style.display = "none";
+    Blockly.utils.addClass(root, "blocklyCulled");
   }
 };
 
