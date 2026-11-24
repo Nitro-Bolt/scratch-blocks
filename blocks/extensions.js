@@ -50,7 +50,7 @@ Blockly.Blocks["extension_extendable_test"] = {
             {
               type: "input_value",
               name: "INPUT",
-              shadowOpcode: "text_multiline",
+              shadowOpcode: "text",
               shadowFieldName: "TEXT",
               shadowFieldValue: "apple",
             },
@@ -85,7 +85,7 @@ Blockly.Blocks["extension_extendable_broken_test"] = {
                 {
                   type: "input_value",
                   name: "CONDITION",
-                  shadowOpcode: "text_multiline",
+                  shadowOpcode: "text",
                   shadowFieldName: "TEXT",
                   shadowFieldValue: "should be before statement",
                 },
@@ -305,7 +305,7 @@ Blockly.Blocks["extension_extendable_reporter_test"] = {
             {
               type: "input_value",
               name: "INPUT",
-              shadowOpcode: "text_multiline",
+              shadowOpcode: "text",
               shadowFieldName: "TEXT",
               shadowFieldValue: "apple",
             },

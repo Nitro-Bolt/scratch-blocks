@@ -676,7 +676,7 @@ Blockly.Blocks["operator_join_extendable"] = {
             {
               type: "input_value",
               name: "STRING",
-              shadowOpcode: "text_multiline",
+              shadowOpcode: "text",
               shadowFieldName: "TEXT",
               shadowFieldValue: Blockly.Msg.OPERATORS_JOIN_EXTENDABLE_APPLE,
             },
@@ -971,8 +971,8 @@ Blockly.Blocks["operator_lt_extendable"] = {
             {
               type: "input_value",
               name: "OPERAND",
-              shadowOpcode: "math_number",
-              shadowFieldName: "NUM",
+              shadowOpcode: "text",
+              shadowFieldName: "TEXT",
               shadowFieldValue: "",
             },
           ],
@@ -1008,7 +1008,7 @@ Blockly.Blocks["operator_equals_extendable"] = {
             {
               type: "input_value",
               name: "OPERAND",
-              shadowOpcode: "text_multiline",
+              shadowOpcode: "text",
               shadowFieldName: "TEXT",
               shadowFieldValue: "",
             },
@@ -1045,8 +1045,8 @@ Blockly.Blocks["operator_gt_extendable"] = {
             {
               type: "input_value",
               name: "OPERAND",
-              shadowOpcode: "math_number",
-              shadowFieldName: "NUM",
+              shadowOpcode: "text",
+              shadowFieldName: "TEXT",
               shadowFieldValue: "",
             },
           ],
@@ -1082,8 +1082,8 @@ Blockly.Blocks["operator_lte"] = {
             {
               type: "input_value",
               name: "OPERAND",
-              shadowOpcode: "math_number",
-              shadowFieldName: "NUM",
+              shadowOpcode: "text",
+              shadowFieldName: "TEXT",
               shadowFieldValue: "",
             },
           ],
@@ -1119,8 +1119,8 @@ Blockly.Blocks["operator_gte"] = {
             {
               type: "input_value",
               name: "OPERAND",
-              shadowOpcode: "math_number",
-              shadowFieldName: "NUM",
+              shadowOpcode: "text",
+              shadowFieldName: "TEXT",
               shadowFieldValue: "",
             },
           ],
