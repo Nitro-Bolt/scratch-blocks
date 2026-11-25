@@ -2497,12 +2497,15 @@ Blockly.WorkspaceSvg.prototype.cleanUp = function (opt_blockToMakeSpaceFor) {
 
 /**
  * Split the top blocks into ordered columns based on their x position.
+ * @param {Array<!Blockly.BlockSvg>=} opt_blocks Restrict layout to these stacks.
  * @return {!Object} An object with cols and maxWidths.
  * @private
  */
-Blockly.WorkspaceSvg.prototype.getOrderedTopBlockColumns_ = function () {
+Blockly.WorkspaceSvg.prototype.getOrderedTopBlockColumns_ = function (
+  opt_blocks
+) {
   let i;
-  const topBlocks = this.getTopBlocks(false);
+  const topBlocks = opt_blocks || this.getTopBlocks(false);
   const maxWidths = {};
 
   const topComments = this.getTopComments(false);
@@ -2510,10 +2513,19 @@ Blockly.WorkspaceSvg.prototype.getOrderedTopBlockColumns_ = function () {
   // Calculate max widths from comments
   for (i = 0; i < topComments.length; i++) {
     const comment = topComments[i];
+    if (
+      opt_blocks &&
+      (!comment.block_ ||
+        topBlocks.indexOf(comment.block_.getRootBlock()) === -1 ||
+        !comment.isVisible())
+    )
+      continue;
     if (comment.setVisible) {
-      comment.setVisible(false);
-      comment.needsAutoPositioning_ = true;
-      comment.setVisible(true);
+      if (!opt_blocks) {
+        comment.setVisible(false);
+        comment.needsAutoPositioning_ = true;
+        comment.setVisible(true);
+      }
 
       const right = comment.getBoundingRectangle().bottomRight.x;
 
@@ -2564,7 +2576,7 @@ Blockly.WorkspaceSvg.prototype.getOrderedTopBlockColumns_ = function () {
     });
   }
 
-  return { cols: cols, maxWidths: maxWidths };
+  return { cols: cols, maxWidths: maxWidths, columnTolerance: TOLERANCE };
 };
 
 /**

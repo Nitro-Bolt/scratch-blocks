@@ -98,7 +98,7 @@ Blockly.Events.GroupEndDrag = function (group, isOutside) {
   this["isOutside"] = !!isOutside;
   this.recordUndo = false;
   if (!group) return;
-  const blocks = group.getContainedBlocks();
+  const blocks = group.getOwnedTopBlocks_();
   this["groupState"] = group.toJSON();
   this["groupState"].blocks = blocks.map(function (block) {
     return block.id;

@@ -681,6 +681,8 @@ Blockly.ScratchBubble.prototype.registerContextMenuCallback = function (
  */
 Blockly.ScratchBubble.prototype.setAnchorLocation = function (xy) {
   const event = new Blockly.Events.CommentMove(this.comment);
+  // Following a block is undone by the block move, not a second comment move.
+  event.recordUndo = false;
   this.anchorXY_ = xy;
   if (this.rendered_) {
     this.positionBubble_();

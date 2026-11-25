@@ -527,7 +527,10 @@ Blockly.Xml.domToWorkspace = function (xml, workspace) {
         ].forEach(function (key) {
           state[key] = xmlChild.getAttribute(key);
         });
-        newGroups.push(Blockly.Group.fromJSON(workspace, state, false));
+        newGroups.push({
+          group: Blockly.Group.fromJSON(workspace, state, false),
+          recoverMembership: !xmlChild.hasAttribute("blocks"),
+        });
       } else if (
         name == "block" ||
         (name == "shadow" && !Blockly.Events.recordUndo)
@@ -591,8 +594,8 @@ Blockly.Xml.domToWorkspace = function (xml, workspace) {
   }
   // Repair only groups imported by this call. Existing groups may still be
   // waiting for more of their blocks to be restored by subsequent undo events.
-  newGroups.forEach(function (group) {
-    group.restoreBlocks_();
+  newGroups.forEach(function (entry) {
+    entry.group.restoreBlocks_(entry.recoverMembership);
   });
   // Groups are decoded before their blocks. Apply visibility after positioning.
   workspace.getGroups().forEach(function (group) {

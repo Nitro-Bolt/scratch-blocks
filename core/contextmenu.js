@@ -947,6 +947,25 @@ Blockly.ContextMenu.groupRenameOption = function (group) {
 };
 
 /**
+ * Make a context-menu option for arranging a group's owned scripts.
+ * @param {!Blockly.Group} group Group to clean up.
+ * @return {!Object} Context-menu option.
+ */
+Blockly.ContextMenu.groupCleanupOption = function (group) {
+  return {
+    text: Blockly.Msg.CLEAN_UP,
+    enabled:
+      !group.collapsed &&
+      !group.workspace.options.readOnly &&
+      !group.dragState_ &&
+      group.getOwnedTopBlocks_().length > 0,
+    callback: function () {
+      group.cleanUp();
+    },
+  };
+};
+
+/**
  * Make a context-menu option for deleting a group without deleting its blocks.
  * @param {!Blockly.Group} group Group to delete.
  * @return {!Object} Context-menu option.

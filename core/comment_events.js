@@ -441,15 +441,16 @@ Blockly.Events.CommentMove = function (comment) {
 goog.inherits(Blockly.Events.CommentMove, Blockly.Events.CommentBase);
 
 /**
- * Calculate the current, language agnostic location of the comment.
+ * Calculate a language agnostic location of the comment.
  * This value should not report different numbers in LTR vs. RTL.
+ * @param {goog.math.Coordinate=} opt_xy Location to convert, defaults to current.
  * @return {goog.math.Coordinate} The location of the comment.
  * @private
  */
-Blockly.Events.CommentMove.prototype.currentLocation_ = function () {
-  const xy = this.comment_.getXY();
+Blockly.Events.CommentMove.prototype.currentLocation_ = function (opt_xy) {
+  const xy = opt_xy || this.comment_.getXY();
   if (!this.comment_.workspace.RTL) {
-    return xy;
+    return new goog.math.Coordinate(xy.x, xy.y);
   }
 
   let rtlAwareX;
@@ -490,10 +491,7 @@ Blockly.Events.CommentMove.prototype.type = Blockly.Events.COMMENT_MOVE;
  *     coordinates.
  */
 Blockly.Events.CommentMove.prototype.setOldCoordinate = function (xy) {
-  this.oldCoordinate_ = new goog.math.Coordinate(
-    this.comment_.workspace.RTL ? this.workspaceWidth_ - xy.x : xy.x,
-    xy.y
-  );
+  this.oldCoordinate_ = this.currentLocation_(xy);
 };
 
 /**
@@ -552,7 +550,10 @@ Blockly.Events.CommentMove.prototype.run = function (forward) {
 
   if (comment instanceof Blockly.ScratchBlockComment) {
     if (comment.workspace.RTL) {
-      comment.moveTo(this.workspaceWidth_ - target.x, target.y);
+      comment.moveTo(
+        this.workspaceWidth_ - target.x - comment.getBubbleSize().width,
+        target.y
+      );
     } else {
       comment.moveTo(target.x, target.y);
     }

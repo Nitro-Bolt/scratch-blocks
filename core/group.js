@@ -362,13 +362,12 @@ Blockly.Group.prototype.getOwnedTopBlocks_ = function () {
  */
 Blockly.Group.prototype.containsBlock = function (block) {
   if (this.collapsed) return this.blockIds.indexOf(block.id) !== -1;
-  const xy = block.getRelativeToSurfaceXY();
-  const size = block.getHeightWidth();
+  const bounds = block.getBoundingRectangle();
   return (
-    xy.x >= this.x &&
-    xy.y >= this.y + 32 &&
-    xy.x + size.width <= this.x + this.width &&
-    xy.y + size.height <= this.y + this.height
+    bounds.topLeft.x >= this.x &&
+    bounds.topLeft.y >= this.y + 32 &&
+    bounds.bottomRight.x <= this.x + this.width &&
+    bounds.bottomRight.y <= this.y + this.height
   );
 };
 
@@ -377,7 +376,7 @@ Blockly.Group.prototype.startDrag_ = function (e) {
   Blockly.ContextMenu.hide();
   e.stopPropagation();
   Blockly.utils.addClass(this.svgGroup_, "blocklyDragging");
-  const blocks = this.getContainedBlocks();
+  const blocks = this.getOwnedTopBlocks_();
   this.startPointer_(e, false, blocks);
 };
 
@@ -570,11 +569,15 @@ Blockly.Group.prototype.finishPointer_ = function (e) {
         block.moveBy(dx, dy);
       });
     }
-    if (!this.collapsed) {
+    if (
+      !this.collapsed &&
+      !state.resizing &&
+      (this.x !== state.x || this.y !== state.y)
+    ) {
       this.blockIds = this.getContainedBlocks().map(function (block) {
         return block.id;
       });
-      if (!state.resizing) this.bringToFront_();
+      this.bringToFront_();
     }
     state.event.recordNew(this);
     state.event.group = Blockly.Events.getGroup();
@@ -772,6 +775,77 @@ Blockly.Group.prototype.moveBy = function (dx, dy) {
   this.workspace.resizeContents();
 };
 
+/** Arrange owned scripts in columns inside the group as one undoable action. */
+Blockly.Group.prototype.cleanUp = function () {
+  if (
+    !this.workspace ||
+    this.collapsed ||
+    this.workspace.options.readOnly ||
+    this.dragState_
+  )
+    return;
+  const blocks = this.getOwnedTopBlocks_();
+  if (!blocks.length) return;
+  const workspace = this.workspace;
+  const previousGroup = Blockly.Events.getGroup();
+  const resizesEnabled = workspace.resizesEnabled_;
+  const event = new Blockly.Events.GroupChange(this);
+  event.recordOld(this);
+  if (!previousGroup) Blockly.Events.setGroup(true);
+  workspace.setResizesEnabled(false);
+  try {
+    const layout = workspace.getOrderedTopBlockColumns_(blocks);
+    const top = this.y + 48;
+    let cursorX = this.x + 16;
+    let right = cursorX;
+    let bottom = top;
+    let previousBlockX = null;
+    layout.cols.forEach(function (column) {
+      let cursorY = top;
+      const columnWidth = column.blocks.reduce(function (width, block) {
+        return Math.max(
+          width,
+          block.getHeightWidth().width,
+          layout.maxWidths[block.id] || 0
+        );
+      }, 0);
+      let blockX = workspace.RTL ? cursorX + columnWidth : cursorX;
+      if (previousBlockX !== null) {
+        // Keep columns far enough apart to remain distinct on the next cleanup.
+        const adjustment = Math.max(
+          0,
+          previousBlockX + layout.columnTolerance - blockX
+        );
+        cursorX += adjustment;
+        blockX += adjustment;
+      }
+      previousBlockX = blockX;
+      column.blocks.forEach(function (block) {
+        const xy = block.getRelativeToSurfaceXY();
+        const dx = blockX - xy.x;
+        const dy = cursorY - xy.y;
+        if (dx || dy) block.moveBy(dx, dy);
+        const size = block.getHeightWidth();
+        bottom = Math.max(bottom, cursorY + size.height);
+        cursorY += size.height + 72;
+      });
+      right = Math.max(right, cursorX + columnWidth);
+      cursorX += columnWidth + 96;
+    });
+    this.expandedWidth = Math.max(160, right + 16 - this.x);
+    this.expandedHeight = Math.max(96, bottom + 16 - this.y);
+    this.width = this.expandedWidth;
+    this.height = this.expandedHeight;
+    this.render();
+    event.recordNew(this);
+    event.group = Blockly.Events.getGroup();
+    Blockly.Events.fire(event);
+  } finally {
+    Blockly.Events.setGroup(previousGroup);
+    workspace.setResizesEnabled(resizesEnabled);
+  }
+};
+
 Blockly.Group.prototype.rename_ = function (e) {
   e.stopPropagation();
   const group = this;
@@ -803,9 +877,6 @@ Blockly.Group.prototype.toggleCollapsed_ = function (e) {
     this.width = this.expandedWidth;
     this.height = this.expandedHeight;
   } else {
-    this.blockIds = this.getContainedBlocks().map(function (block) {
-      return block.id;
-    });
     this.expandedWidth = this.width;
     this.expandedHeight = this.height;
     this.collapsed = true;
@@ -834,32 +905,18 @@ Blockly.Group.prototype.updateCollapsedBlocks_ = function (opt_collapsed) {
 };
 
 /**
- * Restore saved membership, recovering expanded groups from visible bounds.
+ * Restore saved membership, optionally recovering legacy groups without it.
  * Collapsed groups must never adopt scripts from their hidden expanded area.
+ * @param {boolean=} opt_recoverMembership Whether the imported group lacks saved membership.
  */
-Blockly.Group.prototype.restoreBlocks_ = function () {
-  const workspace = this.workspace;
+Blockly.Group.prototype.restoreBlocks_ = function (opt_recoverMembership) {
   let validIds = this.getOwnedTopBlocks_().map(function (block) {
     return block.id;
   });
-  if (!this.collapsed && !validIds.length) {
-    const group = this;
-    validIds = workspace
-      .getTopBlocks(false)
-      .filter(function (block) {
-        if (workspace.getGroupForBlock(block.id, group)) return false;
-        const xy = block.getRelativeToSurfaceXY();
-        const size = block.getHeightWidth();
-        return (
-          xy.x >= group.x &&
-          xy.y >= group.y + 32 &&
-          xy.x + size.width <= group.x + group.width &&
-          xy.y + size.height <= group.y + group.height
-        );
-      })
-      .map(function (block) {
-        return block.id;
-      });
+  if (opt_recoverMembership && !this.collapsed && !validIds.length) {
+    validIds = this.getContainedBlocks().map(function (block) {
+      return block.id;
+    });
   }
   const changed = validIds.join(" ") !== this.blockIds.join(" ");
   if (changed) {
@@ -876,7 +933,7 @@ Blockly.Group.prototype.restoreBlocks_ = function () {
 Blockly.Group.prototype.duplicateGroup_ = function (e, pointerEvent) {
   let duplicate;
   e.stopPropagation();
-  const blocks = this.getContainedBlocks();
+  const blocks = this.getOwnedTopBlocks_();
   const workspace = this.workspace;
   const offset = 24;
   const state = this.toJSON();
@@ -941,6 +998,7 @@ Blockly.Group.prototype.showContextMenu_ = function (e) {
     [
       Blockly.ContextMenu.groupRenameOption(this),
       Blockly.ContextMenu.groupDuplicateOption(this, e),
+      Blockly.ContextMenu.groupCleanupOption(this),
       Blockly.ContextMenu.groupDeleteOption(this),
     ],
     this.workspace.RTL
@@ -989,11 +1047,6 @@ Blockly.Group.prototype.dispose = function (fireEvent) {
 Blockly.Group.fromJSON = function (workspace, state, fireEvent) {
   const group = new Blockly.Group(workspace, state);
   group.initSvg();
-  if (fireEvent && !group.blockIds.length && !group.collapsed) {
-    group.blockIds = group.getContainedBlocks().map(function (block) {
-      return block.id;
-    });
-  }
   group.updateCollapsedBlocks_();
   if (fireEvent && Blockly.Events.isEnabled()) {
     const event = new Blockly.Events.GroupChange(group);
